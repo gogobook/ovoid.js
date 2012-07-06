@@ -1,5 +1,22 @@
+--------------------------------------------------------------------------------
  OvoiD.JS - WebGL Wrapper Library
 --------------------------------------------------------------------------------
+ Copyright (C) 2011 - 2012  Eric Mahieu.
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>.
+--------------------------------------------------------------------------------
+
 OvoiD.JS is a WebGL wrapper library which includes sound and interactive support 
 with a whole environnement for  WebGL interactives applications developpment. 
 For that, OvoiD.JS can be considered as a middleware. However OvoiD.JS also 
@@ -31,7 +48,7 @@ For more information, examples and samples you can visit
 the project's home page at : http://www.ovoid.org/js/
 
 
-
+--------------------------------------------------------------------------------
 DOCUMENTATION
 --------------------------------------------------------------------------------
 OvoiD.JS Library's reference documentation is available at 
@@ -39,7 +56,7 @@ http://www.ovoid.org/js/doc
 
 
 
-
+--------------------------------------------------------------------------------
 BUG REPPORTS & COMMENTS
 --------------------------------------------------------------------------------
 OvoiD.JS Library still in developpment, is not fully tested, the 
@@ -47,22 +64,3 @@ documentation may have some misstakes, and it obviously remains some
 unknown bugs. Please send comments and bugs repports at: 
 
 root (@) ovoid.org
-
-
-
-LICENSE
---------------------------------------------------------------------------------
- Copyright (C) 2011 - 2012  Eric Mahieu.
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program. If not, see <http://www.gnu.org/licenses/>.
