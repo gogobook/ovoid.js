@@ -415,3 +415,69 @@ Ovoid.Input.trigger = function(m, s, k, f) {
   tary[s].push(trigger);
 
 };
+
+/**
+ * Grab node.
+ * <br>
+ * <br>
+ * Grabs the specified node.
+ * <br>
+ * <br>
+ * <b>Grabbing node</b>
+ * <br>
+ * The "node-grabbing" 
+ * consists in focusing on a node while ignoring  events of others nodes. 
+ * <br>
+ * To understand, suppose you want to rotate a node by moving the mouse while
+ * you maintain the left button pressed. While you move your mouse pointer to 
+ * rotate the object, the pointer will leave the node's region, resulting the 
+ * event stop, since the mouse now roll over another node. 
+ * <br>
+ * The "node-grabbing" prevents the side effects by forcing to focus on the 
+ * grabbed node and to ignore the others. You also have to "release" the 
+ * node when you want to restore the normal event dispatching.
+ * <br>
+ * <br>
+ * For more information about node-grabbing usage, see the 
+ * <code>Ovoid.Action</code> node documentation page.
+ * 
+ * 
+ * @param {Node} node Node object to be grabbed.
+*/
+Ovoid.Input.grabNode = function(node) {
+
+  Ovoid.Input.grabbedNode = node;
+};
+
+/**
+ * Release grab.
+ * <br>
+ * <br>
+ * Releases the current grabbed node and restores the normal event dispatching.
+ * <br>
+ * <br>
+ * <b>Grabbing node</b>
+ * <br>
+ * The "node-grabbing" 
+ * consists in focusing on a node while ignoring  events of others nodes. 
+ * <br>
+ * To understand, suppose you want to rotate a node by moving the mouse while
+ * you maintain the left button pressed. While you move your mouse pointer to 
+ * rotate the object, the pointer will leave the node's region, resulting the 
+ * event stop, since the mouse now roll over another node. 
+ * <br>
+ * The "node-grabbing" prevents the side effects by forcing to focus on the 
+ * grabbed node and to ignore the others. You also have to "release" the 
+ * node when you want to restore the normal event dispatching.
+ * <br>
+ * <br>
+ * For more information about node-grabbing usage, see the 
+ * <code>Ovoid.Action</code> node documentation page.
+ * 
+ * 
+ * Release the current grabbed node.
+ */
+Ovoid.Input.grabRelease = function() {
+
+  Ovoid.Input.grabbedNode = null;
+};

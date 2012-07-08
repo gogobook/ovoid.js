@@ -853,7 +853,7 @@ Ovoid.includeOjsScene = function(url, scene) {
  * <br>
  * <blockcode>
  * function main() {<br>
- * &nbsp;&nbsp;Ovoid.includeOjsScene("helloworld.ojsn", myScene);<br>
+ * &nbsp;&nbsp;Ovoid.includeDaeScene("helloworld.dae", myScene);<br>
  * &nbsp;&nbsp;Ovoid.init("mycanvas");<br>
  * };<br>
  * </blockcode>
@@ -2059,8 +2059,6 @@ Ovoid.setConstraint = function(type, item) {
  * 
  * 
  * @param {Node} node Node object to be grabbed.
- *
- * @param {Scene} scene Scene object to set as active scene.
 */
 Ovoid.grabNode = function(node) {
 

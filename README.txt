@@ -23,26 +23,10 @@ For that, OvoiD.JS can be considered as a middleware. However OvoiD.JS also
 allows a more low-level (or mixed low and high-level) developpment by providing 
 an onion architecture.
 
-OvoiD.JS is thought from both programmer and 3D artist's point of view. The 
-3D artist creates 3D contents, and wants to easily use it without thinking 
-about how the whole thing is working. The programmer wants to keep the 
-freedom to create its own tricks and features.
-
-The goal is to provide a set of top-level methods for instant access to 
-easily and quickly create interactives contents, and keep the possibility 
-to create an custom "high-level" layer for more fine tweaks. 
-
-OvoiD.JS provides the following features (in bulk):
-- WebGL rendering engine.
-- Rudimentary physics engine (forces & collisions).
-- Scenes, graphs and nodes architecture and managment.
-- Interfaces for importing and exporting 3D contents (COLLADA/JSON).
-- Interface for Input's (Keyboard/Mouse) managment and interaction binding.
-- Interface for frame/canvas managment.
-- Simple audio or 3D audio support through HTML5 or Web Audio API (Chrome)
-- GLSL wrapper and managment for custom shaders.
-- Interface for contents loading and wait screen.
-- Classes and methods for 3D geometric algebra and low-level data access.
+OvoiD.JS is thought from both programmer and 3D artist's point of view. The goal 
+is to provide a set of top-level methods for instant access to easily and 
+quickly create interactives contents, and keep the possibility to create an 
+custom "high-level" layer for more fine tweaks. 
 
 For more information, examples and samples you can visit
 the project's home page at : http://www.ovoid.org/js/

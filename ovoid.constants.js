@@ -80,7 +80,7 @@ Ovoid.MAX_BODY_BY_DRAW = 512;
 Ovoid.MAX_LAYER_BY_DRAW = 512;
 
 
-/** Maximum contacts count during collider cycle.
+/** Maximum contacts count during solver cycle.
  * @constant 
  * @memberOf _global_
  * @see Ovoid.Collider */
