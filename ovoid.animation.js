@@ -22,22 +22,38 @@
 /**
  * Animation node constructor.
  * 
- * @class Animation node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Animation node is a Constraint node and, as its name indicates, the 
- * node used to animate the other nodes such as transformable nodes (Transform). 
- * An Animation node traditionnally animates one and only one target node. 
- * Animation nodes are usually not created on the fly and are more often 
- * created by importing Collada/DAE scene files. 
- * <br>
- * <br>
- * To create an Animation from nothing, you have to create relevant 
- * curve objects and assign them to the Animation node with the appropriate 
- * <code>set*spline</code> method depending the curve type.
+ * @class Animation node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Animation node is a Constraint node who apply an prerecorded animation 
+ * to one other node. Animations are composed of several curves which describes 
+ * the value interpolation over the time. The Animation node is a dependency 
+ * node and does not takes place directly in 
+ * the 3D world. The Animation node is typically assigned to one and only one 
+ * other node.<br><br>
+ * 
+ * 
+ * <b>Animation channels<b>
+ * The Animation node acts as an attributes modifier for the targeted node. An 
+ * animation channel is defined by one animation curve which modify one 
+ * attribute (for example : X translation, Z Rotation, etc...). Attributes are 
+ * not all currently supported, or, so to speak, can be animated.<br><br>
+ * The currently implemented channels are the following ones:<br><br>
+ * <ul>
+ * <li>Translation X (Ovoid.ANIMATION_CHANNEL_TRANSLATE_X)</li>
+ * <li>Translation Y (Ovoid.ANIMATION_CHANNEL_TRANSLATE_Y)</li>
+ * <li>Translation Z (Ovoid.ANIMATION_CHANNEL_TRANSLATE_Z</li>
+ * <li>Rotation (euler) X (Ovoid.ANIMATION_CHANNEL_ROTATE_X)</li>
+ * <li>Rotation (euler) Y (Ovoid.ANIMATION_CHANNEL_ROTATE_Y)</li>
+ * <li>Rotation (euler) Z (Ovoid.ANIMATION_CHANNEL_ROTATE_Z)</li>
+ * <li>Orientation (euler) X (Ovoid.ANIMATION_CHANNEL_ORIENTE_X)</li>
+ * <li>Orientation (euler) Y (Ovoid.ANIMATION_CHANNEL_ORIENTE_Y)</li>
+ * <li>Orientation (euler) Z (Ovoid.ANIMATION_CHANNEL_ORIENTE_Z)</li>
+ * <li>Scalling X (Ovoid.ANIMATION_CHANNEL_SCALE_X)</li>
+ * <li>Scalling Y (Ovoid.ANIMATION_CHANNEL_SCALE_Y)</li>
+ * <li>Scalling Z (Ovoid.ANIMATION_CHANNEL_SCALE_Z)</li>
+ * </ul>
  * 
  * @extends Ovoid.Constraint
  *
@@ -213,9 +229,9 @@ Ovoid.Animation.prototype.setBspline = function(f, x, y, cx, cy) {
 
 
 /**
- * Set animation loop.
+ * Set animation loop.<br><br>
  * 
- * <br><br>Enable or disable the animation looping.
+ * Enable or disable the animation looping.
  *
  * @param {bool} loop Loop flag value to set.
  */
@@ -226,9 +242,9 @@ Ovoid.Animation.prototype.setLoop = function(loop) {
 
 
 /**
- * Stop animation.
+ * Stop animation.<br><br>
  * 
- * <br><br>Stop to play the animation.
+ * Stop to play the animation.
  */
 Ovoid.Animation.prototype.stop = function() {
 
@@ -238,9 +254,9 @@ Ovoid.Animation.prototype.stop = function() {
 
 
 /**
- * Play animation.
+ * Play animation.<br><br>
  * 
- * <br><br>Start or restart to play the animation according to the specified
+ * Start or restart to play the animation according to the specified
  * playing factor.
  *
  * @param {float} factor The time factor to play and interpolate the animation. 
@@ -263,9 +279,9 @@ Ovoid.Animation.prototype.play = function(factor) {
 
 
 /**
- * Rewind animation.
+ * Rewind animation.<br><br>
  * 
- * <br><br>Rewind the animation according to the specified
+ * Rewind the animation according to the specified
  * playing factor.
  *
  * @param {float} factor The time factor to rewind the animation. 
@@ -295,9 +311,9 @@ Ovoid.Animation.prototype.rewind = function(factor) {
 
 
 /**
- * Node's caching function.
+ * Node's caching function.<br><br>
  *
- * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
+ * Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
  * <code>Ovoid.Queuer</code> global class and should not be called independently.
  * 

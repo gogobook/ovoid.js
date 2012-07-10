@@ -22,92 +22,75 @@
 /**
  * Mesh node constructor.
  * 
- * @class Mesh node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
+ * @class Mesh node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
  * The Mesh node is an abstract node who describe a geometry structure. 
  * is a collection of vertices, edges and faces that defines the shape of a 
  * polyhedral object. 
- * The Mesh node is what is called a "shape" and is note rendered if it is not 
- * set as shape node of a Body node.
- * <br>
- * <br>
- * <b>Body node and shape concept</b>
- * <br>
- * <br>
- * Once a Mesh node (for example) is ready to be drawn, in fact it is NOT yet 
- * "renderable". In fact Mesh objects are abstract and are not in the world, it 
- * is called a "shape" node. To display our Mesh, we need to create a Body node 
- * that will be in the world and "attach" the Mesh node to this Body.
- * <br>
- * <br>
+ * The Mesh node is a dependency node and does not takes place directly in 
+ * the 3D world. The Mesh node is typically assigned to one or more Body node.<br><br>
+ * 
+ * <b>Body node and shape concept</b><br><br>
+ * 
+ * A Mesh node which is not assigned to a Body node will never be drawn. The 
+ * Mesh node is what is called a "shape" and must be assigned to a 
+ * world-transformable Body node to be included in the drawing pipeline.<br><br>
+ * 
  * To make the concept more understandable, think that Body nodes are like 
- * invisible spirits without shape floating in the world . To make a visible 
- * spirit, you have to give it a shape. You now guess that you can attach the 
- * same Shape node to several Body nodes at the same time. The Body node is 
- * inherited from Transform node, and so is transformable (move, rotate, 
- * scale...). Shape nodes, like Mesh node, are NOT.
- * <br>
- * <br>
+ * invisible spirits without shape floating in the 3D world. To make a visible 
+ * spirit, you have to give it a shape. You can assign the same shape node to 
+ * several Body nodes in the same scene, than you obtain several identical 
+ * shapes with different transformations (rotation, position, etc...).<br><br>
+ * 
  * <blockcode>
- * &nbsp;&nbsp;emitter = scene.create(Ovoid.EMITTER, "particles");<br>
- * &nbsp;&nbsp;body.setShape(emitter);<br>
- * </blockcode>
- * <br>
- * <br>
+ * &nbsp;&nbsp;var mesh = scene.create(Ovoid.MESH, "box1");<br>
+ * &nbsp;&nbsp;body1.setShape(mesh);<br>
+ * &nbsp;&nbsp;body2.setShape(mesh);<br>
+ * </blockcode><br><br>
+ * 
  * <b>The Mesh Structure</b>
  * <ul>
- * <li><b>Polygon polysets</b></li>
- * The Mesh's polygon polysets consist of a set of several polygons 
- * (triangle faces) that is drawn with the same Material. So a polygon polyset is
- * defined by a list of polygons and a material that is associated.
- * The Mesh node use the <code>Ovoid.Polyset</code> object to store polysets.
- * <br>
- * <br>
+ * <li><b>Polysets</b></li>
+ * The Mesh's polysets consist of a list of polygons (triangle faces) which are 
+ * drawn with the same Material. The Mesh node use the <code>Ovoid.Polyset</code> 
+ * object to store polysets.<br><br>
+ * 
  * <li><b>Triangle Faces</b></li>
- * The Mesh's faces consist of a triangular polygon defined by three vertices.
- * Ovoid only support triangle faces.
- * The Mesh node use the <code>Ovoid.Triangle</code> object to store triangle
- * faces.
- * <br>
- * <br>
+ * The Triangles consist of a triangular polygon defined by three 
+ * vertices who describe a triangular surface. (OvoiD.JS supports only 
+ * triangle faces). The Mesh node use the <code>Ovoid.Triangle</code> object to 
+ * store triangles faces.<br><br>
+ * 
  * <li><b>Vertices</b></li>
- * The Mesh's vertex consist of a position along with other information such 
+ * The Vertices consist of a position along with other information such 
  * as color, normal vector and texture coordinates.
  * The Mesh node use the <code>Ovoid.Vertex</code> object to store vertices.
- * </ul>
- * <br>
- * <br>
- * <b>The Vertex Format</b>
- * <br>
- * <br>
- * The Vertex Format describes of which properties a vertex is composed and how 
- * the vertex data should be arranged in Vertex Buffer Objets (VBO).  The 
- * simplest vertex has only one property: its position in space. But a vertex 
- * can have other properties such as normal, texture coordinates, color, etc...
- * <br>
- * <br>
- * In the OvoiD.JS Library, the Vertex Format is defined using an bitmask integer 
- * value that can be formed with symbolic constants:
- * <br>
- * <br>
+ * </ul><br><br>
+ * 
+ * <b>The Vertex Format</b><br><br>
+ * 
+ * The Vertex Format describes of which properties vertices of a list are 
+ * composed and how the vertices's data should be arranged in Vertex Buffer
+ * Objets (VBO).  The simplest vertex has only one property: its position in 
+ * space defined by a point. But a vertices can have other properties such as 
+ * normal, texture coordinates, color, etc...<br><br>
+ * 
+ * In the OvoiD.JS Library, the Vertex Format is defined using an bitmask 
+ * integer value that can be defined with symbolic constants:<br><br>
+ * 
  * <blockcode>
  * var format = Ovoid.Ovoid.VERTEX_VEC4_P | Ovoid.VERTEX_VEC3_N | Ovoid.VERTEX_VEC4_C;
- * </blockcode>
- * <br>
- * <br>
- * In the above example, the resulting vertex of the defined format will include 
- * four float values for position in space, three float values for normal 
- * vector and four float values for color that give us an eleven 32 
- * bits floats vertex.
- * <br>
- * <br>
- * The available vertex format components are the following ones: 
- * <br>
- * <br>
+ * </blockcode><br><br>
+ * 
+ * In the above example, the resulting vertices of the specified format will 
+ * include four float values for position in space, three float values for 
+ * normal vector and four float values for color that give an eleven 32 
+ * bits floats vertex.<br><br>
+ * 
+ * The available vertex format components are the following ones: <br><br>
+ * 
  * <ul>
  * <li><code>Ovoid.VERTEX_VEC4_P</code></li>
  * Four 32 bits float (x,y,z,w) for position point in space.<br><br>
@@ -125,48 +108,43 @@
  * Four 32 bits float (i,i,i,i) for influence matrix index. (skin deform)<br><br>
  * <li><code>Ovoid.VERTEX_VEC4_W</code></li>
  * Four 32 bits float (w,w,w,w) for influence wheight. (skin deform)<br><br>
- * </ul>
- * <br>
- * <br>
- * As object, <code>Ovoid.Vertex</code> class (so the Mesh's vertices) contains 
- * ALL these components that can be filled at your convenience and usage. 
+ * </ul><br><br>
+ * 
+ * As object, <code>Ovoid.Vertex</code> class contains 
+ * all these components that can be filled at your convenience and usage. 
  * The vertex format is used to build and arrange data in Vertex Buffer Objets 
- * (VBO) and describe the GLSL vertex attributes in shaders.
- * <br>
- * <br>
+ * (VBO) and describe the GLSL vertex attributes in shaders.<br><br>
+ * 
  * For more information about vertex format and shader, see the 
- * <code>Ovoid.Shader</code> class documentation.
- * <br>
- * <br>
- * <b>Mesh optimizations</b>
- * <br>
- * <br>
+ * <code>Ovoid.Shader</code> class documentation.<br><br>
+ * 
+ * <b>Mesh optimizations</b><br><br>
+ * 
  * The mesh can and should be optimized using <code>optimizeVertices</code> and 
- * <code>optimizeTriangles</code>, specialy if you are planning to use the 
- * shadow casting rendering. <b>The vertices optimization</b> consists on 
+ * <code>optimizeTriangles</code>, especialy if you are planning to use the 
+ * shadow casting rendering.<br><br>
+ * 
+ * <b>The vertices optimization</b> consists on 
  * merging  duplicated vertices and reassign triangles vertices's indices. 
  * This optimization reduce the vertex buffer size and improve the GPU 
- * cache-hit. 
- * <br>
+ * cache-hit.<br><br>
+ * 
  * <b>The triangles optimizations</b> consists on building an edge/adjacent 
  * faces map. This "map" is heavily used to build object's shadow volumes 
  * during the shadow casting rendering process. Without edge/adjacent faces 
- * map, the shadow-casting will not work properly.
- * <br>
- * <br>
+ * map, the shadow-casting will not work properly.<br><br>
+ * 
  * These optimization usualy occur during the COLLADA importation process if 
  * the suitable importation options are enabled. <br>This may take a long time 
- * to finish if the mesh has many vertices and triangles, and specialy the 
+ * to finish if the mesh has many vertices and triangles, and especialy the 
  * triangles optimization that have more or less a polynomial O(n²) 
- * complexity.</b> 
- * <br>
- * <br>
+ * complexity.</b> <br><br>
+ * 
  * To avoid this long time to wait (that can be VERY annoying for the final 
  * user) you should import and optimize your mesh ONCE then export it in OvoiD 
  * JSON format. You will now import the well optimized mesh directly from OvoiD 
- * JSON, that is significantly faster. 
- * <br>
- * <br>
+ * JSON, which is significantly faster. <br><br>
+ * 
  * See the <code>Ovoid.Ojson</code> class 
  * documentation page for more information about OvoiD JSON.
  * 
@@ -174,7 +152,7 @@
  *
  * @extends Ovoid.Node
  *
- * @param {string} name Name of the new node.
+ * @param {string} name Name of the node.
  */
 Ovoid.Mesh = function(name) {
 
@@ -218,14 +196,14 @@ Ovoid.Mesh.prototype.constructor = Ovoid.Mesh;
 
 
 /**
- * Add polygon polyset.
+ * Add polygon polyset.<br><br>
  * 
- * Add a polygon polyset to the mesh at the specified LOD position 
- * with the given Material.
+ * Add a polyset to the mesh at the specified LOD position 
+ * with the given Vertices list and Material.
  * 
  * @param {int} l LOD level (not yet fully implemented).
- * @param {Vertex[]} vertices Array of Vertices for this polyset.
- * @param {Material} material Material for this polyset.
+ * @param {Vertex[]} vertices Array of Vertices for the new Polyset.
+ * @param {Material} material Material for the new Polyset.
  *
  * @return {bool} True if succeed, false otherwise.
  * 
@@ -325,9 +303,9 @@ Ovoid.Mesh.prototype.addPolyset = function(l, vertices, material) {
 
 
 /**
- * Generate Gl buffers.
+ * Generates Gl buffers.<br><br>
  * 
- * <br><br>Generate and fill the GL Vertex Buffer Objects (VBOs) for this mesh. 
+ * Generate and fill the GL Vertex Buffer Objects (VBOs) for this instance. 
  * (Required to be drawable).
  *
  * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
@@ -347,7 +325,7 @@ Ovoid.Mesh.prototype.addPolyset = function(l, vertices, material) {
  * Ovoid.BUFFER_DYNAMIC,<br>
  * Ovoid.BUFFER_STREAM<br>
  * <br>
- * The VBO Usage pattern is corresponding to the OpenGL specifications:<br><br>
+ * The VBO Usage pattern is corresponding to the OpenGL/WebGL specifications:<br><br>
  * Ovoid.BUFFER_STATIC is GL_STATIC_DRAW :<br>
  * The data store contents will be modified once and used many times.<br>
  * <br>
@@ -392,9 +370,9 @@ Ovoid.Mesh.prototype.createBuffers = function(format, type) {
 
 
 /**
- * Geneare a debug box.
+ * Generate a debug box.<br><br>
  * 
- * <br><br>Generate box mesh structure polygon polyset and put it at the specified LOD
+ * Generates a box mesh structure polyset and put it at the specified LOD
  * position.
  *
  * @param {int} l LOD level (not yet fully implemented).
@@ -776,10 +754,109 @@ Ovoid.Mesh.prototype.genDebugBox = function(l, size, div, material) {
 };
 
 
-/** 
- * Optimize mesh vertices.
+/**
+ * Generate a debug grid/plane.<br><br>
  * 
- * <br><br>Optimizes mesh duplicated vertices. This method will merge
+ * Generates a grid/plane mesh structure polyset and put it at the 
+ * specified LOD position.
+ *
+ * @param {int} l LOD level (not yet fully implemented).
+ * @param {float} size Grid size.
+ * @param {int} div Grid subdivision count.
+ * @param {Material} material Material object for the new polyset.
+ */
+Ovoid.Mesh.prototype.genDebugGrid = function(l, size, div, material) {
+
+  var nv, vt,
+      mnu, mxu, mnv, mxv, mns, mxs, mnt, mxt, min,
+      u, t, v, du, dv, P, N, U, C, seed;
+
+  nv = 6 * (((div * div) * 2) * 3);
+
+  vt = Ovoid.Vertex.newArray(nv);
+
+  u = size / div;
+  t = 1.0 / div; // coordonnée de texture
+
+  min = -(size * 0.5);
+  
+  P = new Float32Array([0, 0, 0, 1]);
+  N = new Float32Array([0, 0, 0]);
+  U = new Float32Array([0, 0, 0]);
+  C = new Float32Array([1, 1, 1, 1]);
+
+  v = 0;
+
+  /* up */
+  for (du = 0; du < div; du++)
+  {
+    mnu = min + (du * u); mxu = min + (u + (du * u));
+    mns = 1.0 - (du * t); mxs = 1.0 - (t + (du * t));
+
+    for (dv = 0; dv < div; dv++)
+    {
+      mnv = min + (dv * u); mxv = min + (u + (dv * u));
+      mnt = (dv * t); mxt = (t + (dv * t));
+
+      P[0] = mnu; P[1] = 0.0; P[2] = mnv;
+      N[0] = 0.0; N[1] = 1.0; N[2] = 0.0;
+      U[0] = mns; U[1] = mnt;
+      C[0] = 1.0; C[1] = 1.0; C[2] = 1.0; C[3] = 1.0;
+      vt[v].p.setv(P); vt[v].n.setv(N); vt[v].u.setv(U);
+      vt[v].c.setv(C);
+      v++;
+      P[0] = mnu; P[1] = 0.0; P[2] = mxv;
+      N[0] = 0.0; N[1] = 1.0; N[2] = 0.0;
+      U[0] = mns; U[1] = mxt;
+      C[0] = 1.0; C[1] = 1.0; C[2] = 1.0; C[3] = 1.0;
+      vt[v].p.setv(P); vt[v].n.setv(N); vt[v].u.setv(U);
+      vt[v].c.setv(C);
+      v++;
+      P[0] = mxu; P[1] = 0.0; P[2] = mxv;
+      N[0] = 0.0; N[1] = 1.0; N[2] = 0.0;
+      U[0] = mxs; U[1] = mxt;
+      C[0] = 1.0; C[1] = 1.0; C[2] = 1.0; C[3] = 1.0;
+      vt[v].p.setv(P); vt[v].n.setv(N); vt[v].u.setv(U);
+      vt[v].c.setv(C);
+      v++;
+
+      P[0] = mxu; P[1] = 0.0; P[2] = mxv;
+      N[0] = 0.0; N[1] = 1.0; N[2] = 0.0;
+      U[0] = mxs; U[1] = mxt;
+      C[0] = 1.0; C[1] = 1.0; C[2] = 1.0; C[3] = 1.0;
+      vt[v].p.setv(P); vt[v].n.setv(N); vt[v].u.setv(U);
+      vt[v].c.setv(C);
+      v++;
+      P[0] = mxu; P[1] = 0.0; P[2] = mnv;
+      N[0] = 0.0; N[1] = 1.0; N[2] = 0.0;
+      U[0] = mxs; U[1] = mnt;
+      C[0] = 1.0; C[1] = 1.0; C[2] = 1.0; C[3] = 1.0;
+      vt[v].p.setv(P); vt[v].n.setv(N); vt[v].u.setv(U);
+      vt[v].c.setv(C);
+      v++;
+      P[0] = mnu; P[1] = 0.0; P[2] = mnv;
+      N[0] = 0.0; N[1] = 1.0; N[2] = 0.0;
+      U[0] = mns; U[1] = mnt;
+      C[0] = 1.0; C[1] = 1.0; C[2] = 1.0; C[3] = 1.0;
+      vt[v].p.setv(P); vt[v].n.setv(N); vt[v].u.setv(U);
+      vt[v].c.setv(C);
+      v++;
+    }
+  }
+  
+  if (!material) {
+    material = new Ovoid.Material("blank_material");
+  }
+
+  this.addPolyset(l, vt, material);
+};
+
+
+
+/** 
+ * Optimize mesh vertices.<br><br>
+ * 
+ * Optimizes mesh duplicated vertices. This method will merge
  * identical vertices as possible and rebuild indices list.
  * 
  * <br><br>NOTE: This function can be an huge time consumer according to the
@@ -852,9 +929,9 @@ Ovoid.Mesh.prototype.optimizeVertices = function() {
 
 
 /**
- * Optimize mesh triangles.
+ * Optimize mesh triangles.<br><br>
  * 
- * <br><br>Optimizes mesh triangles components. This method will setup normal,
+ * Optimizes mesh triangles components. This method will setup normal,
  * center, and adjacents triangles indices for all triangles.
  * 
  * <br><br>NOTE: This function can be an VERY huge time consumer according to 
@@ -1034,9 +1111,9 @@ Ovoid.Mesh.prototype.optimizeTriangles = function() {
 
 
 /**
- * Node's caching function.
+ * Node's caching function.<br><br>
  *
- * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
+ * Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
  * <code>Ovoid.Queuer</code> global class and should not be called independently.
  * 
@@ -1091,9 +1168,9 @@ Ovoid.Mesh.prototype.cachMesh = function() {
 
 
 /**
- * JavaScript Object Notation (JSON) serialization method.
+ * JavaScript Object Notation (JSON) serialization method.<br><br>
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * This method is commonly used by the <code>Ovoid.Ojson</code> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

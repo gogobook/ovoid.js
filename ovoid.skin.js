@@ -126,6 +126,51 @@ Ovoid.Skin.prototype.linkJoint = function(joint) {
 
 
 /**
+ * Unlink influence Joint.
+ *
+ * <br><br>Unkinks the specified Joint from this instance as skinning influence.
+ * 
+ * @param {Object} joint Joint node.
+ */
+Ovoid.Skin.prototype.unlinkJoint = function(joint) {
+
+  var i = this.joint.length;
+  while (i--) {
+    if(this.joint[i] === joint) {
+      this.joint.splice(i, 1);
+      this.bindJointMatrix.splice(i, 1);
+      this.infWorldMatrix.splice(i, 1);
+      this.infNormalMatrix.splice(i, 1);
+    }
+  }
+  this.breakDepend(joint);
+  joint.skin = null;
+  this.unCach(Ovoid.CACH_SKIN);
+};
+
+
+/**
+ *  Mirror mesh data.<br><br>
+ * 
+ * Create a local mesh's data mirror to calculate the wheited/deformed mesh data
+ * in real time.
+ * 
+ * @private
+ */
+Ovoid.Skin.prototype._localMirror = function() {
+  
+  /* mirroir des vertices et polygones du mesh */
+  for (var l = 0; l < Ovoid.MAX_MESH_LOD; l++) {
+    this.triangles[l] = Ovoid.Triangle.newArray(this.mesh.triangles[l].length);
+    this.vertices[l] = Ovoid.Vertex.newArray(this.mesh.vertices[l].length);
+    for (var t = 0; t < this.mesh.triangles[l].length; t++) {
+      this.triangles[l][t].copy(this.mesh.triangles[l][t]);
+    }
+  }
+}
+
+
+/**
  * Bind skin.
  * <br>
  * <br>
@@ -155,15 +200,9 @@ Ovoid.Skin.prototype.bindSkin = function(mesh, mbindshape, mbindjoint,
   
   /* mirroir des vertices et polygones du mesh */
   if (Ovoid.opt_localSkinData) {
-    for (var l = 0; l < Ovoid.MAX_MESH_LOD; l++) {
-      this.triangles[l] = Ovoid.Triangle.newArray(mesh.triangles[l].length);
-      this.vertices[l] = Ovoid.Vertex.newArray(mesh.vertices[l].length);
-      for (var t = 0; t < mesh.triangles[l].length; t++) {
-        this.triangles[l][t].copy(mesh.triangles[l][t]);
-      }
-    }
+    this._localMirror();
   }
-
+  
   /* on ajoute ensuite les weights et les ijoint aux nouveau
    * tableau de vertices */
   var l = 0; /* lod 0 par defaut */
@@ -386,7 +425,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
             v1.subOf(p0, p2);
 
             this.triangles[l][t].normal.crossOf(v0, v1);
-            this.triangles[l][t].normal.normalize();
+            //this.triangles[l][t].normal.normalize();
 
             // calcule du centre
             this.triangles[l][t].center.set(

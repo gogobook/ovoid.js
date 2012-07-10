@@ -249,9 +249,14 @@ Ovoid.Sound.prototype.play = function() {
   switch(Ovoid.al.type)
   {
     case 1: /* Ovoid.HTML5_AUDIO */
+      if(this._alsource.readyState != 4)
+        return;
+      this._alsource.currentTime = 0;
       this._alsource.play();
     break;
     case 2: /* Ovoid.MOZ_AUDIO_API */
+      if(this._alsource.readyState != 4)
+        return;
       this._alsource.currentTime = 0;
       this._alsource.play();
     break;

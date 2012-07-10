@@ -306,6 +306,18 @@ Ovoid.Input.update = function() {
     Ovoid.Input.intUp[i] = false;
   }
   
+  /* Modifie le curseur selon */
+  /*
+  if (!Ovoid.Input.grabbedNode) {
+    if (Ovoid.Input.mouseLeaveUid) {
+      document.body.style.cursor = 'default';
+    } else {
+      if (Ovoid.Input.mouseEnterUid) {
+        document.body.style.cursor = 'pointer';
+      }
+    }
+  }
+  */
 };
 
 
@@ -445,7 +457,7 @@ Ovoid.Input.trigger = function(m, s, k, f) {
  * @param {Node} node Node object to be grabbed.
 */
 Ovoid.Input.grabNode = function(node) {
-
+  
   Ovoid.Input.grabbedNode = node;
 };
 

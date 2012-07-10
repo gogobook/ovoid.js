@@ -1795,27 +1795,31 @@ Ovoid.setAction = function(e, item, f) {
   if (!(f instanceof Function))
     return;
   
+  var newaction;
+  
   /* retrouve la node si c'est un string */
   if (typeof(item) == "string") {
-    var nodes = Ovoid.rscene.searchMatches(name);
-    
+    var nodes = Ovoid.rscene.searchMatches(item);
     if (nodes.length == 0) {
       Ovoid.log(2, 'Ovoid.setAction', "no node found with matching name '"
-        +name+"' in the current active scene '" + Ovoid.rscene.name + "'.");
+        +item+"' in the current active scene '" + Ovoid.rscene.name + "'.");
       return;
     }
+    /* par défaut on crée une nouvelle action */
+    newaction = new Ovoid.Action(item + "Action");
   } else {
     if(item.type & Ovoid.BODY || item.type & Ovoid.LAYER) {
       nodes = new Array();
       nodes.push(item);
+      /* par défaut on crée une nouvelle action */
+      newaction = new Ovoid.Action(item.name + "Action");
     } else {
       Ovoid.log(2, 'Ovoid.setAction', 'node ' 
-          + nodes[i].name + ' is not a Body or Layer instance.');
+          +item.name+' is not a Body or Layer instance.');
     }
   }
   
-  /* par défaut on crée une nouvelle action */
-  var newaction = new Ovoid.Action(name + "Action");
+  
   /* témoins pour savoir si la nouvelle action a déja été configuré */
   var newactiondone = false;
   var action;
@@ -1981,11 +1985,11 @@ Ovoid.setConstraint = function(type, item) {
   
   /* retrouve la node si c'est un string */
   if ( typeof(item) == "string" ) {
-    var nodes = Ovoid.rscene.searchMatches(name);
+    var nodes = Ovoid.rscene.searchMatches(item);
     
     if (nodes.length == 0) {
       Ovoid.log(2, 'Ovoid.setConstraint', "no node found with matching name '"
-        +name+"' in the current active scene '" + Ovoid.rscene.name + "'.");
+        +item+"' in the current active scene '" + Ovoid.rscene.name + "'.");
       return;
     }
   } else {
@@ -1994,7 +1998,7 @@ Ovoid.setConstraint = function(type, item) {
       nodes.push(item);
     } else {
       Ovoid.log(2, 'Ovoid.setAction', 'node ' 
-          + nodes[i].name + ' is not a Transform instance.');
+          + item.name + ' is not a Transform instance.');
     }
   }
   
@@ -2033,27 +2037,30 @@ Ovoid.setConstraint = function(type, item) {
 
 
 /**
- * Grab node.
- * <br>
- * <br>
- * Grabs the specified node.
- * <br>
- * <br>
- * <b>Grabbing node</b>
- * <br>
- * The "node-grabbing" 
- * consists in focusing on a node while ignoring  events of others nodes. 
- * <br>
- * To understand, suppose you want to rotate a node by moving the mouse while
- * you maintain the left button pressed. While you move your mouse pointer to 
- * rotate the object, the pointer will leave the node's region, resulting the 
- * event stop, since the mouse now roll over another node. 
- * <br>
- * The "node-grabbing" prevents the side effects by forcing to focus on the 
- * grabbed node and to ignore the others. You also have to "release" the 
- * node when you want to restore the normal event dispatching.
- * <br>
- * <br>
+ * Grab node.<br><br>
+ * 
+ * Grabs the specified node.<br><br>
+ * 
+ * <b>Node Grabbing</b><br><br>
+ * 
+ * The "node-grabbing" consists in focusing on a node while ignoring events of 
+ * other nodes.<br>
+ * 
+ * Suppose you want to rotate a node by moving the mouse while you maintain the 
+ * left button pressed. While you move your mouse pointer to rotate the object, 
+ * the pointer should leave the node's region, resulting that the trigger 
+ * function stops, since the mouse now rolls over another node (or the 
+ * background).<br><br>
+ * 
+ * The "node-grabbing" prevents this kind of side effects by forcing to focus on 
+ * the grabbed node while ignoring the others. You also must release the grabbed 
+ * node to return in the normal interaction behaviour.<br><br>
+ * 
+ * The Action node also provides two special overridable trigger functions 
+ * related to the node-grabbing which correspond to the two main possibilities: 
+ * "while node is grabbed" and "while node is NOT Grabbed". Both trigger 
+ * function are called each frame while the event "node is grabbed" or "node is 
+ * not grabbed" is true.<br><br>
  * For more information about node-grabbing usage, see the 
  * <code>Ovoid.Action</code> node documentation page.
  * 
@@ -2062,32 +2069,36 @@ Ovoid.setConstraint = function(type, item) {
 */
 Ovoid.grabNode = function(node) {
 
-  Ovoid.Input.grabbedNode = node;
+  Ovoid.Input.grabNode(node);
 };
 
 
 /**
- * Release grab.
- * <br>
- * <br>
- * Releases the current grabbed node and restores the normal event dispatching.
- * <br>
- * <br>
- * <b>Grabbing node</b>
- * <br>
- * The "node-grabbing" 
- * consists in focusing on a node while ignoring  events of others nodes. 
- * <br>
- * To understand, suppose you want to rotate a node by moving the mouse while
- * you maintain the left button pressed. While you move your mouse pointer to 
- * rotate the object, the pointer will leave the node's region, resulting the 
- * event stop, since the mouse now roll over another node. 
- * <br>
- * The "node-grabbing" prevents the side effects by forcing to focus on the 
- * grabbed node and to ignore the others. You also have to "release" the 
- * node when you want to restore the normal event dispatching.
- * <br>
- * <br>
+ * Release grab.<br><br>
+ * 
+ * Releases the current grabbed node and restores the normal event's dispatching.<br><br>
+ * 
+ * <b>Node Grabbing</b><br><br>
+ * 
+ * The "node-grabbing" consists in focusing on a node while ignoring events of 
+ * other nodes.<br>
+ * 
+ * Suppose you want to rotate a node by moving the mouse while you maintain the 
+ * left button pressed. While you move your mouse pointer to rotate the object, 
+ * the pointer should leave the node's region, resulting that the trigger 
+ * function stops, since the mouse now rolls over another node (or the 
+ * background).<br><br>
+ * 
+ * The "node-grabbing" prevents this kind of side effects by forcing to focus on 
+ * the grabbed node while ignoring the others. You also must release the grabbed 
+ * node to return in the normal interaction behaviour.<br><br>
+ * 
+ * The Action node also provides two special overridable trigger functions 
+ * related to the node-grabbing which correspond to the two main possibilities: 
+ * "while node is grabbed" and "while node is NOT Grabbed". Both trigger 
+ * function are called each frame while the event "node is grabbed" or "node is 
+ * not grabbed" is true.<br><br>
+ * 
  * For more information about node-grabbing usage, see the 
  * <code>Ovoid.Action</code> node documentation page.
  * 
@@ -2096,5 +2107,5 @@ Ovoid.grabNode = function(node) {
  */
 Ovoid.grabRelease = function() {
 
-  Ovoid.Input.grabbedNode = null;
+  Ovoid.Input.grabRelease();
 };

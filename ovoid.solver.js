@@ -36,12 +36,14 @@
 Ovoid.Solver = {};
 
 
-/** Solver option. Maximim iteration for contact solver */
+/** Enable or disable the iterative contact solving */
+Ovoid.Solver.opt_iterativeSolver = true;
+
+/** Maximim iteration for iterative contact solving */
 Ovoid.Solver.opt_contactItFactor = 4;
 
-
-/** Solver option. Use high resolution/iterative contact solver */
-Ovoid.Solver.opt_iterativeSolver = true;
+/** Enable or disable the friction for landscape collisions */
+Ovoid.Solver.opt_landscapeFriction = true;
 
 
 /** Contact stack */
@@ -147,8 +149,12 @@ Ovoid.Solver._canContact = function (a, b, m) {
  */
 Ovoid.Solver._addContact = function(b0, b1, c, n, p) {
 
+    if (Ovoid.Solver._contactq.isFull()) {
+      Ovoid.log(2, "Ovoid.Solver", "Contact stack overflow.");
+      return;
+    }
     /* init le contact courent dans la liste */
-    Ovoid.Solver._contactq.current().set(b0, b1, c, n, p, Ovoid.Timer.quantum);
+    Ovoid.Solver._contactq.current().set(b0, b1, c, n, p,  Ovoid.Timer.quantum);
     /* Contact suivant dans la pile */
     Ovoid.Solver._contactq.forward();
 };
@@ -224,7 +230,12 @@ Ovoid.Solver._getContactB2L = function (a, b) {
   var nC = 0;
   var P = 0.0;
   var C = Ovoid.Solver._tmpc;
+  C.set(0.0,0.0,0.0,1.0);
   var N = Ovoid.Solver._tmpn;
+  N.set(0.0,0.0,0.0);
+  var nD = 0.0;
+  var nN = new Ovoid.Vector();
+  var nP = new Ovoid.Point();
   
   /* trois vertices et une normale */
   var v0, v1, v2, n;
@@ -253,7 +264,7 @@ Ovoid.Solver._getContactB2L = function (a, b) {
     while(j--) {
       /* d = distance au plan du vertex de la box */
       d = bv[j].dot(n) + mesh.triangles[0][i].equation;
-      if(d < 0.0) {
+      if(d <= 0.0) {
         /* On verifie que le coin de la box est dans la face */
         v0 = mesh.vertices[0][mesh.triangles[0][i].index[0]].p;
         v1 = mesh.vertices[0][mesh.triangles[0][i].index[1]].p;
@@ -275,17 +286,37 @@ Ovoid.Solver._getContactB2L = function (a, b) {
 
         if ( (u >= 0.0) && (v >= 0.0) && (u + v < 1.0) ) {
           /* Retrouve la normale du contact en coordonnée monde  */
+          nN.transform4Of(n, Tb);
+          nP.transform4Of(bv[j], Tb);
+          nD += -d;
+          N.addBy(nN);
+          C.addBy(nP);
+          /*
           N.transform4Of(n, Tb);
-          /* on retransforme le point pour l'avoir en coordonnée monde */
+          N.normalize();
+          // on retransforme le point pour l'avoir en coordonnée monde
           C.transform4Of(bv[j], Tb);
-          /* Ajoute un contact */
-          Ovoid.Solver._addContact(a, null, C, N, -d, Ovoid.Timer.quantum);
+          // Ajoute un contact
+          Ovoid.Solver._addContact(a, null, C, N, -d);
+          */
           nC++;
+          if(nC == 4) 
+            break;
         }
       }
     }
-    if(nC == 4) 
+    if(nC) { 
+      if(nC > 1) {
+        N.normalize();
+        nD /= nC;
+        C.v[0] /= nC;
+        C.v[1] /= nC;
+        C.v[2] /= nC;
+        C.v[3] = 1.0;
+      }
+      Ovoid.Solver._addContact(a, null, C, N, nD*1.5);
       return;
+    }
   }
 };
 
@@ -379,7 +410,7 @@ Ovoid.Solver._getContactS2L = function (a, b) {
         C.v[3] = 1.0;
         C.transform4(Tb);
         /* Ajoute un contact */
-        Ovoid.Solver._addContact(a, null, C, N, P, Ovoid.Timer.quantum);
+        Ovoid.Solver._addContact(a, null, C, N, P);
         return;
       }
     }

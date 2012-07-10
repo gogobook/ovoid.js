@@ -33,10 +33,10 @@
 Ovoid.Contact = function() {
   
   /** Contact friction */
-  this._f = 1.0;
+  this._f = false;
   
   /** Contact restitution */
-  this._r = 1.0;
+  this._r = 0.5;
   
   /** Contact actors bodys */
   this._b = new Array(2);
@@ -94,12 +94,12 @@ Ovoid.Contact.prototype._solveDelta = function(q) {
   var av = new Ovoid.Vector();
   var fa;
   av.copy(this._b[0]._oldLinear);
-  //av.scaleBy(q);
+  av.scaleBy(q);
   fa = av.dot(this._n);
   
   if (this._b[1]) {
     av.copy(this._b[1]._oldLinear);
-    //av.scaleBy(q);
+    av.scaleBy(q);
     fa -= av.dot(this._n);
   }
 
@@ -116,8 +116,8 @@ Ovoid.Contact.prototype._solveDelta = function(q) {
  * 
  * <br><br>Initialize the collision contact data between two rigid body.
  * 
- * @param {Body} b0 The first body involved in the contact.
- * @param {Body} b1 The second body involved in the contact.
+ * @param {Physics} b0 The first body involved in the contact.
+ * @param {Physics} b1 The second body involved in the contact.
  * @param {Point} c Contact point world position.
  * @param {Vector} n Contact normal in world coordinate.
  * @param {float} p Contact penetration.
@@ -125,6 +125,13 @@ Ovoid.Contact.prototype._solveDelta = function(q) {
  */
 Ovoid.Contact.prototype.set = function(b0, b1, c, n, p, q) {
   
+  if( b1 ) {
+    this._f = (b0.useFriction && b1.useFriction);
+    this._r = (b0.restitution * b1.restitution);
+  } else {
+    this._f = Ovoid.Solver.opt_landscapeFriction;
+    this._r = b0.restitution;
+  }
   this._b[0] = b0;
   this._b[1] = b1;
   this._c.copy(c);
@@ -312,7 +319,7 @@ Ovoid.Contact.prototype._applyImpulses = function() {
   var impulse = new Ovoid.Vector();
   
   /* sans friction le calcul est simplifié */
-  if (this._f == 0.0) {
+  if (!this._f) {
     
     /* Vecteur temporaire */
     var vv = new Ovoid.Vector();

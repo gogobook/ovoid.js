@@ -223,8 +223,8 @@
  * creating doubled nodes.
  * <li>Ovoid.DAE_CREATE_TRACK</li>
  * Create a Track node which contains all imported Animation nodes. The Track
- * node will be named according to the DAE file name with the given prefix
- * and suffix. For example, a file named "mybox.dae" will give "myboxTrack".
+ * node will be named according to the DAE file name with the "Track" suffix. 
+ * For example, a file named "mybox.dae" will give "myboxTrack".
  * </ul>
  * <br>
  * 
@@ -3054,8 +3054,8 @@ Ovoid.Collada.prototype.loadSource = function(url, async, nopath) {
  * creating doubled nodes.
  * <li>Ovoid.DAE_CREATE_TRACK</li>
  * Create a Track node which contains all imported Animation nodes. The Track
- * node will be named according to the DAE file name with the given prefix
- * and suffix. For example, a file named "mybox.dae" will give "myboxTrack".
+ * node will be named according to the DAE file name with the "Track" suffix. 
+ * For example, a file named "mybox.dae" will give "myboxTrack".
  * </ul>
  * <br>
  * </ul>
@@ -3084,12 +3084,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
   this._dstsc = scene;
   
   /* détermine le nom du collada d'apres l'url */
-  var tmp = this.url;
-  tmp = tmp.split('/');
-  tmp = tmp[tmp.length - 1];
-  tmp = tmp.split('.');
-  this.name = tmp[0];
-
+  this.name = Ovoid.extractName(this.url);
+  
   /* définie le suffix */
   if (!suffix) {
     this._sfix = '';
@@ -3125,7 +3121,7 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
 
   /* Crée un track si demandé */
   if (this._mask & Ovoid.DAE_CREATE_TRACK) {
-    var track = new Ovoid.Track(this._pfix + this.name + this._sfix);
+    var track = new Ovoid.Track(this.name + "Track");
     Ovoid.log(3, 'Ovoid.Collada ' + this.name, " Track '" + track.name + "' : created");
   }
 

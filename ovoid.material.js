@@ -28,75 +28,57 @@
  * This class is a Node object inherited from <code>Ovoid.Node</code> class.
  * <br>
  * <br>
- * The Material node is used to describe shaded surfaces properties. Object's 
- * appearance is defined by how the light interact with its surface. The 
- * Material node is used to describe shaded surfaces properties. Object's 
- * appearance is defined by how the light interact with its surface. The 
- * Material node provides a model of surface's properties to describe this 
- * interaction. The Material principally defined by five compoment color plus
- * one special components. 
- * <br>
- * <br>
+ * The Material node is used to describe shaded surfaces properties. The 
+ * Material is defined by five compoment color (or/and Textures) plus one 
+ * special texture components for normal mapping. The Material node is a 
+ * dependency node and does not takes place directly in the 3D world.<br><br>
+ * 
+ * The Material's components/slots are the followings:
+ * 
  * <ul>
  * <li><code>Ovoid.AMBIENT</code></li>
  * The ambient component defines how ambient light act on the surface. It can 
- * be a simple flat color or a Texture.
- * <br>
- * <br>
+ * be a simple flat color or a Texture.<br><br>
+ * 
  * <li><code>Ovoid.DIFFUSE</code></li>
  * The diffuse component defines how normal light sources act on the surface. It 
- * can be a simple flat color or a Texture.
- * <br>
- * <br>
+ * can be a simple flat color or a Texture.<br><br>
+ * 
  * <li><code>Ovoid.SPECULAR</code></li>
  * The specular component defines the (simulated) direct light specular 
- * reflection of the surface. It can be a simple flat color or a Texture.
- * <br>
- * <br>
+ * reflection of the surface. It can be a simple flat color or a Texture.<br><br>
+ * 
  * <li><code>Ovoid.EMISSIVE</code></li>
  * The emissive component defines how the surface emits its own color without
- * light interaction. It can be a simple flat color or a Texture.
- * <br>
- * <br>
+ * light interaction. It can be a simple flat color or a Texture.<br><br>
+ * 
  * <li><code>Ovoid.REFLECT</code></li>
  * The reflect component defines how the surface reflect its environement. It 
- * can be a simple flat color or (more interesting) a Texture.
- * <br>
- * <br>
+ * can be a simple flat color or (more interesting) a Texture.<br><br>
+ * 
  * <li><code>Ovoid.NORMAL</code></li>
  * The normal component defines the normal map for this material. It 
  * must be a (normal map) Texture. (Not yet implemented in the default supplied 
- * shaders)
- * <br>
- * <br>
+ * shaders)<br><br>
  * </ul>
- * The Material node is not drawn, since it's an abstract dependency node and is
- * not in the world. 
- * <br>
- * <br>
- * <b>Lights, Materials and Shaders issue</b>
- * <br>
- * <br>
- * One important thing to understand is that all the render process is finaly 
- * determined by the shader program. Render nodes like Light or Material can 
- * have many parameters and options, if the shader program don't implement it, 
- * all these parameters take no effect. Material and Light node are designed to
- * offer as many parameters as possible. But keep in mind that these parameters 
- * can be not implemented or implemented in an unexpected way, depending on the 
- * used shader program.
- * <br>
- * <br>
- * Shaders are simple programs that describe the traits of either a vertex or a 
- * pixel. Vertex shaders describe the traits (position, texture coordinates, 
- * colors, etc.) of a vertex, while pixel shaders describe the traits (color, 
- * z-depth and alpha value) of a pixel. A vertex shader is called for each 
- * vertex in a primitive (possibly after tessellation); thus one vertex in, 
- * one (updated) vertex out. Each vertex is then rendered as a series of 
- * pixels onto a surface (block of memory) that will eventually be sent to 
- * the screen.
- * <br>
- * <br>
- * For more information about how shaders are implemented in Ovoid, see the 
+ * 
+ * The color and textures compoments are typically merged together, which mean 
+ * that if you set a full colored Diffuse texture, and, an all black Diffuse 
+ * color, you'll obtain an all black surface because the texture's components 
+ * are multiplied by the color's compomnents. However, this behaviour depend 
+ * on the  used shader and how the shader is designed.
+ * 
+ * <b>Lights, Materials and Shaders issue</b><br><br>
+ * 
+ * One important thing to know is that all the render process is finaly 
+ * determined by the shader program. Render nodes like Light or Material could 
+ * have many parameters and options, if the shader program does not implements 
+ * them,  all these parameters take no effect. Material and Light nodes are 
+ * designed to offer as many parameters as possible. But keep in mind that 
+ * these parameters may be implemented (or not at all) in an unexpected way, 
+ * depending on the used shader program.<br><br>
+ * 
+ * For more information about how shaders are implemented in OvoiD.JS, see the 
  * <code>Ovoid.Shader</code> class documentation.
  * 
  * @extends Ovoid.Node
@@ -142,9 +124,9 @@ Ovoid.Material.prototype.constructor = Ovoid.Material;
 
 
 /**
- * Define material component texture.
+ * Set material component texture.<br><br>
  * 
- * <br><br>Sets the specified material component's texture with the specified one.
+ * Sets the specified material component's texture with the specified one.
  *
  * @param {enum} slot Component identifier. Can be an integer between 0 and 5 or
  * one of the following symbolic constants:<br>
@@ -171,9 +153,9 @@ Ovoid.Material.prototype.setTexture = function(slot, texture) {
 
 
 /**
- * Define material component color.
+ * Set material component color.<br><br>
  *
- * <br><br>Sets the specified material component's color according to the specified 
+ * Sets the specified material component's color according to the specified 
  * values.
  * 
  * @param {enum} slot Component identifier. Can be an integer between 0 and 5 or
@@ -199,9 +181,9 @@ Ovoid.Material.prototype.setColor = function(slot, r, g, b, a) {
 
 
 /**
- * Define material component color.
+ * Set material component color from array.<br><br>
  *
- * <br><br>Sets the specified material component's color according to the specified 
+ * Sets the specified material component's color according to the specified 
  * array.
  * 
  * @param {enum} slot Component identifier. Can be an integer between 0 and 5 or

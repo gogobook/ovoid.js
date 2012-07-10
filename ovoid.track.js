@@ -22,26 +22,28 @@
 /**
  * Track node object constructor.
  *
- * @class Track node object.
- * <br>
- * <br>
- * The Tack node is an Animation group node. Track is implemented to allow to 
- * create animation blocks which can be played or stopped all at once without 
- * having to deal with all Animations independently. Keep in mind that there is 
- * allways ONE Animation node for ONE object. So, if you have a skeletal/rig 
- * animation that involves many bones/joints, you'll also have much of 
- * Animation nodes.
- * <br>
- * <br>
- * One Track node is created, if desired, during the COLLADA scene importation. 
- * In this case, the Track node will contain all the Animations imported during 
- * the importation process (which are supposed to be grouped, for example : walk
- * animation, jump animation, run animation, etc...).
- * <br>
+ * @class Track node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Track node is an Animation grouping node. The Track node purpose is to 
+ * provide a more maniable way to play, stop or rewind several Animation nodes 
+ * at once. The Track node is typically useful for rigged character animations, 
+ * which have several animations (one per joint/bone) for only one animation 
+ * sequence, which should all be started and ended at the same time.<br><br>
+ * 
+ * The Track node is one of the few which is not a dependency node nor a world 
+ * node.  Because it does not create dependency relationship (but has animations
+ * as dependencies) and is obviously not a world node.<br><br>
+ * 
+ * <b>Track creation at Collada import<b><br><br>
+ * One Track node is created per COLLADA scene importation (if the suitable 
+ * option Ovoid.DAE_CREATE_TRACK is passed in the importation method's mask 
+ * parameter). The created Track node will contains all the Animation nodes 
+ * imported during the importation process (which are supposed to be grouped, 
+ * for example : walk animation, jump animation, run animation, etc...).
  *
- * @extends Ovoid.Node
- *
- * @param {string} name Name of the new node.
+ * @param {string} name Name of the node.
  */
 Ovoid.Track = function(name) {
 
@@ -56,8 +58,6 @@ Ovoid.Track = function(name) {
   this.loop = false;
   /** Animation ended flag */
   this.ended = false;
-  /** Animation time factor */
-  this.factor = -1.0;
   /** Animation channel curves */
   this.animation = new Array();
   /** Animation overridable onended function
@@ -69,9 +69,9 @@ Ovoid.Track.prototype.constructor = Ovoid.Track;
 
 
 /**
- * Add animation.
+ * Add animation.<br><br>
  * 
- * <br><br>Adds an Animation node to this instance.
+ * Adds an Animation node to this instance.
  *
  * @param {Animation} anim Animation object to be added.
  * 
@@ -80,14 +80,35 @@ Ovoid.Track.prototype.constructor = Ovoid.Track;
 Ovoid.Track.prototype.addAnimation = function(anim) {
 
   this.animation.push(anim);
+  this.makeDepend(anim);
 };
 
 
+/**
+ * Remove animation.<br><br>
+ * 
+ * Removes an Animation node from this instance.
+ *
+ * @param {Animation} anim Animation object to be removed.
+ * 
+ * @see Ovoid.Animation
+ */
+Ovoid.Track.prototype.remAnimation = function(anim) {
+
+  var i = this.animation.length;
+  while (i--) {
+    if(this.animation[i] === anim) {
+      this.animation.splice(i, 1);
+    }
+  }
+  this.breakDepend(anim);
+};
+
 
 /**
- * Set track loop.
+ * Set track loop.<br><br>
  * 
- * <br><br>Enable or disable loop playing.
+ * Enable or disable loop playing.
  *
  * @param {bool} loop Loop flag value to set.
  */
@@ -95,6 +116,22 @@ Ovoid.Track.prototype.setLoop = function(loop) {
 
   var i = this.animation.length;
   while (i--) this.animation[i].loop = loop;
+};
+
+
+/**
+ * Set track time factor.<br><br>
+ * 
+ * Changes the animation time factor during play.
+ *
+ * @param {float} factor The time factor to play and interpolate the animation. 
+ * The factor can be negative to play the animation backward. For example a 
+ * value of -2.0 will play the animation backward twice the normal speed.
+ */
+Ovoid.Track.prototype.setFactor = function(factor) {
+
+  var i = this.animation.length;
+  while (i--) this.animation[i].factor = factor;
 };
 
 
@@ -218,7 +255,6 @@ Ovoid.Track.prototype.toJSON = function() {
   o['playing'] = this.playing;
   o['loop'] = this.loop;
   o['ended'] = this.ended;
-  o['factor'] = this.factor;
   o['animation'] = new Array();
   for (var i = 0; i < this.animation.length; i++)
     o['animation'][i] = this.animation[i].uid;

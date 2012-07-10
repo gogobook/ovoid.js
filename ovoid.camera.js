@@ -210,16 +210,19 @@ Ovoid.Camera.prototype.cachCamera = function() {
     this.perspective.m[5] = f;
     this.perspective.m[15] = 0.0;
     this.perspective.m[11] = -1.0;
-    /* si inferieur  ou egal à zero, la projection est
-        calculé différament avec un far_clip infini. c'est utile
-        pour le rendu stencil des ombres volumétriques */
-    var zfact = 1.0 / (this.clipNear - this.clipFar);
-    if (this.clipFar > 0.0) {
-      this.perspective.m[10] = (this.clipFar + this.clipNear) * zfact;
-    } else {
+    /* si inferieur  ou egal à zero, la projection est calculé différament avec 
+     * un far_clip infini. c'est utile pour le rendu stencil des ombres 
+     * volumétriques */
+    if(Ovoid.Drawer.opt_shadowCasting) {
+      var zfact = 1.0 / (this.clipNear - -1.0);
       this.perspective.m[10] = 0.0;
+      this.perspective.m[14] = (2.0 * -1.0 * this.clipNear) * zfact;
+    } else {
+      var zfact = 1.0 / (this.clipNear - this.clipFar);
+      this.perspective.m[10] = (this.clipFar + this.clipNear) * zfact;
+      this.perspective.m[14] = (2.0 * this.clipFar * this.clipNear) * zfact;
     }
-    this.perspective.m[14] = (2.0 * this.clipFar * this.clipNear) * zfact;
+    
 
     //  2 /     0     0     Tx
     //  right-left

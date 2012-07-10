@@ -22,40 +22,32 @@
 /**
  * Body node constructor.
  *
- * @class Body node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
+ * @class Body node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
  * The Body node is the main representative world object. Inherited from the 
- * Transform node, it is a transformable node. That means the node can be moved
- * rotated, scaled, since it evolve in the world 3D space. The Body node is 
- * considered "drawable" or "renderable", but is not "rendered" until it have 
- * a "shape".
- * <br>
- * <br>
- * <b>Body node and shape concept</b>
- * <br>
- * <br>
- * Once a Mesh node (for example) is ready to be drawn, in fact it is NOT yet 
- * "renderable". In fact Mesh objects are abstract and are not in the world, it 
- * is called a "shape" node. To display our Mesh, we need to create a Body node 
- * that will be in the world and "attach" the Mesh node to this Body.
- * <br>
- * <br>
+ * Transform node, it is a world-transformable node, which means it can be moved
+ * rotated, scaled, etc... The Body node is dedicated (but not forced) to have a 
+ * shape (Mesh, Emitter, etc...) which is assigned to it.
+ * 
+ * <b>Body node and shape concept</b><br><br>
+ * 
+ * A Mesh node which is not assigned to a Body node will never be drawn. The 
+ * Mesh node is what is called a "shape" and must be assigned to a 
+ * world-transformable Body node to be included in the drawing pipeline.<br><br>
+ * 
  * To make the concept more understandable, think that Body nodes are like 
- * invisible spirits without shape floating in the world . To make a visible 
- * spirit, you have to give it a shape. You now guess that you can attach the 
- * same Shape node to several Body nodes at the same time. The Body node is 
- * inherited from Transform node, and so is transformable (move, rotate, 
- * scale...). Shape nodes, like Mesh node, are NOT.
- * <br>
- * <br>
+ * invisible spirits without shape floating in the 3D world. To make a visible 
+ * spirit, you have to give it a shape. You can assign the same shape node to 
+ * several Body nodes in the same scene, than you obtain several identical 
+ * shapes with different transformations (rotation, position, etc...).<br><br>
+ * 
  * <blockcode>
- * &nbsp;&nbsp;body = scene.create(Ovoid.BODY, "HelloBox");<br>
- * &nbsp;&nbsp;body.setShape(mesh);<br>
- * </blockcode>
+ * &nbsp;&nbsp;var mesh = scene.create(Ovoid.MESH, "box1");<br>
+ * &nbsp;&nbsp;body1.setShape(mesh);<br>
+ * &nbsp;&nbsp;body2.setShape(mesh);<br>
+ * </blockcode><br><br>
  * 
  * @extends Ovoid.Transform
  *
@@ -84,8 +76,8 @@ Ovoid.Body.prototype.constructor = Ovoid.Body;
 /**
  * Assing a shape to this instance.
  * 
- * <br><br>Assing a Mesh, Emitter or Skin node as shape for this Body. The assigned 
- * shape will be a dependency for this instance.
+ * <br><br>Assings a Mesh, Emitter or Skin node as shape for this instance. 
+ * The assigned shape will be a dependency (depend node) for this instance.
  * 
  * @param {Node} shape Shape node to assing to this Body.
  * 

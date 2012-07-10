@@ -177,8 +177,7 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
   /* verifie les collisions de nom */
   if (this.search(name)) {
 
-    Ovoid.log(2, 'Ovoid.Scene ' + this.name,
-        " create node, name collision '" + name + "'");
+    Ovoid.log(2, 'Ovoid.Scene.create',"name collision '" + name + "'");
 
     var ct = 1; var basename = name;
 
@@ -194,7 +193,6 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
   {
     case Ovoid.TRANSFORM:
       node = new Ovoid.Transform(name);
-      this.node.push(node);
       this.transform.push(node);
       dparent = this.world;
       break;
@@ -239,9 +237,6 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
     case Ovoid.PHYSICS:
       node = new Ovoid.Physics(name);
       this.physics.push(node);
-      if(Ovoid.Solver != undefined)
-        Ovoid.log(2, "Ovoid.Scene.create", 
-            "Creating PHYSICS node while Ovoid.Solver module is not loaded.");
       break;
     case Ovoid.ANIMATION:
       node = new Ovoid.Animation(name);
@@ -315,81 +310,73 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
  * carefully removed from groups and graph. If the node has a child tree, 
  * the whole child tree is removed too.
  * 
- * @param {Node} node Node to remove.
+ * @param {Node|String|int} item Node object, node's name or node's Uid to removes.
+ * @param {Bool} rdep If possible, removes node's dependencies nodes.
  * 
  * @see Ovoid.Node
  */
-Ovoid.Scene.prototype.remove = function(node) {
+Ovoid.Scene.prototype.remove = function(item, rdep) {
 
-  var i, rmgroup;
+  var i, rmgroup, node;
+  
+  if(typeof(item) == 'number' || typeof(item) == 'string') {
+    node = this.search(item);
+    if(!node) return;
+  } else {
+    node = item;
+  }
 
-  if(node.child.length) {
-    /* Construit la liste des enfants */
-    var child = new Array();
-    var it = new Ovoid.WgIterator(node);
-    while(it.explore()) {
-      child.push(it.current);
+  // Liste des noeud à supprimer avec celui-ci
+  var related = new Array();
+  
+  /* On supprime les liens de dependence */
+  var links = new Array();
+  for (i = 0; i < node.link.length; i++) {
+    links.push(node.link[i]);
+  }
+  for (i = 0; i < links.length; i++) {
+    links[i].breakDepend(node);
+    Ovoid.log(2, "Ovoid.Scene.remove", "Break link " + links[i].name);
+    /* Cas particulier pour les Track */
+    if(links[i].type & Ovoid.TRACK) {
+        Ovoid.log(2, "Ovoid.Scene.remove", "Removing animation from " + links[i].name);
+        links[i].remAnimation(node);
     }
-    /* Supprime tous les enfants des groupes */
-    for (i = 0; i < child.length; i++) {
-      
-      if (child[i].type & Ovoid.CAMERA)
-        rmgroup = this.camera;
-
-      if (child[i].type & Ovoid.LIGHT)
-        rmgroup = this.light;
-
-      if (child[i].type & Ovoid.TRANSFORM)
-        rmgroup = this.transform;
-
-      if (child[i].type & Ovoid.MESH || 
-          node.type & Ovoid.SKIN || 
-          node.type & Ovoid.EMITTER)
-        rmgroup = this.shape;
-
-      if (child[i].type & Ovoid.MATERIAL)
-        rmgroup = this.material;
-
-      if (child[i].type & Ovoid.TEXTURE)
-        rmgroup = this.texture;
-
-      if (child[i].type & Ovoid.ANIMATION)
-        rmgroup = this.animation;
-
-      if (child[i].type & Ovoid.TRACK)
-        rmgroup = this.track;
-        
-      if (child[i].type & Ovoid.PHYSICS)
-        rmgroup = this.physics;
-        
-      if (child[i].type & Ovoid.ACTION)
-        rmgroup = this.action;
-
-      if (child[i].type & Ovoid.LAYER)
-        rmgroup = this.layer;
-
-      if (child[i].type & Ovoid.SOUND)
-        rmgroup = this.sound;
-        
-      if (child[i].type & Ovoid.AUDIO)
-        rmgroup = this.audio;
-        
-      i = rmgroup.length;
-      while (i--) {
-
-        if (rmgroup[i] === child[i])
-          rmgroup.splice(i, 1);
-
-      }
-
-      i = this.node.length;
-      while (i--) {
-
-        if (this.node[i] === child[i])
-          this.node.splice(i, 1);
-      }
+    /* Cas particulier pour les Skin */
+    if(links[i].type & Ovoid.SKIN) {
+      Ovoid.log(2, "Ovoid.Scene.remove", "Removing joint from " + links[i].name);
+      links[i].unlinkJoint(node);
     }
   }
+  /* On regarde les dependence, si ce noeud est leur seul link
+   * on les supprimer avec */
+  var depends = new Array();
+  for (i = 0; i < node.depend.length; i++) {
+    depends.push(node.depend[i]);
+    
+  }
+  for (i = 0; i < depends.length; i++) {
+    node.breakDepend(depends[i]);
+    Ovoid.log(2, "Ovoid.Scene.remove", "Break Dependency " + depends[i].name);
+    // Si il n'ya plus de link, ce noeud était le seul a dependre, on 
+    // supprime donc le noeud qui ne sert plus à rien
+    if(depends[i].link.length == 0 && rdep) {
+      Ovoid.log(2, "Ovoid.Scene.remove", "Removes unused dependency " + depends[i].name);
+      related.push(depends[i]);
+    }
+  }
+  /* On ajoute tous les enfants à supprimer */
+  var it = new Ovoid.WgIterator(node);
+  while(it.explore()) {
+    related.push(it.current);
+  }
+  /* Operation recurcive pour tous les noeuds, afin de bien supprimer
+   * tout l'arbre de dependence */
+  for (i = 0; i < related.length; i++) {
+    this.remove(related[i], rdep);
+  }
+  
+  /* Cherche les link et dependences */
   
   /* Supprime la node des groupes */
   if (node.type & Ovoid.CAMERA)
@@ -486,9 +473,7 @@ Ovoid.Scene.prototype.insert = function(node, parent, preserveParent, preserveUi
   /* verifie les collisions de nom */
   if (this.search(node.name)) {
 
-    Ovoid.log(2, 'Ovoid.Scene ' + this.name,
-        " create node, name collision '" +
-        node.name + "'");
+    Ovoid.log(2, 'Ovoid.Scene.insert',"name collision '" + name + "'");
 
     var ct = 1; var basename = node.name;
 
@@ -578,6 +563,43 @@ Ovoid.Scene.prototype.insert = function(node, parent, preserveParent, preserveUi
 
 
 /**
+ * Parent two nodes.<br><br>
+ * 
+ * Sets a node as parent to another.
+ *
+ * @param {Node|string|int} child Node object, name or UID to be child.
+ * @param {Node|string|int} parent Node object, name or UID to be parent.
+ *
+ */
+Ovoid.Scene.prototype.parent = function(child, parent) {
+  
+  var nchild, nparent;
+  
+  if(typeof(child) === 'string' || typeof(child) === 'number') {
+    nchild = this.search(child);
+    if(!nchild) {
+       Ovoid.log(2, "Ovoid.Scene.parent", "No node matches with name or UID:" + child);
+       return;
+     }
+  } else {
+    nchild = child;
+  }
+  
+  if(typeof(parent) === 'string' || typeof(parent) === 'number') {
+    nparent = this.search(parent);
+    if(!nparent) {
+       Ovoid.log(2, "Ovoid.Scene.parent", "No node matches with name or UID:" + parent);
+       return;
+     }
+  } else {
+    nparent = parent;
+  }
+    
+  nchild.setParent(nparent);
+}
+
+
+/**
  * Transplant tree.
  * 
  * <br><br>Transplants the specified node's child tree into the scene including the
@@ -632,7 +654,6 @@ Ovoid.Scene.prototype.transplant = function(tree) {
     }
   }
 };
-
 
 
 /**
@@ -756,10 +777,11 @@ Ovoid.Scene.prototype.searchMatches = function(item) {
  *
  * @param {string|bitmask} item String that matches nodes's name or bitmask
  * that matches nodes's type.
+ * @param {Bool} rdep If possible, removes node's dependencies nodes.
  *
  * @return {bool} True if a node is removed, false otherwise.
  */
-Ovoid.Scene.prototype.removeMatches = function(item) {
+Ovoid.Scene.prototype.removeMatches = function(item, rdep) {
 
   var i = this.node.length;
   var f = false;

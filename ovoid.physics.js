@@ -72,6 +72,13 @@ Ovoid.Physics = function(name) {
    * @type float */
   this.damping = 0.1;
   
+  /** Use friction for contact.
+   * @type bool */
+  this.useFriction = false;
+  /** Contact restitution factor.
+   * @type bool */
+  this.restitution = 0.5;
+  
   /** Linear velocity.
    * @type Vector */
   this.linearVelocity = new Ovoid.Vector(0.0,0.0,0.0);
@@ -410,7 +417,7 @@ Ovoid.Physics.prototype.cachPhysics = function() {
     
     /* Mise en someil du node physique si ses mouvements sont 
      * stables depuis un certain temps */;
-    var curmot = (this.linearVelocity.size2() + this.angularVelocity.size2()) * 10.0;
+    var curmot = (this.linearVelocity.size2() + this.angularVelocity.size2());
     var bias = Math.pow(0.5, Ovoid.Timer.quantum);
     this._motion = bias*this._motion + (1-bias)*curmot;
     

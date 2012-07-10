@@ -84,7 +84,7 @@ Ovoid.MAX_LAYER_BY_DRAW = 512;
  * @constant 
  * @memberOf _global_
  * @see Ovoid.Collider */
-Ovoid.MAX_CONTACT_BY_CYCLE = 32;
+Ovoid.MAX_CONTACT_BY_CYCLE = 128;
 
 
 /** Maximum level of detail count for mesh.
@@ -99,21 +99,6 @@ Ovoid.MAX_MESH_LOD = 4;
  * @memberOf _global_
   @see Ovoid.Particles */
 Ovoid.MAX_EMITTER_PARTICLES = 1024;
-
-
-/** Maximum length of drawn text string.
- * @constant 
- * @memberOf _global_
- * @see Ovoid.Text
- * @see Ovoid.Drawer */
-Ovoid.MAX_FONTMAP_STRING_LENGTH = 2048;
-
-
-/** Maximum vertices count for one shadow volum.
- * @constant 
- * @memberOf _global_
- * @see Ovoid.Drawer */
-Ovoid.MAX_SHADOW_VOLUM_VERTICES = 32768;
 
 
 /** Picking offscreen render frame width.

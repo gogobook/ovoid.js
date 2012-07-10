@@ -22,45 +22,25 @@
 /**
  * Light node constructor.
  * 
- * @class Light node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Light node is used to describe a world light source. 
- * Inherited from the Transform node, it is a transformable node. That means the 
- * node can be moved, rotated, scaled, since it evolve in the world 3D space. 
- * <br>
- * <br>
- * The Light node is not drawn, since it is only used as the light source
- * to calculate objects's colours and shading. The Light node is, as the 
- * Material node, intimely linked to shaders.
- * <br>
- * <br>
- * <b>Lights, Materials and Shaders issue</b>
- * <br>
- * <br>
- * One important thing to understand is that all the render process is finaly 
- * determined by the shader program. Render nodes like Light or Material can 
- * have many parameters and options, if the shader program don't implement it, 
- * all these parameters take no effect. Material and Light node are designed to
- * offer as many parameters as possible. But keep in mind that these parameters 
- * can be not implemented or implemented in an unexpected way, depending on the 
- * used shader program.
- * <br>
- * <br>
- * Shaders are simple programs that describe the traits of either a vertex or a 
- * pixel. Vertex shaders describe the traits (position, texture coordinates, 
- * colors, etc.) of a vertex, while pixel shaders describe the traits (color, 
- * z-depth and alpha value) of a pixel. A vertex shader is called for each 
- * vertex in a primitive (possibly after tessellation); thus one vertex in, 
- * one (updated) vertex out. Each vertex is then rendered as a series of 
- * pixels onto a surface (block of memory) that will eventually be sent to 
- * the screen.
- * <br>
- * <br>
- * For more information about how shaders are implemented in Ovoid, see the 
+ * @class Light node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Light node is used to describe a world light source. Inherited from the 
+ * Transform node, it is a world-transformable node, which means it can be moved
+ * rotated, scaled, etc...<br><br>
+ * 
+ * <b>Lights, Materials and Shaders issue</b><br><br>
+ * 
+ * One important thing to know is that all the render process is finaly 
+ * determined by the shader program. Render nodes like Light or Material could 
+ * have many parameters and options, if the shader program does not implements 
+ * them,  all these parameters take no effect. Material and Light nodes are 
+ * designed to offer as many parameters as possible. But keep in mind that 
+ * these parameters may be implemented (or not at all) in an unexpected way, 
+ * depending on the used shader program.<br><br>
+ * 
+ * For more information about how shaders are implemented in OvoiD.JS, see the 
  * <code>Ovoid.Shader</code> class documentation.
  * 
  * @extends Ovoid.Transform
@@ -114,9 +94,9 @@ Ovoid.Light.prototype.constructor = Ovoid.Light;
 
 
 /**
- * Define light source color.
+ * Set light source color.<br><br>
  * 
- * <br><br>Sets the light source color according to the specified values.
+ * Sets the light source color according to the specified values.
  *
  * @param {float} r The Red component.
  * @param {float} g The Green component.
@@ -130,9 +110,10 @@ Ovoid.Light.prototype.setColor = function(r, g, b, a) {
 
 
 /**
- * Define light source color.
+ * Set light source color from array.<br><br>
  *
- * <br><br>Sets the light source color according to the specified components array.
+ * Sets the light source color according to the specified components 
+ * array.
  * 
  * @param {float[]} a Float Array with r, g, b and a components.
  */
@@ -143,9 +124,10 @@ Ovoid.Light.prototype.setColorv = function(a) {
 
 
 /**
- * Define light source range.
+ * Set light source range.<br><br>
  *
- * <br><br>Sets the light source maximum range radius according to the specified value.
+ * Sets the light source maximum sphere range radius according to the specified 
+ * value.
  * 
  * @param {float} range The range value.
  */
@@ -157,9 +139,9 @@ Ovoid.Light.prototype.setRange = function(range) {
 
 
 /**
- * Define light source attenuation model.
+ * Set light source attenuation model.<br><br>
  * 
- * <br><br>Sets the light source attenuation model according to the specified values.
+ * Sets the light source attenuation model according to the specified values.
  * This will automaticaly recalculate light range from attenuation equation.
  *
  * @param {float} c The constant attenuation value.
@@ -182,23 +164,28 @@ Ovoid.Light.prototype.setAttenuation = function(c, l, q) {
 
 
 /**
- * Define light spot angle.
+ * Set light spot angle and falloff.<br><br>
  * 
- * <br><br>Sets the light source spot angle according to the specified value in degrees
+ * Sets the light source's spot angle (in degrees) and falloff according to the 
+ * specified value.
  *
  * @param {float} angle The spot angle value in degrees.
+ * @param {float} angle The spot falloof value.
  */
-Ovoid.Light.prototype.setSpotAngle = function(angle) {
+Ovoid.Light.prototype.setSpotAngle = function(angle, falloff) {
 
   this.spotAngle = Ovoid.deg2Rad(angle);
+  if(falloff) this.falloff = falloff;
 };
 
 
 /**
- * Lightening test.
+ * Lightening test.<br><br>
  * 
- * <br><br>Checks whether an Transform node is enlightened by this instance. This method is
- * used to define the light-linking.
+ * Checks whether an Transform node is enlightened by this instance. This method 
+ * isused to define the light-linking and use the light instance's and 
+ * Transform's bounding spheres. The light instance's bounding sphere is defined
+ * by its range sphere.
  *
  * @param {Transform} tform Transform object to check.
  *

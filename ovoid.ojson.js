@@ -142,8 +142,8 @@ Ovoid.Ojson.prototype.loadSource = function(url, async, nopath) {
           this.owner._json = JSON.parse(this.responseText);
           this.owner.loadStatus = 1;
         } else {
-          this.parent.loadStatus = -1;
-          Ovoid.log(1, 'Ovoid.Ojson ' + this.name,
+          this.owner.loadStatus = -1;
+          Ovoid.log(2, 'Ovoid.Ojson ' + this.name,
               "unable to load source '" +
               this.owner.url + "'");
         }
@@ -367,8 +367,20 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
 
   if(n.type & Ovoid.SKIN) {
     n.mesh = this._dstsc.search(n.mesh);
-    for(var i = 0; i < n.joint.length; i++)
+    /* retrouve les joints */
+    var joints = new Array();
+    for(var i = 0; i < n.joint.length; i++) {
       n.joint[i] = this._dstsc.search(n.joint[i]);
+      /* Il faut aussi recréer les tableaux de matrices */
+      n.bindJointMatrix.push(new Ovoid.Matrix4());
+      n.infWorldMatrix.push(new Ovoid.Matrix4());
+      n.infNormalMatrix.push(new Ovoid.Matrix3());
+      n.unCach(Ovoid.CACH_SKIN);
+    }
+    /* mirroir des vertices et polygones du mesh */
+    if (Ovoid.opt_localSkinData) {
+      n._localMirror();
+    }
   }
 
   if(n.type & Ovoid.JOINT)
@@ -401,7 +413,6 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
       }
     }
   }
-  
 };
 
 
@@ -531,14 +542,12 @@ Ovoid.Ojson.prototype._procTrack = function(n, j) {
    * .playing
    * .loop
    * .ended
-   * .factor
    * .animation[]
    * .onended()
    */
   n.playing = j.playing;
   n.loop = j.loop;
   n.ended = j.ended;
-  n.factor = j.factor;
   for (var i = 0; i < j.animation.length; i++)
     n.animation.push(j.animation[i]);
   n.onended = this._parseFunc(j.onended);

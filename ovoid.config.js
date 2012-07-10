@@ -5,7 +5,7 @@
 Ovoid.opt_libPath = 'ovoid.js/'
 /* Environment: Log verbose level */
 Ovoid.opt_logLevel = 2; // 0: disabled, 1: errors only, 2: errors+warinings, 3: all.
-/* Environment: Avoid browser cache and force (re)load source files */
+/* Environment: Avoid browser cache (force (re)load source files) and force Body/Layer pickability */
 Ovoid.opt_debugMode = true;
 /* Environment: Dsiable alert messages */
 Ovoid.opt_disableAlerts = true;
@@ -28,13 +28,13 @@ Ovoid.opt_stencil = true;
 /* WebGL Context option: Enable or disable premultiplied alpha */
 Ovoid.opt_premultipliedAlpha = true;
 /* Environment: Textures source files search path */
-Ovoid.opt_texturePath = "data/map/";
+Ovoid.opt_texturePath = '';
 /* Environment: COLLADA/DE source files search path */
-Ovoid.opt_daePath = "data/dae/";
+Ovoid.opt_daePath = '';
 /* Environment: OJSON source files search path */
-Ovoid.opt_ojsonPath = 'data/ojsn/';
+Ovoid.opt_ojsonPath = '';
 /* Environment: Audio source files search path */
-Ovoid.opt_audioPath = "data/snd/";
+Ovoid.opt_audioPath = '';
 /* Environment: GLSL sahders source files search path */
 Ovoid.opt_shadersPath = Ovoid.opt_libPath + "lib/glsl/";
 /* Environment: Default fontmap Texture source image URL */
@@ -70,6 +70,8 @@ Ovoid.Queuer.opt_defaultCameraPos = [0.0, 0.0, 5.0];
 Ovoid.Queuer.opt_defaultCameraRot = [0.0, 0.0, 0.0];
 
 /* --------------------------- DRAWER OPTIONS ------------------------------- */
+/* Canvas clearing color */
+Ovoid.Drawer.opt_clearColor = [1.0, 1.0, 1.0, 1.0];
 /* Global ambient lighting color */
 Ovoid.Drawer.opt_ambientColor = [0.2, 0.2, 0.2, 1.0];
 /* Enable or disable Z-fail shadow casting */
@@ -93,8 +95,8 @@ Ovoid.Drawer.opt_drawJointBones = true;
 Ovoid.Drawer.opt_drawLights = true;
 /* Enable or disable (helpers) camera draws */
 Ovoid.Drawer.opt_drawCameras = true; 
-/* Canvas clearing color */
-Ovoid.Drawer.opt_clearColor = [1.0, 1.0, 1.0, 1.0];
+/* Joint helpers's size */
+Ovoid.Drawer.opt_jointSize = 2.0;
 
 /* --------------------------- LOADER OPTIONS ------------------------------- */
 /* Draw the Wait screen or let blank during loading process */
@@ -136,25 +138,27 @@ Ovoid.Loader.opt_loadcircleSize = [64, 64];
 /* Wait screen loading circle X and Y position */
 Ovoid.Loader.opt_loadcirclePos = [400, 230];
 /* Wait screen show or hide percentage */
-Ovoid.Loader.opt_showPercentage = true;
+Ovoid.Loader.opt_showPercentage = false;
 /* Wait screen show or hide percentage X, Y position and font size */
 Ovoid.Loader.opt_percentageXys = [400, 224, 16];
 /* Wait screen show or hide title */
-Ovoid.Loader.opt_showTitle = true;
+Ovoid.Loader.opt_showTitle = false;
 /* Wait screen title X, Y position and font size */
 Ovoid.Loader.opt_titleXys = [400, 180, 16];
 /* Wait screen show or hide details */
 Ovoid.Loader.opt_titleStr = "Loading Please Wait";
 /* Enable or disable current loading url text */
-Ovoid.Loader.opt_showDetails = true;
+Ovoid.Loader.opt_showDetails = false;
 /* Wait screen details X, Y position and font size */
 Ovoid.Loader.opt_detailsXys = [400, 310, 16];
 
 
 /* --------------------------- SOLVER OPTIONS ------------------------------- */
 if ( Ovoid.Solver ) {
-/* Use high resolution/iterative contact solver */
-Ovoid.Solver.opt_iterativeSolver = true;
-/* Maximim iterations for contact solver */
+/* Enable or disable the friction for landscape collisions */
+Ovoid.Solver.opt_landscapeFriction = false;
+/* Enable or disable the iterative contact solving */
+Ovoid.Solver.opt_iterativeSolver = false;
+/* Maximim iteration for iterative contact solving */
 Ovoid.Solver.opt_contactItFactor = 4;
 }

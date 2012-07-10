@@ -487,17 +487,17 @@ Ovoid.Vector.prototype.transform3Inverse = function(mat3) {
  */
 Ovoid.Vector.prototype.transform3InverseOf = function(vect, mat3) {
 
-  this.v[0] = vect.v[0] * mat4.m[0] +
-      vect.v[1] * mat4.m[1] +
-      vect.v[2] * mat4.m[2];
+  this.v[0] = vect.v[0] * mat3.m[0] +
+      vect.v[1] * mat3.m[1] +
+      vect.v[2] * mat3.m[2];
 
-  this.v[1] = vect.v[0] * mat4.m[3] +
-      vect.v[1] * mat4.m[4] +
-      vect.v[2] * mat4.m[5];
+  this.v[1] = vect.v[0] * mat3.m[3] +
+      vect.v[1] * mat3.m[4] +
+      vect.v[2] * mat3.m[5];
 
-  this.v[2] = vect.v[0] * mat4.m[6] +
-      vect.v[1] * mat4.m[7] +
-      vect.v[2] * mat4.m[8];
+  this.v[2] = vect.v[0] * mat3.m[6] +
+      vect.v[1] * mat3.m[7] +
+      vect.v[2] * mat3.m[8];
 };
 
 
@@ -518,11 +518,11 @@ Ovoid.Vector.prototype.addWeightTransform3Of = function(vect, mat3, w) {
       vect.v[1] * mat3.m[3] +
       vect.v[2] * mat3.m[6]) * w;
 
-  this.v[1] += (vect.v[0] * mat4.m[1] +
+  this.v[1] += (vect.v[0] * mat3.m[1] +
       vect.v[1] * mat3.m[4] +
       vect.v[2] * mat3.m[7]) * w;
 
-  this.v[2] += (vect.v[0] * mat4.m[2] +
+  this.v[2] += (vect.v[0] * mat3.m[2] +
       vect.v[1] * mat3.m[5] +
       vect.v[2] * mat3.m[8]) * w;
 };

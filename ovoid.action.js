@@ -22,70 +22,56 @@
 /** 
  * Action node constructor.
  * 
- * @class Action node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Action node is the main way to make your scene interactive. This node 
- * is an abstract dependency node and is not in the world. Action nodes are used
- * to link some interactive events to call custom functions. Actually (at this 
- * developement stage) Action node principally act with the mouse Picking 
- * system. It act as an "Event detector" such of mouse over a node or mouse 
- * entering in a node, mouse click on a node, etc... and then to call the 
- * corresponding trigger function.
- * <br>
- * <br>
- * For example, Action node allow you to catch when the user is clicking on a
- * node with the left mouse button, and so associate any generic or specific 
- * function with this event.
- * <br>
- * <br>
+ * @class Action node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Action node is an interaction trigger. Action node is used to assign 
+ * custom functions to some predefined events which occure on the target node. 
+ * It node mainly work in couple with the mouse picking mecanism.
+ * The Action node is a dependency node and does not takes place directly in 
+ * the 3D world. The Action node is typically linked to one or more Body or 
+ * Layer nodes.<br><br>
+ * 
  * <blockcode>
  * function catastrophe(node) {<br>
- * &nbsp;&nbsp;<commentcode>// Do some funny stuff</commentcode><br>
+ * &nbsp;&nbsp;<codecomment>// Do some funny stuff</codecomment><br>
  * };<br>
  * <br>
  * var action = new Ovoid.Action("myAction");
  * action.onLmbDn = catastrophe;<br>
  * action.linkNode(mybox);<br>
- * </blockcode>
- * <br>
- * <br>
- * The Action node is presently composed of several overridable trigger 
- * methods corresponding to predefined events. For example the 
- * <code>onEnter</code> method, 
- * is called when the mouse pointer just enter over the node and the 
- * <code>onOver</code> 
- * method is constantly called as long as the mouse pointer is rolling over 
- * the node. All Action node's methods take one argument that is the 
- * implied node of the event.
- * <br>
- * <br>
- * <b>Grabbing node</b>
- * <br>
- * Action node also work with a node-grabbing system. The "node-grabbing" 
- * consists in focusing on a node while ignoring  events of others nodes. 
- * <br>
- * To understand, suppose you want to rotate a node by moving the mouse while
- * you maintain the left button pressed. While you move your mouse pointer to 
- * rotate the object, the pointer will leave the node's region, resulting the 
- * event stop, since the mouse now roll over another node. 
- * <br>
- * The "node-grabbing" prevents the side effects by forcing to focus on the 
- * grabbed node and to ignore the others. You also have to "release" the 
- * node when you want to restore the normal event dispatching.
- * <br>
- * <br>
- * There is also special methods <code>onUngrab</code> and 
- * <code>onGrab</code>. <code>onUngrab</code> is constantly 
- * called without any special event as long as the node is NOT grabbed (i.e. 
- * the normal node's status). In opposit, the <code>onGrab</code> method is 
- * constantly 
- * called as long as the node IS grabbed.
- * <br>
- * <br>
+ * </blockcode><br><br>
+ * 
+ * The Action node is currently composed of several overridable trigger 
+ * functions corresponding to predefined events which can occur on a node. 
+ * Overridables trigger function take one parameter which is the node implied 
+ * in the event trigger.<br><br>
+ * 
+ * The Action node also provides, in couple with the Input global class, a 
+ * node-grabbing system which allow some specific treatements on the node.<br><br>
+ * 
+ * <b>Node Grabbing</b><br><br>
+ * 
+ * The "node-grabbing" consists in focusing on a node while ignoring events of 
+ * other nodes.<br>
+ * 
+ * Suppose you want to rotate a node by moving the mouse while you maintain the 
+ * left button pressed. While you move your mouse pointer to rotate the object, 
+ * the pointer should leave the node's region, resulting that the trigger 
+ * function stops, since the mouse now rolls over another node (or the 
+ * background).<br><br>
+ * 
+ * The "node-grabbing" prevents this kind of side effects by forcing to focus on 
+ * the grabbed node while ignoring the others. You also must release the grabbed 
+ * node to return in the normal interaction behaviour.<br><br>
+ * 
+ * The Action node also provides two special overridable trigger functions 
+ * related to the node-grabbing which correspond to the two main possibilities: 
+ * "while node is grabbed" and "while node is NOT Grabbed". Both trigger 
+ * function are called each frame while the event "node is grabbed" or "node is 
+ * not grabbed" is true.<br><br>
+ * 
  * <blockcode>
  * function grabnode(node) {<br>
  * &nbsp;&nbsp;Ovoid.grabNode(node)<br>
@@ -322,6 +308,7 @@ Ovoid.Action.prototype.linkNode = function(node) {
       if(this.link[i] === node)
         return;
     }
+    node.pickable = true;
     node.makeDepend(this);
 };
 
@@ -346,8 +333,10 @@ Ovoid.Action.prototype.cachAction = function() {
     while (i--)
     {
       
-      if (this.link[i].uid == Ovoid.Input.mouseLeaveUid)
+      if (this.link[i].uid == Ovoid.Input.mouseLeaveUid) {
         this.onLeave(this.link[i]);
+        document.body.style.cursor = 'default';
+      }
       
       if (this.link[i].uid == Ovoid.Input.mouseEnterUid) {
         this.onEnter(this.link[i]);
@@ -360,7 +349,7 @@ Ovoid.Action.prototype.cachAction = function() {
       } else {
         /* La node est-elle sous la souris ? */
         if (this.link[i].uid == Ovoid.Input.mouseOverUid) {
-          
+          document.body.style.cursor = 'pointer';
           this.onOver(this.link[i]);
           /* y'a-t-il une node grabbed ? */
           if (!Ovoid.Input.grabbedNode) {
@@ -380,6 +369,8 @@ Ovoid.Action.prototype.cachAction = function() {
 
       /* cette node est-elle la grabbed one ? */
       if (this.link[i] == Ovoid.Input.grabbedNode) {
+        /* modifie le curseur */
+        document.body.style.cursor = 'crosshair';
         this.onGrabd(this.link[i]);
         /* on test tous les évements */
         if (Ovoid.Input.intDn[0]) this.onLmbDn(this.link[i]);

@@ -145,52 +145,56 @@
 Ovoid.Drawer = {};
 
 
-/** drawer option. Clearing buffer color */
+/** Clearing buffer color */
 Ovoid.Drawer.opt_clearColor = [1.0, 1.0, 1.0, 1.0];
 
 
-/** drawer option. Global ambient lighting color */
+/** Global ambient lighting color */
 Ovoid.Drawer.opt_ambientColor = [0.2, 0.2, 0.2, 1.0];
 
 
-/** drawer option. Enable Z-fail shadow casting rendering */
+/** Enable Z-fail shadow casting rendering */
 Ovoid.Drawer.opt_shadowCasting = true;
 
 
-/** drawer option. Minimum average size to build shadow volum for */
+/** Minimum average size to build shadow volum for */
 Ovoid.Drawer.opt_shadowCastingExclusion = 2.0;
 
 
-/** drawer option. Enable layers drawing */
+/** Enable layers drawing */
 Ovoid.Drawer.opt_drawLayers = true;
 
 
-/** drawer option. Enable helpers drawing */
+/** Enable helpers drawing */
 Ovoid.Drawer.opt_drawHelpers = false;
 
 
-/** drawer option. Enable axis drawing */
+/** Enable axis drawing */
 Ovoid.Drawer.opt_drawAxis = false;
 
 
-/** drawer option. Enable bounding box drawing */
+/** Enable bounding box drawing */
 Ovoid.Drawer.opt_drawBoundingBox = false;
 
 
-/** drawer option. Enable bounding _sphere drawing */
+/** Enable bounding _sphere drawing */
 Ovoid.Drawer.opt_drawBoundingSphere = false;
 
 
-/** drawer option. Enable joint helpers drawing */
+/** Enable joint helpers drawing */
 Ovoid.Drawer.opt_drawJointBones = false;
 
 
-/** drawer option. Enable light helpers drawing */
+/** Enable light helpers drawing */
 Ovoid.Drawer.opt_drawLights = false;
 
 
-/** drawer option. Enable camera helpers drawing */
+/** Enable camera helpers drawing */
 Ovoid.Drawer.opt_drawCameras = false;
+
+
+/** Joint helpers's size */
+Ovoid.Drawer.opt_jointSize = 2.0;
 
 
 /** Private class member for drawing shader set stock. */
@@ -293,19 +297,11 @@ Ovoid.Drawer._blanktexture = null;
 Ovoid.Drawer._fontmap = null;
 
 
-/** Private class member for texts vertices buffer. */
-Ovoid.Drawer._f32arytext = new Float32Array(Ovoid.MAX_FONTMAP_STRING_LENGTH * 4);
-
-
-/** Private class member for shadow volums vertices buffer. */
-Ovoid.Drawer._f32aryshdw = new Float32Array(Ovoid.MAX_SHADOW_VOLUM_VERTICES * 4);
-
-
 /** temporary transformation matrix */
 Ovoid.Drawer._f32arymxf = new Float32Array(16);
 
 
-/** temporary orthographic perspective matrix */
+/** temporary orthographic projection matrix */
 Ovoid.Drawer._f32arymor = new Float32Array(16);
 
 
@@ -344,17 +340,6 @@ Ovoid.Drawer._f32aryle = new Int32Array(Ovoid.MAX_LIGHT_BY_DRAW);
 /** Private class member for ambient color. */
 Ovoid.Drawer._f32aryac = new Float32Array(4);
 
-
-/** temporary light position */
-Ovoid.Drawer._templp = new Ovoid.Point();
-
-
-/** temporary light direction */
-Ovoid.Drawer._templd = new Ovoid.Vector();
-
-
-/** temporary shadow volum vertex position */
-Ovoid.Drawer._tempvp = Ovoid.Point.newArray(6);
 
 
 /**
@@ -1040,10 +1025,15 @@ Ovoid.Drawer.drawStacksRPixel = function(reye, bodyq, layerq) {
   var i = bodyq.count;
   while (i--)
   {
+    /* ne dessinge que les nodes pickable (linked a un Action) sauf si 
+     * en mode debug */
+    if(!bodyq[i].pickable && !Ovoid.opt_debugMode)
+      continue;
+      
     color.fromInt(bodyq[i].uid);
     /* set color C */
     Ovoid.Drawer._sp.setUniform4fv(9, color.v);
-
+    
     if (bodyq[i].shape.type & Ovoid.MESH) {
       /* transform matrix; MXF */
       Ovoid.Drawer._sp.setUniformMatrix4fv(0, bodyq[i].worldMatrix.m);
@@ -1307,7 +1297,7 @@ Ovoid.Drawer.drawStackWorldZfail = function(reye, lightq, bodyq) {
     if (lightq[l].shadowCasting)
     {
       /* Dessin des shadow volums */
-
+      
       /* disable ambient; ENa */
       Ovoid.Drawer._sp.setUniform1i(1, 0);
       Ovoid.gl.depthFunc(Ovoid.gl.LESS);
@@ -1354,7 +1344,7 @@ Ovoid.Drawer.drawStackWorldZfail = function(reye, lightq, bodyq) {
 
     /* Dessins de la scenne en blend additif pour ajouter l'éclairage
      * diffus */
-
+  
     /* enable diffuse ENd */
     Ovoid.Drawer._sp.setUniform1i(0, 1);
     /* changement du depth func */
@@ -1552,7 +1542,9 @@ Ovoid.Drawer.drawText = function(text) {
   var z = text.size.v[0];
 
   var n = text.string.length;
-  for (var i = 0; i < n && i < Ovoid.MAX_FONTMAP_STRING_LENGTH; i++)
+  var V = new Float32Array(n*4);
+  
+  for (var i = 0; i < n; i++)
   {
     b = a; /* old a == charCodeAt(i - 1) */
     a = text.string.charCodeAt(i);
@@ -1568,10 +1560,10 @@ Ovoid.Drawer.drawText = function(text) {
     if (b == 0xC3) { /* unicod correction d'index */
       a += 64;
     }
-    Ovoid.Drawer._f32arytext[c] = x + (u * x);
-    Ovoid.Drawer._f32arytext[c + 1] = (y * 0.5) + (l * y);
-    Ovoid.Drawer._f32arytext[c + 2] = z;
-    Ovoid.Drawer._f32arytext[c + 3] = a - 32;
+    V[c] = x + (u * x);
+    V[c + 1] = (y * 0.5) + (l * y);
+    V[c + 2] = z;
+    V[c + 3] = a - 32;
     c += 4; u++;
   }
   /* transform matrix; MXF */
@@ -1586,12 +1578,11 @@ Ovoid.Drawer.drawText = function(text) {
 
   /* texture sampler diffuse; Sd */
   Ovoid.Drawer._sp.setUniformSampler(1, 1);
+  
   Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[7]);
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-                      Ovoid.Drawer._f32arytext,
-                      Ovoid.gl.DYNAMIC_DRAW);
+  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,V,Ovoid.gl.DYNAMIC_DRAW);
   Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P, 16);
-  Ovoid.gl.drawArrays(Ovoid.gl.POINTS, 0, c / 4);
+  Ovoid.gl.drawArrays(Ovoid.gl.POINTS, 0, c*0.25);
   
   Ovoid.Drawer._drawnlayer++;
 };
@@ -1733,16 +1724,16 @@ Ovoid.Drawer.drawSymbolic = function(transform) {
   if ((transform.type & Ovoid.JOINT) && Ovoid.Drawer.opt_drawJointBones) {
 
     Ovoid.Drawer._f32arymxf.set(transform.worldMatrix.m);
-    var size = 2.0;
-    Ovoid.Drawer._f32arymxf[0] *= size; 
-    Ovoid.Drawer._f32arymxf[1] *= size; 
-    Ovoid.Drawer._f32arymxf[2] *= size;
-    Ovoid.Drawer._f32arymxf[4] *= size; 
-    Ovoid.Drawer._f32arymxf[5] *= size; 
-    Ovoid.Drawer._f32arymxf[6] *= size;
-    Ovoid.Drawer._f32arymxf[8] *= size; 
-    Ovoid.Drawer._f32arymxf[9] *= size; 
-    Ovoid.Drawer._f32arymxf[10] *= size;
+    var S = Ovoid.Drawer.opt_jointSize * transform.size;
+    Ovoid.Drawer._f32arymxf[0] *= S; 
+    Ovoid.Drawer._f32arymxf[1] *= S; 
+    Ovoid.Drawer._f32arymxf[2] *= S;
+    Ovoid.Drawer._f32arymxf[4] *= S; 
+    Ovoid.Drawer._f32arymxf[5] *= S; 
+    Ovoid.Drawer._f32arymxf[6] *= S;
+    Ovoid.Drawer._f32arymxf[8] *= S; 
+    Ovoid.Drawer._f32arymxf[9] *= S; 
+    Ovoid.Drawer._f32arymxf[10] *= S;
     /* transform matrix; MXF */
     Ovoid.Drawer._sp.setUniformMatrix4fv(0, Ovoid.Drawer._f32arymxf);
     /* color; C */
@@ -1847,50 +1838,54 @@ Ovoid.Drawer.drawSymbolic = function(transform) {
  */
 Ovoid.Drawer.drawShadowVolum = function(body, light) {
 
-  if (((body.boundingBox.hsize.v[0] +
-      body.boundingBox.hsize.v[1] +
-      body.boundingBox.hsize.v[2])) <
-          Ovoid.Drawer.opt_shadowCastingExclusion)
+  if (((body.boundingBox.hsize.v[0] + body.boundingBox.hsize.v[1] + body.boundingBox.hsize.v[2])) < Ovoid.Drawer.opt_shadowCastingExclusion)
     return;
 
   var polyset, l, j, k, i, a, n, c;
+  
   l = 0; /* TODO: implementation du Lod si besoin */
-
-  /* construction du shadow volum */
-  /* position de la lumiere en coordonnée locale à l'objet */
-  Ovoid.Drawer._templp.copy(light.worldPosition);
-  Ovoid.Drawer._templp.transform4Inverse(body.worldMatrix);
-
-  /* on parcour la liste de triangles pour creer le vertex buffer du
-   * shadow volum */
   c = body.shape.triangles[l].length;
+  
+  var P = new Array(6);
+  P[3] = new Ovoid.Point();
+  P[4] = new Ovoid.Point();
+  P[5] = new Ovoid.Point();
+  var LP = new Ovoid.Point();
+  var LD = new Ovoid.Vector();
+  // 4 float par vertex, 3 vertex par face, le double de face = 24
+  var V = new Float32Array(c*24);
+
+  // position de la lumiere en coordonnée locale à l'objet 
+  LP.copy(light.worldPosition);
+  LP.transform4Inverse(body.worldMatrix);
+
+  // on parcour la liste de triangles pour creer le vertex buffer du shadow volum
   n = 0;
   for (i = 0; i < c; i++)
   {
-    Ovoid.Drawer._templd.subOf(Ovoid.Drawer._templp, body.shape.triangles[l][i].center);
-    //Ovoid.Drawer._f32aryld.normalize();
-    if (Ovoid.Drawer._templd.dot(body.shape.triangles[l][i].normal) > 0.0)
+    LD.subOf(LP, body.shape.triangles[l][i].center);
+    if (LD.dot(body.shape.triangles[l][i].normal) > 0.0)
     {
       /* triangles face lumiere */
-      Ovoid.Drawer._tempvp[0] = body.shape.vertices[l][body.shape.triangles[l][i].index[0]].p;
-      Ovoid.Drawer._tempvp[1] = body.shape.vertices[l][body.shape.triangles[l][i].index[1]].p;
-      Ovoid.Drawer._tempvp[2] = body.shape.vertices[l][body.shape.triangles[l][i].index[2]].p;
+      P[0] = body.shape.vertices[l][body.shape.triangles[l][i].index[0]].p;
+      P[1] = body.shape.vertices[l][body.shape.triangles[l][i].index[1]].p;
+      P[2] = body.shape.vertices[l][body.shape.triangles[l][i].index[2]].p;
       
-      Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[0].v, n * 4); n++;
-      Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[1].v, n * 4); n++;
-      Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[2].v, n * 4); n++;
-
       /* triangle extrudé à l'infini lumiere */
-      Ovoid.Drawer._tempvp[3].subOf(Ovoid.Drawer._tempvp[0], Ovoid.Drawer._templp);
-      Ovoid.Drawer._tempvp[4].subOf(Ovoid.Drawer._tempvp[1], Ovoid.Drawer._templp);
-      Ovoid.Drawer._tempvp[5].subOf(Ovoid.Drawer._tempvp[2], Ovoid.Drawer._templp);
+      P[3].subOf(P[0], LP);
+      P[4].subOf(P[1], LP);
+      P[5].subOf(P[2], LP);
 
-      /* doivent être dessiné a l'envers pour que le cull
-       * face Front/Back soit re_specte */
-      Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[3].v, n * 4); n++;
-      Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[5].v, n * 4); n++;
-      Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[4].v, n * 4); n++;
-
+      // ( La methode d'assignation est bête et brute, mais c'est la plus rapide )
+      V[n] = P[0].v[0]; n++; V[n] = P[0].v[1]; n++; V[n] = P[0].v[2]; n++; V[n] = 1.0; n++;
+      V[n] = P[1].v[0]; n++; V[n] = P[1].v[1]; n++; V[n] = P[1].v[2]; n++; V[n] = 1.0; n++;
+      V[n] = P[2].v[0]; n++; V[n] = P[2].v[1]; n++; V[n] = P[2].v[2]; n++; V[n] = 1.0; n++;
+      
+      // doivent être dessiné a l'envers pour le face-culling Front/Back 
+      V[n] = P[3].v[0]; n++; V[n] = P[3].v[1]; n++; V[n] = P[3].v[2]; n++; V[n] = 0.0; n++;
+      V[n] = P[5].v[0]; n++; V[n] = P[5].v[1]; n++; V[n] = P[5].v[2]; n++; V[n] = 0.0; n++;
+      V[n] = P[4].v[0]; n++; V[n] = P[4].v[1]; n++; V[n] = P[4].v[2]; n++; V[n] = 0.0; n++;
+      
       /* on verifie les adjacents */
       for (j = 0; j < 3; j++)
       {
@@ -1898,41 +1893,44 @@ Ovoid.Drawer.drawShadowVolum = function(body, light) {
         a = body.shape.triangles[l][i].adjacent[j];
         if (a != -1.0)
         {
-          Ovoid.Drawer._templd.subOf(Ovoid.Drawer._templp, body.shape.triangles[l][a].center);
-          //Ovoid.Drawer._f32aryld.normalize();
-          if (Ovoid.Drawer._templd.dot(body.shape.triangles[l][a].normal) <= 0.0)
+          LD.subOf(LP, body.shape.triangles[l][a].center);
+          if (LD.dot(body.shape.triangles[l][a].normal) <= 0.0)
           {
             /* le premier triangle du "ring", l'index des vertices
              * est trouvé car l'ordre des edges est 01-12-20 le second
              * peut donc être trouvé grace à un modulo :
              * (0+1)%3 = 1, (1+1)%3 = 2, (1+2)%3 = 0*/
+            
             k = (j + 1) % 3;
-            Ovoid.Drawer._tempvp[3].subOf(Ovoid.Drawer._tempvp[j], Ovoid.Drawer._templp);
-            Ovoid.Drawer._tempvp[4].subOf(Ovoid.Drawer._tempvp[k], Ovoid.Drawer._templp);
+            P[3].subOf(P[j], LP);
+            P[4].subOf(P[k], LP);
 
-            Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[j].v, n * 4); n++;
-            Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[4].v, n * 4); n++;
-            Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[k].v, n * 4); n++;
-
-            Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[j].v, n * 4); n++;
-            Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[3].v, n * 4); n++;
-            Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[4].v, n * 4); n++;
+            V[n] = P[j].v[0]; n++;V[n] = P[j].v[1]; n++;V[n] = P[j].v[2]; n++;V[n] = 1.0; n++;
+            V[n] = P[4].v[0]; n++;V[n] = P[4].v[1]; n++;V[n] = P[4].v[2]; n++;V[n] = 0.0; n++;
+            V[n] = P[k].v[0]; n++;V[n] = P[k].v[1]; n++;V[n] = P[k].v[2]; n++;V[n] = 1.0; n++;
+            
+            V[n] = P[j].v[0]; n++;V[n] = P[j].v[1]; n++;V[n] = P[j].v[2]; n++;V[n] = 1.0; n++;
+            V[n] = P[3].v[0]; n++;V[n] = P[3].v[1]; n++;V[n] = P[3].v[2]; n++;V[n] = 0.0; n++;
+            V[n] = P[4].v[0]; n++;V[n] = P[4].v[1]; n++;V[n] = P[4].v[2]; n++;V[n] = 0.0; n++;
+            
           }
         } else {
 
           /* si pas de face adjacente c'est un face de bordure
              on extrude les bords */
+          
           k = (j + 1) % 3;
-          Ovoid.Drawer._tempvp[3].subOf(Ovoid.Drawer._tempvp[j], Ovoid.Drawer._templp);
-          Ovoid.Drawer._tempvp[4].subOf(Ovoid.Drawer._tempvp[k], Ovoid.Drawer._templp);
+          P[3].subOf(P[j], LP);
+          P[4].subOf(P[k], LP);
 
-          Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[j].v, n * 4); n++;
-          Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[4].v, n * 4); n++;
-          Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[k].v, n * 4); n++;
-
-          Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[j].v, n * 4); n++;
-          Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[3].v, n * 4); n++;
-          Ovoid.Drawer._f32aryshdw.set(Ovoid.Drawer._tempvp[4].v, n * 4); n++;
+          V[n] = P[j].v[0]; n++;V[n] = P[j].v[1]; n++;V[n] = P[j].v[2]; n++;V[n] = 1.0; n++;
+          V[n] = P[4].v[0]; n++; V[n] = P[4].v[1]; n++;V[n] = P[4].v[2]; n++;V[n] = 0.0; n++;
+          V[n] = P[k].v[0]; n++; V[n] = P[k].v[1]; n++;V[n] = P[k].v[2]; n++;V[n] = 1.0; n++;
+          
+          V[n] = P[j].v[0]; n++;V[n] = P[j].v[1]; n++;V[n] = P[j].v[2]; n++;V[n] = 1.0; n++;
+          V[n] = P[3].v[0]; n++;V[n] = P[3].v[1]; n++;V[n] = P[3].v[2]; n++;V[n] = 0.0; n++;
+          V[n] = P[4].v[0]; n++;V[n] = P[4].v[1]; n++;V[n] = P[4].v[2]; n++;V[n] = 0.0; n++;
+          
         }
       }
     }
@@ -1940,24 +1938,18 @@ Ovoid.Drawer.drawShadowVolum = function(body, light) {
   
   /* bind les buffers */
   Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[7]);
-
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-                      Ovoid.Drawer._f32aryshdw,
-                      Ovoid.gl.DYNAMIC_DRAW);
-
+  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER, V, Ovoid.gl.DYNAMIC_DRAW);
   Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P, 16);
-
-  
 
   /* dessins des faces arrieres, incremente le stencil */
   Ovoid.gl.cullFace(Ovoid.gl.FRONT);
   Ovoid.gl.stencilOp(Ovoid.gl.KEEP, Ovoid.gl.INCR, Ovoid.gl.KEEP);
-  Ovoid.gl.drawArrays(Ovoid.gl.TRIANGLES, 0, n);
+  Ovoid.gl.drawArrays(Ovoid.gl.TRIANGLES, 0, n*0.25);
 
   /* dessins des faces avant, decremente le stencil */
   Ovoid.gl.cullFace(Ovoid.gl.BACK);
   Ovoid.gl.stencilOp(Ovoid.gl.KEEP, Ovoid.gl.DECR, Ovoid.gl.KEEP);
-  Ovoid.gl.drawArrays(Ovoid.gl.TRIANGLES, 0, n);
+  Ovoid.gl.drawArrays(Ovoid.gl.TRIANGLES, 0, n*0.25);
 
   Ovoid.Drawer._drawnshadow++;
 };
