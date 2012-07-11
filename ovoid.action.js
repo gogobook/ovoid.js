@@ -38,7 +38,7 @@
  * &nbsp;&nbsp;<codecomment>// Do some funny stuff</codecomment><br>
  * };<br>
  * <br>
- * var action = new Ovoid.Action("myAction");
+ * var action = scene.create(Ovoid.ACTION, "myAction");<br>
  * action.onLmbDn = catastrophe;<br>
  * action.linkNode(mybox);<br>
  * </blockcode><br><br>
@@ -66,12 +66,6 @@
  * the grabbed node while ignoring the others. You also must release the grabbed 
  * node to return in the normal interaction behaviour.<br><br>
  * 
- * The Action node also provides two special overridable trigger functions 
- * related to the node-grabbing which correspond to the two main possibilities: 
- * "while node is grabbed" and "while node is NOT Grabbed". Both trigger 
- * function are called each frame while the event "node is grabbed" or "node is 
- * not grabbed" is true.<br><br>
- * 
  * <blockcode>
  * function grabnode(node) {<br>
  * &nbsp;&nbsp;Ovoid.grabNode(node)<br>
@@ -87,11 +81,17 @@
  * &nbsp;&nbsp;}<br>
  * };<br>
  * <br>
- * var action = new Ovoid.Action("myAction");
+ * var action = scene.create(Ovoid.ACTION, "myAction");<br>
  * action.onLmbDn = grabnode;<br>
  * action.onGrabd = rotate;<br>
  * action.linkNode(mybox);<br>
- * </blockcode>
+ * </blockcode><br><br>
+ * 
+ * The Action node also provides two special overridable trigger functions 
+ * related to the node-grabbing which correspond to the two main possibilities: 
+ * "while node is grabbed" and "while node is NOT Grabbed". Both trigger 
+ * function are called each frame while the event "node is grabbed" or "node is 
+ * not grabbed" is true.
  * 
  * @extends Ovoid.Node
  * 
@@ -107,126 +107,126 @@ Ovoid.Action = function(name) {
    * @type string */
   this.name = name;
 
-  /** Overridable event triggered function.
-   * Function triggered once when the mouse pointer is penetrating over the node.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+  /** Overridable event triggered function.<br><br>
+   * Function triggered once when the mouse pointer is penetrating over the node.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onEnter = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field 
    * @type Function
-   * @param {Object} node The implied event's node. */
+   * @param {Object} node The implied event node. */
   this.onEnter = function(node) {};
-  /** Overridable event triggered function.
-   * Function triggered once when the mouse pointer is leaving from over the node.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+  /** Overridable event triggered function.<br><br>
+   * Function triggered once when the mouse pointer is leaving from over the node.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onLeave = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field 
    * @type Function
-   * @param {Object} node The implied event's node. */
+   * @param {Object} node The implied event node. */
   this.onLeave = function(node) {};
-  /** Overridable event triggered function.
-   * Function triggered constantly when the mouse pointer is over the node.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+  /** Overridable event triggered function.<br><br>
+   * Function triggered constantly when the mouse pointer is over the node.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onOver = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field 
    * @type Function
-   * @param {Object} node The implied event's node. */
+   * @param {Object} node The implied event node. */
   this.onOver = function(node) {};
-  /** Overridable event triggered function.
+  /** Overridable event triggered function.<br><br>
    * Function triggered once when the mouse pointer is over the node and the.
-   * left mouse button is pressed.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+   * left mouse button is pressed.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onLmbDn = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field 
    * @type Function
-   * @param {Object} node The implied event's node. */
+   * @param {Object} node The implied event node. */
   this.onLmbDn = function(node) {};
-  /** Overridable event triggered function.
+  /** Overridable event triggered function.<br><br>
    * Function triggered once when the mouse pointer is over the node and the.
-   * left mouse button is released.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+   * left mouse button is released.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onLmbUp = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field 
    * @type Function
-   * @param {Object} node The implied event's node. */
+   * @param {Object} node The implied event node. */
   this.onLmbUp = function(node) {};
-  /** Overridable event triggered function.
+  /** Overridable event triggered function.<br><br>
    * Function triggered constantly when the mouse pointer is over the node and the.
-   * left mouse button is held.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+   * left mouse button is held.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onLmbHl = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field 
    * @type Function
-   * @param {Object} node The implied event's node. */
+   * @param {Object} node The implied event node. */
   this.onLmbHl = function(node) {};
-  /** Overridable event triggered function.
+  /** Overridable event triggered function.<br><br>
    * Function triggered once when the mouse pointer is over the node and the 
-   * middle mouse button is pressed.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+   * middle mouse button is pressed.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onMmbDn = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field 
    * @type Function
-   * @param {Object} node The implied event's node. */
+   * @param {Object} node The implied event node. */
   this.onMmbDn = function(node) {};
-  /** Overridable event triggered function.
+  /** Overridable event triggered function.<br><br>
    * Function triggered once when the mouse pointer is over the node and the 
-   * middle mouse button is released.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+   * middle mouse button is released.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onMmbUp = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field 
    * @type Function
-   * @param {Object} node The implied event's node. */
+   * @param {Object} node The implied event node. */
   this.onMmbUp = function(node) {};
-  /** Overridable event triggered function.
+  /** Overridable event triggered function.<br><br>
    * Function triggered constantly when the mouse pointer is over the node and the 
-   * middle mouse button is held.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+   * middle mouse button is held.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onMmbHl = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field 
    * @type Function
-   * @param {Object} node The implied event's node. */
+   * @param {Object} node The implied event node. */
   this.onMmbHl = function(node) {};
-  /** Overridable event triggered function.
+  /** Overridable event triggered function.<br><br>
    * Function triggered once when the mouse pointer is over the node and the 
-   * right mouse button is pressed.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+   * right mouse button is pressed.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onRmbDn = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
@@ -234,12 +234,12 @@ Ovoid.Action = function(name) {
    * @type Function
    * @param {Object} node The implied event's node. */
   this.onRmbDn = function(node) {};
-  /** Overridable event triggered function.
+  /** Overridable event triggered function.<br><br>
    * Function triggered once when the mouse pointer is over the node and the 
-   * right mouse button is released.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+   * right mouse button is released.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onRmbUp = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
@@ -247,12 +247,12 @@ Ovoid.Action = function(name) {
    * @type Function
    * @param {Object} node The implied event's node. */
   this.onRmbUp = function(node) {};
-  /** Overridable event triggered function.
+  /** Overridable event triggered function.<br><br>
    * Function triggered constantly when the mouse pointer is over the node and the 
-   * right mouse button is held.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+   * right mouse button is held.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onRmbHl = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
@@ -260,11 +260,11 @@ Ovoid.Action = function(name) {
    * @type Function
    * @param {Object} node The implied event's node. */
   this.onRmbHl = function(node) {};
-  /** Overridable event triggered function.
-   * Function triggered constantly when the linked/target node(s) is grabbed.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+  /** Overridable event triggered function.<br><br>
+   * Function triggered constantly when the linked nodes are grabbed.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onGrabd = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
@@ -272,11 +272,11 @@ Ovoid.Action = function(name) {
    * @type Function
    * @param {Object} node The implied event's node. */
   this.onGrabd = function(node) {};
-  /** Overridable event triggered function.
-   * Function triggered constantly when the linked/target node(s) is NOT grabbed.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the implied event's node.
-   * <br><br>
+  /** Overridable event triggered function.<br><br>
+   * Function triggered constantly when the linked nodes are not grabbed.<br><br>
+   * 
+   * The function accepts one parameter which is the event's involved node.<br><br>
+   * 
    * <blockcode>
    * action.onUgrabd = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
@@ -291,11 +291,9 @@ Ovoid.Action.prototype.constructor = Ovoid.Action;
 
 
 /**
- * Link a node to this instance.
+ * Link a node to this instance.<br><br>
  * 
- * <br><br>If you want the Action node to take effect on a node, you have to link 
- * the node to it. You can link as many nodes you want to the same Action node 
- * instance, so all linked nodes will have the same behaviours.
+ * Assigns a node which be affected by this instance's trigger functions.
  *
  * @param {Node} node Node to link.
  * 

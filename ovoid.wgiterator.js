@@ -21,39 +21,30 @@
 /**
  * Create new world graph iterator.
  *
- * @class World Graph depth-first iterator.
+ * @class World Graph depth-first iterator.<br><br>
  *
  * This class provides an implementation of a graph depth-first iterator for 
- * Node objects. The world graph is the graph defined by the 
- * <code>parent</code> and <code>child</code> Node object fileds. 
- * <br>
- * <br>
- * <b>The Node world hierarchy concept</b>
- * <br>
- * <br>
- * Nodes are almost all connected ones with the others. The most known and 
- * common node relationship is the hierarchy, described with a graph of parent 
- * and child nodes, it is also the most visible. This relationship is called 
- * "world" because it affect the nodes's world transformations in space.
- * <br>
- * <br>
- * The node world hierarchy 
- * can be defined as how a node's transformations lead the transformations of 
- * another one, or from an other point of view, in which order the nodes's 
- * transformations should be treated to accomplish the global scene 
- * transformation. For example, suppose two nodes, the first is the parent of
- * the second, and so the first has the second as child. If you move the first
- * (parent) node, the second (child) node will follow the first in all its 
- * transformations. However, if you move the second (child) node, the first 
- * (parent) will not be affected by this transformation.
- * <br>
- * <br>
- * In Node object the world hierarchy graph is defined by the <code>parent</code>
- * and 
- * <code>child</code> fields. The first is a reference to an other Node object, 
- * the second is an Array of other Node objets. The <code>parent</code> is a 
- * the parent node of the Node object. The <code>child</code> Array contains all 
- * nodes who are child of the Node object.
+ * Node objects's hierarchy tree.<br><br>
+ * 
+ * <b>World hierarchy graph</b><br><br>
+ * 
+ * The world hierarchy is the most common and known relationship type in 3D 
+ * context. It is defined by the child-parent relationship, 
+ * who describes how a node will affects (leads) the transformation of one or 
+ * several other nodes. In practice, each child nodes recursively undergoes the 
+ * transformation (in parent space coordinate) applied to its parents.<br><br>
+ * 
+ * <blockcode>
+ * var wgit = new Ovoid.WgIterator(node);<br>
+ * while(wgit.explore()) {<br>
+ * &nbsp;&nbsp;alert(dgit.current.name);<br>
+ * }<br>
+ * </blockcode><br><br>
+ * 
+ * The Node class implement this relationship through its <code>parent</code> and 
+ * <code>child</code> member fields, and the relationship is created using the 
+ * <code>setParent</code> method. One node can only have one parent, and an 
+ * limitless amount of children.<br><br>
  * 
  * @see Ovoid.Node
  *
@@ -70,9 +61,9 @@ Ovoid.WgIterator = function(root) {
 
 
 /**
- * Iteration initialization.
+ * Iteration initialization.<br><br>
  * 
- * <br><br>Initialize the iterator for a new depth-first iteration trought Node's 
+ * Initialize the iterator for a new depth-first iteration trought Node's 
  * hierarchy tree.
  *
  * @param {Node} root Root Node object to begin iteration.
@@ -89,9 +80,9 @@ Ovoid.WgIterator.prototype.init = function(root) {
 
 
 /**
- * Iterate through the graph tree.
+ * Iterate through the graph tree.<br><br>
  * 
- * <br><br>Iterate in depth-first through the graph tree of nodes who are the direct
+ * Iterate in depth-first through the graph tree of nodes who are the direct
  * childrens of the current one.
  *
  * @return {bool} True if it remains nodes to be explored, false if tree is 

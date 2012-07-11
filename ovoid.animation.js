@@ -33,8 +33,16 @@
  * the 3D world. The Animation node is typically assigned to one and only one 
  * other node.<br><br>
  * 
+ * <blockcode>
+ * var youpi = scene.create(Ovoid.ANIMATION, "youpiAnim");<br>
+ * youpi.setCspline(Ovoid.ANIMATION_CHANNEL_ROTATE_X, keyTimes, keyValues);<br>
+ * <br>
+ * youpi.setTarget(box);<br>
+ * youpi.play();<br>
+ * </blockcode><br><br>
  * 
- * <b>Animation channels<b>
+ * <b>Animation channels</b><br><br>
+ * 
  * The Animation node acts as an attributes modifier for the targeted node. An 
  * animation channel is defined by one animation curve which modify one 
  * attribute (for example : X translation, Z Rotation, etc...). Attributes are 
@@ -88,11 +96,12 @@ Ovoid.Animation = function(name) {
    * will play the animation backward twice the normal speed.
    * @type float */
   this.factor = 1.0;
-  /** Overridable triggered function.
-   * Function triggered once the animation is end.
-   * <br><br>The function sould be designed to accept one parameter that is the 
-   * the Animation's target node.
-   * <br><br>
+  /** Overridable triggered function.<br><br>
+   * 
+   * This function is triggered each time the animation ends.<br><br>
+   * 
+   * The function accepts one parameter which is the involved 'this' instance.<br><br>
+   * 
    * <blockcode>
    * animation.onended = function (node) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
@@ -112,9 +121,10 @@ Ovoid.Animation.prototype.constructor = Ovoid.Animation;
 
 
 /**
- * Assign a curve to a target channel.
+ * Create curve on animation channel.<br><br>
  * 
- * Assign an linear-cosin interpolated curve to the specified target channel.
+ * Creates an linear/cosin interpolation curve to the specified animation 
+ * channel according to the specified data arrays.<br><br>
  *
  * @param {bitmask} f Curve target channel. Can be one the following symbolic 
  * constant:<br>
@@ -150,9 +160,10 @@ Ovoid.Animation.prototype.setCspline = function(f, x, y) {
 
 
 /**
- * Assign a curve to a target channel.
+ * Create curve on animation channel.<br><br>
  * 
- * Assign an Hermit interpolated curve to the specified target channel.
+ * Creates an Hermit interpolation curve to the specified animation 
+ * channel according to the specified data arrays.<br><br>
  *
  * @param {bitmask} f Curve target channel. Can be one the following symbolic 
  * constant:<br>
@@ -189,9 +200,10 @@ Ovoid.Animation.prototype.setHspline = function(f, x, y, v) {
 
 
 /**
- * Assign a curve to a target channel.
+ * Create curve on animation channel.<br><br>
  * 
- * Assign an Bezier interpolated curve to the specified target channel.
+ * Creates an Bezier interpolation curve to the specified animation 
+ * channel according to the specified data arrays.<br><br>
  *
  * @param {bitmask} f Curve target channel. Can be one the following symbolic 
  * constant:<br>
@@ -233,7 +245,7 @@ Ovoid.Animation.prototype.setBspline = function(f, x, y, cx, cy) {
  * 
  * Enable or disable the animation looping.
  *
- * @param {bool} loop Loop flag value to set.
+ * @param {bool} loop Boolean to enable or disable.
  */
 Ovoid.Animation.prototype.setLoop = function(loop) {
 
@@ -244,7 +256,7 @@ Ovoid.Animation.prototype.setLoop = function(loop) {
 /**
  * Stop animation.<br><br>
  * 
- * Stop to play the animation.
+ * Stop or pause the animation at the current time.
  */
 Ovoid.Animation.prototype.stop = function() {
 
@@ -256,12 +268,12 @@ Ovoid.Animation.prototype.stop = function() {
 /**
  * Play animation.<br><br>
  * 
- * Start or restart to play the animation according to the specified
- * playing factor.
+ * Play the animation from the current time with the specified pitch.
  *
- * @param {float} factor The time factor to play and interpolate the animation. 
- * The factor can be negative to play the animation backward. For example a 
- * value of -2.0 will play the animation backward twice the normal speed.
+ * @param {float} factor Pitch time factor.
+ * The factor can be positive to increase the animation pitch or negative to 
+ * play the animation backward. For example a value of -2.0 will play the 
+ * animation backward twice the normal speed.
  */
 Ovoid.Animation.prototype.play = function(factor) {
 
@@ -281,10 +293,10 @@ Ovoid.Animation.prototype.play = function(factor) {
 /**
  * Rewind animation.<br><br>
  * 
- * Rewind the animation according to the specified
- * playing factor.
+ * Rewind the animation at the end or the begining according to the specified 
+ * pitch.
  *
- * @param {float} factor The time factor to rewind the animation. 
+ * @param {float} factor Pitch time factor.
  * A positive value will set the animation at its begining, a negative value 
  * will set the animation at its end.
  */

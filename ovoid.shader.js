@@ -22,92 +22,116 @@
 /**
  * Create a Shader object.
  * 
- * @class Shader program object.
- * <br>
- * <br>
- * The Shader program is a wrapper interface class for accessing and interact
- * with GLSL shaders.
- * <br>
- * <br>
- * Note: This portion of documentation is more or less destined to advanced 
- * users since shader programming is the lowest programmation level and is not 
- * realy easily understandable without good basis on CG programming.
- * <br>
- * <br>
- * <b>What is a Shader Program</b>
- * <br>
- * <br>
- * Shaders are simple programs that describe the traits of either a vertex or a 
- * pixel. Vertex shaders describe the traits (position, texture coordinates, 
- * colors, etc.) of a vertex, while pixel shaders describe the traits (color, 
- * z-depth and alpha value) of a pixel. A vertex shader is called for each 
- * vertex in a primitive (possibly after tessellation); thus one vertex in, 
- * one (updated) vertex out. Each vertex is then rendered as a series of pixels 
- * onto a surface (block of memory) that will eventually be sent to the screen.
- * <br>
- * <br>
- * Shaders replace a section of video hardware typically called the Fixed 
- * Function Pipeline (FFP) – so-called because it performs lighting and texture 
- * mapping in a hard-coded manner. Shaders provide a programmable alternative 
- * to this hard-coded approach. (Thanks to Wikipedia)
- * <br>
- * <br>
- * <b>Why Wrapping Shader Programs</b>
- * <br>
- * <br>
- * Working with shaders, then interacting with shaders's variables or attributes 
- * with the GL built-in functions quickly becomes confusing depending on the 
- * shader's complexity. Because of that, once you have programmed a shader you 
- * are tempted to create hard-codded rendering process that work with  your 
- * own shader program. Since Ovoid is attempting to provide some flexibility, 
- * the wrapper is a standardised way to allow any shader program to work 
- * properly with the OvoiD.JS's rendering engine. (However, this flexibility has 
- * limits, since the rendering engine can't be modified, you have to follow 
- * some rules.)
- * <br>
- * <br>
- * <b>Wrap Map Concept</b>
- * <br>
- * <br>
- * The wrap map consist of an XML or JSON file that indicate to which slot/role 
- * the shader's variables are assigned. Ovoid provide an hard-coded wrap map for
- * default mapping, but also allow to use custom wrap map files.
- * <br>
- * <br>
- * In OpenGL or WebGL, the shader's variables and attributes can be retrieved by
- * their names. The wrapper must know which variable or attribute's name 
- * corresponds to which role in the rendering pipeline. For example if you have
- * an uniform matrix called "MvMtx", the wrapper must know that this 
- * uniform "MvMtx" is dedicated to be the main Modelview matrix to fill
- * and update its data during the rendering process. The wrap map provides a 
- * mecanism to automatize this translation between the shader's variable names 
- * and the internal OvoiD.JS's organization.
- * <br>
- * <br>
- * The XML or JSON wrap map file simply consist of a list of translation 
- * parameters. Here is an XML sample:
- * <br>
- * <br>
+ * @class Shader program object.<br><br>
+ * 
+ * The Shader object is a wrapper interface class for accessing and interact
+ * with GLSL shaders. It is used to load GLSL shader sources then compile, 
+ * link and wrap.<br><br>
+ * 
+ * <blockcode>
+ * var phong = new Ovoid.Shader();<br>
+ * phong.loadSource("phong.vs", "phong.fs", "custom.xml")<br>
+ * phong.linkWrap();<br>
+ * </blockcode><br><br>
+ * 
+ * <b>Why Wrapping Shader Programs</b><br><br>
+ * 
+ * Work with shaders by interacting with uniforms or attributes using the WebGL 
+ * built-in functions quickly becomes confusing depending on the shader's 
+ * complexity. The usual way consist on hard-coding the variables assignation 
+ * which creates a rigid program where shaders must always have the same 
+ * variables names to fit with the hard-coded assignation. Wrapping shader 
+ * allow an unified access to the variables of any custom shader without 
+ * rewriting the core rendering process.<br><br>
+ * 
+ * <b>Wrap Map Concept</b><br><br>
+ * 
+ * The wrap map is an XML or JSON file that indicate to which slot/role the 
+ * shader's variables are assigned. OvoiD.JS provide an hard-coded wrap map 
+ * for default mapping, but  allows to use custom wrap maps.<br><br>
+ * 
+ * In GLSL, the shader's variables and attributes can be retrieved by their 
+ * names. The wrapper must know which variable or attribute's name corresponds 
+ * to which role in the rendering pipeline. For example if you have an uniform 
+ * matrix called "MvMtx", the wrapper must know that this uniform "MvMtx" is 
+ * dedicated to be the main Modelview matrix to fill and update its data during 
+ * the rendering process. The wrap map provides a mecanism to automatize this 
+ * translation between the shader's variable names and the OvoiD.JS Drawing 
+ * process.<br><br>
+ * 
+ * The XML or JSON wrap map file simply consists of a list of translation 
+ * parameters. Here is an XML sample:<br><br>
+ * 
  * <blockcode>
  * &lt;uniformMatrix&gt;<br>
-   &nbsp;&nbsp;&lt;s symbol="UNIFORM_MATRIX_TRANSFORM_MAT4" id="0"&gt;MXF&lt;/s&gt;<br>
-   &nbsp;&nbsp;&lt;s symbol="UNIFORM_MATRIX_NORMAL_MAT3" id="1"&gt;MNR&lt;/s&gt;<br>
- * </blockcode>
- * <br>
- * <br>
+ * &nbsp;&nbsp;&lt;s symbol="UNIFORM_MATRIX_TRANSFORM_MAT4" id="0"&gt;MXF&lt;/s&gt;<br>
+ * &nbsp;&nbsp;&lt;s symbol="UNIFORM_MATRIX_NORMAL_MAT3" id="1"&gt;MNR&lt;/s&gt;<br>
+ * </blockcode><br><br>
+ * 
  * In the above sample, we can identify "symbol" and "id" attributes which are 
- * the internal OvoiD.JS's symbolic constants and their integer values. These XML 
- * attributes must not be modified. The "MXF" and "MNR" values are the names of 
- * uniformMatrix variables IN the shader. You guess that here, the MXF uniform 
- * is plugged to the UNIFORM_MATRIX_TRANSFORM_MAT4 rôle and the "MNR" uniform is 
- * plugged to the UNIFORM_MATRIX_NORMAL_MAT3 rôle.
- * <br>
- * <br>
- * Note, your shader must not necessarly use ALL the provided wrap's slots. The 
- * not found shader's variables are simply ignored and not wrapped.
- * <br>
- * <br>
- * Full filled XML and JSON wrap map examples are provided with OvoiD.JS Library.
+ * the internal OvoiD.JS symbolic constants and their integer values. These XML 
+ * attributes must not be modified (note: the "symbol" attribute is here for 
+ * readibility, the wrapping process ignores this attribute, which can 
+ * in fact stay empty). The "MXF" and "MNR" are the uniformMatrix variables's 
+ * names in the shader which should be assigned to the corresponding slot/id. 
+ * Here, the "MXF" uniform is plugged to the "UNIFORM_MATRIX_TRANSFORM_MAT4" 
+ * role/slot and the "MNR" uniform is plugged to the 
+ * "UNIFORM_MATRIX_NORMAL_MAT3" role/slot.<br><br>
+ * 
+ * The shader must not necessarly use ALL the available wrap slots. The 
+ * unfound shader's variables are simply ignored and not wrapped.<br><br>
+ * 
+ * Full filled XML and JSON wrap map examples are provided in OvoiD.JS source
+ * packages.<br><br>
+ * 
+ * <b>The Vertex Format</b><br><br>
+ * 
+ * The Vertex Format describes of which properties vertices of a list are 
+ * composed and how the vertices's data should be arranged in Vertex Buffer
+ * Objets (VBO).  The simplest vertex has only one property: its position in 
+ * space defined by a point. But a vertices can have other properties such as 
+ * normal, texture coordinates, color, etc...<br><br>
+ * 
+ * In the OvoiD.JS Library, the Vertex Format is defined using an bitmask 
+ * integer value that can be defined with symbolic constants:<br><br>
+ * 
+ * <blockcode>
+ * var format = Ovoid.Ovoid.VERTEX_VEC4_P | Ovoid.VERTEX_VEC3_N | Ovoid.VERTEX_VEC4_C;
+ * </blockcode><br><br>
+ * 
+ * In the above example, the resulting vertices of the specified format will 
+ * include four float values for position in space, three float values for 
+ * normal vector and four float values for color that give an eleven 32 
+ * bits floats vertex.<br><br>
+ * 
+ * The available vertex format components are the following ones: <br><br>
+ * 
+ * <ul>
+ * <li><code>Ovoid.VERTEX_VEC4_P</code></li>
+ * Four 32 bits float (x,y,z,w) for position point in space.<br><br>
+ * <li><code>Ovoid.VERTEX_VEC3_N</code></li>
+ * Three 32 bits float (x,y,z) for normal vector.<br><br>
+ * <li><code>Ovoid.VERTEX_VEC3_U</code></li>
+ * Three 32 bits float (u,v,w) for Uv texture coordinate.<br><br>
+ * <li><code>Ovoid.VERTEX_VEC3_T</code></li>
+ * Three 32 bits float (u,v,w) for Tangent space coordinate. (normal mapping)<br><br>
+ * <li><code>Ovoid.VERTEX_VEC3_B</code></li>
+ * Three 32 bits float (u,v,w) for binormal vector. (normal mapping)<br><br>
+ * <li><code>Ovoid.VERTEX_VEC4_C</code></li>
+ * Four 32 bits float (r,g,b,a) for vertex color.<br><br>
+ * <li><code>Ovoid.VERTEX_VEC4_I</code></li>
+ * Four 32 bits float (i,i,i,i) for influence matrix index. (skin deform)<br><br>
+ * <li><code>Ovoid.VERTEX_VEC4_W</code></li>
+ * Four 32 bits float (w,w,w,w) for influence wheight. (skin deform)<br><br>
+ * </ul><br><br>
+ * 
+ * As object, <code>Ovoid.Vertex</code> class contains 
+ * all these components that can be filled at your convenience and usage. 
+ * The vertex format is used to build and arrange data in Vertex Buffer Objets 
+ * (VBO) and describe the GLSL vertex attributes in shaders.<br><br>
+ * 
+ * The Shader object use the vertex format to automaticaly bind shader 
+ * attributes and enable or disable the suitable vertex attribs arrays.
  * 
  * @param {string} name Indicative name for this shader.
  */
@@ -187,11 +211,10 @@ Ovoid.Shader = function(name) {
   for (var i = 0; i < Ovoid.MAX_OUT_FRAGMENT; i++)
     this.outFragment[i] = -1;
 
-  /** Sahder source files loading status.
-   * This variable describe the current loading status of the source files. A 
-   * value of 0 means that the files are not loaded, a value of 1 means that the 
-   * files was successfully loaded, and a value of -1 means that the files 
-   * loading has failed.
+  /** Sahder source files loading status.<br><br>
+   * A value of 0 means that one or more file is not yet loaded, a value of 1 
+   * means that all the sources was successfully loaded, and a value of -1 means 
+   * the loading failed.
    * @type int */
   this.loadStatus = 0;
   
@@ -241,31 +264,24 @@ Ovoid.Shader.prototype._handleError = function() {
 
 
 /**
- * Load the specified source file for this instance.
+ * Load the specified source files for this instance.<br><br>
  * 
- * <br><br>By this method you can specify the source file to load and use to be
- * the data source of this instance. The file loading is instantaneously 
- * started in asynby this method. Once the loading is started you can check the 
- * <code>loadStatus</code> variable of this instance to know if and when 
- * the loading is done.
- * <br>
- * <br>
- * This <code>loadStatus</code> variable describe the current loading status of 
- * the source file. A value of 0 means that the file is not loaded, a value of 1 
- * means that the file was successfully loaded, and a value of -1 means that the 
- * file loading.
+ * Loads the specified external source files and store the 
+ * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
+ *  
+ * The <code>loadSatus</code> member indicates the loading status through an 
+ * integer value of 0, 1 or -1. A value of 0 means that one or more file is not 
+ * yet loaded, a value of 1 means that all the sources was successfully loaded, 
+ * and a value of -1 means the loading failed.<br><br>
  *
- * @param {string} vs Vertex program shader source file name. The 
- * specified source files are retrieved according to 
- * the <code>Ovoid.opt_shadersPath</code> global option.
+ * @param {string} vs Vertex program shader source file name. 
+ * <code>Ovoid.opt_shadersPath</code> is used as base path. 
  * 
- * @param {string} fs Fragment program shader source file name. The 
- * specified source files are retrieved according to 
- * the <code>Ovoid.opt_shadersPath</code> global option.
+ * @param {string} fs Fragment program shader source file name.
+ * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
- * @param {string} wm XML or JSON wrap map file name. The 
- * specified source files are retrieved according to 
- * the <code>Ovoid.opt_shadersPath</code> global option.
+ * @param {string} wm XML or JSON wrap map file name.
+ * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
  * @param {bool} as Optionnal asynchronous loading flag. If true or not null
  * the source is loaded in asynchronous way.
@@ -413,10 +429,10 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, as, np) {
 
 
 /**
- * Set shader's sources.
- * <br>
- * <br>
- * Defines the sahder's vertex program, fragment program and wrap map source. 
+ * Set shader's sources.<br><br>
+ * 
+ * Sets the sahder's vertex program, fragment program and wrap map source 
+ * strings. 
  *
  * @param {string} vs Vertex program shader source string.
  * 
@@ -433,15 +449,11 @@ Ovoid.Shader.prototype.setSources = function(vs, fs, wm) {
 }
 
 /**
- * Link & wrap shader sources.
+ * Link & wrap shader sources.<br><br>
  * 
- * <br><br>Compiles, links and then wraps the specified shader source files 
- * according to the given wrap map. The specified source files are retrieved 
- * according to the <code>Ovoid.opt_shadersPath</code> global option.
- * <br>
- * <br>
- * Note: The sources files must be successfully loaded using the 
- * <code>loadSource</code> method.
+ * Compiles, links and then wraps the current shader's sources. Source strings 
+ * must be loaded or defined using the <code>loadSource</code> or 
+ * <code>setSources</code> method.
  * 
  * @return {bool} True if operations suceeds, false otherwise.
  */
@@ -777,9 +789,9 @@ Ovoid.Shader.prototype.use = function() {
 
 
 /**
- * Plug vertex attribute.
+ * Plug vertex attribute.<br><br>
  * 
- * <br><br>Plugs the given vertex attribute to the specified slot.
+ * Plugs the given vertex attribute to the specified slot.
  *
  * @param {enum} slot Vertex attribute slot identifier. Can be one of the 
  * following symbolic constants:<br>
@@ -840,9 +852,9 @@ Ovoid.Shader.prototype.plugVertexAttrib = function(slot, attr) {
 
 
 /**
- * Plug uniform.
+ * Plug uniform.<br><br>
  * 
- * <br><br>Plugs the given uniform to the specified slot.
+ * Plugs the given uniform to the specified slot.
  *
  * @param {enum} slot Uniform slot identifier. Can be one of the 
  * following symbolic constants:<br><br>
@@ -897,9 +909,9 @@ Ovoid.Shader.prototype.plugUniform = function(slot, name) {
 
 
 /**
- * Plug matrix uniform.
+ * Plug matrix uniform.<br><br>
  *
- * <br><br>Plugs the given matrix uniform to the specified slot.
+ * Plugs the given matrix uniform to the specified slot.
  * 
  * @param {enum} slot Matrix uniform slot identifier. Can be one of the 
  * following symbolic constants:<br><br>
@@ -927,9 +939,9 @@ Ovoid.Shader.prototype.plugUniformMatrix = function(slot, name) {
 
 
 /**
- * Plug sampler uniform.
+ * Plug sampler uniform.<br><br>
  *
- * <br><br>Plugs the given sampler uniform to the specified slot.
+ * Plugs the given sampler uniform to the specified slot.
  * 
  * @param {enum} slot Sampler uniform slot identifier. Can be one of the 
  * following symbolic constants:<br><br>
@@ -1114,9 +1126,9 @@ Ovoid.Shader.prototype.setUniformSampler = function(s) {
 };
 
 
-/** Set attributes pointers.
+/** Set attributes pointers.<br><br>
  * 
- * <br><br>Enables and/or disables GL vertex attributes pointers and arrays 
+ * Enables and/or disables WebGL vertex attributes pointers and arrays 
  * according to the given Vertex format and vertex size.
  *
  * @param {bitmask} vformat Vertex format.
@@ -1154,9 +1166,9 @@ Ovoid.Shader.prototype.setVertexAttribPointers = function(vformat, vfbytes) {
 
 
 /**
- * Clear out fragment.
+ * Clear out fragment.<br><br>
  * 
- * <br><br>Clears all wrapped output fragments. (not yet implemented).
+ * Clears all wrapped output fragments. (not yet implemented).
  */
 Ovoid.Shader.prototype.clearOutFragment = function() {
 
@@ -1166,9 +1178,9 @@ Ovoid.Shader.prototype.clearOutFragment = function() {
 
 
 /**
- * Clear attributes.
+ * Clear attributes.<br><br>
  * 
- * <br><br>Clears all wrapped vertex attributes.
+ * Clears all wrapped vertex attributes.
  */
 Ovoid.Shader.prototype.clearVertexAttribs = function() {
 
@@ -1178,9 +1190,9 @@ Ovoid.Shader.prototype.clearVertexAttribs = function() {
 
 
 /**
- * Clear uniforms.
+ * Clear uniforms.<br><br>
  * 
- * <br><br>Clears all wrapped uniforms.
+ * Clears all wrapped uniforms.
  */
 Ovoid.Shader.prototype.clearUniforms = function() {
 
@@ -1190,9 +1202,9 @@ Ovoid.Shader.prototype.clearUniforms = function() {
 
 
 /**
- * Clear matrix uniforms.
+ * Clear matrix uniforms.<br><br>
  * 
- * <br><br>Clears all wrapped matrix uniforms.
+ * Clears all wrapped matrix uniforms.
  */
 Ovoid.Shader.prototype.clearUniformMatrices = function() {
 
@@ -1202,9 +1214,9 @@ Ovoid.Shader.prototype.clearUniformMatrices = function() {
 
 
 /**
- * Clear sampler uniforms.
+ * Clear sampler uniforms.<br><br>
  * 
- * <br><br>Clears all wrapped sampler uniforms.
+ * Clears all wrapped sampler uniforms.
  */
 Ovoid.Shader.prototype.clearUniformSamplers = function() {
 
@@ -1214,9 +1226,9 @@ Ovoid.Shader.prototype.clearUniformSamplers = function() {
 
 
 /**
- * Clear shader.
+ * Clear shader.<br><br>
  * 
- * <br><br>Clears and resets this instance.
+ * Clears and resets this instance.
  */
 Ovoid.Shader.prototype.clear = function() {
 

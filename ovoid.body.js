@@ -29,7 +29,7 @@
  * The Body node is the main representative world object. Inherited from the 
  * Transform node, it is a world-transformable node, which means it can be moved
  * rotated, scaled, etc... The Body node is dedicated (but not forced) to have a 
- * shape (Mesh, Emitter, etc...) which is assigned to it.
+ * shape (Mesh, Emitter, etc...) assigned.<br><br>
  * 
  * <b>Body node and shape concept</b><br><br>
  * 
@@ -74,9 +74,9 @@ Ovoid.Body.prototype.constructor = Ovoid.Body;
 
 
 /**
- * Assing a shape to this instance.
+ * Assing a shape to this instance.<br><br>
  * 
- * <br><br>Assings a Mesh, Emitter or Skin node as shape for this instance. 
+ * Assings a Mesh, Emitter or Skin node as shape for this instance. 
  * The assigned shape will be a dependency (depend node) for this instance.
  * 
  * @param {Node} shape Shape node to assing to this Body.

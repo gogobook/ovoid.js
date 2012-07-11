@@ -22,19 +22,18 @@
 /**
  * Texture node constructor.
  * 
- * @class Texture node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Texture node is the node used to load and store a texture image source. 
- * The Texture node is an abstract dependency node and is not in the world. 
- * Usualy, Texture are used for Material, Text (for font map) and Layer 
- * (for background).
- * <br>
- * <br>
- *  
+ * @class Texture node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Texture node implement a generic texture image. It is a 
+ * dependency node and does not takes place directly in the 3D world.<br><br>
+ * 
+ * <blockcode>
+ * var brick = scene.create(Ovoid.TEXTURE, "BrickTexture");<br>
+ * brick.loadSource("brickwall.png", true);<br>
+ * </blockcode><br><br>
+ * 
  * @extends Ovoid.Node
  *
  * @param {string} name Name of the node.
@@ -66,7 +65,10 @@ Ovoid.Texture = function(name) {
   /** Filtering level.
    * @type bool */
   this.filter = false;
-  /** Source image loading status.
+  /** Source image loading status.<br><br>
+   * A value of 0 means that the file is not yet 
+   * loaded, a value of 1 means that the source was successfully loaded, and a 
+   * value of -1 means the loading failed.
    * @type int */
   this.loadStatus = 0;
   /** Pixmap object.
@@ -130,12 +132,12 @@ Ovoid.Texture.prototype._handleError = function() {
 
 
 /**
- * Define filtering.
+ * Set filtering.<br><br>
  * 
- * <br><br>Sets the filtering for this instance. 
+ * Sets the texture filtering for this instance.
  *
- * @param {bool} filter If true the linear filtering is enabled, otherwize
- * the Nearest technique is used.
+ * @param {bool} filter If true all filtering are enabled as possible, otherwize
+ * the "nearest" technic is used.
  */
 Ovoid.Texture.prototype.setFilter = function(filter) {
 
@@ -193,23 +195,22 @@ Ovoid.Texture.prototype.setFilter = function(filter) {
 
 
 /**
- * Load the specified source file for this instance.
+ * Load the specified source file for this instance.<br><br>
  * 
- * <br><br>By this method you can specify the source file to load and use to be
- * the data source of this instance. The file loading is instantaneously 
- * started in asynby this method. Once the loading is started you can check the 
- * <code>loadStatus</code> variable of this instance to know if and when 
- * the loading is done.
- * <br>
- * <br>
- * This <code>loadStatus</code> variable describe the current loading status of 
- * the source file. A value of 0 means that the file is not loaded, a value of 1 
- * means that the file was successfully loaded, and a value of -1 means that the 
- * file loading 
+ * Loads the specified external source file and extracts, decodes or parses the 
+ * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
+ *  
+ * The <code>loadSatus</code> member indicates the loading status through an 
+ * integer value of 0, 1 or -1. A value of 0 means that the file is not yet 
+ * loaded, a value of 1 means that the source was successfully loaded, and a 
+ * value of -1 means the loading failed.<br><br>
  *
- * @param {string} url Source file name to load. Keep in mind that the 
- * <code>Ovoid.opt_texturePath</code> option will be used to retrieve the file.
- * @param {bool} filter Texture filtering to apply at loading.
+ * @param {string} url Source file name/url to load.
+ * <code>Ovoid.opt_texturePath</code> is used as base path.
+ * 
+ * @param {bool} filter Enable or disable the texture filtering on loaded 
+ * texture.
+ * 
  * @param {bool} nopath ignore the default search path 
  * (<code>Ovoid.opt_texturePath</code>).
  */
@@ -238,9 +239,9 @@ Ovoid.Texture.prototype.loadSource = function(url, filter, nopath) {
 
 
 /**
- * Bind texture.
+ * Bind texture.<br><br>
  * 
- * <br><br>Bind the Gl texture handle to the current Gl sampler.
+ * Bind the texture handle to the current sampler.
  */
 Ovoid.Texture.prototype.bind = function() {
 

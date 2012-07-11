@@ -28,22 +28,38 @@
  * This class is a Node object inherited from <code>Ovoid.Node</code> class.
  * <br>
  * <br>
- * The Physics node is a Constraint node and is used to describe and simulate 
- * physics properties to transformable nodes (Transform). Physics nodes apply 
- * physics behaviours constraints such as gravity or collisions with others 
- * Physics's constrained nodes, so they make the target node what is usualy 
- * called a "Rigid body".
- * An Physics node traditionnally simulate physics to one and only one target 
- * node. Since <code>Ovoid.Collada</code> DAE importer doese not support 
- * physical propertie importation the Physics node must be manually created.
- * <br>
- * <br>
+ * The Physics node implements an abstract object subjected to the laws of 
+ * physics. The Physics node is a dependency node and does not takes 
+ * place directly in the 3D world. It is a Constraint inherited node who modify 
+ * its target node's transformations.<br><br>
+ * 
  * <blockcode>
  * var phyics = scene.create(Ovoid.PHYSICS, "bodyPhysics");<br>
  * physics.model = Ovoid.RIGID_MASSIVE_SPHERE;<br>
  * physics.setTarget(body);<br>
- * </blockcode>
- * <br>
+ * </blockcode><br><br>
+ * 
+ * The Physics node is designed to be what is commonly called a Rigid Body. It 
+ * currently provides three behaviour models:<br><br>
+ * <ul>
+ * <li><b>Ovoid.RIGID_MASSIVE_SPHERE</b><br>
+ * The Rigid Massive Sphere model corresponds to a sphere shaped rigid body who 
+ * undergoes and react to applied forces (gravity, wind... ). The collision 
+ * shape is defined by the target node's bounding sphere.
+ * </li>
+ * <li><b>Ovoid.RIGID_MASSIVE_BOX</b><br>
+ * The Rigid Massive Box model corresponds to a box shaped rigid body who 
+ * undergoes and react to applied forces (gravity, wind... ). The collision 
+ * shape is defined by the target node's bounding box.
+ * </li>
+ * <li><b>Ovoid.RIGID_LANDSCAPE</b><br>
+ * The Rigid Landscape model corresponds to a mesh shaped rigid body who does 
+ * not undergoes nor react to applied forces and is dedicated to be used as 
+ * static collision landscape. The collision  shape is defined by the target 
+ * node's mesh.
+ * </li>
+ * </ul>
+ * 
  * @extends Ovoid.Constraint
  *
  * @param {string} name Name of the new node.

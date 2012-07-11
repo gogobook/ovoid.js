@@ -22,94 +22,75 @@
 /**
  * Transform node constructor.
  *
- * @class Transform node object.
- * <br>
- * <br>
- * The Transform node is the main base class for all transformable node. 
- * Transform is designed to be transformable in 3D world space.
- * <br>
- * <br>
- * Transform node is a geometrical affine transformer. In geometry, an affine 
- * transformation is a transformation which preserves straight lines  
- * and ratios of distances between points lying on a straight line. For this 
- * purpose, it use transformation matrices.
- * <br>
- * <br>
- * <b>Transformation matrices</b>
- * <br>
- * The transformation matrices of the Transform node are 4x4 matrices 
- * defined as follows:
- * <br>
+ * @class Transform node object.<br><br>
+ * 
+ * The Transform node implements an transformable node. It is the main 
+ * base class for all world-transformable node. It is a geometrical affine 
+ * transformer and provides common transformation methods such as translation,
+ * rotation, scale...<br><br>
+ * 
  * <blockcode>
- * | Xx  Xy  Xz  0 |<br>
- * | Yx  Yy  Yz  0 |<br>
- * | Zx  Zy  Zz  0 |<br>
- * | Tx  Ty  Tz  1 |<br>
- * </blockcode>
- * <br>
- * Where X, Y and Z are the main axis vectors of the object, and T the 
- * translation component.
- * <br>
- * Note: Unlike OpenGL (and so, WebGL) the OvoiD.JS Library uses
- * row-major transformation matrices order. (The matrices's data are in all 
- * cases stored as an 16 floats array, so, the OvoiD.JS Library's matrices's data 
- * can directly fill the GL's matrices)
- * <ul>
- * <li>Local Transformation matrix</li>
+ * var locator = scene.create(Ovoid.TRANSFORM, "nullobject");<br>
+ * locator.moveXyz(5.0, -2.0, 0.0, Ovoid.WORLD, Ovoid.ABSOLUT);<br>
+ * locator.rotateXyz(0.0, 1.57, 0.0, Ovoid.LOCAL, Ovoid.RELATIVE);<br>
+ * </blockcode><br><br>
+ * 
+ * <b>Transformation matrices</b>
+ * 
+ * Transform node implements transformations through an optimized version of the
+ * commonly used matrices multiplication:<br><br>
+ * 
+ * [S]*[RX]*[RY]*[RZ]*[T]<br><br>
+ * 
+ * Where S=Scale matrix, R=Rotation matrix, T=Translation matrix.<br><br>
+ * 
+ * <li>matrix</li><br>
  * The local transformation matrix describes the transformation of the object 
- * relative to itself or, in other words, its own origin. This matrix is 
- * directly made from the Transform's attributes : scale, translation, 
- * orientation, rotation.<br>
- * This an row-major 4x4 matrix.
- * <br>
- * <br>
- * <li>World transformation matrix</li>
+ * relative to itself without the recursive parent's transformations. 
+ * (This is a 4x4 matrix)<br><br>
+ * 
+ * <li>worldMatrix</li><br>
  * The world transformation matrix describes the transformation of the object 
- * relative to the world origin. This can be the same as the local 
- * transformation matrix if the Transform has no parent node. Otherwise, 
- * the world transformation matrix is a combinaison of the local 
- * transformation matrix and parent's world transformation matrix.<br>
- * This an row-major 4x4 matrix.
- * <br>
- * <br>
- * <li>Normal transformation matrix</li>
- * The normal transformation matrix is the transformation matrix applied to 
- * faces's or vertices's normals. This is the inverted "rotation" component 
- * of the  world transformation matrix.<br>
- * This is an row-major 3x3 matrix.
+ * relative to the world origin, in other words, the local transformation with 
+ * the recursive parent's transformations.<br>
+ * (This is a 4x4 matrix)<br><br>
+ * 
+ * <li>normalMatrix</li><br>
+ * The normal transformation matrix is the transformation matrix for
+ * faces's or vertices's normals. It is the inverse "rotation" component 
+ * of the world transformation matrix.<br>
+ * (This is a 3x3 matrix)<br><br>
  * </ul>
- * <br>
- * <b>Transformation space</b>
- * <br>
- * The transformation space describe in what space coordinate the transformation 
- * is applied. The Transform node considers two spaces coordinates, the local 
- * and world.
+ * 
+ * <b>Transformation Space</b><br><br>
+ * 
+ * The transformation space defines in which space coordinate the transformation 
+ * is applied. The Transform node considers two space coordinate.<br><br>
  * <ul>
- * <li>Local Space</li>
- * Local space, or object space is relative to the object's local 
+ * <li>Ovoid.LOCAL</li><br>
+ * Local space, or object space, is relative to the object's local 
  * transformations. Transformations applied using this space are applied from 
- * the object's "point of view".
- * <br>
- * <br>
- * <li>World Space</li>
+ * object's point of view.<br><br>
+ * 
+ * <li>Ovoid.WORLD</li><br>
  * World space is relative to the world origin's coordinates. Transformations 
- * applied using this space are applied from world's "point of view".
+ * applied using this space are applied from world's point of view.<br><br>
  * </ul>
- * <br>
- * <br>
- * <b>Transformation mode</b>
- * <br>
+ * 
+ * <b>Transformation Mode</b><br><br>
+ * 
  * The transformation mode describes how the transformation is applied according
- * to the object's origin.
+ * to the object's origin.<br><br>
  * <ul>
- * <li>Relative</li>
- * This is the most common way to transform objects. In relative mode, the given
- * transformation is applied as an "addition" to the current transformation.
- * <br>
- * <br>
- * <li>Absolute</li>
- * In absolute mode, the given transformation is applied from the world origin. 
+ * <li>Ovoid.RELATIVE</li><br>
+ * This is the most common way to transform objects. the given transformation is 
+ * applied as an addition to the current transformation.<br><br>
+ * 
+ * <li>Ovoid.ABSOLUTE</li><br>
+ * In absolute mode, the given transformation is applied as absolute values 
+ * from the world origin.<br><br>
  * </ul>
+ * 
  * @extends Ovoid.Node
  *
  * @param {string} name Name of the new node.
@@ -166,9 +147,8 @@ Ovoid.Transform.prototype.constructor = Ovoid.Transform;
 
 
 /**
- * Transform distance.
- * <br>
- * <br>
+ * Get distance from another instance.<br><br>
+ * 
  * Calculates the distance between this instance and another 
  * Transform instance.
  *
@@ -187,14 +167,14 @@ Ovoid.Transform.prototype.distanceFrom = function(transform) {
 
 
 /**
- * Transform direction.
+ * Get the direction from this instance to another.<br><br>
  * 
- * <br><br>Retriev the direction Vector from this instance to another Transform 
- * instance.
+ * Calculates the normalized direction vector from this instance to another 
+ * Transform instance.
  *
  * @param {Transform} transform Transform.
  *
- * @return {Vector} The normalized Vector to the specified Transform.
+ * @return {Vector} The normalized Vector from this to the specified Transform.
  *
  * @see Ovoid.Vector
  */
@@ -214,9 +194,9 @@ Ovoid.Transform.prototype.directionTo = function(transform) {
 
 
 /**
- * Scale transform.
+ * Scale transform.<br><br>
  * 
- * <br><br>Applies scale transformation to this instance according to the 
+ * Applies scale transformation to this instance according to the 
  * specified Vector.
  *
  * @param {Object} vect Scales Vector.
@@ -244,9 +224,9 @@ Ovoid.Transform.prototype.scale = function(vect, m) {
 
 
 /**
- * Scale transform.
+ * Scale transform.<br><br>
  * 
- * <br><br>Applies scale transformation to this instance according to the 
+ * Applies scale transformation to this instance according to the 
  * specified x, y and z values.
  *
  * @param {float} x The X scale value.
@@ -274,9 +254,9 @@ Ovoid.Transform.prototype.scaleXyz = function(x, y, z, m) {
 
 
 /**
- * Translation transform.
+ * Translation transform.<br><br>
  * 
- * <br><br>Applies translation transformation to this instance according to the 
+ * Applies translation transformation to this instance according to the 
  * specified Vector.
  * 
  * @param {Vector} vect Translation Vector.
@@ -341,9 +321,9 @@ Ovoid.Transform.prototype.move = function(vect, c, m) {
 
 
 /**
- * Translation transform.
+ * Translation transform.<br><br>
  * 
- * <br><br>Applies translation transformation to this instance according to the 
+ * Applies translation transformation to this instance according to the 
  * specified x, y and z values.
  *
  * @param {float} x The X translation value.
@@ -408,9 +388,9 @@ Ovoid.Transform.prototype.moveXyz = function(x, y, z, c, m) {
 
 
 /**
- * Orientation transform.
+ * Orientation transform.<br><br>
  * 
- * <br><br>Applies orientation transformation to this instance according to the 
+ * Applies orientation transformation to this instance according to the 
  * specified Euler rotation.
  *
  * @param {Euler} euler Orientation Euler.
@@ -444,9 +424,9 @@ Ovoid.Transform.prototype.orient = function(euler, c, m) {
 
 
 /**
- * Orientation transform.
+ * Orientation transform.<br><br>
  * 
- * <br><br>Applies orientation transformation to this instance according to the 
+ * Applies orientation transformation to this instance according to the 
  * specified x, y, and z euler angles.
  *
  * @param {float} x The X angle orientation value.
@@ -480,9 +460,9 @@ Ovoid.Transform.prototype.orientXyz = function(x, y, z, c, m) {
 
 
 /**
- * Rotation transform.
+ * Rotation transform.<br><br>
  * 
- * <br><br>Applies rotation transformation to this instance according to the 
+ * Applies rotation transformation to this instance according to the 
  * specified Euler rotation.
  *
  * @param {Euler} euler Rotation Euler.
@@ -521,9 +501,9 @@ Ovoid.Transform.prototype.rotate = function(euler, c, m) {
 
  
 /**
- * Rotation transform.
+ * Rotation transform.<br><br>
  * 
- * <br><br>Applies rotation transformation to this instance according to the 
+ * Applies rotation transformation to this instance according to the 
  * specified x, y and z euler angles.
  *
  * @param {float} x The X angle rotation value.

@@ -21,35 +21,29 @@
 /**
  * Create new dependency graph iterator.
  *
- * @class Dependency Graph depth-first iterator.
- * <br>
- * <br>
- * This class provides an implementation of a graph depth-first iterator for 
- * Node objects. The dependency graph is the graph defined by the 
- * <code>link</code> and <code>depend</code> Node object Array fileds. 
- * <br>
- * <br>
- * <b>The Node dependency concept</b>
- * <br>
- * <br>
- * Nodes are almost all connected ones with the others. The most known and 
- * common node relationship is the hierarchy, described with a graph of parent 
- * and child nodes. An other node relation is the dependency. 
- * <br>
- * <br>
- * The node dependency 
- * can be defined as how a node depends of another one to do its job, or 
- * from an other point of view, in which order the nodes should be treated to 
- * accomplish a global good job. For example, you can easily understand that a 
- * Mesh node that use some Material nodes depends of the Material nodes. 
- * If the Material nodes have a problem, the Mesh node has problem too.
- * <br>
- * <br>
- * In Node object the dependency graph is defined by the <code>link</code> and 
- * <code>depend</code> fields that are Array of other Node objects. The 
- * <code>depend</code> Array contains all nodes whose the Node object directly 
- * depends. The <code>link</code> Array contains all nodes whose directly 
- * depends of the Node object.
+ * @class Dependency Graph depth-first iterator.<br><br>
+ * 
+ * This class provides an implementation of a depth-first iterator for 
+ * Node objects's dependency tree.<br><br>
+ * 
+ * <b>Nodes dependency graph</b><br><br>
+ * 
+ * The nodes dependency is a less known relationship type who describe, as its 
+ * name says, the relative dependencies of nodes between them. In practice, the 
+ * the dependency graph tells which nodes should be updated in 
+ * order to fulfill updates of an other one.<br><br>
+ * 
+ * <blockcode>
+ * var dgit = new Ovoid.DgIterator(node);<br>
+ * while(dgit.exploreDepend()) {<br>
+ * &nbsp;&nbsp;alert(dgit.current.name);<br>
+ * }<br>
+ * </blockcode><br><br>
+ * 
+ * The Node class implement this relationship through its <code>depend</code> and 
+ * <code>link</code> member fields, and the relationship is created or 
+ * destroyed using the <code>makeDepend</code> and <code>breakDepend</code> 
+ * methods. One node can have an limitless amount of linked and depend nodes.<br><br> 
  * 
  * @see Ovoid.Node
  *
@@ -69,9 +63,9 @@ Ovoid.DgIterator = function(root) {
 
 
 /**
- * Iteration initialization.
+ * Iteration initialization.<br><br>
  * 
- * <br><br>Initialize the iterator for a new depth-first iteration trought Node's 
+ * Initialize the iterator for a new depth-first iteration trought Node's 
  * dependency tree.
  *
  * @param {Node} root Root Node object to begin iteration.
@@ -89,9 +83,9 @@ Ovoid.DgIterator.prototype.init = function(root) {
 
 
 /**
- * Iterate through the graph tree.
+ * Iterate through the graph tree.<br><br>
  * 
- * <br><br>Iterate in depth-first through the graph tree of nodes whose the current one
+ * Iterate in depth-first through the graph tree of nodes whose the current one
  * directly depends.
  *
  * @return {bool} True if it remains nodes to be explored, false if tree is 
@@ -127,9 +121,9 @@ Ovoid.DgIterator.prototype.exploreDepend = function() {
 
 
 /**
- * Iterate through the graph tree.
+ * Iterate through the graph tree.<br><br>
  * 
- * <br><br>Iterate in depth-first through the graph tree of nodes whose directly depends 
+ * Iterate in depth-first through the graph tree of nodes whose directly depends 
  * of the current one.
  *
  * @return {bool} True if it remains nodes to be explored, false if tree is 
@@ -165,9 +159,9 @@ Ovoid.DgIterator.prototype.exploreLink = function() {
 
 
 /**
- * Jump graph tree branch.
+ * Jump graph tree branch.<br><br>
  * 
- * <br><br>Stop the exploration of the current depend branch and jump to 
+ * Stop the exploration of the current depend branch and jump to 
  * the next branch.
  */
 Ovoid.DgIterator.prototype.jumpDepend = function() {

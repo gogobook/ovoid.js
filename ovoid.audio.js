@@ -22,28 +22,31 @@
 /**
  * Audio node constructor.
  * 
- * @class Audio node object.
+ * @class Audio node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Audio node implements a cross-platform source audio buffer. It is used to
+ * load, decode and store external audio files source. An external audio file 
+ * should be loaded only once using the Audio node.<br><br>
+ * 
+ * The Audio node is a dependency node and does not takes place directly in 
+ * the 3D world. The Audio node is typically assigned to one or more Sound node.<br><br>
+ * 
+ * <blockcode>
+ * var vroum = scene.create(Ovoid.AUDIO, "vroum");<br>
+ * vroum.loadSource("vroum.ogg");<br>
  * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Audio node is the node used to load and store an audio source buffer. 
- * The Audio node is an abstract dependency node and is not in the world. Like 
- * the Mesh node is a "shape" for Body nodes, the Audio node is a kind of 
- * "shape" for Sound nodes. So you guess that you can (and it's hardly 
- * recommended) use the same Audio node as audio source for several Sound nodes 
- * at the same time.
- * <br>
- * <br>
- * If available, the Audio node use the W3C Web Audio API, in other case, it use
- * the HTML5 audio element object.
+ * var sound = scene.create(Ovoid.SOUND, "engineSound");<br>
+ * sound.setAudio(vroum);<br>
+ * sound.spatialize(true);<br>
+ * </blockcode><br><br>
  * 
  * @extends Ovoid.Node
  *
  * @see Ovoid.Sound
  * 
- * @param {string} name Name of the new node.
+ * @param {string} name Name of the node.
  */
 Ovoid.Audio = function(name) {
 
@@ -70,11 +73,10 @@ Ovoid.Audio = function(name) {
    * @type int
    */
   this.duration = 0;
-  /** Audio source file loading status.
-   * This variable describe the current loading status of the source file. A 
-   * value of 0 means that the file is not loaded, a value of 1 means that the 
-   * file was successfully loaded, and a value of -1 means that the file loading 
-   * has failed.
+  /** Audio source file loading status.<br><br>
+   * A value of 0 means that the file is not yet 
+   * loaded, a value of 1 means that the source was successfully loaded, and a 
+   * value of -1 means the loading failed.
    * @type int */
   this.loadStatus = 0;
   /** Audio Layer buffer */
@@ -178,22 +180,19 @@ Ovoid.Audio.prototype._handleError = function() {
 
 
 /**
- * Load the specified source file for this instance.
+ * Load the specified source file for this instance.<br><br>
  * 
- * <br><br>By this method you can specify the source file to load and use to be
- * the data source of this instance. The file loading is instantaneously 
- * started in asynby this method. Once the loading is started you can check the 
- * <code>loadStatus</code> variable of this instance to know if and when 
- * the loading is done.
- * <br>
- * <br>
- * This <code>loadStatus</code> variable describe the current loading status of 
- * the source file. A value of 0 means that the file is not loaded, a value of 1 
- * means that the file was successfully loaded, and a value of -1 means that the 
- * file loading.
+ * Loads the specified external source file and extracts, decodes or parses the 
+ * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
+ *  
+ * The <code>loadSatus</code> member indicates the loading status through an 
+ * integer value of 0, 1 or -1. A value of 0 means that the file is not yet 
+ * loaded, a value of 1 means that the source was successfully loaded, and a 
+ * value of -1 means the loading failed.<br><br>
  *
- * @param {string} url Source file name to load. Keep in mind that the 
- * <code>Ovoid.opt_audioPath</code> option will be used to retrieve the file.
+ * @param {string} url Source file name/url to load. 
+ * <code>Ovoid.opt_audioPath</code> is used as base path.
+ * 
  * @param {bool} nopath ignore the default search path 
  * (<code>Ovoid.opt_audioPath</code>).
  */

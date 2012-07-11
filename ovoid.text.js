@@ -22,27 +22,28 @@
 /**
  * Layer node constructor.
  *
- * @class Overlay Text node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Text node is a specific overlay to display text. Inherited from the 
- * Layer node, it is a transformable node. That means the node can be moved
- * rotated, scaled, since it evolve in the world 3D space. Text node use the
- * texture font technique to display text from string. The texture font 
- * technique use a special texture as font library.
- * <br>
- * <br>
- * The Text node is what we call an "overlay sprite". An overlay sprite 
- * structurally is a 3D object, but appears as 2D object over the scene. 
- * The overlay sprite is not drawn according to the perspective and world 
- * coordinates, but according to the screen surface and resolution. In fact, 
- * the overlay sprite is a quad polygon (sprite) rendered over the 3D scene 
- * in a particular orthographic projection.
- * <br>
- * <br>
+ * @class Overlay Text node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Text node implements an 2D text string overlayed on the 
+ * rendered scene. It uses the texture mapped font technic to draw characters as 
+ * point-sprites. Inherited from the Layer node, it is a world-transformable 
+ * node, which means it can be transformed in a 2D space coordinate who 
+ * corresponds to the canvas/client area.
+ * 
+ * <blockcode>
+ * var hello = scene.create(Ovoid.TEXT, "BlueText");<br>
+ * hello.setFgColor(0.0, 0.5, 1.0, 1.0);<br>
+ * hello.moveXyz(320, 240, 0.0);<br>
+ * hello.string = "Hello World !";<br>
+ * </blockcode><br><br>
+ * 
+ * <b>Texture Mapped Font</b><br><br>
+ * 
+ * The Texture Mapped Font uses a special texture who store font's characters 
+ * arranged in rows and collumns matrix. The suitable character is drawn by 
+ * selecting an texture portion according to the texture coordinates.
  * 
  * @extends Ovoid.Layer
  *
@@ -71,9 +72,9 @@ Ovoid.Text.prototype.constructor = Ovoid.Text;
 
 
 /**
- * Define format.
+ * Set font format.<br><br>
  * 
- * <br><br>Sets text font format according to the specified values.
+ * Sets text font format according to the specified values.
  *
  * @param {float} s Character sprite size in pixel.
  * @param {float} c Interchar value in pixel.
@@ -86,13 +87,12 @@ Ovoid.Text.prototype.setFormat = function(s, c, l) {
 
 
 /**
- * Fontmap assignment.
+ * Assign font texture.<br><br>
  * 
- * <br><br>Assigns the specified Texture object as fontmap. If null, the 
- * default render engine's fontmap is used.
+ * Assigns the specified Texture object as font map. If null, the 
+ * default global font map texture is used.
  *
- * @param {Texture} texture Texture object. If null, the 
- * default render engine's fontmap is used.
+ * @param {Texture} texture Texture object.
  * 
  * @see Ovoid.Texture
  */
@@ -104,9 +104,9 @@ Ovoid.Text.prototype.setFontmap = function(texture) {
 
 
 /**
- * Get width.
+ * Get width.<br><br>
  * 
- * <br><br>Returns the layer width according to the current string and font
+ * Returns the layer width according to the current string and font
  * parameters.
  */
 Ovoid.Text.prototype.getWidth = function(texture) {

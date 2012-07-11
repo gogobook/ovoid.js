@@ -26,11 +26,11 @@
  * 
  * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
  * 
- * The Mesh node is an abstract node who describe a geometry structure. 
+ * The Mesh node implements a mesh geometry structure. 
  * is a collection of vertices, edges and faces that defines the shape of a 
  * polyhedral object. 
  * The Mesh node is a dependency node and does not takes place directly in 
- * the 3D world. The Mesh node is typically assigned to one or more Body node.<br><br>
+ * the 3D world. It is typically assigned to one or more Body node.<br><br>
  * 
  * <b>Body node and shape concept</b><br><br>
  * 
@@ -115,8 +115,9 @@
  * The vertex format is used to build and arrange data in Vertex Buffer Objets 
  * (VBO) and describe the GLSL vertex attributes in shaders.<br><br>
  * 
- * For more information about vertex format and shader, see the 
- * <code>Ovoid.Shader</code> class documentation.<br><br>
+ * For more information about shader, refere to
+ * <code>Ovoid.Shader</code> class documentation.<br><br><br>
+ * 
  * 
  * <b>Mesh optimizations</b><br><br>
  * 
@@ -135,10 +136,10 @@
  * map, the shadow-casting will not work properly.<br><br>
  * 
  * These optimization usualy occur during the COLLADA importation process if 
- * the suitable importation options are enabled. <br>This may take a long time 
+ * the suitable importation options are enabled. <b>This may take a long time 
  * to finish if the mesh has many vertices and triangles, and especialy the 
  * triangles optimization that have more or less a polynomial O(n²) 
- * complexity.</b> <br><br>
+ * complexity.</b><br><br>
  * 
  * To avoid this long time to wait (that can be VERY annoying for the final 
  * user) you should import and optimize your mesh ONCE then export it in OvoiD 

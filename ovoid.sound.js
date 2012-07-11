@@ -22,28 +22,27 @@
 /**
  * Sound node constructor.
  * 
- * @class Sound node object.
+ * @class Sound node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Sound node implements a global or localized in space sound emitter. 
+ * Inherited from the Transform node, it is a world-transformable node, which 
+ * means it can be moved, rotated, scaled... The Sound node is dedicated to have 
+ * an Audio node assigned.<br><br>
+ * 
+ * <blockcode>
+ * var vroum = scene.create(Ovoid.AUDIO, "vroum");<br>
+ * vroum.loadSource("vroum.ogg");<br>
  * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Sound node is used to describe a world sound source. Inherited from the 
- * Transform node, it is a transformable node. That means the node can be moved
- * rotated, scaled, since it evolve in the world 3D space. the Sound node takes 
- * an Audio node as "audio buffer source". <br>
- * Like the Mesh node is a "shape" for Body nodes, the Audio node is a kind of 
- * "shape" for Sound nodes. So you guess that you can (and it's hardly 
- * recommended) use the same Audio node as audio source for several Sound nodes 
- * at the same time.
- * <br>
- * <br>
- * If available, the Sound node use the W3C Web Audio API, in other case, it use
- * the HTML5 audio element object. If the Web Audio API is available, the sound
- * node can act as a spacialised sound source. 
- * <br>
- * <br>
- * Note: The global audio and sound implementation is at early stage.
+ * var sound = scene.create(Ovoid.SOUND, "engineSound");<br>
+ * sound.setAudio(vroum);<br>
+ * sound.spatialize(true);<br>
+ * </blockcode><br><br>
+ * 
+ * The Sound spatialization is browsers depend. OvoiD.JS currently support the 
+ * spatialization through the Webkit Audio API. Else, OvoiD.JS uses the HTML5 
+ * standard implementation where the spatialization is unavailable.
  * 
  * @extends Ovoid.Transform
  * 
@@ -113,12 +112,12 @@ Ovoid.Sound.prototype = new Ovoid.Transform;
 Ovoid.Sound.prototype.constructor = Ovoid.Sound;
 
 /**
- * Spatialize sound.
+ * Set sound spatialization.<br><br>
  * 
- * <br><br>Sets the sound as spatialized or standard flat sound.
+ * Sets the sound as spatialized relative to a virtual listener or flat 
+ * background sound. (The sound spatialization only works with Webkit Audio API).
  *
- * @param {bool} e If true the sound is make spatial sound, otherwize the 
- * sound is make standard flat sound.
+ * @param {bool} e True to spatialize the sound, or false for a standard sound.
  */
 Ovoid.Sound.prototype.spatialize = function(e) {
   
@@ -142,10 +141,10 @@ Ovoid.Sound.prototype.spatialize = function(e) {
 
 
 /**
- * Define panner cone.
+ * Set panner cone.<br><br>
  * 
- * <br><br>Sets the sound's panner cone parameters according to the specified
- * values.
+ * Sets the spatialized sound's panner cone parameters according to the specified
+ * values. (This takes effect only on spatialized sounds)
  *
  * @param {float} iangle Cone inner angle.
  * @param {float} oangle Cone outer angle.
@@ -160,10 +159,10 @@ Ovoid.Sound.prototype.setPannerCone = function(iangle, oangle, ogain) {
 
 
 /**
- * Define panner dinstances.
+ * Set panner dinstances.<br><br>
  * 
- * <br><br>Sets the sound's panner dinstances parameters according to the specified
- * values.
+ * Sets the spatialized sound's panner dinstances parameters according to the 
+ * specified values. (This takes effect only on spatialized sounds)
  *
  * @param {float} ref Source gain reference distance.
  * @param {float} max Source gain maximum distance.
@@ -178,9 +177,10 @@ Ovoid.Sound.prototype.setPannerDist = function(ref, max, rolloff) {
 
 
 /**
- * Link Audio node.
+ * Link Audio node.<br><br>
  *
- * <br><br>Sets the specified Audio node as audio source buffer for this instance.
+ * Assings the specified Audio node as audio source buffer for this instance. 
+ * The assigned Audio will be a dependency (depend node) for this instance.
  * 
  * @param {Audio} audio Audio object.
  * 
@@ -210,9 +210,9 @@ Ovoid.Sound.prototype.setAudio = function(audio) {
 
 
 /**
- * Loop playing.
+ * Loop playing.<br><br>
  * 
- * <br><br>Sets whether the Sound should loop.
+ * Sets whether the Sound should loop.
  *
  * @param {bool} enable Enable or disable loop playing.
  */
@@ -237,9 +237,9 @@ Ovoid.Sound.prototype.setLoop = function(e) {
 
 
 /**
- * Play sound.
+ * Play sound.<br><br>
  * 
- * <br><br>Plays the Sound's audio buffer source.
+ * Plays the Sound.
  */
 Ovoid.Sound.prototype.play = function() {
   
@@ -276,9 +276,9 @@ Ovoid.Sound.prototype.play = function() {
 
 
 /**
- * Stop sound.
+ * Stop sound.<br><br>
  * 
- * <br><br>Stops the Sound's audio buffer source.
+ * Stops the Sound.
  */
 Ovoid.Sound.prototype.stop = function() {
   
@@ -301,9 +301,9 @@ Ovoid.Sound.prototype.stop = function() {
 
 
 /**
- * Sound volum.
+ * Sound volum.<br><br>
  * 
- * <br><br>Sets the Sound's base gain.
+ * Sets the Sound base gain.
  *
  * @param {float} gain Volum gain.
  */

@@ -22,31 +22,19 @@
 /**
  * Camera node constructor.
  * 
- * @class Camera node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Camera node is used to describe the rendering's point of view. 
- * Inherited from the Transform node, it is a transformable node. That means the 
- * node can be moved, rotated, scaled, since it evolve in the world 3D space. 
- * <br>
- * <br>
- * The Camera node is not drawn, since it is used as the point of 
- * view to draw the scene. To use or select a camera as active one for 
- * rendering, you have to define it as "active camera" in the scene where the
- * camera is included.
- * <br>
- * <br>
+ * @class Camera node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Camera node implements a perspective or orthographic projection frustum 
+ * located and oriented in space to draw a scene from a specific point a view.
+ * Inherited from the Transform node, it is a world-transformable node, which 
+ * means it can be moved, rotated, scaled...<br><br>
+ * 
  * <blockcode>
- * &nbsp;&nbsp;camera = scene.create(Ovoid.CAMERA, "MyEye");<br>
- * &nbsp;&nbsp;scene.useCamera(camera);<br>
+ * camera = scene.create(Ovoid.CAMERA, "MyEye");<br>
+ * scene.useCamera(camera);<br>
  * </blockcode>
- * <br>
- * <br>
- * Obviously, you can have several cameras in the same scene and switch between
- * them during the runtime.
  * 
  * @extends Ovoid.Transform
  *
@@ -104,9 +92,9 @@ Ovoid.Camera.prototype.constructor = Ovoid.Camera;
 
 
 /**
- * Define viewport.
+ * Set viewport.<br><br>
  * 
- * <br><br>Sets the camera's viewport size according to the given width and height value
+ * Sets the camera viewport size according to the given width and height value
  * in pixel.
  *
  * @param {float} width Viewport width value.
@@ -121,9 +109,9 @@ Ovoid.Camera.prototype.setView = function(width, height) {
 
 
 /**
- * Define field of view.
+ * Set field of view.<br><br>
  * 
- * <br><br>Sets the camera's field of view angle in degrees according to the given value.
+ * Sets the camera field of view angle in degrees according to the given value.
  *
  * @param {float} f Field of view angle.
  */
@@ -135,9 +123,9 @@ Ovoid.Camera.prototype.setFov = function(f) {
 
 
 /**
- * Define clipping.
+ * Set clipping.<br><br>
  * 
- * <br><br>Sets the camera's near and far clipping planes distance according to the 
+ * Sets the camera near and far clipping planes distance according to the 
  * given values.
  *
  * @param {float} n Near clipping plane distance.
@@ -152,15 +140,15 @@ Ovoid.Camera.prototype.setCliping = function(n, f) {
 
 
 /**
- * Viewability test.
+ * Viewability test.<br><br>
  *
- * <br><br>Checks whether an Transform node is the view frustum. In other words this function
- * checks whether an Transform node is viewable in the final scene rendering.
+ * Checks whether an Transform node is within the view frustum planes of this 
+ * instance.
  * 
- * @param {Transform} transform Transform node to check its viewability.
+ * @param {Transform} transform Transform node to check.
  *
- * @return {bool} True if the specified Transform is in the view frustum,
- * false otherwise.
+ * @return {bool} True if this instance watches the specified node, false 
+ * otherwise.
  * 
  * @see Ovoid.Transform
  */

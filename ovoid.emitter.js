@@ -22,38 +22,34 @@
 /**
  * Particle emitter node constructor.
  * 
- * @class Particle emitter node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Emitter node is an abstract node who emits particles in world space. 
- * The Emitter node is what is called a "shape" and is note rendered if it is not 
- * set as shape node of a Body node.
- * <br>
- * <br>
- * <b>Body node and shape concept</b>
- * <br>
- * <br>
- * Once a Mesh node (for example) is ready to be drawn, in fact it is NOT yet 
- * "renderable". In fact Mesh objects are abstract and are not in the world, it 
- * is called a "shape" node. To display our Mesh, we need to create a Body node 
- * that will be in the world and "attach" the Mesh node to this Body.
- * <br>
- * <br>
- * To make the concept more understandable, think that Body nodes are like 
- * invisible spirits without shape floating in the world . To make a visible 
- * spirit, you have to give it a shape. You now guess that you can attach the 
- * same Shape node to several Body nodes at the same time. The Body node is 
- * inherited from Transform node, and so is transformable (move, rotate, 
- * scale...). Shape nodes, like Mesh node, are NOT.
- * <br>
- * <br>
+ * @class Particle emitter node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Emitter node implements a point-sprite particles emitter. 
+ * The Emitter node is a dependency node and does not takes place directly in 
+ * the 3D world. The Emitter node is typically assigned to one Body node 
+ * (multiple assignation is allowed but with unpredictable results).<br><br>
+ * 
  * <blockcode>
- * &nbsp;&nbsp;emitter = scene.create(Ovoid.EMITTER, "particles");<br>
- * &nbsp;&nbsp;body.setShape(emitter);<br>
- * </blockcode>
+ * emitter = scene.create(Ovoid.EMITTER, "particles");<br>
+ * body.setShape(emitter);<br>
+ * emitter.setSprite(glowTexture);<br>
+ * emitter.setSizes(5.0, 20.0);<br>
+ * emitter.emits = true;
+ * </blockcode><br><br>
+ * 
+ * <b>Body node and shape concept</b><br><br>
+ * 
+ * A Mesh node which is not assigned to a Body node will never be drawn. The 
+ * Mesh node is what is called a "shape" and must be assigned to a 
+ * world-transformable Body node to be included in the drawing pipeline.<br><br>
+ * 
+ * To make the concept more understandable, think that Body nodes are like 
+ * invisible spirits without shape floating in the 3D world. To make a visible 
+ * spirit, you have to give it a shape. You can assign the same shape node to 
+ * several Body nodes in the same scene, than you obtain several identical 
+ * shapes with different transformations (rotation, position, etc...).<br><br>
  * 
  * @see Ovoid.Body
  * 
@@ -127,10 +123,11 @@ Ovoid.Emitter.prototype.constructor = Ovoid.Emitter;
 
 
 /**
- * Define particles colours.
- * <br>
- * <br>
- * Sets the particles birth and death colours with the specified Color.
+ * Set particles colours.<br><br>
+ * 
+ * Sets the particles birth and death colours with the specified color 
+ * components. The birth and death colours are interpolated during the particle 
+ * lifetime.
  * 
  * @param {float} br Particles birth color Red component.
  * @param {float} bg Particles birth color Green component.
@@ -149,10 +146,9 @@ Ovoid.Emitter.prototype.setColours = function(br, bg, bb, ba, dr, dg, db, da) {
 
 
 /**
- * Define particles texture.
- * <br>
- * <br>
- * Sets the particles sprite texture with the specified Texture object.
+ * Set particles texture.<br><br>
+ * 
+ * Sets the particles's sprite texture with the specified Texture object.
  * 
  * @param {Texture} texture Texture object.
  */
@@ -163,10 +159,10 @@ Ovoid.Emitter.prototype.setSprite = function(texture) {
 
 
 /**
- * Define particles sizes.
- * <br>
- * <br>
- * Sets the particles birth and death sizes with the specified values.
+ * Set particles sizes.<br><br>
+ * 
+ * Sets the particles birth and death sizes with the specified values. The birth 
+ * and death sizes are interpolated during the particle lifetime.
  * 
  * @param {float} bsize Particles birth size.
  * @param {float} dsize Particles death size.
@@ -179,11 +175,10 @@ Ovoid.Emitter.prototype.setSizes = function(bsize, dsize) {
 
 
 /**
- * Define particles velocity.
- * <br>
- * <br>
- * Sets the particles birth velocity, damping and random delta with 
- * the specified values.
+ * Set particles velocity.<br><br>
+ * 
+ * Sets the particles birth velocity, velocity damping and random velocity delta 
+ * with the specified values. 
  * 
  * @param {float} velocity Particles birth velocity factor.
  * @param {float} delta Particles random velocity delta.
@@ -198,11 +193,10 @@ Ovoid.Emitter.prototype.setVelocity = function(velocity, delta, damping) {
 
 
 /**
- * Define particles scattering.
- * <br>
- * <br>
- * Sets the particles maximum scattering cone angle in degrees with the 
- * specified values.
+ * Set particles scattering.<br><br>
+ * 
+ * Sets the particles scattering cone angle in degrees with the 
+ * specified value.
  * 
  * @param {float} angle Particles maximum scattering angle in degrees.
  */
@@ -213,12 +207,11 @@ Ovoid.Emitter.prototype.setScattering = function(angle) {
 
 
 /**
- * Get alives particles count.
- * <br>
- * <br>
- * Returns the current count of alives particles for this instance.
+ * Get alive particles count.<br><br>
  * 
- * @return {int} Alives particles count.
+ * Returns the current alive particles count for this instance.
+ * 
+ * @return {int} Alive particles count.
  */
 Ovoid.Emitter.prototype.getAlives = function() {
   

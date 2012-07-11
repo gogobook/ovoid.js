@@ -22,25 +22,26 @@
 /**
  * Layer node constructor.
  *
- * @class Overlay Layer node object.
+ * @class Overlay Layer node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Layer node implements a sprite drawn as an 2D overlayed rectangle on the 
+ * rendered scene.
+ * Inherited from the Transform node, it is a world-transformable node, which 
+ * means it can be moved rotated, scaled, etc... It is typically 
+ * used to display images in a 2D space coordinate who corresponds to the 
+ * canvas/client area. Layer node is used, so to speak, to simulates a 2D 
+ * context through 3D environment.<br><br>
+ * 
+ * <blockcode>
+ * var logo = scene.create(Ovoid.LAYER, "logo");<br>
+ * logo.setBgColor(1.0, 0.5, 0.0, 1.0);<br>
+ * logo.setBgTexture(logoTexture);<br>
+ * logo.setSize(320, 240);<br>
  * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Layer node is the main representative overlay object. Inherited from the 
- * Transform node, it is a transformable node. That means the node can be moved
- * rotated, scaled, since it evolve in the world 3D space.
- * <br>
- * <br>
- * The Layer node is what we call an "overlay sprite". An overlay sprite 
- * structurally is a 3D object, but appears as 2D object over the scene. 
- * The overlay sprite is not drawn according to the perspective and world 
- * coordinates, but according to the screen surface and resolution. In fact, 
- * the overlay sprite is a quad polygon (sprite) rendered over the 3D scene 
- * in a particular orthographic projection.
- * <br>
- * <br>
+ * </blockcode><br><br>
+ * 
  * @extends Ovoid.Transform
  *
  * @param {string} name Name of the new node.
@@ -74,9 +75,9 @@ Ovoid.Layer.prototype.constructor = Ovoid.Layer;
 
 
 /**
- * Define layer size.
+ * Set layer size.<br><br>
  * 
- * <br><br>Sets the size of this instance in pixel according to the spedified values.
+ * Sets the size of this instance in pixel according to the spedified values.
  *
  * @param {float} x Layer width in pixel.
  * @param {float} y Layer height in pixel.
@@ -88,9 +89,9 @@ Ovoid.Layer.prototype.setSize = function(x, y) {
 
 
 /**
- * Define layer background color.
+ * Set layer background color.<br><br>
  * 
- * <br><br>Sets the background color of this instance according to the specified values.
+ * Sets the background color of this instance according to the specified values.
  *
  * @param {float} r The Red component.
  * @param {float} g The Green component.
@@ -104,9 +105,10 @@ Ovoid.Layer.prototype.setBgColor = function(r, g, b, a) {
 
 
 /**
- * Define layer background texture.
+ * Set layer background texture.<br><br>
  * 
- * <br><br>Sets the background texture of this instance with the given one. 
+ * Sets the background texture of this instance with the specified 
+ * Texture object. 
  *
  * @param {Texture} texture Texture object to use as background.
  * 
@@ -119,9 +121,9 @@ Ovoid.Layer.prototype.setBgTexture = function(texture) {
 
 
 /**
- * Define layer foreground color.
+ * Set layer foreground color.<br><br>
  * 
- * <br><br>Sets the foreground color of this instance according to the specified values.
+ * Sets the foreground color of this instance according to the specified values.
  *
  * @param {float} r The Red component.
  * @param {float} g The Green component.

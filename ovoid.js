@@ -104,7 +104,8 @@ Ovoid.error = function(code, message) {
   content += '<h1><b><big>OvoiD.JS Error X(</big></b></h1><span style="color:#ddd;">';
 
   var comment = "<p>Sorry, the page you requested uses the <i>OvoiD.JS's WebGL Wrapper</i> and the library's script has stopped ";
-  var browser = '</p><p>We recommands you to use the latest version of one of the followings:</p><table cellpadding=10px style="border:0;margin:auto;text-align:center;"><tr><td><a style="color:#fa0;" href="http://www.google.com/chrome/">Chrome<a></td><td><a style="color:#fa0;" href="http://www.mozilla.org/firefox/">Firefox<a></div></td></tr><tr><td><a style="color:#fa0;" href="http://www.opera.com/browser/">Opera</a></td><td><a style="color:#fa0;" href="http://www.apple.com/safari/">Safari<a></td></tr></table>';
+  var browser = '</p><p>This error is related to your web browser and/or your operating system. This may be caused by:<div style="text-align:left;"><ul><b><li>An outdated or incompatible browser</li><li>The browser Hardware Acceleration and/or WebGL support disabled</li> <li>Not properly installed graphic drivers</li></b></ul></div><p>If you already uses a compatible browser try to update it or enable the Hardware Acceleration and WebGL support in the browser parameters (<a style="color:#fa0;" href="http://www.ovoid.org/js/doc/index.php#faq">How to enable WebGL</a>). Else, it is recommanded to use the latest version of one of the followings:</p><table cellpadding=10px style="border:0;margin:auto;text-align:center;"><tr><td><a style="color:#fa0;" href="http://www.google.com/chrome/">Chrome<a></td><td><a style="color:#fa0;" href="http://www.mozilla.org/firefox/">Firefox<a></div></td></tr><tr><td><a style="color:#fa0;" href="http://www.opera.com/browser/">Opera</a></td><td><a style="color:#fa0;" href="http://www.apple.com/safari/">Safari<a></td></tr></table>';
+  browser += '';
   var dcode = '';
   
   switch(code)
@@ -116,11 +117,12 @@ Ovoid.error = function(code, message) {
       break;
     case 2:
       dcode += "02 - WebGL Context Exception";
-      comment += 'because an exception occured during the <b><a style="color:#fa0;" href="http://www.khronos.org/webgl/">WebGL<a></b> context creation. This error may be caused by not properly installed or outdated graphic drivers.';
+      comment += 'because an exception occured during the <b><a style="color:#fa0;" href="http://www.khronos.org/webgl/">WebGL<a></b> context creation.';
+      comment += browser;
       break;
     case 3:
       dcode += "03 - WebGL Context Not Found";
-      comment += 'because no suitable <b><a style="color:#fa0;" href="http://www.khronos.org/webgl/">WebGL<a></b> implementation was found. You probably use an incompatible or outdated browser.';
+      comment += 'because no suitable <b><a style="color:#fa0;" href="http://www.khronos.org/webgl/">WebGL<a></b> implementation was found.';
       comment += browser;
       break;
     case 4:

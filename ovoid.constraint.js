@@ -22,25 +22,16 @@
 /**
  * Constraint node constructor.
  *
- * @class Constraint node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * Constraint nodes are intermediary abstract nodes dedicated to be used as 
- * inheritance by others classes. Alone, Constraint nodes does not have any 
- * utility.<br>
- * <br>
- * At this stage of developement there is two Constraint inherited nodes, 
- * <code>Ovoid.Physics</code> and <code>Ovoid.Animation</code>.
- * <br>
- * <br>
- * The Constraint nodes are defined by the fact they are able to constrain the 
- * transformable nodes's (Transform inherited) behaviours. The constrained node 
- * is called the target node. The target node will be under the influence of 
- * the Constraint node.
- *
+ * @class Constraint node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Constraint node is the base class for constraint nodes type. It 
+ * implements a simple node targeting abstract mechanism. The Constraint node is 
+ * a dependency node and does not takes place directly in the 3D world. The 
+ * Constraint node is typically used to modify the transformation behaviours of 
+ * one Body node.<br><br>
+ * 
  * @extends Ovoid.Node
  * 
  * @see Ovoid.Animation
@@ -66,11 +57,12 @@ Ovoid.Constraint.prototype.constructor = Ovoid.Constraint;
 
 
 /**
- * Set the target node of this instance.
+ * Set the target node of this instance.<br><br>
  *
- * <br><br>This method will set the specified node under the influence of this instance.
+ * Assign the specified node as target node of this instance. The assigned node 
+ * will have this instance as dependency (depend node).
  * 
- * @param {Node} node Node object to set as target.
+ * @param {Node} node Node object to assign as target.
  * 
  * @see Ovoid.Node
  */

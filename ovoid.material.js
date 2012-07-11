@@ -33,6 +33,12 @@
  * special texture components for normal mapping. The Material node is a 
  * dependency node and does not takes place directly in the 3D world.<br><br>
  * 
+ * <blockcode>
+ * var material = scene.create(Ovoid.MATERIAL, "green");<br>
+ * material.setColor(Ovoid.DIFFUSE, 0.0, 1.0, 0.0, 1.0);<br>
+ * material.setTexture(Ovoid.DIFFUSE, anyTexture);<br>
+ * </blockcode><br><br>
+ * 
  * The Material's components/slots are the followings:
  * 
  * <ul>
@@ -65,21 +71,22 @@
  * The color and textures compoments are typically merged together, which mean 
  * that if you set a full colored Diffuse texture, and, an all black Diffuse 
  * color, you'll obtain an all black surface because the texture's components 
- * are multiplied by the color's compomnents. However, this behaviour depend 
- * on the  used shader and how the shader is designed.
+ * are multiplied by the color's compomnents. However, this behaviour is 
+ * specific to a shader and how is designed.<br><br><br>
+ * 
  * 
  * <b>Lights, Materials and Shaders issue</b><br><br>
  * 
  * One important thing to know is that all the render process is finaly 
  * determined by the shader program. Render nodes like Light or Material could 
  * have many parameters and options, if the shader program does not implements 
- * them,  all these parameters take no effect. Material and Light nodes are 
+ * them, all these parameters take no effect. Material and Light nodes are 
  * designed to offer as many parameters as possible. But keep in mind that 
  * these parameters may be implemented (or not at all) in an unexpected way, 
  * depending on the used shader program.<br><br>
  * 
- * For more information about how shaders are implemented in OvoiD.JS, see the 
- * <code>Ovoid.Shader</code> class documentation.
+ * For more information about how shaders are implemented in OvoiD.JS, 
+ * refere to <code>Ovoid.Shader</code> class documentation.
  * 
  * @extends Ovoid.Node
  *

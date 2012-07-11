@@ -32,6 +32,16 @@
  * which have several animations (one per joint/bone) for only one animation 
  * sequence, which should all be started and ended at the same time.<br><br>
  * 
+ * <blockcode>
+ * var characterSet1 = scene.create(Ovoid.TRACK, "CharacterSet1");<br>
+ * characterSet1.addAnimation(leftArmAnimation);<br>
+ * characterSet1.addAnimation(rightArmAnimation);<br>
+ * characterSet1.addAnimation(LeftLegAnimation);<br>
+ * characterSet1.addAnimation(RightLegAnimation);<br>
+ * characterSet1.addAnimation(HeadAnimation);<br>
+ * characterSet1.play();<br>
+ * </blockcode><br><br>
+ * 
  * The Track node is one of the few which is not a dependency node nor a world 
  * node.  Because it does not create dependency relationship (but has animations
  * as dependencies) and is obviously not a world node.<br><br>
@@ -110,7 +120,7 @@ Ovoid.Track.prototype.remAnimation = function(anim) {
  * 
  * Enable or disable loop playing.
  *
- * @param {bool} loop Loop flag value to set.
+ * @param {bool} loop Boolean to enable or disable.
  */
 Ovoid.Track.prototype.setLoop = function(loop) {
 
@@ -120,13 +130,14 @@ Ovoid.Track.prototype.setLoop = function(loop) {
 
 
 /**
- * Set track time factor.<br><br>
+ * Set track pitch.<br><br>
  * 
- * Changes the animation time factor during play.
+ * Changes the animation pitch while playing.
  *
- * @param {float} factor The time factor to play and interpolate the animation. 
- * The factor can be negative to play the animation backward. For example a 
- * value of -2.0 will play the animation backward twice the normal speed.
+ * @param {float} factor Pitch time factor.
+ * The factor can be positive to increase the animation pitch or negative to 
+ * play the animation backward. For example a value of -2.0 will play the 
+ * animation backward twice the normal speed.
  */
 Ovoid.Track.prototype.setFactor = function(factor) {
 
@@ -136,27 +147,15 @@ Ovoid.Track.prototype.setFactor = function(factor) {
 
 
 /**
- * Stop track.
+ * Play track.<br><br>
  * 
- * <br><br>Stops to play all animations of this instance.
- */
-Ovoid.Track.prototype.stop = function() {
-
-  var i = this.animation.length;
-  while (i--) this.animation[i].stop();
-  this.playing = false;
-};
-
-
-/**
- * Play track.
- * 
- * <br><br>Start or restart to play all animations of this instance according 
- * to the specified playing factor.
+ * Play all the animations of this instance from the current time with the 
+ * specified pitch.
  *
- * @param {float} factor The time factor to play and interpolate the animation. 
- * The factor can be negative to play the animation backward. For example a 
- * value of -2.0 will play the animation backward twice the normal speed.
+ * @param {float} factor Pitch time factor.
+ * The factor can be positive to increase the animation pitch or negative to 
+ * play the animation backward. For example a value of -2.0 will play the 
+ * animation backward twice the normal speed.
  */
 Ovoid.Track.prototype.play = function(factor) {
 
@@ -167,12 +166,25 @@ Ovoid.Track.prototype.play = function(factor) {
 
 
 /**
- * Rewind track.
+ * Stop track.<br><br>
  * 
- * <br><br>Rewind all animations of this instance according to the specified
- * playing factor.
+ * Stop or pause all the animations of this instance.
+ */
+Ovoid.Track.prototype.stop = function() {
+
+  var i = this.animation.length;
+  while (i--) this.animation[i].stop();
+  this.playing = false;
+};
+
+
+/**
+ * Rewind track.<br><br>
+ * 
+ * Rewind all the animation at the end or the begining according to the s
+ * pecified pitch.
  *
- * @param {float} factor The time factor to rewind the animation. 
+ * @param {float} factor Pitch time factor.
  * A positive value will set the animation at its begining, a negative value 
  * will set the animation at its end.
  */

@@ -22,22 +22,15 @@
 /**
  * Joint node constructor.
  * 
- * @class Skeketon Joint node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Joint node describes a joint or often called bone of a rig/skeleton
+ * @class Skeketon Joint node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Joint node implements a joint (often called bone) of a rig/skeleton
  * structure. 
- * Inherited from the Transform node, it is a transformable node. That means the 
- * node can be moved, rotated, scaled, since it evolve in the world 3D space. 
- * <br>
- * <br>
- * Unlike the Body node, the Joint node can't have any shape. However, it is 
- * used in the Skin node for meshs's skinning deformation. Precisely, as
- * in CG softwares, Joint node's matrices are used to apply deformations
- * to the meshs's vertices.
+ * Inherited from the Transform node, it is a world-transformable node, which 
+ * means it can be moved rotated, scaled, etc... The Joint node is dedicated 
+ * to be used as influence for the Skin node.<br><br>
  * 
  * @extends Ovoid.Transform
  *

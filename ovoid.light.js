@@ -26,9 +26,18 @@
  * 
  * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
  * 
- * The Light node is used to describe a world light source. Inherited from the 
+ * The Light node implements a world light source. Inherited from the 
  * Transform node, it is a world-transformable node, which means it can be moved
- * rotated, scaled, etc...<br><br>
+ * rotated, scaled...<br><br>
+ * 
+ * <blockcode>
+ * var spot = scene.create(Ovoid.LIGHT, "redSpot");<br>
+ * spot.setColor(1.0, 0.0, 0.0, 1.0);<br>
+ * spot.setSpotAngle(45.0, 0.05);<br>
+ * <br>
+ * var lamp = scene.create(Ovoid.LIGHT, "pointLight");
+ * lamp.setColor(1.0, 1.0, 1.0, 1.0);<br>
+ * </blockcode><br><br>
  * 
  * <b>Lights, Materials and Shaders issue</b><br><br>
  * 

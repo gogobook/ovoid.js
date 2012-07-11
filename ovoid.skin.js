@@ -22,41 +22,43 @@
 /**
  * Skin controler node constructor.
  * 
- * @class Skin controler node object.
- * <br>
- * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
- * <br>
- * <br>
- * The Skin node is an abstract node who store data of and controls skinning 
- * mesh deformation. Each bone in the skeleton is associated with some portion 
- * of the Mesh. Skinning is the process of creating this association.
- * <br><br>
- * The Skin node is what is called a "shape" and is note rendered if it is not 
- * set as shape node of a Body node.
- * <br>
- * <br>
- * <b>Local Data Mirroring</b>
- * <br>
- * The Skin's local data mirroring is enabled or disabled by setting the 
- * <code>Ovoid.opt_localSkinData</code> global option. 
- * Usually, vertices's deformations are calculated by the GPU with the suitable 
- * vertex shader, and that is very fast. Unfortunately, these data can't be 
- * retrievable. The local mirroring create a local weighted vertices and 
- * triangles list calculated using the normal (and slow) way (CPU/Javascript). 
- * This allow:
- * <br>
- * <ul>
- * <li>Up to date bounding box and bounding sphere.</li>
- * <li>To use skin deformed mesh as "Rigid Landscape" physics with correct data.</li>
- * <li>Create shadow volumes (cast shadows) for skin deformed mesh.</li>
- * </ul>
- * This has a MAJOR disadvantage : This divides the framerate More or less 
- * by two.
+ * @class Skin controler node object.<br><br>
+ * 
+ * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * 
+ * The Skin node implements a mesh skinning deformer.
+ * The Skin node is a dependency node and does not takes place directly in 
+ * the 3D world. It is typically assigned to one or more Body node.<br><br>
+ * 
+ * <b>Body node and shape concept</b><br><br>
+ * 
+ * A Mesh node which is not assigned to a Body node will never be drawn. The 
+ * Mesh node is what is called a "shape" and must be assigned to a 
+ * world-transformable Body node to be included in the drawing pipeline.<br><br>
+ * 
+ * To make the concept more understandable, think that Body nodes are like 
+ * invisible spirits without shape floating in the 3D world. To make a visible 
+ * spirit, you have to give it a shape. You can assign the same shape node to 
+ * several Body nodes in the same scene, than you obtain several identical 
+ * shapes with different transformations (rotation, position, etc...).<br><br>
+ * 
+ * <b>Skin Local Data Mirroring</b><br><br>
+ * 
+ * The local data mirroring force the node to creates its own copy of the 
+ * deformed mesh in real-time. Usually, the mesh is deformed through the vertex 
+ * shader by the GPU, which prevent hitting global performances. Unfortunately, 
+ * the deformed data are not retrievable, and can not be used for further 
+ * operations like building shadow volumes  or bounding box. For this reason, 
+ * a local version of the deformed mesh must be created. Because the mesh 
+ * deformation is calculated through normal process, it impacts the global 
+ * performances.<br><br>
+ * 
+ * The Local Data Mirroring can be enabled or disabled through the 
+ * <code>Ovoid.opt_localSkinData</code> global option.
  * 
  * @extends Ovoid.Node
  *
- * @param {string} name Name of the new node.
+ * @param {string} name Name of the node.
  */
 Ovoid.Skin = function(name) {
 
@@ -107,9 +109,9 @@ Ovoid.Skin.prototype.constructor = Ovoid.Skin;
 
 
 /**
- * Link influence Joint.
+ * Link influence Joint.<br><br>
  *
- * <br><br>Links the specified Joint to this instance as skinning influence.
+ * Links the specified Joint to this instance as skinning influence.
  * 
  * @param {Object} joint Joint node.
  */
@@ -126,9 +128,9 @@ Ovoid.Skin.prototype.linkJoint = function(joint) {
 
 
 /**
- * Unlink influence Joint.
+ * Unlink influence Joint.<br><br>
  *
- * <br><br>Unkinks the specified Joint from this instance as skinning influence.
+ * Unkinks the specified Joint from this instance as skinning influence.
  * 
  * @param {Object} joint Joint node.
  */
@@ -150,7 +152,7 @@ Ovoid.Skin.prototype.unlinkJoint = function(joint) {
 
 
 /**
- *  Mirror mesh data.<br><br>
+ * Mirror mesh data.<br><br>
  * 
  * Create a local mesh's data mirror to calculate the wheited/deformed mesh data
  * in real time.
@@ -171,9 +173,8 @@ Ovoid.Skin.prototype._localMirror = function() {
 
 
 /**
- * Bind skin.
- * <br>
- * <br>
+ * Bind skin.<br><br>
+ * 
  * Configures vertices of the specified Mesh according to the given 
  * weigths, Joints indices and matrices. The weights and joint's id are stored
  * in the mesh's vertice's data.
@@ -258,85 +259,6 @@ Ovoid.Skin.prototype.bindSkin = function(mesh, mbindshape, mbindjoint,
 
 
 /**
- * Get weighted vertex.
- * <br>
- * <br>
- * Returns the weighted mesh's vertex according to the specified lod level and
- * vertex index.
- * 
- * @param {int} l Lod level.
- * @param {int} v Mesh's vertex index.
- * 
- * @return {Vertex} The weighted vertex.
- */
-Ovoid.Skin.prototype.weightedVertex = function(l, v) {
-  
-  var mv = this.mesh.vertices[l][v];
-  var result = new Ovoid.Vertex();
-  
-  if(mv.w.v[0] > 0.0) {
-    result.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[0]], mv.w.v[0]);
-    result.n.addWeightTransform3Of(mv.n, this.infNormalMatrix[mv.i.v[0]], mv.w.v[0]);
-  }
-  if(mv.w.v[1] > 0.0) {
-    result.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[1]], mv.w.v[1]);
-    result.n.addWeightTransform3Of(mv.n, this.infNormalMatrix[mv.i.v[1]], mv.w.v[1]);
-  }
-  if(mv.w.v[2] > 0.0) {
-    result.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[2]], mv.w.v[2]);
-    result.n.addWeightTransform3Of(mv.n, this.infNormalMatrix[mv.i.v[2]], mv.w.v[2]);
-  }
-  if(mv.w.v[3] > 0.0) {
-    result.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[3]], mv.w.v[3]);
-    result.n.addWeightTransform3Of(mv.n, this.infNormalMatrix[mv.i.v[3]], mv.w.v[3]);
-  }
-  
-  return result;
-}
-
-
-/**
- * Get weighted vertices.
- * <br>
- * <br>
- * Returns the weighted mesh's vertices according to the specified lod level.
- * 
- * @param {int} v Mesh's vertex index.
- * 
- * @return {Vertex[]} The weighted vertices array.
- */
-Ovoid.Skin.prototype.weightedVertices = function(l) {
-  
-  var mv;
-  var result = Ovoid.Vertex.newArray(this.mesh.vertices[l].length);
-
-  var v = result.length;
-  while(v--) {
-    
-    mv = this.mesh.vertices[l][v];
-    
-    if(mv.w.v[0] > 0.0) {
-      result[v].p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[0]], mv.w.v[0]);
-      result[v].n.addWeightTransform3Of(mv.n, this.infNormalMatrix[mv.i.v[0]], mv.w.v[0]);
-    }
-    if(mv.w.v[1] > 0.0) {
-      result[v].p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[1]], mv.w.v[1]);
-      result[v].n.addWeightTransform3Of(mv.n, this.infNormalMatrix[mv.i.v[1]], mv.w.v[1]);
-    }
-    if(mv.w.v[2] > 0.0) {
-      result[v].p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[2]], mv.w.v[2]);
-      result[v].n.addWeightTransform3Of(mv.n, this.infNormalMatrix[mv.i.v[2]], mv.w.v[2]);
-    }
-    if(mv.w.v[3] > 0.0) {
-      result[v].p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[3]], mv.w.v[3]);
-      result[v].n.addWeightTransform3Of(mv.n, this.infNormalMatrix[mv.i.v[3]], mv.w.v[3]);
-    }
-  }
-  return result;
-}
-
-
-/**
  * Node's caching function.
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
@@ -355,7 +277,8 @@ Ovoid.Skin.prototype.cachSkin = function() {
           this.joint[i].worldMatrix);
 
       this.infNormalMatrix[i].fromMat4(this.infWorldMatrix[i]);
-
+      this.infNormalMatrix[i].toNormalTransform();
+      
       this.infMxfArray.set(this.infWorldMatrix[i].m, i * 16);
       this.infMnrArray.set(this.infNormalMatrix[i].m, i * 9);
       // On world-cach le joint à partir du moment où le skin est up-to-date

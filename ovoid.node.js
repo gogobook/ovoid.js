@@ -22,65 +22,53 @@
 /**
  * Node object constructor.
  * 
- * @class Generic Node object.
- * <br>
- * <br>
+ * @class Generic Node object.<br><br>
+ * 
  * This class provides an implementation of a graph node. Node is the 
- * fundamental unit of which graphs are formed. In Ovoid, Node are the base 
- * class for all the scene's objects and obviously a scene is what is called a
- * graph. The Node object forms two types of paralel graph, first one is the 
- * world hierarchy tree and the second is the dependency graph.
- * <br>
- * <br>
- * <b>The Node world hierarchy concept</b>
- * <br>
- * <br>
- * Nodes are almost all connected ones with the others. The most known and 
- * common node relationship is the hierarchy, described with a graph of parent 
- * and child nodes, it is also the most visible. This relationship is called 
- * "world" because it affect the nodes's world transformations in space.
- * <br>
- * <br>
- * The node world hierarchy 
- * can be defined as how a node's transformations lead the transformations of 
- * another one, or from an other point of view, in which order the nodes's 
- * transformations should be treated to accomplish the global scene 
- * transformation. For example, suppose two nodes, the first is the parent of
- * the second, and so the first has the second as child. If you move the first
- * (parent) node, the second (child) node will follow the first in all its 
- * transformations. However, if you move the second (child) node, the first 
- * (parent) will not be affected by this transformation.
- * <br>
- * <br>
- * In Node object the world hierarchy graph is defined by the <code>parent</code>
- * and 
- * <code>child</code> fields. The first is a reference to an other Node object, 
- * the second is an Array of other Node objets. The <code>parent</code> is a 
- * the parent node of the Node object. The <code>child</code> Array contains all 
- * nodes who are child of the Node object.
- * <br>
- * <br>
- * <b>The Node dependency concept</b>
- * <br>
- * <br>
- * Nodes are almost all connected ones with the others. The most known and 
- * common node relationship is the hierarchy, described with a graph of parent 
- * and child nodes. An other node relation is the dependency. 
- * <br>
- * <br>
- * The node dependency 
- * can be defined as how a node depends of another one to do its job, or 
- * from an other point of view, in which order the nodes should be treated to 
- * accomplish a global good job. For example, you can easily understand that a 
- * Mesh node that use some Material nodes depends of the Material nodes. 
- * If the Material nodes have a problem, the Mesh node has problem too.
- * <br>
- * <br>
- * In Node object the dependency graph is defined by the <code>link</code> and 
- * <code>depend</code> fields that are Array of other Node objects. The 
- * <code>depend</code> Array contains all nodes whose the Node object directly 
- * depends. The <code>link</code> Array contains all nodes whose directly 
- * depends of the Node object.
+ * fundamental unit of which graphs are formed. Node class is the base 
+ * class for all Node objects.<br><br>
+ * 
+ * The Node object implements two types of node relationships which forms two 
+ * types of graphs. The both relationship types can (and typically) occur in 
+ * same time for each nodes. One can say that nodes form two diferent parallel 
+ * graphs.<br><br>
+ * 
+ * <b>World hierarchy graph</b><br><br>
+ * 
+ * The world hierarchy is the most common and known relationship type in 3D 
+ * context. It is defined by the child-parent relationship, 
+ * who describes how a node will affects (leads) the transformation of one or 
+ * several other nodes. In practice, each child nodes recursively undergoes the 
+ * transformation (in parent space coordinate) applied to its parents.<br><br>
+ * 
+ * <blockcode>
+ * var node0 = scene.create(Ovoid.NODE, "node0");<br>
+ * var node1 = scene.create(Ovoid.NODE, "node1");<br>
+ * node0.setParent(node1);<br>
+ * </blockcode><br><br>
+ * 
+ * The Node class implement this relationship through its <code>parent</code> and 
+ * <code>child</code> member fields, and the relationship is created using the 
+ * <code>setParent</code> method. One node can only have one parent, and an 
+ * limitless amount of children.<br><br>
+ * 
+ * <b>Nodes dependency graph</b><br><br>
+ * 
+ * The nodes dependency is a less known relationship type who describe, as its 
+ * name says, the relative dependencies of nodes between them. In practice, the 
+ * the dependency graph tells which nodes should be updated in 
+ * order to fulfill updates of an other one.<br><br>
+ * 
+ * <blockcode>
+ * var node0 = scene.create(Ovoid.NODE, "node0");<br>
+ * var node1 = scene.create(Ovoid.NODE, "node1");<br>
+ * node0.makeDepend(node1);<br>
+ * </blockcode><br><br>
+ * 
+ * The Node class implement this relationship through its <code>depend</code> and 
+ * <code>link</code> member fields, and the relationship is created or 
+ * destroyed using the <code>makeDepend</code> and <code>breakDepend</code> 
+ * methods. One node can have an limitless amount of linked and depend nodes.<br><br> 
  * 
  * @see Ovoid.Scene
  * @see Ovoid.WgIterator
@@ -131,9 +119,9 @@ Ovoid.Node = function(name) {
 
 
 /**
- * Set parent.
+ * Set parent.<br><br>
  * 
- * <br><br>Sets the parent node of this instance.
+ * Sets the parent node of this instance.
  *
  * @param {Node} node Node object to be parent.
  */
@@ -171,9 +159,9 @@ Ovoid.Node.prototype.setParent = function(node) {
 
 
 /**
- * Make dependency link.
+ * Make dependency link.<br><br>
  * 
- * <br><br>Make a dependency link between this node and the specified one.
+ * Make a dependency link between this node and the specified one.
  * This will add a node who this instance depends on, and add this instance 
  * as linked one to the specified node.
  *
@@ -193,9 +181,9 @@ Ovoid.Node.prototype.makeDepend = function(node) {
 
 
 /**
- * Break dependency link.
+ * Break dependency link.<br><br>
  * 
- * <br><br>If link exists, break the dependency link between this node and the 
+ * If link exists, break the dependency link between this node and the 
  * specified one.
  *
  * @param {Node} node Node Object to break dependency link with.
@@ -224,9 +212,9 @@ Ovoid.Node.prototype.breakDepend = function(node) {
 
 
 /**
- * Enable caching bit.
+ * Enable caching bit.<br><br>
  * 
- * <br><br>Enable the specified caching bit for this instance.
+ * Enable the specified caching bit for this instance.
  *
  * @param {bitmask} cach Bitmask of the cach bits to enable.
  */
@@ -250,9 +238,9 @@ Ovoid.Node.prototype.unCach = function(cach) {
 
 
 /**
- * Set visibility.
+ * Set visibility.<br><br>
  * 
- * <br><br>Sets the visibility attribute of this instance and for the whole
+ * Sets the visibility attribute of this instance and for the whole
  * children tree of this instance.
  *
  * @param {bool} v Boolean value to set visibility.
