@@ -673,7 +673,7 @@ Ovoid.Scene.prototype.transplant = function(tree) {
 /**
  * Use camera as active.<br><br>
  * 
- * Sets the specified Camera node as active camera. It node must be 
+ * Sets the specified Camera node as active camera. It must be 
  * in the scene.
  *
  * @param {Camera|string|int} node Camera object, name or UID to be active.

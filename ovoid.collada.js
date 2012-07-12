@@ -2920,7 +2920,7 @@ Ovoid.Collada.prototype._procAni = function(dae) {
  * loaded, a value of 1 means that the source was successfully loaded, and a 
  * value of -1 means the loading failed.<br><br>
  *
- * @param {string} url Source file name to load.
+ * @param {string} url Source file url to load.
  * <code>Ovoid.opt_daePath</code> is used as base path.
  * 
  * @param {bool} async Optionnal asynchronous loading flag. If true or not null

@@ -763,8 +763,8 @@ Ovoid.Loader._launch = function() {
  * 
  * @see Ovoid.Ojson
  *
- * @param {string} url Source file name to load. Keep in mind that the 
- * <code>Ovoid.opt_ojsonPath</code> option will be used to retrieve the file.
+ * @param {string} url Source file url to load.
+ * <code>Ovoid.opt_ojsonPath</code> is used as base path.
  * 
  * @param {Scene} scene Importation recipient Scene object.
  */
@@ -798,13 +798,16 @@ Ovoid.Loader.includeOjson = function(url, scene) {
  *
  * @see Ovoid.Collada
  *
- * @param {string} url @param {string} url Source file name to load. Keep in mind that the 
- * <code>Ovoid.opt_daePath</code> option will be used to retrieve the file.
+ * @param {string} url @param {string} url Source file url to load. 
+ * <code>Ovoid.opt_daePath</code> is used as base path.
  * 
  * @param {bitmask} mask Importation options bitmask.
+ * 
  * @param {Scene} scene Recipient Scene object.
- * @param {string} namespace Prefix used to name imported nodes.
- * @param {string} extention Suffix used to name imported nodes.
+ * 
+ * @param {string} prefix Prefix used to name imported nodes or null.
+ * 
+ * @param {string} suffix Suffix used to name imported nodes or null.
  */
 Ovoid.Loader.includeCollada = function(url, mask, scene, namespace, extension) {
 
@@ -892,23 +895,18 @@ Ovoid.Loader.includeAudio = function(audio) {
  * Ovoid.DRAWER_SP_LAYER,<br>
  * Ovoid.DRAWER_SP_PARTICLES<br><br>
  * 
- * @param {string} vs Vertex program shader source file name. The 
- * specified source files are retrieved according to 
- * the <code>Ovoid.opt_shadersPath</code> global option.
+ * @param {string} vs Vertex program shader source file url. 
+ * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
- * @param {string} fs Fragment program shader source file name. The 
- * specified source files are retrieved according to 
- * the <code>Ovoid.opt_shadersPath</code> global option.
+ * @param {string} fs Fragment program shader source file url. 
+ * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
- * @param {string} wm XML or JSON wrap map file name. The 
- * specified source files are retrieved according to 
- * the <code>Ovoid.opt_shadersPath</code> global option.
+ * @param {string} wm XML or JSON wrap map file url. 
+ * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
  * @param {string} name Optionnal shader name.
  *
  * @see Ovoid.Shader
- * 
- * @param {Audio} audio Audio object.
  */
 Ovoid.Loader.includeShader = function(slot, vs, fs, wm, name) {
 

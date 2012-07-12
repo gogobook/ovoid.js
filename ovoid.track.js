@@ -185,8 +185,8 @@ Ovoid.Track.prototype.stop = function() {
  * pecified pitch.
  *
  * @param {float} factor Pitch time factor.
- * A positive value will set the animation at its begining, a negative value 
- * will set the animation at its end.
+ * A positive value will set the track at its begining, a negative value 
+ * will set the track at its end.
  */
 Ovoid.Track.prototype.rewind = function(factor) {
 

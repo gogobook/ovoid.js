@@ -274,13 +274,13 @@ Ovoid.Shader.prototype._handleError = function() {
  * yet loaded, a value of 1 means that all the sources was successfully loaded, 
  * and a value of -1 means the loading failed.<br><br>
  *
- * @param {string} vs Vertex program shader source file name. 
+ * @param {string} vs Vertex program shader source file url. 
  * <code>Ovoid.opt_shadersPath</code> is used as base path. 
  * 
- * @param {string} fs Fragment program shader source file name.
+ * @param {string} fs Fragment program shader source file url.
  * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
- * @param {string} wm XML or JSON wrap map file name.
+ * @param {string} wm XML or JSON wrap map file url.
  * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
  * @param {bool} as Optionnal asynchronous loading flag. If true or not null

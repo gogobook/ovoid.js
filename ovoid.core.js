@@ -17,230 +17,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** Environment option.
- * Default OvoiD.JS library path.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Default OvoiD.JS library path. */
 Ovoid.opt_libPath = 'ovoid.js/';
 
-/** WebGL context option. 
- * Enable or disable alpha canvas. This option allow canvas to be transparent.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+
+/** WebGL context option to enable or disable alpha canvas, which allow canvas to be transparent.*/
 Ovoid.opt_alpha = false;
 
 
-/** WebGL context option. 
- * Enable or disable Preserve Drawing Buffer. This option must be enabled to
- * use Picking. 
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** WebGL context option to enable or disable Preserve Drawing Buffer. (required for mouse picking mecanism) */
 Ovoid.opt_preserveDrawingBuffer = true;
 
 
-/** WebGL context option. 
- * Enable or disable anti-aliasing.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** WebGL context option to enable or disable anti-aliasing. */
 Ovoid.opt_antialias = true;
 
 
-/** WebGL context option. 
- * Enable or disable the stencil buffer 
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** WebGL context option to enable or disable the stencil buffer. */
 Ovoid.opt_stencil = true;
 
 
-/** WebGL context option. 
- * Enable or disable premultiplied alpha channel. 
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** WebGL context option to enable or disable premultiplied alpha channel. */
 Ovoid.opt_premultipliedAlpha = true;
 
 
-/** Environment option.
- * Avoids browser's cache and force to (re)load external sources files. 
- * 
- * <br><br>This function is usefull during development time to ensure that you 
- * allways work with the latest modified external sources.
- * 
- * <br><br>Note: Except for debugging purpose this option should stay disabled.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Avoids browser's cache and force all nodes as pickable. */
 Ovoid.opt_debugMode = false;
 
 
-/** Environment option.
- * Default path for Textures's images source files.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Default path for Textures's images source files. */
 Ovoid.opt_texturePath = 'data/map/';
 
 
-/** Environment option.
- * Default path for Scenes's DAE/Collada source files.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Default path for Scenes's DAE/Collada source files. */
 Ovoid.opt_daePath = 'data/dae/';
 
 
-/** Environment option.
- * Default path for Scenes's OJSON source files.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Default path for Scenes's OJSON source files. */
 Ovoid.opt_ojsonPath = 'data/ojsn/';
 
 
-/** Environment option.
- * Default path for Audio's sound source files.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Default path for Audio's sound source files. */
 Ovoid.opt_audioPath = 'data/snd/';
 
 
-/** Environment option.
- * Default path for Shaders's GLSL source files.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Default path for Shaders's GLSL source files. */
 Ovoid.opt_shadersPath = 'data/glsl/';
 
 
-/** Environment option. 
- * Default source image filename for font texture map. 
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Default source image filename for font texture map. */
 Ovoid.opt_defaultFontmapUrl = 'font_CPMonoPlain.png';
 
 
-/** Environment option. 
- * Default filter level for font texture map. 
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Default filter level for font texture map. */
 Ovoid.opt_defaultFontmapFilter = 0;
 
 
-/** Environment option. 
- * <br><br>Enable mouse interacive picking.
- * 
- * <br><br>The picking allow interactions between the drawn scene and
- * the mouse pointer by allowing to know wich object the 
- * mouse pointer is rolling over.
- * 
- * <br><br>Note: Picking involve rendering's methods that can hit framerate. In 
- * details, the picking need to draw the scene a second time in a separate frame 
- * buffer and use the gl.ReadPixels() function. 
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Enable mouse interacive picking. */
 Ovoid.opt_enablePicking = true;
 
 
-/** Environment option. 
- * Disable alert messages. 
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Disable alert messages. */
 Ovoid.opt_disableAlerts = false;
 
 
-/** Display option. 
- * Show head-up display. 
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Show head-up display. */
 Ovoid.opt_showHud = true;
 
 
-/** Display option. 
- * Show debug screen.
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Show debug screen.<br><br> */
 Ovoid.opt_showDebug = false;
 
 
-/** Environment option. 
- * Global gravity vector for particles and solver
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * 
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
- */
+/** Global gravity vector for particles and solver.*/
 Ovoid.opt_gravity = [0.0,-0.98,0.0];
 
 
-/** Current active scene.
- * <br>
- * <br>
- * Current active scene reference. To change the current active scene you
- * can modify this variable or use the <code>Ovoid.useScene()</code> method.
+/** Current active scene reference.
  * @type {Scene} */
 Ovoid.rscene = new Ovoid.Scene("null");
 
@@ -259,18 +112,11 @@ for (var i = 0; i < 8; i++)
   Ovoid._dbg[i] = new Ovoid.Text();
 
 
-/** Global WebGL Context handle. 
- * 
- * <br><br>This is the global WeGL context object. You can use it for your own WebGL
- * function calls. */
+/** Global WebGL Context handle. */
 Ovoid.gl = null;
 
 
-/** Global Audio API Context handle.
- * 
- * <br><br>This is the global Web Audio API context object. You can use it for your
- * own Web Audio API function calls. Note that Chrome browser is the only one 
- * that currently support Web Audio API. */
+/** Global Audio API Context handle. */
 Ovoid.al = null;
   
 
@@ -278,28 +124,12 @@ Ovoid.al = null;
 Ovoid._modules = new Array();
 
 /**
- * Main initialization function.
+ * Main initialization function.<br><br>
  * 
- * <br><br>Excepting the data/scenes's preloading, before doing something with 
- * the library, it must be initialized. OvoiD.JS Library is an WebGL wrapper and 
- * many of its classes refers to the WebGL context's core functions.  So, first 
- * of all, if WebGL is not properly initialized, most of OvoiD.JS's  classes 
- * simply won't work.
- * <br>
- * In a second stage, the main initialization will launch all globals classes's 
- * initialization. The main initialization will finally launch the preloading 
- * of external contents.
- * <br>
- * <br>
- * To learn more about preload process, see the <code>Ovoid.Loader</code>  
- * global class's documentation page.
- * <br>
- * <br>
- * The main initialization should be called at page loading. for example,  you 
- * can do it by calling initialisation in any function that is called  by an 
- * "onload"  trigger in the body tag of your HTML page:
- * <br>
- * <br>
+ * Initializes the whole library including global classes and 
+ * preloading external data, and create a WebGL context on the specified 
+ * HTML canvas.<br><br>
+
  * <blockcode>
  * function main() {<br>
  * &nbsp;&nbsp;<codecomment>// Start OvoiD.JS Library on the given canvas.</codecomment><br>
@@ -309,10 +139,6 @@ Ovoid._modules = new Array();
  * <br>
  * &lt;body style="margin:0px;" <b>onload="main();"</b>&gt;<br>
  * </blockcode>
- * <br>
- * <br>
- * 
- * @see Ovoid
  * 
  * @param {string} canvas HTML5 Canvas id to init frame and WebGL context.
 */
@@ -542,46 +368,44 @@ Ovoid.init = function(canvas) {
 };
 
 
-/** Global overidable application main loop function. 
- * <br>
- * <br>
- * Main function for the custom loop process. This function is dedicated to be 
- * overrided.
- * <br>
- * <br>
- * The <code>Ovoid.onloop</code> function is called at EACH frame's refresh. 
- * So it's recomended to include code carefully to prevent performance issues 
- * or strange behaviors. For stupid exemple, don't create a new node in this 
- * function without conditions: this would (depending the frame rate) create 
- * more or less 60 new nodes per seconds.
- * <br>
- * <br>
+/** Global overidable Onload function.<br><br>
+ *
+ * This function is dedicated to be user defined.<br><br>
  * 
- * @see Ovoid
- */
-Ovoid.onloop = function () {};
-
-
-/** Global overidable application intialization function.
+ * The <code>Ovoid.onload</code> function is called ONLY ONCE after the main 
+ * initialization, and after the preloading process. The purpose of this 
+ * function is to provide a space between the main initialization and the main 
+ * loop. This is where you can setup your application's behaviours, create some 
+ * nodes, and do some job that must be done before entering the main loop.<br><br>
  * 
- * <br>
- * <br>
- * The main pre-loop function for the custom initializations. This function is 
- * dedicated to be overrided.
- * <br>
- * <br>
- * The <code>Ovoid.onload</code> function is called only once after the main 
- * initialization. the purpose of this function is to provide a space between 
- * the main initialization and the main loop. Since you can't do many things 
- * while WebGL is not initialized, you need to do it after the library's 
- * initialization, and you probably have to do some things before the program 
- * enters in the main loop.
- * <br>
- * <br>
- * 
- * @see Ovoid
+ * For more informations about <code>Ovoid.onload</code> and 
+ * <code>Ovoid.onloop</code> method see the 
+ * <a href="http://www.ovoid.org/js/doc/#onloadonloop">"The Onload And Onloop 
+ * Methods" General documentation chapter</a>
  */
 Ovoid.onload = function () {};
+
+
+/** Global overidable Onloop function.<br><br> 
+ * 
+ * This function is dedicated to be user defined.<br><br>
+ * 
+ * The <code>Ovoid.onloop</code> function is called at each frame's refresh. 
+ * Which means, between each application global refresh. It si where you can put 
+ * all your real-time interactive process like hooking user's inputs, changing 
+ * some world component, etc...
+ * You should also keep in mind that this function is critical, and it is 
+ * recomended to include code carefully to prevent performance issues or 
+ * strange behaviors. For stupid exemple, don't create new nodes in this 
+ * function without conditions: this would (depending the frame rate) create 
+ * more or less 60 new nodes per seconds.<br><br>
+ * 
+ * For more informations about <code>Ovoid.onload</code> and 
+ * <code>Ovoid.onloop</code> method see the 
+ * <a href="http://www.ovoid.org/js/doc/#onloadonloop">"The Onload And Onloop 
+ * Methods" General documentation chapter</a>
+ */
+Ovoid.onloop = function () {};
 
 
 /**
@@ -608,9 +432,9 @@ Ovoid._hasWarning = function() {
 
 
 /**
- * Get the log string.
+ * Get the log string.<br><br>
  * 
- * <br><br>Returns the current whole log string.
+ * Returns the current log string.
  *
  * @return {string} Current log string.
 */
@@ -794,39 +618,26 @@ Ovoid._mainloop = function() {
 
 
 /**
- * Add a whole Ovoid JSON scene importation into the preloading's stack.
- * <br>
- * <br>
- * This function will add an OJSON file importation into the  
- * <code>Ovoid.Loader</code> global class's preloading's stack. This function 
- * imports the whole OJSON's content without restriction or filter in the 
- * specifed Scene object.
- * <br>
- * <br>
- * Because  the preloading of data arrives with the main library's 
- * initialization, <code>Ovoid.include*</code> functions are the only ones 
- * that MUST be called BEFORE the <code>Ovoid.init</code> function :
- * <br>
- * <br>
+ * Include OJSON scene.<br><br>
+ * 
+ * Includes an OJSON scene file to the preloading stacks. 
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
+ * 
  * <blockcode>
  * function main() {<br>
  * &nbsp;&nbsp;Ovoid.includeOjsScene("helloworld.ojsn", myScene);<br>
  * &nbsp;&nbsp;Ovoid.init("mycanvas");<br>
  * };<br>
- * </blockcode>
- * <br>
- * <br>
- * The <code>Ovoid.include*</code> functions are more or less shortcuts of 
- * <code>Ovoid.Loader</code>  global class's methods.
- * <br>
- * <br>
- * For more information about OJSON importation and exportation see the
- * <code>Ovoid.Ojson</code> class documentation.
+ * </blockcode><br><br>
+ * 
+ * For more information about OvoiD.JSON importation see the
+ * <code>Ovoid.Ojson</code> class reference documentation.
  * 
  * @see Ovoid.Ojson
  * 
- * @param {string} url OJSON source file name. Keep in mind that the 
- * <code>Ovoid.opt_ojsonPath</code> option will be used to retrieve the file.
+ * @param {string} url OJSON source file url.
+ * <code>Ovoid.opt_ojsonPath</code> is used as base path.
  * 
  * @param {Object} scene Recipient Scene object.
  */
@@ -837,64 +648,39 @@ Ovoid.includeOjsScene = function(url, scene) {
 
 
 /**
- * Add a whole DAE/Collada scene importation into the preloading's stack.
- * <br>
- * <br>
- * This function will add an DAE/COLLADA file importation into the  
- * <code>Ovoid.Loader</code> global class's preloading's stack. This function 
- * imports the whole DAE's content without restriction or filter in the 
- * specifed Scene object.
- * <br>
- * <br>
- * Because  the preloading of data arrives with the main library's 
- * initialization, <code>Ovoid.include*</code> functions are the only ones 
- * that MUST be called BEFORE the <code>Ovoid.init</code> function :
- * <br>
- * <br>
+ * Include DAE scene.<br><br>
+ * 
+ * Includes an COLLADA/DAE scene file to the preloading stacks. 
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
+ * 
  * <blockcode>
  * function main() {<br>
  * &nbsp;&nbsp;Ovoid.includeDaeScene("helloworld.dae", myScene);<br>
  * &nbsp;&nbsp;Ovoid.init("mycanvas");<br>
  * };<br>
- * </blockcode>
- * <br>
- * <br>
- * The <code>Ovoid.include*</code> functions are more or less shortcuts of 
- * <code>Ovoid.Loader</code>  global class's methods.
- * <br>
- * <br>
- * If set to null, the default options mask used is:<br>
- * <code>Ovoid.DAE_ALLSNODES|
- * Ovoid.DAE_REPARENT_SKIN|
- * Ovoid.DAE_FORCE_CSPLINE|
- * Ovoid.DAE_OPTIMIZE_ALL</code>
- * <br>
- * <br>
+ * </blockcode><br><br>
+ * 
+ * The default mask used to import the DAE scene is defined as follow:<br>
+ * <code>Ovoid.DAE_ALLSNODES|Ovoid.DAE_CREATE_TRACK|Ovoid.DAE_FORCE_CSPLINE|
+ * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_OPTIMIZE_ALL</code>
+ * 
  * For more information about Collada/DAE importation see the
- * <code>Ovoid.Collada</code> class documentation.
+ * <code>Ovoid.Collada</code> class reference documentation.
  * 
  * @see Ovoid.Collada
  * 
- * @param {string} url DAE/COLLADA source file name. Keep in mind that the 
- * <code>Ovoid.opt_daePath</code> option will be used to retrieve the file.
+ * @param {string} url DAE/COLLADA source file url.
+ * <code>Ovoid.opt_daePath</code> is used as base path.
  * 
- * @param {bitmask} options Importation options bitmask. If set to null, the 
- * default options mask used is:<br>
- * <code>Ovoid.DAE_ALLSNODES |<br>
- * Ovoid.DAE_REPARENT_SKIN |<br>
- * Ovoid.DAE_FORCE_CSPLINE |<br>
- * Ovoid.DAE_OPTIMIZE_ALL<br></code>
+ * @param {bitmask} options Importation options bitmask or null to use default 
+ * settings.
  * 
- * @param {Scene} scene Recipient Scene object. 
+ * @param {Scene} scene Recipient Scene object.
  * 
- * @param {string} prefix Prefix used to name imported nodes. For more 
- * informations about prefix and suffix usage, see the <code>Ovoid.Collada</code> 
- * documentation page.
+ * @param {string} prefix Prefix used to name imported nodes or null.
  * 
- * @param {string} suffix Suffix used to name imported nodes. For more 
- * informations about prefix and suffix usage, see the <code>Ovoid.Collada</code> 
- * documentation page.
- * 
+ * @param {string} suffix Suffix used to name imported nodes or null.
  */
 Ovoid.includeDaeScene = function(url, mask, scene, prefix, suffix) {
   
@@ -902,6 +688,7 @@ Ovoid.includeDaeScene = function(url, mask, scene, prefix, suffix) {
     mask = Ovoid.DAE_ALL_NODES|
             Ovoid.DAE_CREATE_TRACK|
             Ovoid.DAE_FORCE_CSPLINE|
+            Ovoid.DAE_MERGE_DEPENDENCIES|
             Ovoid.DAE_OPTIMIZE_ALL;
     Ovoid.log(3, 'Ovoid.includeDaeScene', 'null options, use default.');
   }
@@ -909,109 +696,39 @@ Ovoid.includeDaeScene = function(url, mask, scene, prefix, suffix) {
 };
 
 /**
- * Add a DAE/Collada Animation nodes importation into the preloading's stack.
- * <br>
- * <br>
- * This function will add an DAE/COLLADA file importation into the 
- * <code>Ovoid.Loader</code> global class's preloading's stack. This function 
- * only imports the DAE's animations's data. 
- * <ul>
- * <li><b>Scene merging</b></li>
- * The imported Animation nodes are, if possible, merged with the existing 
- * scene's node according to node names.
- * <br>
- * <br>
- * For example, if you allready have a Body node named "mybox" in your  scene, 
- * and if the imported Animation node should animate a node named "mybox", the 
- * importer will link automatically the imported Animation node to the object 
- * "mybox" of the given Scene object. 
- * <br>
- * This way, you can begin to import a scene without animations, and then, 
- * import several scenes with object's animations, without meshs, objects 
- * and scene data reimportation. 
- * <br>
- * <br>
- * <li><b>The suffix parameter</b></li>
- * <br>
- * You can use the 'suffix' parameter to rename the animation node, to avoid 
- * name collision and allow a more managable animations library. Look at the 
- * following example:
- * <br>
- * <br>
- * <blockcode>
- * &nbsp;&nbsp;Ovoid.includeDaeScene("mybox.dae", myScene);<br>
- * &nbsp;&nbsp;Ovoid.includeDaeAnimation("mybox-rotate.dae", myScene, "", "rotate");<br>
- * &nbsp;&nbsp;Ovoid.includeDaeAnimation("mybox-jump.dae", myScene, "", "jump");<br>
- * &nbsp;&nbsp;Ovoid.includeDaeAnimation("mybox-sayhello.dae", myScene, "", "sayhello");<br>
- * </blockcode>
- * <br>
- * <br>
- * The result of this exemple is that you will have the normal scene importation
- * with probably one Mesh and one Body node named "mybox" and the imported 
- * Animation nodes will be named "myboxAnimation.rotate", 
- * "myboxAnimation.jump" and "myboxAnimation.sayhello". Note that this require 
- * that object naming was carefully made during exportion from the 3D modeling 
- * software.
- * <br>
- * <br>
- * <li><b>The Track node</b></li>
- * <br>
- * This importation process also create a Track node. The Track node is a kind 
- * of Animamtion group. ONE Track node is created per importation process, so in
- * our above example, three Track nodes was created. The Track node allow you to
- * manipulate several animation with only one object. That is typically usefull
- * for complexes animations scene like skeletal/bones animation that generate
- * one animation per Joint node. For example, suppose the above exemple imply 
- * skeletal animation with many Animation nodes per importation, you only have 
- * to refer to the Track node to animate the whole thing at a time.
- * <br>
- * <br>
- * Note: The Track node is named according to the scene file name. If your scene 
- * file is called "mybox", the Track node will be named "myboxTrack".
- * </ul>
- * <br>
- * <br>
- * Because  the preloading of data arrives with the main library's 
- * initialization, <code>Ovoid.include*</code> functions are the only ones 
- * that MUST be called BEFORE the <code>Ovoid.init</code> function :
- * <br>
- * <br>
+ * Include animations from DAE scene.<br><br>
+ * 
+ * Includes an COLLADA/DAE scene file to the preloading stacks with options mask 
+ * preset to only import animations and create Track node.
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
+ * 
  * <blockcode>
  * function main() {<br>
  * &nbsp;&nbsp;Ovoid.includeDaeAnimation("guywalk.ojsn", myScene, "", "walk");<br>
  * &nbsp;&nbsp;Ovoid.init("mycanvas");<br>
  * };<br>
- * </blockcode>
- * <br>
- * <br>
- * The <code>Ovoid.include*</code> functions are more or less shortcuts of 
- * <code>Ovoid.Loader</code>  global class's methods.
- * <br>
- * <br>
- * The default import options mask used by this method is:<br>
+ * </blockcode><br><br>
+ * 
+ * The preset mask used to import the DAE scene is defined as follow:<br>
  * <code>Ovoid.DAE_ANIMATIONS|Ovoid.DAE_CREATE_TRACK|
- * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_FORCE_CSPLINE</code>
- * <br>
- * <br>
+ * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_FORCE_CSPLINE</code><br><br>
+ * 
  * For more information about Collada/DAE importation see the
- * <code>Ovoid.Collada</code> class documentation.
+ * <code>Ovoid.Collada</code> class reference documentation.
  * 
  * @see Ovoid.Collada
  * @see Ovoid.Animation
  * @see Ovoid.Track
  * 
- * @param {string} url DAE/COLLADA source file name. Keep in mind that the 
- * <code>Ovoid.opt_daePath</code> option will be used to retrieve the file.
+ * @param {string} url DAE/COLLADA source file url.
+ * <code>Ovoid.opt_daePath</code> is used as base path.
  * 
  * @param {Scene} scene Recipient Scene object.
  * 
- * @param {string} prefix Prefix used to name imported nodes. For more 
- * informations about prefix and suffix usage, see the <code>Ovoid.Collada</code> 
- * documentation page.
+ * @param {string} prefix Prefix used to name imported nodes or null.
  * 
- * @param {string} suffix Suffix used to name imported nodes. For more 
- * informations about prefix and suffix usage, see the <code>Ovoid.Collada</code> 
- * documentation page.
+ * @param {string} suffix Suffix used to name imported nodes or null.
  */
 Ovoid.includeDaeAnimation = function(url, scene, prefix, suffix) {
   
@@ -1025,54 +742,38 @@ Ovoid.includeDaeAnimation = function(url, scene, prefix, suffix) {
 
 
 /**
- * Add a DAE/Collada Mesh nodes importation into the preloading's stack.
- * <br>
- * <br>
- * This function will add an Collada/DAE file importation into the 
- * <code>Ovoid.Loader</code> global class's preload stack. This function will 
- * only import Mesh nodes from the scene's content. 
- * <br>
- * <br>
- * Because  the preloading of data arrives with the main library's 
- * initialization, <code>Ovoid.include*</code> functions are the only ones 
- * that MUST be called BEFORE the <code>Ovoid.init</code> function :
- * <br>
- * <br>
+ * Include meshs from DAE scene.<br><br>
+ * 
+ * Includes an COLLADA/DAE scene file to the preloading stacks with options mask 
+ * preset to only import meshs.
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
+ * 
  * <blockcode>
  * function main() {<br>
- * &nbsp;&nbsp;Ovoid.includeDaeMesh("guybrush.dae", myScene, "global");<br>
+ * &nbsp;&nbsp;Ovoid.includeDaeMesh("guybrush.dae", myScene);<br>
  * &nbsp;&nbsp;Ovoid.init("mycanvas");<br>
  * };<br>
- * </blockcode>
- * <br>
- * <br>
- * The <code>Ovoid.include*</code> functions are more or less shortcuts of 
- * <code>Ovoid.Loader</code>  global class's methods.
- * <br>
- * <br>
- * The default import options mask used by this method is:<br>
+ * </blockcode><br><br>
+ * 
+ * The preset mask used to import the DAE scene is defined as follow:<br>
  * <code>Ovoid.DAE_MESHS|Ovoid.DAE_MATERIALS|
- * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_OPTIMIZE_ALL</code>
- * <br>
- * <br>
+ * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_OPTIMIZE_ALL</code><br><br>
+ * 
  * For more information about Collada/DAE importation see the
- * <code>Ovoid.Collada</code> class documentation.
+ * <code>Ovoid.Collada</code> class reference documentation.
  * 
  * @see Ovoid.Collada
  * @see Ovoid.Mesh
  * 
- * @param {string} url DAE/COLLADA source file name. Keep in mind that the 
- * <code>Ovoid.opt_daePath</code> option will be used to retrieve the file.
+ * @param {string} url DAE/COLLADA source file url.
+ * <code>Ovoid.opt_daePath</code> is used as base path.
  * 
  * @param {Scene} scene Recipient Scene object.
  * 
- * @param {string} prefix Prefix used to name imported nodes. For more 
- * informations about prefix and suffix usage, see the <code>Ovoid.Collada</code> 
- * documentation page.
+ * @param {string} prefix Prefix used to name imported nodes or null.
  * 
- * @param {string} suffix Suffix used to name imported nodes. For more 
- * informations about prefix and suffix usage, see the <code>Ovoid.Collada</code> 
- * documentation page.
+ * @param {string} suffix Suffix used to name imported nodes or null.
  * 
  */
 Ovoid.includeDaeMesh = function(url, scene, prefix, suffix) {
@@ -1087,14 +788,11 @@ Ovoid.includeDaeMesh = function(url, scene, prefix, suffix) {
 
 
 /**
- * Add an audio source file loading as Audio node into the preloading's stack.
+ * Include audio.<br><br>
  * 
- * <br><br>This function will add an audio file (ogg, mp3, wav) loading into the 
- * <code>Ovoid.Loader</code> global class's preload stack as Audio node.
- * 
- * <br><br>Because the preloading of data come with global initialization, 
- * <code>Ovoid.include*</code> functions are the only ones that MUST be called
- * BEFORE the <code>Ovoid.init</code> main initialization function:
+ * Includes an audio file (Audio object) to the preloading stacks.  
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
  * 
  * <br><br>
  * <blockcode>
@@ -1102,15 +800,12 @@ Ovoid.includeDaeMesh = function(url, scene, prefix, suffix) {
  * &nbsp;&nbsp;Ovoid.includeAudio("boom.mp3", myScene);<br>
  * &nbsp;&nbsp;Ovoid.init("mycanvas");<br>
  * };<br>
- * </blockcode>
- * 
- * <br><br>These 
- * functions are more or less shortcuts of <code>Ovoid.Loader</code> global 
- * class's methods.
+ * </blockcode><br><br>
  * 
  * @see Ovoid.Audio
  * 
- * @param {string} url Audio file source URL.
+ * @param {string} url Audio file source url.
+ * <code>Ovoid.opt_audioPath</code> is used as base path.
  * @param {Scene} scene Scene object to insert Audio node in.
  */
 Ovoid.includeAudio = function(url, scene) {
@@ -1123,14 +818,11 @@ Ovoid.includeAudio = function(url, scene) {
 
 
 /**
- * Add an image source file loading as Texture node into the preloading's stack.
+ * Include texture.<br><br>
  * 
- * <br><br>This function will add an image file (jpg, png, gif) loading into the 
- * <code>Ovoid.Loader</code> global class's preload stack as Texture node.
- * 
- * <br><br>Because the preloading of data come with global initialization, 
- * <code>Ovoid.include*</code> functions are the only ones that MUST be called
- * BEFORE the <code>Ovoid.init</code> main initialization function:
+ * Includes an image file (Texture object) to the preloading stacks.  
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
  * 
  * <br><br>
  * <blockcode>
@@ -1138,15 +830,12 @@ Ovoid.includeAudio = function(url, scene) {
  * &nbsp;&nbsp;Ovoid.includeTexture("myimage.png", 1, myScene);<br>
  * &nbsp;&nbsp;Ovoid.init("mycanvas");<br>
  * };<br>
- * </blockcode>
- * 
- * <br><br>These 
- * functions are more or less shortcuts of <code>Ovoid.Loader</code> global 
- * class's methods.
+ * </blockcode><br><br>
  * 
  * @see Ovoid.Texture
  * 
- * @param {string} url Image file source URL.
+ * @param {string} url Image file source url.
+ * <code>Ovoid.opt_texturePath</code> is used as base path.
  * @param {string} filter Default texture filtering.
  * @param {Object} scene Scene object to insert Texture node in.
  */
@@ -1161,15 +850,11 @@ Ovoid.includeTexture = function(url, filter, scene) {
 
 
 /**
- * Add an GLSL source files loading as Shader object into the preloading's stack.
+ * Include GLSL shader.<br><br>
  * 
- * <br><br>This function will add GLSL source files loading into the 
- * <code>Ovoid.Loader</code> global class's preload stack as Shader object and
- * plug it to the specified Drawer's pipeline.
- * 
- * <br><br>Because the preloading of data come with global initialization, 
- * <code>Ovoid.include*</code> functions are the only ones that MUST be called
- * BEFORE the <code>Ovoid.init</code> main initialization function:
+ * Includes an GLSL shader program (Shader object) to the preloading stacks.
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
  * 
  * <br><br>
  * <blockcode>
@@ -1177,13 +862,10 @@ Ovoid.includeTexture = function(url, filter, scene) {
  * &nbsp;&nbsp;Ovoid.includeShader(-1, "snow.vs", "snow.fs", "wrapmap.xml");<br>
  * &nbsp;&nbsp;Ovoid.init("mycanvas");<br>
  * };<br>
- * </blockcode>
- * 
- * <br><br>These 
- * functions are more or less shortcuts of <code>Ovoid.Loader</code> global 
- * class's methods.
+ * </blockcode><br><br>
  * 
  * @see Ovoid.Shader
+ * @see Ovoid.Loader
  * 
  * @param {int} slot Symbolic constant for drawing pipeline. Can be -1 to
  * keep the sahder in the Drawer's stock without pluging it, or one of the 
@@ -1196,22 +878,16 @@ Ovoid.includeTexture = function(url, filter, scene) {
  * Ovoid.DRAWER_SP_LAYER,<br>
  * Ovoid.DRAWER_SP_PARTICLES<br><br>
  * 
- * @param {string} vs Vertex program shader source file name. The 
- * specified source files are retrieved according to 
- * the <code>Ovoid.opt_shadersPath</code> global option.
+ * @param {string} vs Vertex program shader source file name. 
+ * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
- * @param {string} fs Fragment program shader source file name. The 
- * specified source files are retrieved according to 
- * the <code>Ovoid.opt_shadersPath</code> global option.
+ * @param {string} fs Fragment program shader source file name. 
+ * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
- * @param {string} wm XML or JSON wrap map file name. The 
- * specified source files are retrieved according to 
- * the <code>Ovoid.opt_shadersPath</code> global option.
+ * @param {string} wm XML or JSON wrap map file name. 
+ * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
  * @param {string} name Optionnal shader name.
- * 
- * For more information about Audio object and Audio loading see the 
- * <code>Ovoid.Shader</code> class documentation.
  */
 Ovoid.includeShader = function(slot, vs, fs, wm, name) {
 
@@ -1220,13 +896,20 @@ Ovoid.includeShader = function(slot, vs, fs, wm, name) {
 
 
 /**
- * Use a Scene object to draw in canvas and interact with.
+ * Use scene as active.<br><br>
  * 
- * <br><br>You can build as many scenes as you want. The one you want to be used to 
- * be rendered in the canvas must be specified by this method. You can change 
- * the main scene at any time during the runtime. For example you can preload 
- * and preconfigure some scenes and switch between them at your convenience 
- * during the runtime and so switch between application's different contexts.
+ * In OvoiD.JS, a scene must be assigned to the global pipeline as active one in 
+ * order to be treated by the Library mecanism.<br><br>
+ * 
+ * <blockcode>
+ * var scene = new Ovoid.Scene("Hello");<br>
+ * Ovoid.useScene(scene);<br>
+ * </blockcode><br><br>
+ * 
+ * Once a scene is used as active, its graph (nodes) are updated, treated and
+ * may be drawn each frames. Several scenes can be created and set as active at 
+ * desired time until an other is set as active one. While a scene is not 
+ * active, it is left without any change or update.<br><br>
  * 
  * @see Ovoid.Scene
  *
@@ -1238,27 +921,24 @@ Ovoid.useScene = function(scene) {
 };
 
 /**
- * Use camera as active.
- * <br>
- * <br>
- * Sets the specified Camera node as active camera in the current active scene. 
- * The Camera node must be in the current active scene.
- * <br>
- * <br>
- * The active camera is the one that is used to calculate the rendering's point 
- * of view perspective. A scene can contain more than one camera, and so the 
- * active camera must be explicitely defined to tell to the render engine wich 
- * camera to use to render the scene. The active camera can be switched at 
- * any time.
- * <br>
- * <br>
- * This is a shortcut for the Scene object's <code>useCamera</code> 
- * method.
+ * Use camera as active.<br><br>
  * 
- * @see Ovoid.Scene
+ * Sets the specified Camera node as active camera. It must be 
+ * in the current active scene.<br><br>
  * 
- * @param {Camera|string|int} node Camera object, name or UID to be active.
+ * Scene active camera is the one used as point of view to draw the scene. It 
+ * must be in the scene graph.<br><br>
+ * 
+ * <blockcode>
+ * scene.create(Ovoid.CAMERA, "Camera1");<br>
+ * scene.useCamera("Camera1");<br>
+ * </blockcode><br><br>
+ * 
+ * If no active camera is declared, an built-in camera is used. A scene can have 
+ * several cameras which can be set as active at desired time until an other is 
+ * set as active one.
  *
+ * @param {Camera|string|int} node Camera object, name or UID to be active.
  */
 Ovoid.useCamera = function(node) {
 
@@ -1267,9 +947,8 @@ Ovoid.useCamera = function(node) {
 
 
 /**
- * Adjust active camera yaw.
- * <br>
- * <br>
+ * Adjust active camera yaw.<br><br>
+ * 
  * Rotate the current active camera by the specified value in yaw axis.
  * 
  * @param {float} y Yaw value.
@@ -1281,9 +960,8 @@ Ovoid.cameraYaw = function(y) {
 
 
 /**
- * Adjust active camera pitch.
- * <br>
- * <br>
+ * Adjust active camera pitch.<br><br>
+ * 
  * Rotate the current active camera by the specified value in yaw axis.
  * 
  * @param {float} x Pitch value.
@@ -1295,9 +973,8 @@ Ovoid.cameraPitch = function(x) {
 
 
 /**
- * Adjust active camera pitch.
- * <br>
- * <br>
+ * Adjust active camera pitch.<br><br>
+ * 
  * Rotate the current active camera by the specified value in yaw axis.
  * 
  * @param {float} z Pitch value.
@@ -1309,9 +986,8 @@ Ovoid.cameraRoll = function(z) {
 
 
 /**
- * Adjust active camera dolly.
- * <br>
- * <br>
+ * Adjust active camera dolly.<br><br>
+ * 
  * Move the current active camera by the specified value in dolly axis.
  * 
  * @param {float} z Pitch value.
@@ -1323,20 +999,13 @@ Ovoid.cameraDolly = function(z) {
 
 
 /**
- * Search a node in the current active scene.
- * <br>
- * <br>
- * Retrieves and returns the current active scene's node of the with the 
- * specified name or UID from the.
- * <br>
- * <br>
- * This is a shortcut for the Scene object's <code>search</code> method. 
+ * Search node.<br><br>
  * 
- * @see Ovoid.Scene
- * @see Ovoid.Node
+ * Search and returns the node from the current active scene with the specified 
+ * name or UID.
  *
  * @param {string|int} item Name or UID of the Node to search.
- * 
+ *
  * @return {Node} The found node, or null if none is found.
  */
 Ovoid.search = function(name) {
@@ -1347,16 +1016,12 @@ Ovoid.search = function(name) {
 
 
 /**
- * Search by matches.
- * <br>
- * <br>
- * Retrieves and returns one or more current active scene's nodes whose name 
- * is containing the specified string, or nodes whose type matches with the 
- * specified bitmask.
- * <br>
- * <br>
- * This is a shortcut for the Scene object's <code>searchMatches</code> method. 
+ * Search by matches.<br><br>
  * 
+ * Search and returns one or more nodes from the current active scene whose name 
+ * contains the specified string, or nodes whose type matches with the specified
+ * bitmask.
+ *
  * @param {string|bitmask} item String that matches nodes's name or bitmask
  * that matches nodes's type.
  *
@@ -1369,12 +1034,12 @@ Ovoid.searchMatches = function(item) {
 
 
 /**
- * Move an Transform node of the current active scene.
+ * Move a Transform node.<br><br>
  * 
- * <br><br>This is a shortcut for the <code>moveXyz</code> method of Transform 
- * object applyed to the found node.
+ * Search Transform node with the specified name in the current active scene and 
+ * apply the specified translation.
  *
- * @param {string} name Name of the Transform to scale.
+ * @param {string} name Name of the Transform to translate.
  * @param {float} x X translation value.
  * @param {float} y Y translation value.
  * @param {float} z Z translation value.
@@ -1398,12 +1063,12 @@ Ovoid.move = function(name, x, y, z, c, m) {
 
 
 /**
- * Rotate an Transform node of the current active scene.
+ * Rotate a Transform node.<br><br>
  * 
- * <br><br>This is a shortcut for the <code>rotateXyz</code> method of Transform 
- * object applyed to the found node.
+ * Search Transform node with the specified name in the current active scene and 
+ * apply the specified rotation.
  * 
- * @param {string} name Name of the Transform to scale.
+ * @param {string} name Name of the Transform to rotate.
  * @param {float} x X rotation value.
  * @param {float} y Y rotation value.
  * @param {float} z Z rotation value.
@@ -1427,28 +1092,26 @@ Ovoid.rotate = function(name, x, y, z, c, m) {
 
 
 /**
- * Scale an Transform node of the current active scene.
+ * Scale a Transform node.<br><br>
  * 
- * <br><br>This is a shortcut for the <code>scaleXyz</code> method of Transform 
- * object applyed to the found node.
+ * Search Transform node with the specified name in the current active scene and 
+ * apply the specified scale.
  * 
  * @param {string} name Name of the Transform to scale.
  * @param {float} x X scaling value.
  * @param {float} y Y scaling value.
  * @param {float} z Z scaling value.
- * @param {enum} c Space coordinate. Can be Ovoid.WORLD, Ovoid.LOCAL. If not
- * specified or null, Ovoid.WORLD is applyed by default.
  * @param {enum} m Transformation mode. Can be Ovoid.RELATIVE or Ovoid.ABSOLUTE.
  * If not specified or null, Ovoid.RELATIVE is applyed by default.
  * 
  * @see Ovoid.Transform
  */
-Ovoid.scale = function(name, x, y, z, c, m) {
+Ovoid.scale = function(name, x, y, z, m) {
   
   var i = Ovoid.rscene.transform.length;
   while (i--) {
     if (name == Ovoid.rscene.transform[i].name) {
-      Ovoid.rscene.transform[i].scaleXyz(x, y, z, c, m);
+      Ovoid.rscene.transform[i].scaleXyz(x, y, z, m);
       break;
     }
   }
@@ -1456,16 +1119,15 @@ Ovoid.scale = function(name, x, y, z, c, m) {
 
 
 /**
- * Rewind a Track node of the current active scene.
+ * Rewind a Track node.<br><br>
  *
- * <br><br>This is a shortcut for the <code>rewind</code> method of Track 
- * object applyed to the found one.
+ * Search Track node with the specified name in the current active scene and 
+ * rewind it.
  * 
  * @param {string} name The name of Track node to rewind.
- * @param {float} f Playing factor. The playing factor determine the speed and 
- * direction (backward or forward) of the playing. For example a value of 1.0 
- * will play forward at normal speed and a value of -2.0 will play backward at 
- * twice the normal speed.
+ * @param {float} f Pitch time factor.
+ * A positive value will set the track at its begining, a negative value 
+ * will set the track at its end.
  * 
  * @see Ovoid.Track
  */
@@ -1482,16 +1144,16 @@ Ovoid.trackRewind = function(name, f) {
 
 
 /**
- * Play a Track node of the current active scene.
+ * Play a Track node.<br><br>
  *
- * <br><br>This is a shortcut for the <code>play</code> method of Track 
- * object applyed to the found one.
+ * Search Track node with the specified name in the current active scene and 
+ * play it.
  * 
  * @param {string} name The name of Track node to play.
- * @param {float} f Playing factor. The playing factor determine the speed and 
- * direction (backward or forward) of the playing. For example a value of 1.0 
- * will play forward at normal speed and a value of -2.0 will play backward at 
- * twice the normal speed.
+ * @param {float} f Pitch time factor.
+ * The factor can be positive to increase the animation pitch or negative to 
+ * play the animation backward. For example a value of -2.0 will play the 
+ * animation backward twice the normal speed.
  * @param {bool} l Enable or disable loop playing.
  * 
  * @see Ovoid.Track
@@ -1510,10 +1172,10 @@ Ovoid.trackPlay = function(name, f, l) {
 
 
 /**
- * Pause a Track node of the current active scene.
+ * Pause a Track node.<br><br>
  *
- * <br><br>This is a shortcut for the <code>stop</code> method of Track 
- * object applyed to the found one.
+ * Search Track node with the specified name in the current active scene and 
+ * pause it.
  * 
  * @param {string} name The name of Track node to pause.
  * 
@@ -1531,10 +1193,10 @@ Ovoid.trackPause = function(name) {
 
 
 /**
- * Rewind a Sound node of the current active scene.
+ * Rewind a Sound node.<br><br>
  *
- * <br><br>This is a shortcut for the <code>rewind</code> method of Sound 
- * object applyed to the found one.
+ * Search Sound node with the specified name in the current active scene and 
+ * rewind it.
  * 
  * @param {string} name The name of Sound node to rewind.
  * 
@@ -1552,10 +1214,10 @@ Ovoid.soundRewind = function(name) {
 
 
 /**
- * Play a Sound node of the current active scene.
+ * Play a Sound node.<br><br>
  *
- * <br><br>This is a shortcut for the <code>play</code> method of Sound 
- * object applyed to the found one.
+ * Search Sound node with the specified name in the current active scene and 
+ * play it.
  * 
  * @param {string} name The name of Sound node to play.
  * @param {bool} l Enable or disable loop playing.
@@ -1575,10 +1237,10 @@ Ovoid.soundPlay = function(name, l) {
 
 
 /**
- * Pause a Sound node of the current active scene.
+ * Pause a Sound node.<br><br>
  *
- * <br><br>This is a shortcut for the <code>pause</code> method of Sound 
- * object applyed to the found one.
+ * Search Sound node with the specified name in the current active scene and 
+ * pause it.
  * 
  * @param {string} name The name of Sound node to pause.
  * 
@@ -1596,20 +1258,11 @@ Ovoid.soundPause = function(name) {
 
 
 /**
- * Define or modify an input trigger.
- * <br>
- * <br>
- * You can bind a key and/or mouse button combination to a specific function, 
- * so when the specified key/mouse combination happens, the function is called.
- * <br>
- * <br>
- * The combination is described by a main key event (down, up or held) with 
- * an optional modifier key held such as Control, Shift, Alt, Right Super or
- * Left Super.
- * <br>
- * Here is some examples:
- * <br>
- * <br>
+ * Set or modify an input trigger.<br><br>
+ * 
+ * Sets or modifies an input combinaison who trigger a custom function. The 
+ * specified function will be called each time the input combinaison occur.<br><br>
+ * 
  * <blockcode>
  * function lookright() {<br>
  * &nbsp;&nbsp;Ovoid.Node("camera").rotateXyz(0.0, -0.05, 0.0);<br>
@@ -1621,11 +1274,10 @@ Ovoid.soundPause = function(name) {
  * <br>
  * Ovoid.inputTrigger(Ovoid.CTR_HELD, 39, Ovoid.HELD, lookright);<br>
  * Ovoid.inputTrigger(Ovoid.CTR_HELD, Ovoid.KB_LARROW, Ovoid.HELD, lookleft);<br>
- * </blockcode>
- * <br>
- * <br>
- * This function is a shortcut for the <code>setTrigger</code> of
- * the <code>Ovoid.Input</code> global class.
+ * </blockcode><br><br>
+ * 
+ * This method is a shortcut for the <code>setTrigger</code> method of
+ * <code>Ovoid.Input</code> global class.
  * 
  * @param {enum} m Held key modifier, can be null or one of the following 
  * symbolic constants:<br>
@@ -1657,72 +1309,12 @@ Ovoid.inputTrigger = function(m, k, s, f) {
 
 
 /**
- * Add or modify an Action node to one or several nodes.
- * <br>
- * <br>
- * This function is a shortcut to create or modify an Action node, and if it 
- * is needed (if not allready linked), link it to one or several nodes. 
- * Indeed you can link ONE Action node to  several nodes at the same time. 
- * Linking one Action node to several nodes is particularly relevant when 
- * several nodes should have the same behaviour. 
- * <br>
- * <br>
- * The created Action node will be named according to the name parameter.
- * For example if you create an Action node for the node named "mybox", the 
- * resulting Action node name will be "myboxAction". If you create an Action 
- * node for all nodes whose name contains the string "box", the Action 
- * node will be named "boxAction".
- * <br>
- * <br>
- * The Action node is the main way to make your scene interactive. This node 
- * is an abstract dependency node and is not in the world. Action nodes are 
- * used to link some interactive events which call custom functions. Actually 
- * (at this developement stage) Action node principally acts with the mouse 
- * Picking system. It acts as an "Event detector" such as , for example, 
- * mouse over a node or mouse entering in a node, mouse click on a node, 
- * etc... once the specified event is catched, it call the corresponding 
- * trigger function.
- * <br>
- * <br>
- * For example, Action node allows you to make a function which will be called 
- * when the user clicks on an object (on the screen) with the left mouse button.
- * <br>
- * <br>
- * <blockcode>
- * function catastrophe(node) {<br>
- * &nbsp;&nbsp;<commentcode>// Do some funny stuff</commentcode><br>
- * };<br>
- * <br>
- * Ovoid.setAction(Ovoid.MOUSE_OVER_LEFT_DOWN, "mybox", catastrophe);<br>
- * </blockcode>
- * <br>
- * <br>
- * The Action node is presently composed of several overridables trigger methods
- *  corresponding to predefined events.
- * <br>
- * For example the <code>onEnter</code> method, is called when the mouse pointer
- * enters over the node and the <code>onOver</code>  method is constantly 
- * called as long as the mouse pointer rolls over the node. 
- * <br>
- * All Action node's methods take one argument that is the event's involved 
- * node.
- * <br>
- * <br>
- * <b>Grabbing node</b>
- * <br>
- * Action node also work with a node-grabbing system. The "node-grabbing" 
- * consists in focusing on a node while ignoring  events of others nodes. 
- * <br>
- * To understand, suppose you want to rotate a node by moving the mouse while
- * you maintain the left button pressed. While you move your mouse pointer to 
- * rotate the object, the pointer will leave the node's region, resulting the 
- * event stop, since the mouse now roll over another node. 
- * <br>
- * The "node-grabbing" prevents the side effects by forcing to focus on the 
- * grabbed node and to ignore the others. You also have to "release" the 
- * node when you want to restore the normal event dispatching.
- * <br>
- * <br>
+ * Assign an Action node to one or several pickable nodes.<br><br>
+ * 
+ * Assigns an Action nodes to one or several pickable nodes (Body, Layer). 
+ * Target can be a Transform node instance or a string to retrieve one or 
+ * several nodes whose name matches with.<br><br>
+ * 
  * <blockcode>
  * function grabnode(node) {<br>
  * &nbsp;&nbsp;Ovoid.Input.grabNode(node)<br>
@@ -1740,25 +1332,10 @@ Ovoid.inputTrigger = function(m, k, s, f) {
  * <br>
  * Ovoid.setAction(Ovoid.MOUSE_OVER_LEFT_DOWN, "mybox", grabnode);<br>
  * Ovoid.setAction(Ovoid.ON_GRABBED, "mybox", rotate);<br>
- * </blockcode>
- * <br>
- * <br>
- * There is also special methods <code>onUngrab</code> and <code>onGrab</code>. 
- * <code>onUngrab</code> is constantly called (without event) as long as the 
- * node is NOT grabbed (i.e. the normal node's status). on the other hand, the 
- * <code>onGrab</code> method is constantly called as long as the node IS 
- * grabbed.
- * <br>
- * <br>
- * <blockcode>
- * function grabnode(node) {<br>
- * &nbsp;&nbsp;Ovoid.Input.grabNode(node)<br>
- * };<br>
- * <br>
- * var action = scene.create(Ovoid.ACTION, "myaction");<br>
- * action.onLmbDn = grabnode;<br>
- * action.linkNode(mybox);<br>
- * </blockcode>
+ * </blockcode><br><br>
+ * 
+ * For more information about how Action node, see the 
+ * <code>Ovoid.Action</code> class documentation reference.
  * 
  * @see Ovoid.Action
  *
@@ -1779,15 +1356,14 @@ Ovoid.inputTrigger = function(m, k, s, f) {
  * Ovoid.ON_GRABBED,<br>
  * Ovoid.ON_UNGRABBED<br>
  * 
- * @param {string|Node} item Node object or the Node name to link the Action 
- * node to, or a string that is matching with name of several nodes to link 
- * more than one node.
+ * @param {string|Node} target Node object, or a string to retrieve one or 
+ * several nodes whose name matches with.
  * 
  * @param {Function} f The trigger function to call for this event.
  * 
- * @return {Action} The created Action node's reference.
+ * @return {Action} The created Action node reference.
  */
-Ovoid.setAction = function(e, item, f) {
+Ovoid.setAction = function(e, target, f) {
   
   if (e > 13) 
     return;
@@ -1798,24 +1374,24 @@ Ovoid.setAction = function(e, item, f) {
   var newaction;
   
   /* retrouve la node si c'est un string */
-  if (typeof(item) == "string") {
-    var nodes = Ovoid.rscene.searchMatches(item);
+  if (typeof(target) == "string") {
+    var nodes = Ovoid.rscene.searchMatches(target);
     if (nodes.length == 0) {
       Ovoid.log(2, 'Ovoid.setAction', "no node found with matching name '"
-        +item+"' in the current active scene '" + Ovoid.rscene.name + "'.");
+        +target+"' in the current active scene '" + Ovoid.rscene.name + "'.");
       return;
     }
     /* par défaut on crée une nouvelle action */
-    newaction = new Ovoid.Action(item + "Action");
+    newaction = new Ovoid.Action(target + "Action");
   } else {
-    if(item.type & Ovoid.BODY || item.type & Ovoid.LAYER) {
+    if(target.type & Ovoid.BODY || target.type & Ovoid.LAYER) {
       nodes = new Array();
-      nodes.push(item);
+      nodes.push(target);
       /* par défaut on crée une nouvelle action */
-      newaction = new Ovoid.Action(item.name + "Action");
+      newaction = new Ovoid.Action(target.name + "Action");
     } else {
       Ovoid.log(2, 'Ovoid.setAction', 'node ' 
-          +item.name+' is not a Body or Layer instance.');
+          +target.name+' is not a Body or Layer instance.');
     }
   }
   
@@ -1938,29 +1514,12 @@ Ovoid.setAction = function(e, item, f) {
 
 
 /**
- * Create and link a Constraint node to one or several transformable nodes.
- * <br>
- * <br>
- * This function is a shortcut that creates specified Constraint node type and 
- * links it to a transformable (Transform's inherited) node. The function can 
- * do this operation for several nodes if the name parameter is a string that 
- * match with several nodes name. 
- * <br>
- * <br>
- * The created Constraint node will be named according to the found node's name 
- * and the Constraint node's type. For example if you create an Physics node 
- * for the node named "mybox", the resulting Physics node name will be 
- * "myboxPhysics". If you create Animation nodes for all nodes whose name 
- * is contains the string "box", the Animation nodes will be named with the 
- * corresponding target node's name, followed by "Animation" :  
- * "box1Animation", "box2Animation", "coolboxAnimation", etc...
- * <br>
- * <br>
- * At this stage of developement, it exists two types of Constraint node : 
- * Physics and Animation. Constraint nodes are abstract dependencies and are 
- * not in the world.
- * <br>
- * <br>
+ * Assign Constraint nodes to one or several Transform nodes.<br><br>
+ * 
+ * Assigns Constraint nodes of the specified type to one or several Transform 
+ * nodes. Target can be a Transform node instance or a string to retrieve one or 
+ * several nodes whose name matches with.<br><br>
+ * 
  * <blockcode>
  * var constraints = Ovoid.setConstraint(Ovoid.PHYSICS, "box")<br>
  * for (var i = 0; i < constraints.length; i++) {<br>
@@ -1975,30 +1534,29 @@ Ovoid.setAction = function(e, item, f) {
  * @param {int} type Constraint node type. Can be Ovoid.PHYSICS or 
  * Ovoid.ANIMATION.
  * 
- * @param {string|Node} item Node object, or the Node name to link a Constraint 
- * to, or a string that is matching with name of several nodes to link more 
- * than one node.
+ * @param {string|Node} target Node object, or a string to retrieve one or 
+ * several nodes whose name matches with.
  * 
- * @return {Array} Array containing the created Constraint nodes's references.
+ * @return {Array} Array containing references of the created Constraint nodes.
  */
-Ovoid.setConstraint = function(type, item) {
+Ovoid.setConstraint = function(type, target) {
   
   /* retrouve la node si c'est un string */
   if ( typeof(item) == "string" ) {
-    var nodes = Ovoid.rscene.searchMatches(item);
+    var nodes = Ovoid.rscene.searchMatches(target);
     
     if (nodes.length == 0) {
       Ovoid.log(2, 'Ovoid.setConstraint', "no node found with matching name '"
-        +item+"' in the current active scene '" + Ovoid.rscene.name + "'.");
+        +target+"' in the current active scene '" + Ovoid.rscene.name + "'.");
       return;
     }
   } else {
-    if(item.type & Ovoid.TRANSFORM) {
+    if(target.type & Ovoid.TRANSFORM) {
       nodes = new Array();
-      nodes.push(item);
+      nodes.push(target);
     } else {
       Ovoid.log(2, 'Ovoid.setAction', 'node ' 
-          + item.name + ' is not a Transform instance.');
+          + target.name + ' is not a Transform instance.');
     }
   }
   
@@ -2043,8 +1601,8 @@ Ovoid.setConstraint = function(type, item) {
  * 
  * <b>Node Grabbing</b><br><br>
  * 
- * The "node-grabbing" consists in focusing on a node while ignoring events of 
- * other nodes.<br>
+ * Node-grabbing consists in focusing on a node while ignoring events of 
+ * other nodes.<br><br>
  * 
  * Suppose you want to rotate a node by moving the mouse while you maintain the 
  * left button pressed. While you move your mouse pointer to rotate the object, 
@@ -2056,14 +1614,8 @@ Ovoid.setConstraint = function(type, item) {
  * the grabbed node while ignoring the others. You also must release the grabbed 
  * node to return in the normal interaction behaviour.<br><br>
  * 
- * The Action node also provides two special overridable trigger functions 
- * related to the node-grabbing which correspond to the two main possibilities: 
- * "while node is grabbed" and "while node is NOT Grabbed". Both trigger 
- * function are called each frame while the event "node is grabbed" or "node is 
- * not grabbed" is true.<br><br>
  * For more information about node-grabbing usage, see the 
  * <code>Ovoid.Action</code> node documentation page.
- * 
  * 
  * @param {Node} node Node object to be grabbed.
 */
@@ -2076,12 +1628,12 @@ Ovoid.grabNode = function(node) {
 /**
  * Release grab.<br><br>
  * 
- * Releases the current grabbed node and restores the normal event's dispatching.<br><br>
+ * Releases the current grabbed node and restores the normal event dispatching.<br><br>
  * 
  * <b>Node Grabbing</b><br><br>
  * 
- * The "node-grabbing" consists in focusing on a node while ignoring events of 
- * other nodes.<br>
+ * Node-grabbing consists in focusing on a node while ignoring events of 
+ * other nodes.<br><br>
  * 
  * Suppose you want to rotate a node by moving the mouse while you maintain the 
  * left button pressed. While you move your mouse pointer to rotate the object, 
@@ -2093,17 +1645,8 @@ Ovoid.grabNode = function(node) {
  * the grabbed node while ignoring the others. You also must release the grabbed 
  * node to return in the normal interaction behaviour.<br><br>
  * 
- * The Action node also provides two special overridable trigger functions 
- * related to the node-grabbing which correspond to the two main possibilities: 
- * "while node is grabbed" and "while node is NOT Grabbed". Both trigger 
- * function are called each frame while the event "node is grabbed" or "node is 
- * not grabbed" is true.<br><br>
- * 
  * For more information about node-grabbing usage, see the 
  * <code>Ovoid.Action</code> node documentation page.
- * 
- * 
- * Release the current grabbed node.
  */
 Ovoid.grabRelease = function() {
 
