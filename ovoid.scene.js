@@ -22,47 +22,61 @@
 /**
  * Create a Scene object.
  *
- * @class World Scene Graph object.
- * <br>
- * <br>
+ * @class World Scene Graph object.<br><br>
+ * 
  * The scene graph is a structure that arranges the logical and spatial 
- * representation of a graphical scene. The Scene object can be defined as the 
- * main place where nodes are stored and as in the primary meaning of the word 
- * "scene" i.e. a place to show (draw) and act with nodes. The scene object is 
- * designed to provide an interface to access, search and create nodes.
- * <br>
- * <br>
- * <b>The Scene components</b>
- * <br>
- * The Scene object combine several element:
- * <br>
+ * representation of a graphical scene. The Scene object is the main work space 
+ * where nodes are stored. It is designed to store and organize nodes and to 
+ * provide an interface to access, search and create nodes.<br><br>
+ * 
+ * <b>Active Scene</b><br><br>
+ * 
+ * In OvoiD.JS, a scene must be assigned to the global pipeline as active one in 
+ * order to be treated by the Library mecanism.<br><br>
+ * 
+ * <blockcode>
+ * var scene = new Ovoid.Scene("Hello");<br>
+ * Ovoid.useScene(scene);<br>
+ * </blockcode><br><br>
+ * 
+ * Once a scene is used as active, its graph (nodes) are updated, treated and
+ * may be drawn each frames. Several scenes can be created and set as active at 
+ * desired time until an other is set as active one. While a scene is not 
+ * active, it is left without any change or update.<br><br>
+ * 
+ * <b>Active Camera</b><br><br>
+ * 
+ * Scene active camera is the one used as point of view to draw the scene. It 
+ * must be in the scene graph.<br><br>
+ * 
+ * <blockcode>
+ * scene.create(Ovoid.CAMERA, "Camera1");<br>
+ * scene.useCamera("Camera1");<br>
+ * </blockcode><br><br>
+ * 
+ * If no active camera is declared, an built-in camera is used. A scene can have 
+ * several cameras which can be set as active at desired time until an other is 
+ * set as active one.
+ * 
+ * <b>Scene components</b><br><br>
+ * 
+ * The Scene object is roughly divided in three elements.<br><br>
+ * 
  * <ul>
- * <li><b>The World Scene</b></li>
- * The world scene is the graph tree of transformable nodes that concern the 
- * 3D space. World scene graph is defined by a root generic Node object who 
- * is the overall parent of all nodes.
- * <br>
- * <br>
- * <li><b>The Overlay Scene</b></li>
- * The overlay scene is the graph tree of transformable nodes that concern the 
- * 2D overlay context. Overlay scene graph is defined by a root generic Node 
- * object who is the overall parent of all nodes.
- * <br>
- * <br>
- * <li><b>The Active Camera</b></li>
- * The active camera is the one that is used to calculate the rendering's point 
- * of view perspective. A scene can contain more than one camera, and so the 
- * active camera must be explicitely defined to tell to the render engine wich 
- * camera to use to render the scene. The active camera can be switched at 
- * any time.
- * <br>
- * <br>
- * <li><b>The Nodes Groups</b></li>
- * For conveniences and overall for access, performance and design issue, all 
- * nodes are stored in groups (Array) according to their type and/or usage. 
- * Although a node can be retrieved using any graph iterator, it is far simpler 
- * and quicker to search it in the suitable group, or even, in a simple list of 
- * all nodes.
+ * <li><b>The World Graph</b><br>
+ * The world graph is the graph tree of transformable nodes who takes place in 
+ * the 3D world. World graph have a generic Node object (<code>world</code>) as 
+ * root who is the overall parent of all world nodes.</li>
+ * 
+ * <li><b>The Overlay Graph</b><br>
+ * The overlay graph is the graph tree of transformable nodes who take place in 
+ * the 2D overlay screen space. Overlay graph have a generic Node object 
+ * (<code>overlay</code>) as root who is the overall parent of all overlay 
+ * nodes.</li>
+ * 
+ * <li><b>The Nodes Groups</b><br>
+ * For access, performance and design issues, all nodes are stored in groups 
+ * (Array) according to their type and / or typical usage.</li>
  * </ul>
  * 
  * @see Ovoid.Node
@@ -132,10 +146,10 @@ Ovoid.Scene = function(name) {
 
 
 /**
- * Create node.
+ * Create node.<br><br>
  * 
- * <br><br>Creates a new node of the given type and name, then if specified, 
- * parent it to the specified parent node. The node is automatically included
+ * Creates a new node of the given type and name, then if specified, 
+ * parent it to the given parent node. The node is automatically included
  * in the world or overlay graph and the suitable groups according to its type.
  *
  * @param {int} type Node type to create. Can be one of the followin symbolic 
@@ -160,12 +174,10 @@ Ovoid.Scene = function(name) {
  * Ovoid.AUDIO, <br>
  * Ovoid.SOUND.<br><br>
  * 
- * @param {string} name Node name. If a node with the same name allready exists,
- * the created one will be automaticaly renamed with a #<number> at the end of 
- * the specified name. For example "mynode" will be renamed to "mynode#2".
+ * @param {string} name Node name.
  * 
  * @param {Node} parent Parent node (must be in the scene). If null or undefined
- * the created node is parented to the world root or overlay root node according
+ * the created node is parent to the world root or overlay root node according
  * to its type.
  *
  * @return {Node} The new created node.
@@ -304,9 +316,9 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
 
 
 /**
- * Remove node.
+ * Remove node.<br><br>
  *
- * <br><br>Removes the specified node from the scene. The node is automaticaly and 
+ * Removes the specified node from the scene. The node is automaticaly and 
  * carefully removed from groups and graph. If the node has a child tree, 
  * the whole child tree is removed too.
  * 
@@ -440,9 +452,11 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
 
 
 /**
- * Insert node.
+ * Insert node.<br><br>
  * 
- * <br><br>Inserts a node that was not created using the create method of this instance.
+ * Inserts a node who was not created using the <code>create</code> method of 
+ * this instance.<br><br>
+ * 
  * The node is automatically included in the world or overlay graph and the 
  * suitable groups according to its type and the given options.
  *
@@ -452,9 +466,9 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
  * the created node is parented to the world root or overlay root node according
  * to its type.
  * 
- * @param {bool} preserveParent If true, the inserted node parent will not be 
- * modified and the parent parameter will be ignored. However the node will be 
- * included in suitable groups according to its type and the given options.
+ * @param {bool} preserveParent If true, the inserted node will not be 
+ * reparented at all. However the node will be included in suitable groups 
+ * according to its type and the given options.
  * 
  * @param {bool} preserveUid If true, the inserted node UID will not be 
  * modified.
@@ -600,9 +614,9 @@ Ovoid.Scene.prototype.parent = function(child, parent) {
 
 
 /**
- * Transplant tree.
+ * Transplant tree.<br><br>
  * 
- * <br><br>Transplants the specified node's child tree into the scene including the
+ * Transplants the specified node's child tree into the scene including the
  * dependencies nodes. The specified root node is NOT included.
  *
  * @param {Node} tree Root node of the tree to be transplanted.
@@ -657,9 +671,9 @@ Ovoid.Scene.prototype.transplant = function(tree) {
 
 
 /**
- * Use camera as active.
+ * Use camera as active.<br><br>
  * 
- * <br><br>Sets the specified Camera node as active camera. The Camera node must be 
+ * Sets the specified Camera node as active camera. It node must be 
  * in the scene.
  *
  * @param {Camera|string|int} node Camera object, name or UID to be active.
@@ -689,9 +703,9 @@ Ovoid.Scene.prototype.useCamera = function(camera) {
 
 
 /**
- * Check whether has node.
+ * Check whether has node.<br><br>
  * 
- * <br><br>Checks whether the scene owns the specified node.
+ * Checks whether the scene owns the specified node.
  *
  * @param {Object} node Node to search.
  *
@@ -709,9 +723,9 @@ Ovoid.Scene.prototype.ownsNode = function(node) {
 
 
 /**
- * Search node.
+ * Search node.<br><br>
  * 
- * <br><br>Retrieves and returns the node with the specified name or UID.
+ * Search and returns the node with the specified name or UID.
  *
  * @param {string|int} item Name or UID of the Node to search.
  *
@@ -737,9 +751,9 @@ Ovoid.Scene.prototype.search = function(item) {
 
 
 /**
- * Search by matches.
+ * Search by matches.<br><br>
  * 
- * <br><br>Retrieves and returns one or more nodes whose name is containing the 
+ * Search and returns one or more nodes whose name contains the 
  * specified string, or nodes whose type matches with the specified bitmask.
  *
  * @param {string|bitmask} item String that matches nodes's name or bitmask
@@ -770,14 +784,15 @@ Ovoid.Scene.prototype.searchMatches = function(item) {
 
 
 /**
- * Remove by matches.
+ * Remove by matches.<br><br>
  * 
- * <br><br>Removesone or more nodes whose name is containing the 
+ * Search and removes one or more nodes whose name contains the 
  * specified string, or nodes whose type matches with the specified bitmask.
  *
  * @param {string|bitmask} item String that matches nodes's name or bitmask
  * that matches nodes's type.
- * @param {Bool} rdep If possible, removes node's dependencies nodes.
+ * 
+ * @param {Bool} rdep If possible, removes node's dependencies.
  *
  * @return {bool} True if a node is removed, false otherwise.
  */

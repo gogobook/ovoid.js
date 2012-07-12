@@ -21,125 +21,85 @@
 /**
  * Drawer global static class.
  *
- * @namespace Drawer global class.
- * <br>
- * <br>
- * This class is a global static one, that means that it has no constructor and 
- * has only one instance. In the OvoiD.JS Library, global classes implements 
- * features for specific range of tasks. Global classes can be seen as several 
- * worker that accomplish their own job.
- * <br>
- * <br>
- * The Drawer global class is the main OvoiD.JS Library's rendering engine. It 
- * provides all the methods that are directly related to the WebGL's drawing 
- * process. 
- * <br>
- * <br>
- * This class provides many public methods but the direct use of these methodes 
- * is rather for advanced programmers.
- * <br>
- * <br>
- * <b>Drawing Pipelines</b>
- * <br>
- * <br>
+ * @namespace Drawer global class.<br><br>
+ * 
+ * The Drawer class implements a WebGL rendering engine. It is a global 
+ * static (namespace) class. The Drawer class is the main OvoiD.JS rendering 
+ * engine. It provides all the methods that are directly related to the WebGL
+ * drawing pipeline.<br><br>
+ * 
+ * <b>Drawing Pipelines</b><br><br>
+ * 
  * The Drawer use several drawing pipelines depending on what is drawn. For 
  * example you don't draw particles like you draw common objects. This is why 
- * the OvoiD.JS Library use several shaders. The actually implemented drawing 
- * pipelines are the following ones:
- * <br>
+ * OvoiD.JS use several shaders. The currently implemented drawing pipelines
+ * are the following ones:<br><br>
+ * 
  * <ul>
- * <li><b>ReadPixel Picking pipeline</b></li>
- * <br>
- * <br>
- * Flat color. Draws objets without shading, lighting and only with a flat 
+ * <li><b>ReadPixel Picking pipeline</b> Ovoid.DRAWER_SP_COLOR<br><br>
+ * 
+ * Flat color. Draws objets without shading nor lighting and only with a flat 
  * colours. The color is specified by an uniform. This drawing mode is used to 
- * draw the scene for the mouse's Picking technique.
- * <br>
- * <br>
- * <li><b>Symbolic shapes pipeline</b></li>
- * <br>
- * <br>
- * Flat vertex color. Draws object without shading, lighting and only with flat
+ * draw the scene for the mouse Picking mecanism.</li>
+ * 
+ * <li><b>Symbolic shapes pipeline</b> Ovoid.DRAWER_SP_VERTEX_COLOR<br><br>
+ * 
+ * Flat vertex color. Draws object without shading nor lighting and only with flat
  * colours using the vertices's color attribute. This drawing pipeline is used to
- * draw the symbolic shapes and object's helpers.
- * <br>
- * <br>
- * <li><b>Z-Fail shadow casting pipeline</b></li>
- * <br>
- * <br>
+ * draw the symbolic shapes and object's helpers.</li>
+ * 
+ * <li><b>Z-Fail shadow casting pipeline</b> Ovoid.DRAWER_SP_1LIGHT<br><br>
+ * 
  * Shading per-light passes. Draws objet with full shading and 
  * textures but with per-light drawing passes. This drawing pipeline is used to 
- * draw the scene for the Z-fail shadow casting technique that require a 
- * multi-passes drawing (one pass per light).
- * <br>
- * <br>
- * <li><b>Standard shading pipeline</b></li>
- * <br>
- * <br>
+ * draw the scene for the Z-fail shadow casting which require a multi-passes 
+ * drawing (one pass per light).</li>
+ * 
+ * <li><b>Standard shading pipeline</b> Ovoid.DRAWER_SP_NLIGHT<br><br>
+ * 
  * Shading N lights. Draws objet with full shading, textures and several light 
- * sources in one pass. This is the common and standard scene's drawing pipeline.
- * The bundle shader support up to eight light sources.
- * The default shader supplied with OvoiD.JS Library (ovoid_shading_8l.fs) supports
- * up to eight light sources. You can increase this value by editing 
- * (or rewritting) the default shader AND by modifiying the global constant 
- * <code>Ovoid.MAX_LIGHT_BY_DRAW</code>. However, eight light sources should
- * be sufficiant.
- * <br>
- * <br>
- * <li><b>Text dedicated pipeline</b></li>
- * <br>
- * <br>
+ * sources in one pass. This is the common and standard drawing pipeline.
+ * (The built-in shader support up to eight light sources)</li>
+ * 
+ * <li><b>Text dedicated pipeline</b> Ovoid.DRAWER_SP_TEXT<br><br>
+ * 
  * Special text. Draws vertices in point-sprites mode according to a specific 
- * data store to display texts. This drawing pipeline is exclusively dedicated to
- * draw the Text nodes.
- * <br>
- * <br>
- * <li><b>Layer dedicated pipeline</b></li>
- * <br>
- * <br>
+ * data storing to display texture mapped font text.</li>
+ * 
+ * <li><b>Layer dedicated pipeline</b> Ovoid.DRAWER_SP_LAYER<br><br>
+ * 
  * Special layer. Draws a colored and/or textured sprite according to a specific
- * data store to display overlays. This drawing pipeline is exclusively dedicated 
- * to draw the Layer nodes.
- * <br>
- * <br>
- * <li><b>Particles pipeline</b></li>
- * <br>
- * <br>
+ * data storing to display overlays layers.</li>
+ * 
+ * <li><b>Particles pipeline</b> Ovoid.DRAWER_SP_PARTICLES<br><br>
+ * 
  * Particles. Draws vertices in point-sprites mode with color and texture. This
- * drawing pipeline is used to draw particles from Emitter nodes.
- * </ul>
- * <br>
- * <br>
- * <b>Custom Shaders</b>
- * <br>
- * <br>
- * Yes, you can ! The Drawer class implements ways and methodes to use several 
- * custom shaders AND switch between them on the fly during the runtime. But, 
- * this is not christmas. You have to keep in mind:
- * <ul>
- * <li>the current available drawing pipelines</li>
- * <li>Drawing process for the different nodes (not yet documented)</li>
- * </ul>
- * To use custom shaders you first have to add them to the drawer's stock by 
- * using the <code>addShader</code> method. The <code>addShader</code> methode 
- * will give you an index identifier for all successfully added shaders. Once 
- * shaders are in the drawer, you can plug a shader to the pipeline you want 
- * by using the <code>plugShader</code> method. The Drawer will now use the 
- * specified shader to draw in the specified drawing pipeline. You can change 
- * the shader-pipeline configuration every frames.
- * <br>
- * <br>
+ * drawing pipeline is used to draw particles.</li>
+ * </ul><br><br>
+ * 
+ * <b>Custom Shaders</b><br><br>
+ * 
+ * The Drawer class implements ways and methodes to use several 
+ * custom shaders and switch between them during the runtime.<br><br>
+ * 
+ * To use custom shaders you first have to add them to the drawer's stock using 
+ * the <code>addShader</code> method who returns an index identifier 
+ * of the added shaders. (The shader must be successfully linked and wrapped)<br><br>
+ * 
+ * Once shaders are in the Drawer stock, you can plug it to the desired 
+ * pipeline using the <code>plugShader</code> method. This takes effect 
+ * immediately.<br><br>
+ * 
  * <blockcode>
  * var snow = Ovoid.Drawer.addShader("snow.vs", "snow.fs", "snow.wm");<br>
  * if( snow == -1) {<br>
  * &nbsp;&nbsp;<codecomment>// error</codecomment><br>
  * }<br>
  * Ovoid.Drawer.plugShader(Ovoid.DRAWER_SP_PARTICLES, snow);<br>
- * </blockcode>
- * <br>
- * <br>
- * For more informations about shaders compilation, link and <b>wrapping</b> 
- * seen the <code>Ovoid.Shader</code> object's documentation page.
+ * </blockcode><br><br>
+ * 
+ * For more informations about shaders link and wrapping see the 
+ * <code>Ovoid.Shader</code> object documentation page.
  * 
  */
 Ovoid.Drawer = {};
@@ -343,11 +303,10 @@ Ovoid.Drawer._f32aryac = new Float32Array(4);
 
 
 /**
- * Drawer initialization.
- * <br>
- * <br>
- * Global initialization method. This methode is called once during the Ovoid 
- * library's main initalization. It should not be called a second time.
+ * Drawer initialization.<br><br>
+ * 
+ * Global initialization method. This methode is called once during the library 
+ * main initalization. It shouldn't be called a second time.
  * 
  * @see Ovoid.init
  *
@@ -756,15 +715,10 @@ Ovoid.Drawer.init = function() {
 
 
 /**
- * Add a shader.
- * <br>
- * <br>
- * Adds a Shader object (GLSL shader program) into the Drawer's shader's stocks
- * from the given shader's sources.
- * <br>
- * The created Shader object is stored in the class and the method returns the 
- * index where the shader is stored. You might use this index to identify the 
- * shader for further use.
+ * Add a shader to shader stock.<br><br>
+ * 
+ * Adds the specified Shader object into the shader stock and returns stock 
+ * index identifier.
  * 
  * @param {string} sp Shader program object to be added.
  * 
@@ -786,60 +740,10 @@ Ovoid.Drawer.addShader = function(sp) {
 
 
 /**
- * Plug a shader.
- * <br>
- * <br>
- * Plugs the given shader index to the specified drawing's slot. The
- * shader will be used for the specified drawing pipeline.
- * The drawing pipeline and corresponding symbolic constants are the following 
- * ones:
- * <ul>
- * <li>Ovoid.DRAWER_SP_COLOR</li>
- * Flat color. Draws objets without shading, lighting and only with a flat 
- * colours. The color is specified by an uniform. This drawing mode is used to 
- * draw the scene for the mouse's Picking technique.
- * <br>
- * <br>
- * <li>Ovoid.DRAWER_SP_VERTEX_COLOR</li>
- * Flat vertex color. Draws object without shading, lighting and only with flat
- * colours using the vertices's color attribute. This drawing pipeline is used to
- * draw the symbolic shapes and object's helpers.
- * <br>
- * <br>
- * <li>Ovoid.DRAWER_SP_1LIGHT</li>
- * Shading per-light passes. Draws objet with full shading and 
- * textures but with per-light drawing passes. This drawing pipeline is used to 
- * draw the scene for the Z-fail shadow casting technique that require a 
- * multi-passes drawing (one pass per light).
- * <br>
- * <br>
- * <li>Ovoid.DRAWER_SP_NLIGHT</li>
- * Shading N lights. Draws objet with full shading, textures and several light 
- * sources in one pass. This is the common and standard scene's drawing pipeline.
- * The bundle shader support up to eight light sources.
- * The default shader supplied with OvoiD.JS Library (ovoid_shading_8l.fs) supports
- * up to eight light sources. You can increase this value by editing 
- * (or rewritting) the default shader AND by modifiying the global constant 
- * <code>Ovoid.MAX_LIGHT_BY_DRAW</code>. However, eight light sources should
- * be sufficiant.
- * <br>
- * <br>
- * <li>Ovoid.DRAWER_SP_TEXT</li>
- * Special text. Draws vertices in point-sprites mode according to a specific 
- * data store to display texts. This drawing pipeline is exclusively dedicated to
- * draw the Text nodes.
- * <br>
- * <br>
- * <li>Ovoid.DRAWER_SP_LAYER</li>
- * Special layer. Draws a colored and/or textured sprite according to a specific
- * data store to display overlays. This drawing pipeline is exclusively dedicated 
- * to draw the Layer nodes.
- * <br>
- * <br>
- * <li>Ovoid.DRAWER_SP_PARTICLES</li>
- * Particles. Draws vertices in point-sprites mode with color and texture. This
- * drawing pipeline is used to draw particles from Emitter nodes.
- * </ul>
+ * Plug a shader to drawing pipeline.<br><br>
+ * 
+ * Plugs the specified shader index to the desired drawing pipeline slot. Index
+ * must corresponds to an existing shader in the stock.
  * 
  * @param {int} slot Symbolic constant for drawing pipeline. Can be one of the 
  * following ones:

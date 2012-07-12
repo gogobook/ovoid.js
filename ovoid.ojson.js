@@ -22,67 +22,58 @@
 /**
  * OJSON translator constructor.
  * 
- * @class OJSON translator object.
- * <br>
- * <br>
- * This class provides an implementation of an Ovoid JSON scene file importer
- * and exporter.
- * <br>
- * <br>
- * <ul>
- * <li><b>The Ovoid JSON File Format</b></li>
- * First of all, Ovoid JSON file format is - you'll guessed it - in JSON format.
- * JSON, or JavaScript Object Notation, is a lightweight text-based open 
- * standard designed for human-readable data interchange. It is derived from 
- * the JavaScript scripting language for representing simple data structures 
- * and associative arrays, called objects.<br>
- * Ovoid JSON is simply a JSON file of an specific encapsulation object. The 
- * encapsulation object for scene files is as follows:
- * <br>
- * <br>
+ * @class OvoiD.JSON translator object.<br><br>
+ *
+ * The Ojson object implements a JSON format scene exporter/importer.<br><br>
+ * 
+ * <b>The OvoiD.JSON File Format</b><br><br>
+ * 
+ * OvoiD.JSON is a JSON formated file who store an OvoiD.JS specific data 
+ * encapsulation object.<br><br>
+ * 
  * <blockcode>
- * {<br>
- * &nbsp;"OJSON":1,<br>
- * &nbsp;"type":"scene",<br>
- * &nbsp;"scene":{...}<br>
- * }<br>
- * </blockcode>
- * <br>
- * <br>
- * Ovoid JSON format is designed to be used with the OvoiD.JS Library as the main 
- * saving and loading file format.
- * <br>
- * <br>
- * <li><b>What is imported/exported</b></li>
- * (Note: At this stage of developpement only Scene object with contents are 
- * exported and imported.)
- * <br>
- * <br>
- * <ul>
- * <li>Scene</li>
- * Nearly all nodes and object involved in a scene are exported with all common
- * properties.
- * </ul>
- * <br>
- * <br>
- * <li><b>Why use Ojson instead of COLLADA ?</b></li>
- * The question may be clever since you can import scene contents directly from 
- * 3D software without using the OJSON export. However, the OJSON translator 
- * was not implemented for cosmetic reasons. Here is some good reasons:
+ * {"OJSON":1, "type":"scene", "scene":{...}}<br>
+ * </blockcode><br><br>
+ * 
+ * OvoiD.JSON is designed to be used as the main OvoiD.JS Library saving and 
+ * loading file format. It currently provides full support for Scene exporation
+ * and importation.<br><br>
+ * 
+ * <blockcode>
+ * var ojson = new Ovoid.Ojson();<br>
+ * ojson.exportScene(scene);<br>
+ * </blockcode><br><br>
+ * 
+ * <b>Saving your work</b><br><br>
+ * 
+ * The exportation process is rather rustical since the Javascript environment 
+ * is client side and forbids some basic functionnalities. It currently consist 
+ * of a simple popup window who contains the resulting JSON export in text 
+ * format. You have to copy and paste the text to save in any file.<br><br>
+ * 
+ * <blockcode>
+ * var ojson = new Ovoid.Ojson();<br>
+ * ojson.loadSource("savedscene.ojsn");<br>
+ * ojson.importScene(scene);<br>
+ * </blockcode><br><br>
+ * 
+ * The Ojson export includes all OvoiD.JS nodes with custom trigger functions, 
+ * optimized mesh data and global nodes status.
+ * 
+ * <b>Why use Ojson instead of COLLADA</b>
  * <ul>
  * <li>COLLADA import is slower and COLLADA files are heavier than OJSON for 
  * less contents.</li>
  * <li>COLLADA doese not contain all the scene interactions nodes such as Action
- * node with scripts, and Physic node constraints with parameters.</li>
+ * node with scripts, and Physics node constraints with parameters.</li>
  * <li>If your final scene is composed of several COLLADA files (to have 
  * several animations for the same object for exemple), you can save the 
- * final result as OJSON and then all reimports all at once.</li>
+ * final result as OJSON and then reimports all at once.</li>
  * <li>With COLLADA you have to optimize all your meshs at loading. 
- * OSJON save the mesh datas in their optimized state.</li>
+ * OSJON save the optimized mesh data.</li>
  * </ul>
- * COLLADA is a good way to import data from CG softwares and to develop 
- * your application. But is rather a bad way for the final show.
- * </ul>
+ * COLLADA is a good way to import data from 3D softwares and to build complex 
+ * composite scenes. But is rather a bad way for the final show.
  */ 
 Ovoid.Ojson = function() {
 
@@ -103,24 +94,22 @@ Ovoid.Ojson = function() {
 
 
 /**
- * Load the specified source file for this instance.
+ * Load the specified source file for this instance.<br><br>
  * 
- * <br><br>By this method you can specify the source file to load and use to be
- * the data source of this instance. The file loading is instantaneously 
- * started in asynby this method. Once the loading is started you can check the 
- * <code>loadStatus</code> variable of this instance to know if and when 
- * the loading is done.
- * <br>
- * <br>
- * This <code>loadStatus</code> variable describe the current loading status of 
- * the source file. A value of 0 means that the file is not loaded, a value of 1 
- * means that the file was successfully loaded, and a value of -1 means that the 
- * file loading.
+ * Loads the specified external source file and extracts, decodes or parses the 
+ * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
+ *  
+ * The <code>loadSatus</code> member indicates the loading status through an 
+ * integer value of 0, 1 or -1. A value of 0 means that the file is not yet 
+ * loaded, a value of 1 means that the source was successfully loaded, and a 
+ * value of -1 means the loading failed.<br><br>
  * 
- * @param {string} url Source file name to load. Keep in mind that the 
- * <code>Ovoid.opt_ojsonPath</code> option will be used to retrieve the file.
+ * @param {string} url Source file name to load.
+ * <code>Ovoid.opt_ojsonPath</code> is used as base path.
+ * 
  * @param {bool} async Optionnal asynchronous loading flag. If true or not null
  * the source is loaded in asynchronous way.
+ * 
  * @param {bool} nopath ignore the default search path 
  * (<code>Ovoid.opt_ojsonPath</code>).
  */
@@ -174,16 +163,20 @@ Ovoid.Ojson.prototype.loadSource = function(url, async, nopath) {
   }
 };
 
+
 /**
- * Scene export.
+ * Export Scene as OJSON data.<br><br>
  * 
- * <br><br>Exports the specified scene with all included nodes and properties. This 
- * method will display the JSON result in text format in a pop-up windows. Make
- * sure you don't block pop-up before using this method.
+ * Exports the given scene with all included nodes and properties. It returns 
+ * the exportation result in a string and creates a popup window filled with the 
+ * exportation data result in text format. You have to copy and paste the text 
+ * to save in any file.<br><br>
+ * 
+ * (be sure your browser will autorize popup window before using this method)
  *
- * @param {Object} scene Scene Object to export.
+ * @param {Object} scene Scene object to export.
  * 
- * @return {String} Ovoid JSON exportation result string.
+ * @return {String} Exportation result string.
  */
 Ovoid.Ojson.prototype.exportScene = function(scene) {
   
@@ -204,10 +197,9 @@ Ovoid.Ojson.prototype.exportScene = function(scene) {
   return Ojson;
 };
 
+
 /**
  * Parse function body and arguments form a string.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} s Function string to parse.
  * 
@@ -231,8 +223,6 @@ Ovoid.Ojson.prototype._parseFunc = function(s) {
 
 /**
  * Proceed to importation of the typed Node from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} j OJSON Node sub-object.
  */
@@ -323,8 +313,6 @@ Ovoid.Ojson.prototype._importNode = function(j) {
 
 /**
  * Proceed to relink / reparent node from Json uid's to Node pointers.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Node Object to relink.
  */
@@ -419,8 +407,6 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
 
 /**
  * Proceed to importation of the Node part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -451,8 +437,6 @@ Ovoid.Ojson.prototype._procNode = function(n, j) {
 
 /**
  * Proceed to importation of the Material part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -488,8 +472,6 @@ Ovoid.Ojson.prototype._procMaterial = function(n, j) {
 
 /**
  * Proceed to importation of the Texture part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -509,8 +491,6 @@ Ovoid.Ojson.prototype._procTexture = function(n, j) {
 
 /**
  * Proceed to importation of the Audio part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -528,8 +508,6 @@ Ovoid.Ojson.prototype._procAudio = function(n, j) {
 
 /**
  * Proceed to importation of the Track part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -556,8 +534,6 @@ Ovoid.Ojson.prototype._procTrack = function(n, j) {
 
 /**
  * Proceed to importation of the Mesh part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -629,8 +605,6 @@ Ovoid.Ojson.prototype._procMesh = function(n, j) {
 
 /**
  * Proceed to importation of the Constraint part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -648,8 +622,6 @@ Ovoid.Ojson.prototype._procConstraint = function(n, j) {
 
 /**
  * Proceed to importation of the Animation part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -710,8 +682,6 @@ Ovoid.Ojson.prototype._procAnimation = function(n, j) {
 
 /**
  * Proceed to importation of the Physic part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -735,8 +705,6 @@ Ovoid.Ojson.prototype._procPhysic = function(n, j) {
 
 /**
  * Proceed to importation of the Skin part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -765,8 +733,6 @@ Ovoid.Ojson.prototype._procSkin = function(n, j) {
 
 /**
  * Proceed to importation of the Emitter part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -809,8 +775,6 @@ Ovoid.Ojson.prototype._procEmitter = function(n, j) {
 
 /**
  * Proceed to importation of the Transform part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -834,8 +798,6 @@ Ovoid.Ojson.prototype._procTransform = function(n, j) {
 
 /**
  * Proceed to importation of the Camera part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -865,8 +827,6 @@ Ovoid.Ojson.prototype._procCamera = function(n, j) {
 
 /**
  * Proceed to importation of the Camera part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -905,8 +865,6 @@ Ovoid.Ojson.prototype._procLight = function(n, j) {
 
 /**
  * Proceed to importation of the Body part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -926,8 +884,6 @@ Ovoid.Ojson.prototype._procBody = function(n, j) {
 
 /**
  * Proceed to importation of the Joint part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -947,8 +903,6 @@ Ovoid.Ojson.prototype._procJoint = function(n, j) {
 
 /**
  * Proceed to importation of the Sound part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -986,8 +940,6 @@ Ovoid.Ojson.prototype._procSound = function(n, j) {
 
 /**
  * Proceed to importation of the Layer part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -1015,8 +967,6 @@ Ovoid.Ojson.prototype._procLayer = function(n, j) {
 
 /**
  * Proceed to importation of the Text part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -1038,8 +988,6 @@ Ovoid.Ojson.prototype._procText = function(n, j) {
 
 /**
  * Proceed to importation of the Action part from a OJSON sub-object.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
  * @param {Object} j OJSON object.
@@ -1082,12 +1030,10 @@ Ovoid.Ojson.prototype._procAction = function(n, j) {
 
 
 /**
- * Scene import.
+ * Import OJSON scene data.<br><br>
  * 
- * <br>
- * <br>
- * Imports all the given OJSON scene file content and include it in the specified
- * scene.
+ * Interprets the current parsed OSJON source and import the result in the
+ * given recipient scene.
  *
  * @param {Object} scene Recipient Scene object.
  * 

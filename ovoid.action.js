@@ -53,8 +53,8 @@
  * 
  * <b>Node Grabbing</b><br><br>
  * 
- * The "node-grabbing" consists in focusing on a node while ignoring events of 
- * other nodes.<br>
+ * Node-grabbing consists in focusing on a node while ignoring events of 
+ * other nodes.<br><br>
  * 
  * Suppose you want to rotate a node by moving the mouse while you maintain the 
  * left button pressed. While you move your mouse pointer to rotate the object, 

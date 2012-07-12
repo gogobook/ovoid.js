@@ -22,211 +22,287 @@
 /**
  * COLLADA scene importer constructor.
  *
- * @class COLLADA scene importer object.
- * <br>
- * <br>
- * This class provides an implementation of a COLLADA/DAE scene file importer.
- * <br>
- * <br>
- * <ul>
- * <li><b>The COLLADA File Format</b></li>
- * <br>
- * COLLADA is a COLLAborative Design Activity for establishing an interchange 
- * file format for interactive 3D applications. COLLADA is managed by the 
- * nonprofit technology consortium, the Khronos Group. 
- * <br>
- * <br>
+ * @class COLLADA scene importer object.<br><br>
+ * 
+ * The Collada object implements a COLLADA/DAE scene file importer. It is used 
+ * to load DAE source files, then parse XML and extract COLLADA scene data. 
+ * One Collada object should represents one COLLADA file.<br><br>
+ * 
+ * <b>The COLLADA File Format</b><br><br>
+ * 
  * COLLADA defines an open standard XML schema for exchanging digital assets 
  * among various graphics software applications that might otherwise store 
  * their assets in incompatible file formats. COLLADA documents that describe 
  * digital assets are XML files, usually identified with a .dae (digital asset 
  * exchange) filename extension.
- * <br>
- * <br>
- * <li><b>Supported Data</b></li>
- * <br>
- * At this stage of developement, the OvoiD.JS COLLADA importer support 
- * the following data:
- * <br>
- * <br>
+ * 
+ * <b>Supported Data</b><br><br>
+ * 
+ * The Collada object currently knows and imports the following nodes and 
+ * features:<br><br>
+ * 
  * <ul>
- * <li>Scene graph hierachy</li>
- * <li>Textures as Texture nodes</li>
- * <li>Materials data as Material nodes</li>
- * <li>World nodes as Body or Transform nodes</li>
- * <li>Lights as Light nodes</li>
- * <li>Cameras as Camera nodes</li>
- * <li>Mesh data as Mesh nodes</li>
- * <li>Animation data as Animation nodes</li>
- * <li>Skinning controlers as Skin nodes</li>
- * <li>Skinning joints as Joint nodes</li>
+ * <li>
+ * <b>Materials</b><br>
+ * Materials are imported with the common available attributes: Color and 
+ * assigned textures for Ambient, Diffuse, Emissive and Reflective channels; 
+ * global opacity/transparency; shininess value.
+ * </li>
+ * <li><b>Textures</b><br>
+ * Textures are imported without image data (which is not included in 
+ * the COLLADA file). The source image filename is
+ * stored in the <code>url</code> field of the Texture node.
+ * </li>
+ * <li><b>Lights</b><br>
+ * Lights are imported with the common available attributes: Color; 
+ * Attenuation model; spot angle and falloff; intensity;
+ * </li>
+ * <li><b>Cameras</b><br>
+ * Cameras are imported with the common available attribute: Fov; Near and far
+ * clip planes values.
+ * </li>
+ * <li><b>Transforms</b><br>
+ * Transforms are imported as simple Transform, Body or Joint node with commons 
+ * transformations: Translation, rotation, scale, including joint orientation.
+ * </li>
+ * <li><b>Meshs</b><br>
+ * Meshs are imported with common available data: Vertices position, normal,
+ * texture coordinates; Polygons sets with assigned material and vertices 
+ * indinces. <b>Only triangulated meshs are supported</b></li>
+ * <li><b>Animations</b><br>
+ * Animation are imported with common translation, rotation and
+ * scale channel with Bezier, Hermit and linear interpolation data.
+ * </li>
+ * <li><b>Skinning</b><br>
+ * Mesh skin controller is imported as Skin node with all available data with
+ * up to four influences/weights per vertex.
+ * </li>
+ * </ul><br><br>
+ * 
+ * <blockcode>
+ * var collada = new Ovoid.Collada();<br>
+ * collada.loadSource("homework.dae");<br>
+ * var options = Ovoid.DAE_ALL_NODES|Ovoid.DAE_OPTIMIZE_ALL|Ovoid.DAE_CREATE_TRACK|Ovoid.DAE_FORCE_CSPLINE;<br>
+ * collada.importDae(options, scene);<br>
+ * </blockcode><br><br>
+ * 
+ * <b>Importation Options</b><br><br>
+ * 
+ * Importation process behaviour can be modified with several options. These 
+ * options are commonly used to do some little jobs and/or to filter the 
+ * nodes importation. Options are passed as a bitmask parameter:<br><br>
+ * 
+ * <ul>
+ * <li>Ovoid.DAE_ALL_NODES<br>
+ * Importation includes all supported nodes.</li>
+ * <li>Ovoid.DAE_WORLD_NODES<br>
+ * Importation includes all world nodes (Transform, Body, Light, Camera, Joint).</li>
+ * <li>Ovoid.DAE_DEPENDENCY_NODES<br>
+ * Importation includes all dependency nodes (Texture, Material, Animation, Mesh, Skin).</li>
+ * <li>Ovoid.DAE_TRANSFORMS<br>
+ * Importation includes Transform nodes.</li>
+ * <li>Ovoid.DAE_MESHS<br>
+ * Importation includes Mesh nodes.</li>
+ * <li>Ovoid.DAE_LIGHTS<br>
+ * Importation includes Light nodes.</li>
+ * <li>Ovoid.DAE_CAMERAS<br>
+ * Importation includes Camera nodes.</li>
+ * <li>Ovoid.DAE_JOINTS<br>
+ * Importation includes Joint nodes.</li>
+ * <li>Ovoid.DAE_ANIMATIONS<br>
+ * Importation includes Animation nodes.</li>
+ * <li>Ovoid.DAE_MATERIALS<br>
+ * Importation includes Material nodes.</li>
+ * <li>Ovoid.DAE_CONTROLLERS<br>
+ * Importation includes Skin nodes.</li>
+ * <li>Ovoid.DAE_FORCE_CSPLINE<br>
+ * Ignore animations's Bezier and Hermit interpolation data and only extract the 
+ * keytime-keyvalue pair as linear interpolation curve.</li>
+ * <li>Ovoid.DAE_OPTIMIZE_MESH_VERTICES<br>
+ * Optimizes mesh's vertices once imported.
+ * This operation may take long time depending on the mesh's complexity. It is 
+ * recommanded to import and optimize once then export the optimized mesh in 
+ * OvoiD JSON format.</li>
+ * <li>Ovoid.DAE_OPTIMIZE_MESH_TRIANGLES<br>
+ * Optimizes mesh's triangles once imported. 
+ * This operation may take long time depending on the mesh's complexity. It is 
+ * recommanded to import and optimize once then export the optimized mesh in 
+ * OvoiD JSON format.</li>
+ * <li>Ovoid.DAE_OPTIMIZE_ALL<br>
+ * Optimizes both mesh's vertices and triangles once imported.
+ * This operation may take long time depending on the mesh's complexity. It is 
+ * recommanded to import and optimize once then export the optimized mesh in 
+ * OvoiD JSON format.</li>
+ * <li>Ovoid.DAE_MAYA_FIXS<br>
+ * Fix some specific side effets of Maya exported COLLADA. (Typically: Joints 
+ * orientations and matrices implementation).</li>
+ * <li>Ovoid.DAE_BLENDER_FIXS<br>
+ * Fix some specific side effets of Blender exported COLLADA. (This option has 
+ * currently no effet).</li>
+ * <li>Ovoid.DAE_REPARENT_SKIN<br></li>
+ * Parent the root Joint/bon of the rig structure to the Body which owns the 
+ * skin deformed Mesh.</li>
+ * <li>Ovoid.DAE_MERGE_DEPENDENCIES<br>
+ * Always try to use and link the already existing (imported) nodes (according 
+ * to the nodes name) with the currently imported nodes instead of creating 
+ * doubled nodes.</li>
+ * <li>Ovoid.DAE_CREATE_TRACK<br>
+ * Create a Track node which contains all imported Animation nodes of the 
+ * current importation process.</li>
+ * </ul><br><br>
+ * 
+ * <b>Naming conventions</b><br><br>
+ * 
+ * Except for some node's type, imported nodes are nammed as they are in 
+ * the COLLADA file.
+ * 
+ * <ul>
+ * <li>Animation nodes<br>
+ * OvoiD.JS uses one animation node per transformable (Body, Joint) node. 
+ * COLLADA does not store animations as node objects. Animation nodes are 
+ * created according to the target node's name ended by "Animation". For example
+ * the created Animation node who has a target named "head" will be named 
+ * "headAnimation".</li>
+ * <li>Track nodes<br>
+ * COLLADA does not implements an equivalent of the Track node. One Track node 
+ * is created by importation process. The Track node is named according to the 
+ * DAE file name ended by "Track". For example, a file named "mybox.dae" will 
+ * produce a track named "myboxTrack".
+ * </li>
  * </ul>
+ * 
+ * <b>Renaming rules using Prefix and Suffix</b><br><br>
+ * 
+ * The Collada object implements a renaming mecanism which allows to creates 
+ * basic renaming rules using prefix and suffis during the importation process.
+ * Nodes are renamed according to the prefix and suffix as follow:<br><br>
+ * 
+ * <code>prefix.nodeName.suffix</code><br><br>
+ * 
+ * Renaming rules is implemented to allow to organize complex scenes filled by 
+ * successive COLLADA importations which can cause name collision or simply 
+ * confusing scene. This notably allows to use the searchMatches method of the 
+ * Scene object to retrieve all nodes who contains the specified prefix or 
+ * suffix in their name.
+ * 
+ * <blockcode>
+ * var group1 = scene.searchMatches("group1.");<br>
+ * var group2 = scene.searchMatches(".group2");<br>
+ * </blockcode><br><br>
+ * 
+ * <b>Scene merging and animations</b><br><br>
+ * 
+ * Renames nodes is typically usefull to import several animations set of the 
+ * same object/character. To import several animations for the same object, you 
+ * have to preliminary import the base COLLADA file who contains the object. 
+ * Once done, you have to successively import COLLADA file who contains the 
+ * object and the special animations set.<br><br>
+ * 
+ * <blockcode>
+ * var collada = new Ovoid.Collada();<br>
+ * collada.loadSource("characterBase.dae");<br>
+ * collada.importDae(Ovoid.DAE_ALL_NODES|Ovoid.DAE_OPTIMIZE_ALL, scene, 'guybrush', null);<br>
  * <br>
+ * collada.loadSource("characterWalk.dae");<br>
+ * collada.importDae(Ovoid.DAE_ANIMATIONS|Ovoid.DAE_MERGE_DEPENDENCIES, scene, 'guybrush', 'walk');<br>
  * <br>
- * <li><b>The Compatibility Issue</b></li>
- * <br>
- * In theory, the COLLADA format was designed to be compatible between all 
- * softwares. Unfortunately, in the real world this is not as simple as this. 
- * The COLLADA's specifications are more or less an holdall wich define many 
- * way to do the same thing.  And unfortunately, most softwares use their own 
- * manners to export data with some subtle differences. follow the Exportation 
- * tests from several common softwares demonstrates that there are some 
- * differences between each versions of the SAME software.
- * <br>
- * <br>
- * The OvoiD.JS COLLADA importer does not include ALL specifications, but 
- * implements the most common and usual techniques, and somes tweaks to "catch" 
- * some softwares's specific techniques. Because of that there is no guarantee 
- * that your exported COLLADA will be perfectly imported. In the most of cases, 
- * it will.
- * <br>
- * <br>
- * Files created using the Autodesk FBX Converter software are well supported. 
- * So, exporting your data as FBX and then converting it to DAE using FBX 
- * Converter can be a good idea, if the exported FBX file is well formated 
- * (not allways the case). 
- * <br>
- * <br>
- * Bellow you'll find some known issue and best practices to export your 
- * COLLADA files.
- * <br>
- * <br>
- * <li><b>known Issues</b></li>
- * <br>
+ * collada.loadSource("characterJump.dae");<br>
+ * collada.importDae(Ovoid.DAE_ANIMATIONS|Ovoid.DAE_MERGE_DEPENDENCIES, scene, 'guybrush', 'jump');<br>
+ * </blockcode><br><br>
+ * 
+ * Since Animation nodes are named according to the target's name, and the 
+ * target name will not change, the successive importation will produce name 
+ * collision. Using prefix or suffix prevents this side effect. (Name collisions 
+ * produces automatic renaming according to the node name ended with 
+ * "#<number>").<br><br>
+ * 
+ * In the above example, the imported node will be renamed as follows (supposed 
+ * the scene includes one body, one mesh and several animations):<br><br>
+ * 
  * <ul>
- * <li>General</li>
- * <br>
+ * <li>"Character" => "guybrush.Character"</li>
+ * <li>"CharacterShape" => "guybrush.CharacterShape"</li>
+ * <li>"N/A" => "guybrush.CharacterAnimation.walk"</li>
+ * <li>"N/A" => "guybrush.CharacterAnimation.jump"</li>
+ * </ul><br><br>
+ * 
+ * The dependencies merging ensures the correct linking and correlation between 
+ * world objects and animations during the importation process, according to the 
+ * renaming rules and COLLADA legacy names.<br><br>
+ * 
+ * <b>The Compatibility Issue</b><br><br>
+ * 
+ * In theory, the COLLADA format was designed to be compatible between all 
+ * softwares. Unfortunately,this is not as simple. The COLLADA's specifications 
+ * defines many ways to do the same thing and most softwares use their own 
+ * way to export data with some subtle differences. Exportation 
+ * tests from several common softwares demonstrates there are some 
+ * differences between softwares and even each versions of the SAME software.<br><br>
+ * 
+ * The Collada class does not include all specifications, but implements the 
+ * most common and usual design. Because of that there is no guarantee your 
+ * exported COLLADA will be perfectly imported. However, in the most of cases, 
+ * it would.<br><br>
+ * 
+ * There is well known issues about some softwares's COLLADA exportations. 
+ * COLLADA files created using the Autodesk FBX Converter software are rather 
+ * well supported. When software's COLLADA exportation causes issues, exporting 
+ * in FBX, then converting FBX to COLLADA using Autodesk FBX Converter may be 
+ * a good deal.<br><br>
+ * 
+ * <b>Best Practices and Known issues</b><br><br>
+ * 
+ * <b>General</b><br><br>
  * <ul>
  * <li>Meshs must be triangulated. OvoiD.JS does not support quad or arbitrary 
  * polygones.</li>
- * </ul>
- * <br>
- * <br>
- * <li>Blender</li>
- * <br>
- * COLLADA exportation from Blender work pretty well.
- * There is some details to know:
- * <br>
- * <br>
+ * <li>Up-Axis is ignored. OvoiD.JS is Y-Up and -Z-Forward, transformation and 
+ * geometry data are not converted according to the Up-Axis.</li>
+ * </ul><br><br>
+ * 
+ * <b>Blender</b><br><br>
+ * 
+ * Blender's COLLADA exportation work pretty well.<br><br>
+ * 
  * <ul>
  * <li>Blender is in Z-up, OvoiD.JS usually work in Y-up.</li>
+ * <li>Material opacity/transparency value is reversed.</li>
  * <li>It is highly recommanded to recalculate bones's roll before animating your
  * characters. Not recalculated bones can produce some unpredictable rotation's 
  * artifacts once exported in COLLADA.</li>
  * <li>You must bake your rig animations. <a href="http://wiki.blender.org/index.php/User:Phabtar/Full_COLLADA_Animation_Support_for_Blender">
  * You can read some best practices here.</a></li>
  * <li>Textures are linked to materials only if they are in "UV" mapping.</li>
- * <li>Blender uses a Gamma corrections that deceives the RGB values's visual 
+ * <li>Blender uses a Gamma corrections which deceives the RGB values's visual 
  * perception, so, the exported material's colours seems darker than in 
  * Blender.</li>
- * </ul>
- * <br>
- * <br>
- * <li>Maya</li>
- * <br>
- * Direct COLLADA exportation from Maya does not work very well. 
- * <br>
- * <br>
- * <ul>
- * <li>COLLADA exportation from Maya don't work very well depending on the 
- * version. Some tests revealed incorrect indices data exportation when mesh 
+ * </ul><br><br>
+ * 
+ * 
+ * <b>Maya</b><br><br>
+ * 
+ * Maya's exported COLLADA is version depend and may be corrupted.<br><br>
+ * 
+ * <li>Some tests revealed incorrect indices data exportation when mesh 
  * has more than one material assigned (multple polysets). You should export in 
- * FBX then convert into COLLADA using FBX Converter. Best practices for FBX 
- * export from Maya are the following:
- * <br>
- * <br>
+ * FBX then convert into COLLADA using FBX Converter. Best practices/issues for 
+ * FBX export from Maya:<br><br>
+ * 
  * <ul>
  * <li>To correctly export rig/skeleton animation you must enable Bake 
  * Animation and Resample all options and disable Constraints, Character 
  * Definition options.</li>
  * <li>Bake animation with an other step value than 1 seem create blank 
  * animation extra data that does not make sens.</li>
- * </ul>
- * <br>
- * <br>
- * <li>XSI</li>
- * <br>
+ * </ul><br><br>
+ * 
+ * <b>XSI</b><br><br>
+ * 
  * Not tested.
- * <br>
- * <br>
- * <li>3dsMax</li>
- * <br>
+ * 
+ * <b>3dsMax</b><br><br>
+ * 
  * Not tested.
- * <br>
- * <br>
- * </ul>
- * <li><b>Importation Options</b></li>
- * <br>
- * <br>
- * Importation process behaviour can be modified with several options. These 
- * options are commonly used to do some little jobs and/or to filter the 
- * nodes importation. Options are passed as a bitmask parameter:
- * <br>
- * <br>
- * <ul>
- * <li>Ovoid.DAE_ALL_NODES</li>
- * Import all supported nodes.
- * <li>Ovoid.DAE_WORLD_NODES</li>
- * Import all world nodes including Transform, Body, Light, Camera, Joint.
- * <li>Ovoid.DAE_DEPENDENCY_NODES</li>
- * Import all abstract dependency nodes including Material, Animation, Mesh, Skin.
- * <li>Ovoid.DAE_TRANSFORMS</li>
- * Import Transform nodes.
- * <li>Ovoid.DAE_MESHS</li>
- * Import Mesh nodes.
- * <li>Ovoid.DAE_LIGHTS</li>
- * Import Light nodes.
- * <li>Ovoid.DAE_CAMERAS</li>
- * Import Camera nodes.
- * <li>Ovoid.DAE_JOINTS</li>
- * Import Joint nodes.
- * <li>Ovoid.DAE_ANIMATIONS</li>
- * Import Animation nodes.
- * <li>Ovoid.DAE_MATERIALS</li>
- * Import Material nodes.
- * <li>Ovoid.DAE_CONTROLLERS</li>
- * Import Skin nodes.
- * <li>Ovoid.DAE_FORCE_CSPLINE</li>
- * Ignore animations's interpolation extra data and extract the keyframe/value
- * pair only. This will create a Cspline object that allow the linear or cosine
- * interpolation algorythme. Note: This option is recommended since cosine 
- * interpolation is often sufficiant and the interpolation extra data exported by
- * CG softwares are commonly erroneous.
- * <li>Ovoid.DAE_OPTIMIZE_MESH_VERTICES</li>
- * Proceed to the vertices merging and optimization during the Mesh importation.
- * This operation can be an huge time consumer depending on the mesh's complexity. 
- * It is recomended to use this option to import and optimize the mesh once, 
- * and keep the optimized mesh in Ojson format. (see Ovoid.Ojson for more 
- * information about Ojson import/export).
- * <li>Ovoid.DAE_OPTIMIZE_MESH_TRIANGLES</li>
- * Proceed to the polygons/faces optimization during the Mesh importation. This 
- * option is required to enable the Z-fail casted shadow rendering.
- * This operation can be an VERY huge time consumer depending on the mesh's 
- * complexity. It is recomended to use this option to import and optimize 
- * the mesh once, and keep the optimized mesh in Ojson format. 
- * (see Ovoid.Ojson for more information about Ojson import/export).
- * <li>Ovoid.DAE_OPTIMIZE_ALL</li>
- * Proceed to both the polygons and vertices optimization during the Mesh 
- * importation.
- * <li>Ovoid.DAE_MAYA_FIXS</li>
- * Fix some specific undesired side effets of Maya exported COLLADA files. This
- * principally fix the Joints orientations and matrices implementation.
- * <li>Ovoid.DAE_BLENDER_FIXS</li>
- * Fix some specific undesired side effets of Blender exported COLLADA files. 
- * ( This option has currently no effet ).
- * <li>Ovoid.DAE_REPARENT_SKIN</li>
- * When importing skin controllers, the root joint of the skinning structure is 
- * parented to the Body which originaly owns the skinned Mesh.
- * <li>Ovoid.DAE_MERGE_DEPENDENCIES</li>
- * Allways try to use and link the allready imported node contained in the scene
- * (according to the nodes name) with the currently imported nodes instead of 
- * creating doubled nodes.
- * <li>Ovoid.DAE_CREATE_TRACK</li>
- * Create a Track node which contains all imported Animation nodes. The Track
- * node will be named according to the DAE file name with the "Track" suffix. 
- * For example, a file named "mybox.dae" will give "myboxTrack".
- * </ul>
- * <br>
  * 
  * </ul>
  */
@@ -264,8 +340,6 @@ Ovoid.Collada = function() {
 
 /**
  * Get concatenated childs text data from DOM node's childs.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {DOM_text[]} n DOM_text object array to extract data from.
  *
@@ -284,8 +358,6 @@ Ovoid.Collada.prototype._gTxtData = function(n) {
 /**
  * Get concatenated childs text data from DOM node's childs splited
  * by common sperators.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {DOM_text[]} child DOM_text object array to extract data from.
  *
@@ -309,8 +381,6 @@ Ovoid.Collada.prototype._gTxtDataSplit = function(child) {
 /**
  * Find a DOM node by tagname with a particular tagname and ID or
  * SID attribute value.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {string} t Tagname of the DOM element to find.
  * @param {string} i ID or SID attribute value of the DOM node
@@ -335,8 +405,6 @@ Ovoid.Collada.prototype._getById = function(t, i) {
 /**
  * Get the NAME attribute value of a DOM node with a particular
  * tagname and ID or SID attribute value.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {string} t Tagname of the DOM element to find.
  * @param {string} i ID or SID attribute value of the DOM node
@@ -360,8 +428,6 @@ Ovoid.Collada.prototype._getNameById = function(t, i) {
 
 /**
  * Get all childs of a DOM node with a particular tagname.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {string} n DOM node to search childs in.
  * @param {string} t Tagname of the childs to search for.
@@ -384,8 +450,6 @@ Ovoid.Collada.prototype._getChildByTag = function(n, t) {
 /**
  * Get the child of a DOM node with a particular ID or SID attribute
  * value.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {string} n DOM node to search childs in.
  * @param {string} i ID or SID attribute value of the child to
@@ -411,8 +475,6 @@ Ovoid.Collada.prototype._getChildById = function(n, i) {
 /**
  * Verify if a DOM node have one or more childs with a
  * particular tagname.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} n DOM node to search childs in.
  * @param {string} t Tagname of the childs to search for.
@@ -434,8 +496,6 @@ Ovoid.Collada.prototype._hasChildByTag = function(n, t) {
 /**
  * Retrieve a node according its name, prefix or extention according 
  * importation impotions.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {string} name Node base name.
  *
@@ -487,8 +547,6 @@ Ovoid.Collada.prototype._procVect = function(v, i) {
 /**
  * Proceed to creation and setting of a new camera node from a
  * DOM node of a DAE <camera> descriptor.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} dae DOM node of the DAE camera descriptor.
  *
@@ -551,8 +609,6 @@ Ovoid.Collada.prototype._procCam = function(dae) {
 /**
  * Proceed to creation and setting of a new light node from a
  * DOM node of a DAE <light> descriptor.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {DOM_Object} dae DOM node of the DAE light descriptor.
  *
@@ -680,8 +736,6 @@ Ovoid.Collada.prototype._procLig = function(dae) {
 /**
  * Proceed to creation and setting of a new texture node from a
  * DOM node of a DAE <image> descriptor.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} dae DOM node of the DAE image descriptor.
  *
@@ -836,8 +890,6 @@ Ovoid.Collada.prototype._procEfxComp = function(node, dae, di, mi) {
 /**
  * Proceed to creation and setting of a new material node from a
  * DOM node of a DAE <material> descriptor.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} dae DOM node of the DAE material descriptor.
  *
@@ -917,8 +969,6 @@ Ovoid.Collada.prototype._procMat = function(dae) {
 /**
  * Proceed to creation and setting of a new mesh node from a
  * DOM node of a DAE <geometry> descriptor.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} dae DOM node of the DAE geometry descriptor.
  *
@@ -1335,8 +1385,6 @@ Ovoid.Collada.prototype._procGeo = function(dae) {
 /**
  * Proceed to creation and setting of a new skin/morph node from a
  * DOM node of a DAE <controller> descriptor.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} dae DOM node of the DAE controller descriptor.
  *
@@ -1809,8 +1857,6 @@ Ovoid.Collada.prototype._procCtr = function(dae) {
  * Proceed to creation and/or setting (transform) of new or allready
  * created transform (camera, light) or bone node from a DOM node of a DAE
  * <node> descriptor.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} dae DOM node of the DAE node descriptor.
  *
@@ -2120,8 +2166,6 @@ Ovoid.Collada.prototype._procNod = function(dae) {
 /**
  * Proceed to creation and setting  of new animation node from a DOM
  * node of a DAE <animation> descriptor.
- * This function is typically used as class's private member and should not be 
- * called independently.
  * 
  * @param {Object} dae DOM node of the DAE node descriptor.
  *
@@ -2866,24 +2910,22 @@ Ovoid.Collada.prototype._procAni = function(dae) {
 
 
 /**
- * Load the specified source file for this instance.
+ * Load the specified source file for this instance.<br><br>
  * 
- * <br><br>By this method you can specify the source file to load and use to be
- * the data source of this instance. The file loading is instantaneously 
- * started in asynby this method. Once the loading is started you can check the 
- * <code>loadStatus</code> variable of this instance to know if and when 
- * the loading is done.
- * <br>
- * <br>
- * This <code>loadStatus</code> variable describe the current loading status of 
- * the source file. A value of 0 means that the file is not loaded, a value of 1 
- * means that the file was successfully loaded, and a value of -1 means that the 
- * file loading 
+ * Loads the specified external source file and extracts, decodes or parses the 
+ * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
+ *  
+ * The <code>loadSatus</code> member indicates the loading status through an 
+ * integer value of 0, 1 or -1. A value of 0 means that the file is not yet 
+ * loaded, a value of 1 means that the source was successfully loaded, and a 
+ * value of -1 means the loading failed.<br><br>
  *
- * @param {string} url Source file name to load. Keep in mind that the 
- * <code>Ovoid.opt_daePath</code> option will be used to retrieve the file.
+ * @param {string} url Source file name to load.
+ * <code>Ovoid.opt_daePath</code> is used as base path.
+ * 
  * @param {bool} async Optionnal asynchronous loading flag. If true or not null
  * the source is loaded in asynchronous way.
+ * 
  * @param {bool} nopath ignore the default search path 
  * (<code>Ovoid.opt_daePath</code>).
  */
@@ -2944,126 +2986,16 @@ Ovoid.Collada.prototype.loadSource = function(url, async, nopath) {
 
 
 /**
- * Import DAE data.
- * <br>
- * <br>
- * Once the source file is loaded, the XML file's content is parsed into 
- * an XML/DOM object. This method will extract data from the XML/DOM object and
- * create nodes to import/insert into the given Scene object according to the
- * importation options and parameters.
- * <br>
- * <br>
- * <ul>
- * <li><b>The Prefix and Suffix concept</b></li>
- * By default, the imported nodes are nammed as they are in the DAE file.
- * However, you can apply renaming rules as your conveniance by setting the 
- * prefix and suffix parameters. The prefix and suffix string is applied as 
- * follows:
- * <br>
- * <br>
- * <code>prefix.name.suffix</code>
- * <br>
- * <br>
- * Prefix and suffix can be used to help organizing imported nodes from several
- * DAE files into the same Scene. For example: At the begining, this feature 
- * was implemented to allow the importation of several animations of the SAME 
- * node. During importation process, since Animation nodes are named 
- * according to the targeted node name (i.e. "nodenameAnimation"), importation of
- * several DAE files for several animations of the SAME node are causing name 
- * collisions and produce some confusing names ("nodeAnimation", 
- * "nodeAnimation#2", "nodeAnimation#3", etc...). By using one suffix per scene 
- * importation, the Animation nodes are named according to this suffix and can 
- * be easily retrievable by its name.
- * <br>
- * <br>
- * Another way to use the prefix and suffix feature is to apply a prefix to all 
- * nodes imported from a specific importation process to easily retrieve the 
- * list of all nodes dedicated to a specific task or behaviour. For example, 
- * imagine you have to import a landscape with many trees which share the same 
- * generic Mesh. You can import the whole thing in an smart way as follows:<br>
- * 1) Import the main landscape scene from a DAE file.<br>
- * 2) Import the generic tree mesh object from another DAE file.<br>
- * 3) import a scene with null/locator nodes (will be imported as empty Body 
- * nodes) named with the "tree" prefix from a third DAE file.<br>
- * 4) Retrieve all the nodes whose the name contains the string "tree", then 
- * attach to them the generic tree mesh as shape.<br>
- * <br>
- * <br>
- * <li><b>Importation Options</b></li>
- * Importation process behaviour can be modified with several options. These 
- * options are commonly used to do some little jobs and/or to filter the 
- * nodes importation. Options are passed as a bitmask parameter:
- * <br>
- * <ul>
- * <li>Ovoid.DAE_ALL_NODES</li>
- * Import all supported nodes.
- * <li>Ovoid.DAE_WORLD_NODES</li>
- * Import all world nodes including Transform, Body, Light, Camera, Joint.
- * <li>Ovoid.DAE_DEPENDENCY_NODES</li>
- * Import all abstract dependency nodes including Material, Animation, Mesh, Skin.
- * <li>Ovoid.DAE_TRANSFORMS</li>
- * Import Transform nodes.
- * <li>Ovoid.DAE_MESHS</li>
- * Import Mesh nodes.
- * <li>Ovoid.DAE_LIGHTS</li>
- * Import Light nodes.
- * <li>Ovoid.DAE_CAMERAS</li>
- * Import Camera nodes.
- * <li>Ovoid.DAE_JOINTS</li>
- * Import Joint nodes.
- * <li>Ovoid.DAE_ANIMATIONS</li>
- * Import Animation nodes.
- * <li>Ovoid.DAE_MATERIALS</li>
- * Import Material nodes.
- * <li>Ovoid.DAE_CONTROLLERS</li>
- * Import Skin nodes.
- * <li>Ovoid.DAE_FORCE_CSPLINE</li>
- * Ignore animations's interpolation extra data and extract the keyframe/value
- * pair only. This will create a Cspline object that allow the linear or cosine
- * interpolation algorythme. Note: This option is recommended since cosine 
- * interpolation is often sufficiant and the interpolation extra data exported by
- * CG softwares are commonly erroneous.
- * <li>Ovoid.DAE_OPTIMIZE_MESH_VERTICES</li>
- * Proceed to the vertices merging and optimization during the Mesh importation.
- * This operation can be an huge time consumer depending on the mesh's complexity. 
- * It is recomended to use this option to import and optimize the mesh once, 
- * and keep the optimized mesh in Ojson format. (see Ovoid.Ojson for more 
- * information about Ojson import/export).
- * <li>Ovoid.DAE_OPTIMIZE_MESH_TRIANGLES</li>
- * Proceed to the polygons/faces optimization during the Mesh importation. This 
- * option is required to enable the Z-fail casted shadow rendering.
- * This operation can be an VERY huge time consumer depending on the mesh's 
- * complexity. It is recomended to use this option to import and optimize 
- * the mesh once, and keep the optimized mesh in Ojson format. 
- * (see Ovoid.Ojson for more information about Ojson import/export).
- * <li>Ovoid.DAE_OPTIMIZE_ALL</li>
- * Proceed to both the polygons and vertices optimization during the Mesh 
- * importation.
- * <li>Ovoid.DAE_MAYA_FIXS</li>
- * Fix some specific undesired side effets of Maya exported COLLADA files. This
- * principally fix the Joints orientations and matrices implementation.
- * <li>Ovoid.DAE_BLENDER_FIXS</li>
- * Fix some specific undesired side effets of Blender exported COLLADA files. 
- * ( This option has currently no effet ).
- * <li>Ovoid.DAE_REPARENT_SKIN</li>
- * When importing skin controllers, the root joint of the skinning structure is 
- * parented to the Body which originaly owns the skinned Mesh.
- * <li>Ovoid.DAE_MERGE_DEPENDENCIES</li>
- * Allways try to use and link the allready imported node contained in the scene
- * (according to the nodes name) with the currently imported nodes instead of 
- * creating doubled nodes.
- * <li>Ovoid.DAE_CREATE_TRACK</li>
- * Create a Track node which contains all imported Animation nodes. The Track
- * node will be named according to the DAE file name with the "Track" suffix. 
- * For example, a file named "mybox.dae" will give "myboxTrack".
- * </ul>
- * <br>
- * </ul>
+ * Import DAE data.<br><br>
+ * 
+ * Interprets the current parsed COLLADA source and import the result in the
+ * given recipient scene according to the specified option bitmask and prefix /
+ * suffix renaming rule.
  *
  * @param {bitmask} options Importation options bitmask.
  * @param {Scene} scene Recipient Scene object.
- * @param {string} prefix Prefix used to name imported nodes.
- * @param {string} suffix Suffix used to name imported nodes.
+ * @param {string} prefix Prefix used to name imported nodes or null.
+ * @param {string} suffix Suffix used to name imported nodes or null.
  *
  * @return {bool} True if import suceeds, false otherwise.
  * 
@@ -3074,7 +3006,7 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
 
   /* Si le DOM object n'existe on ne peut rien faire */
   if (!this._dae) {
-    Ovoid.log(2, 'Ovoid.Collada', 'DAE object is null.');
+    Ovoid.log(2, 'Ovoid.Collada', 'no DAE data.');
     return false;
   }
   

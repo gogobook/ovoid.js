@@ -21,17 +21,20 @@
 /**
  * Timer global static class.
  *
- * @namespace Timer global class.
- * <br>
- * <br>
- * This class is a global static one, that means that it has no constructor and 
- * has only one instance. In the OvoiD.JS Library, global classes implements 
- * features for specific range of tasks. Global classes can be seen as several 
- * worker that accomplish their own job.
- * <br>
- * <br>
- * The Timer global class is the main OvoiD.JS Library's time/clock manager. It 
- * provides all the methods that are directly related to the time and clock.
+ * @namespace Timer global class.<br><br>
+ * 
+ * The Timer class implements a global time/timing manager. It is a global 
+ * static (namespace) class. The Timer class provides the common clock and times 
+ * parameter calculated over each frame's refresh.<br><br>
+ * 
+ * <blockcode>
+ * <codecomment>// Get the elapsed time since the last frame in seconds</codecomment>
+ * var qt = Ovoid.Timer.quantum;<br>
+ * <codecomment>// Get current framerate</codecomment>
+ * var fps = Ovoid.Timer.framerate;<br>
+ * <codecomment>// Get current global clock</codecomment>
+ * var clock = Ovoid.Timer.clock;<br>
+ * </blockcode>
  */
 Ovoid.Timer = {};
 
@@ -64,11 +67,10 @@ Ovoid.Timer._fcumul = 0.0;
 
 
 /**
- * Timer initialization.
- * <br>
- * <br>
- * Global initialization method. This methode is called once during the Ovoid 
- * library's main initalization. It should not be called a second time.
+ * Timer initialization.<br><br>
+ * 
+ * Global initialization method. This methode is called once during the library 
+ * main initalization. It shouldn't be called a second time.
  * 
  * @see Ovoid.init
  *
@@ -83,12 +85,11 @@ Ovoid.Timer.init = function() {
 
 
 /**
- * Timer update.
- * <br>
- * <br>
- * Global class's update method. This methode is automaticaly called at each
- * main loop and is dedicated to refresh class's internal data.
- * It shoulds not be called manually.
+ * Timer update.<br><br>
+ * 
+ * Global class update. This method is automaticaly called each
+ * frame during the library main loop and is dedicated to refresh internal data. 
+ * It shouldn't be called manually.
  */
 Ovoid.Timer.update = function() {
 
@@ -99,8 +100,7 @@ Ovoid.Timer.update = function() {
   Ovoid.Timer._timelast = Ovoid.Timer.clock;
 
   /* prévient les eventuels bugs en cas de blocage de frame ou de timer incorrecte */
-  if (Ovoid.Timer.quantum > 0.1)
-      Ovoid.Timer.quantum = 0.01;
+  if (Ovoid.Timer.quantum > 0.25) Ovoid.Timer.quantum = 0.01;
 
   Ovoid.Timer._fcount++;
   Ovoid.Timer._fcumul+=Ovoid.Timer.quantum;
@@ -115,10 +115,10 @@ Ovoid.Timer.update = function() {
 
 
 /**
- * Wait a moment.
- * <br>
- * <br>
- * Waits according the the specified duration.
+ * Wait a moment.<br><br>
+ * 
+ * Waits according the the specified duration. This freezes the global 
+ * execution.
  *
  * @param {float} s Duration in seconds.
  */

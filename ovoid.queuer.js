@@ -21,70 +21,56 @@
 /**
  * Queuer global static class.
  *
- * @namespace Queuer global class.
- * <br>
- * <br>
- * This class is a global static one, that means that it has no constructor and 
- * has only one instance. In the OvoiD.JS Library, global classes implements 
- * features for specific range of tasks. Global classes can be seen as several 
- * worker that accomplish their own job.
- * <br>
- * <br>
- * The Queuer global class is the main OvoiD.JS Library's queue manager. It 
- * is more or less the library's crossroad. The Queuer's purposes 
- * are (in brief):
- * <ul>
- * <li>Refresh the active scene's nodes tree</li>
- * <li>Build render queue according to the view and light linking</li>
- * <li>Build physics solver queue</li>
- * <li>Dispatch nodes trought several queues</li>
- * </ul>
- * <br>
- * <br>
- * <b>View and light culling</b>
- * One of the purpose of the queuer is to select nodes who will be drawed. 
+ * @namespace Queuer global class.<br><br>
+ * 
+ * The Queuer class implements a per frame global treatment queue. It is a 
+ * global static (namespace) class. The Timer class provides the common clock 
+ * and times parameter calculated over each frame's refresh. Typically, Queuer 
+ * will "read" the current active scene, updates all nodes and dependencies, 
+ * and then build a queue (for example) of all objects which must be drawn by 
+ * the Drawer, must be treated by the Solver, etc... each frame.<br><br>
+ * 
+ * <b>Node culling</b><br><br>
+ * 
  * Since it is not desirable to include all nodes of the active scene in the 
- * drawer stack, the Queuer implements some mecanisms that will only include 
- * the needed nodes, also called "node culling".
+ * drawer stack, it implements some mecanisms which only includes the needed
+ * nodes. This mecanisms is called "Node Culling".<br><br>
+ * 
  * <ul>
- * <li><b>View culling</b></li>
- * The view culling mechanism consists on determin if an object is in the field 
- * of view of the active render camera. An object which is not in the field of 
- * view is not visible by definition, so it is excluded from the next 
- * rendering stack. The view culling (at this stage of development) proceeds to 
- * a frustum culling test.
- * <br>
+ * <li><b>View culling</b><br>
+ * The view culling mechanism checks whether a node is within the view frustum 
+ * of the current active camera. Also named "View frustum culling".<br><br>
+ * 
  * This mechanism can be enabled or disabled by modifying the global option
  * <code>Ovoid.Queuer.opt_viewcull</code>
- * <br>
- * <br>
- * <li><b>Light culling</b></li>
- * The light culling mechanism consists on determin whether a light source is 
- * used for an actually rendered object. If a light illuminate none of the 
- * visibles objects, the light is useless, so it is excluded from rendering 
- * pipeline. The light culling (at this stage of development) proceeds to a 
- * light range (sphere intersection) test on every rendered object.
- * <br>
+ * </li>
+ * 
+ * <li><b>Light culling</b><br>
+ * The light culling mechanism checks whether a light is needed to draw the 
+ * current frame. It excludes all the light that does not illuminate one of 
+ * the not culled nodes.<br><br>
+ * 
  * This mechanism can be enabled or disabled by modifying the global option 
  * <code>Ovoid.Queuer.opt_lightcull</code>
+ * </li>
  * </ul>
  */
 Ovoid.Queuer = {};
 
 
-/** queuer option. Enable or disable view culling. */
+/** Enable or disable view culling. */
 Ovoid.Queuer.opt_viewcull = true;
 
 
-/** queuer option. Enable or disable light culling. */
+/** Enable or disable light culling. */
 Ovoid.Queuer.opt_lightcull = true;
 
 
-/** queuer option. Default camera position. */
+/** Default camera position. */
 Ovoid.Queuer.opt_defaultCameraPos = [0.0, 0.0, 10.0];
 
 
-/** queuer option. Default camera rotation. */
+/** Default camera rotation. */
 Ovoid.Queuer.opt_defaultCameraRot = [0.0, 0.0, 0.0];
 
 
@@ -121,11 +107,10 @@ Ovoid.Queuer._dcamera = new Ovoid.Camera('defaultCamera');
 
 
 /**
- * Queuer initialization.
- * <br>
- * <br>
- * Global initialization method. This methode is called once during the Ovoid 
- * library's main initalization. It should not be called a second time.
+ * Queuer initialization.<br><br>
+ * 
+ * Global initialization method. This methode is called once during the library 
+ * main initalization. It shouldn't be called a second time.
  * 
  * @see Ovoid.init
  *
@@ -291,10 +276,9 @@ Ovoid.Queuer._bodyZSortFunc = function(a, b) {
 
 
 /**
- * Reset Queuer.
- * <br>
- * <br>
- * Resets all Queuer's stacks to prepare for a new queuing process.
+ * Reset Queuer.<br><br>
+ * 
+ * Clears all stacks and prepare for a new queuing process.
  */
 Ovoid.Queuer.reset = function() {
 
@@ -307,15 +291,14 @@ Ovoid.Queuer.reset = function() {
 
 
 /**
- * Queue scene.
- * <br>
- * <br>
- * Refreshes and builds queues from the specified scene. Once done, the Queuer 
- * has filled its stacks needed for the drawing and physics solving process.
- * <br>
- * <br>
- * This is the global class's update method. This methode is automaticaly 
- * called at each main loop. It shoulds not be called manually.
+ * Queue scene.<br><br>
+ * 
+ * "Reads" the specified scene, updates all nodes and dependencies, 
+ * and then build a queue of all objects which must be drawn by 
+ * the Drawer, treated by the Solver, etc.<br><br>
+ * 
+ * This is the global class update. This method is automaticaly called each
+ * frame during the library main loop.
  *
  * @param {Scene} sc Scene object to build queues from, usualy the active scene.
  * 

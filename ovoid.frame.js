@@ -21,41 +21,38 @@
 /**
  * Frame global static class.
  *
- * @namespace Frame global class.
- * <br>
- * <br>
- * This class is a global static one, that means that it has no constructor and 
- * has only one instance. In the OvoiD.JS Library, global classes implements 
- * features for specific range of tasks. Global classes can be seen as several 
- * worker that accomplish their own job.
- * <br>
- * <br>
- * The Frame global class is the main OvoiD.JS Library's canvas frame manager. It 
- * provides all the methods that are directly related to the WebGL's canvas and
- * browser client area and screen.
- * <br>
- * <br>
- * <b>Frame modes</b>
- * <br>
+ * @namespace Frame global class.<br><br>
+ * 
+ * The Frame class implements a global frame/canvas manager. It is a global 
+ * static (namespace) class. The Frame class is typically used to defines or 
+ * retrieves frame attributes and define the frame behaviour according to the 
+ * client area.<br><br>
+ * 
+ * <blockcode>
+ * <codecomment>// Set our canvas to follow the full client area</codecomment>
+ * Ovoid.Frame.setMode(Ovoid.FRAME_FULL_CLIENT); <br>
+ * <codecomment>// Get the horizontal center of our frame in pixels</codecomment>
+ * var ScreenX = Ovoid.Frame.size.v[0];<br>
+ * var ScreenCenterX = ScreenX * 0.5;<br>
+ * </blockcode>
+ * 
+ * <b>Frame modes</b><br><br>
+ * 
  * Frame class allows to override and modify the HTML defined canvas's size and 
- * behaviour. Here is the current implemented frame modes:
- * <ul>
- * <li>FRAME_FIXED_SIZE</li>
- * Fixed size canvas. This frame mode defines a fixed size canvas. This is the 
- * standad default  canvas behaviour.
- * <br>
- * <br>
- * <li>FRAME_FULL_CLIENT</li>
+ * behaviour.<br><br>
+ * 
+ * <li><b>FRAME_FIXED_SIZE</b><br>
+ * Fixed size canvas. This frame mode defines a fixed size canvas.</li>
+ * 
+ * <li><b>FRAME_FULL_CLIENT</b><br>
  * Full client size canvas. This frame mode defines a variable size canvas 
- * according to the full browser's client area size.
- * <br>
- * <br>
- * <li>FRAME_FULL_SCREEN (Not yet implemented)</li>
+ * according to the full browser's client area size.</li>
+ * 
+ * <li><b>FRAME_FULL_SCREEN</b> (Not yet implemented)<br>
  * Full screen size. This frame mode defines a fixed canvas size according to
- * the full screen size. NOTE: This frame mode is not yet implemented.
- * <br>
- * <br>
+ * the full screen size. NOTE: This frame mode is not yet implemented.</li>
  * </ul>
+ * 
  */
 Ovoid.Frame = {};
 
@@ -135,11 +132,10 @@ Ovoid.Frame._handleScroll = function() {
 
 
 /**
- * Frame initialization.
- * <br>
- * <br>
- * Global initialization method. This methode is called once during the Ovoid 
- * library's main initalization. It should not be called a second time.
+ * Frame initialization.<br><br>
+ * 
+ * Global initialization method. This methode is called once during the library 
+ * main initalization. It shouldn't be called a second time.
  * 
  * @see Ovoid.init
  *
@@ -191,12 +187,11 @@ Ovoid.Frame.init = function(canvas) {
 
 
 /**
- * Frame update.
- * <br>
- * <br>
- * Global class's update method. This methode is automaticaly called at each
- * main loop and is dedicated to refresh class's internal data.
- * It shoulds not be called manually.
+ * Frame update.<br><br>
+ * 
+ * Global class update. This method is automaticaly called each
+ * frame during the library main loop and is dedicated to refresh internal data. 
+ * It shouldn't be called manually.
  */
 Ovoid.Frame.update = function() {
 
@@ -205,11 +200,10 @@ Ovoid.Frame.update = function() {
 
 
 /**
- * Set frame mode.
- * <br>
- * <br>
- * Sets or changes the current canvas frame mode according to the specified one.
- * The modification take effect immediately.
+ * Set frame mode.<br><br>
+ * 
+ * Sets or changes the current canvas frame mode according to the specified<br>
+ * symbolic constant. This takes effect immediately.
  *
  * @param {int} mode Frame mode. Can be one of the following symbolic constants:
  * <br>
@@ -242,11 +236,10 @@ Ovoid.Frame.setMode = function(mode) {
 
 
 /**
- * Resize frame.
- * <br>
- * <br>
- * Resize the frame's canvas according to the given value. This method take only
- * effect in the fixed size frame mode.
+ * Resize frame.<br><br>
+ * 
+ * Resize the canvas according to the specified width and height values. This 
+ * only takes effect in the fixed size frame mode.
  * 
  * @param {int} width Frame width.
  * @param {int} height Frame height.

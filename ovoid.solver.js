@@ -21,17 +21,11 @@
 /**
  * Solver global static class.
  *
- * @namespace Solver global class.
- * <br>
- * <br>
- * This class is a global static one, that means that it has no constructor and 
- * has only one instance. In the OvoiD.JS Library, global classes implements 
- * features for specific range of tasks. Global classes can be seen as several 
- * worker that accomplish their own job.
- * <br>
- * <br>
- * The Frame global class is the main OvoiD.JS Library's physics engine. It 
- * provides all the methods that are directly related to the physics simulation.
+ * @namespace Solver global class.<br><br>
+ * 
+ * The Solver class implements a physics engine. It is a global 
+ * static (namespace) class. The Solver class is an optionnal global class who
+ * enable the collision detection and reposes between rigid bodys.<br><br>
  */
 Ovoid.Solver = {};
 
@@ -67,11 +61,10 @@ Ovoid.Solver._tmpn = new Ovoid.Vector();
 
 
 /**
- * Solver initialization.
- * <br>
- * <br>
- * Global initialization method. This methode is called once during the Ovoid 
- * library's main initalization. It should not be called a second time.
+ * Solver initialization.<br><br>
+ * 
+ * Global initialization method. This methode is called once during the library 
+ * main initalization. It shouldn't be called a second time.
  * 
  * @see Ovoid.init
  *
@@ -1040,15 +1033,15 @@ Ovoid.Solver._solveContactsLr = function() {
 
 
 /**
- * Solve the physics queue.
- * <br>
- * <br>
- * Solves the current physic queue collisions and influences.
- * This function take no argument because it work directly with Ovoid.Queuer's
- * node stacks. This function should be called after an
- * <code>Ovoid.Queuer.QueueScene()</code> call. 
- * <br>
- * <br>
+ * Solve the physics queue.<br><br>
+ * 
+ * Checks the current Physics stack for collisions and applies the suitable 
+ * reponses for all of them.
+ * 
+ * This method does not takess argument because it work directly with 
+ * Ovoid.Queuer stacks. This function should be called after an
+ * <code>Ovoid.Queuer.QueueScene</code> call.<br><br>
+ * 
  * This methode is automaticaly called at each main loop. 
  * It shoulds not be called manually.
  * 

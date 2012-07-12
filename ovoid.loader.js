@@ -21,172 +21,169 @@
 /**
  * Loader global static class.
  *
- * @namespace Loader global class.
- * <br>
- * <br>
- * This class is a global static one, that means that it has no constructor and 
- * has only one instance. In the OvoiD.JS Library, global classes implements 
- * features for specific range of tasks. Global classes can be seen as several 
- * worker that accomplish their own job.
- * <br>
- * <br>
- * The Loader global class is the main OvoiD.JS Library's preloading manager. It 
- * provides all the methods that are directly related to the data preloading and
- * loading screen.
- * <br>
- * <br>
- * The Loader has two roles. The first is to preload data, the second is to 
- * provide a customisable "loading wait" screen.
- * <br>
- * <br>
- * <b>Why preloading</b>
- * <br>
- * Preloading data can appear heretic when all efforts (like asynchronous 
- * loading) are made to avoid this annoying "loading please wait" screen from 
- * the web. There some answers:
+ * @namespace Loader global class.<br><br>
+ * 
+ * The Input class implements external data loading and wait screen. It is a 
+ * global static (namespace) class. The Input class is typically used to 
+ * load external data an display a wait screen during library initialization. 
+ * The wait screen display is optionnal.<br><br>
+ * 
+ * <blockcode> <codecomment>// Create a new scene in global scope </codecomment><br>
+ * var myScene = new Ovoid.Scene("hello");<br>
+ * <codecomment>// The main() function will be launched at page loading </codecomment><br>
+ * function main() {<br>
+ * &nbsp;&nbsp;&nbsp; <codecomment>// Adds a DAE scene to the preloading stack</codecomment><br>
+ * &nbsp;&nbsp;&nbsp; Ovoid.Loader.includeCollada("myScene.dae", Ovoid.DAE_ALL_NODES, myScene, null, null);<br>
+ * &nbsp;&nbsp;&nbsp; <codecomment>// Initialize the library</codecomment><br>
+ * &nbsp;&nbsp;&nbsp; Ovoid.init("canvas");<br>
+ * } 
+ * </blockcode><br><br>
+ * 
+ * You are NOT forced to use the Loader class. All the external data can be 
+ * loaded "manualy" and selectively when you want by using the loadSource method 
+ * of the concerned nodes or objects.<br><br>
+ * 
+ * <b>Why preloading</b><br><br>
+ * 
+ * Preloading data with a wait screen may appear heretic when all efforts (like 
+ * asynchronous loading) are made to avoid this annoying wait screen. There some 
+ * answers:<br><br>
  * <ul>
  * <li>
- * Asynchronous loading don't solves everything. Suppose you have to load a 
- * scene, you HAVE to wait until the scene be loaded before displaying 
+ * <b>Asynchronous loading don't solves everything</b>. Suppose you have to load 
+ * a scene, you HAVE to wait until the scene be loaded before displaying 
  * something, asynchronously or not.
  * </li>
  * <li>
- * Asynchronous loading causes unaesthetic side effects. For example until 
- * textures are loaded, your textured objects appears with a defaut flat color 
- * and progressively show its textures  that causes a strange 
- * "unfinished" style.
+ * <b>Asynchronous loading causes unaesthetic side effects</b>. For example 
+ * until textures are fully loaded, your textured objects appears with a defaut 
+ * black color and progressively show its textures.
  * </li>
  * <li>
- * Finaly, this loader is optionnal, except for default shaders, you can load 
- * your data using the common available classes (Ovoid.Collada, Ovoid.Ojson, 
- * Ovoid.Texture, Ovoid.Audio) in paralel of this class. you can disable the
- * wait screen by setting the <code>Ovoid.Loader.opt_drawWaitScreen</code> 
- * option to false.
+ * <b>The wait screen is optionnal</b>. The wait screen can be disabled by 
+ * setting the <code>Ovoid.Loader.opt_drawWaitScreen</code> option to false.
  * </li>
  * </ul>
  * <b>Preloading stacks</b>
  * <br>
- * The Loader more or less works like online shopping. You order some things, 
- * your orders are added in the "to do" stacks, then when the application 
- * starts the loader delivers what you have orderd.
- * <br>
- * <br>
- * To add items to the preloading stack, you should use one of the dedicated 
- * methods. Note that these methodes DON'T launch any loading at all: the 
- * loading occurs during the main OvoiD.JS Library's initialization.
- * <br>
- * <br>
- * <b>Wait screen customization</b>
- * <br>
+ * The Loader is more or less used as an online market (this is a vulgar 
+ * comparison) : Before the library initialization, you say to Loader "I want 
+ * this stuff, this one, and this one", the loader stores your orders in its 
+ * preloading stacks, then during the library initialization, display a wait 
+ * screen and load what you have ordered. Once loading done, the library 
+ * automaticaly launchs the <code>Ovoid.onload</code> function to let you do 
+ * what you have to do before entering the main loop.<br><br>
+ * 
+ * <b>Wait screen customization</b><br><br>
+ * 
  * The wait screen is pretty simple and spartan. However you can customize it 
  * by changing (or removing) images, some texts, colours, or by adding a
- *  background image...You can edit these parameters by modifying the 
- * Loader's global options variables, also in the 
- * <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a> file.
+ * background image. You can edit these parameters by modifying the 
+ * Loader's global options variables, also in the <code>config.js</code> file.
  */
 Ovoid.Loader = {};
 
-/** loader option. Draw the Wait screen or let blank during loading process */
+/** Draw the Wait screen or let blank during loading process */
 Ovoid.Loader.opt_drawWaitScreen = true;
 
 
-/** loader option. Wait screen foreground (text) color */
+/** Wait screen foreground (text) color */
 Ovoid.Loader.opt_foregroundColor = [0.0, 0.0, 0.0, 0.6];
 
 
-/** loader option. Wait screen background color */
+/** Wait screen background color */
 Ovoid.Loader.opt_backgroundColor = [1.0, 1.0, 1.0, 1.0];
 
 
-/** loader option. Wait screen alternative fontmap source image URL */
+/** Wait screen alternative fontmap source image URL */
 Ovoid.Loader.opt_fontmapSrc = '';
 
 
-/** loader option. Wait screen background source image file */
+/** Wait screen background source image file */
 Ovoid.Loader.opt_backgroundSrc = '';
 
 
-/** loader option. Wait screen icons color */
+/** Wait screen icons color */
 Ovoid.Loader.opt_iconsColor = [1.0, 1.0, 1.0, 0.6];
 
 
-/** Loader option. Wait screen icons size */
+/** Wait screen icons size */
 Ovoid.Loader.opt_iconsSize = [32, 32];
 
 
-/** loader option. Wait screen icon scenes source image file */
+/** Wait screen icon scenes source image file */
 Ovoid.Loader.opt_iconscenesSrc = '';
 
 
-/** loader option. Wait screen icon scenes X and Y position */
+/** Wait screen icon scenes X and Y position */
 Ovoid.Loader.opt_iconscenesPos = [330, 270];
 
 
-/** loader option. Wait screen icon textures source image file */
+/** Wait screen icon textures source image file */
 Ovoid.Loader.opt_icontexturesSrc = '';
 
 
-/** loader option. Wait screen icon textures X and Y position */
+/** Wait screen icon textures X and Y position */
 Ovoid.Loader.opt_icontexturesPos = [370, 270];
 
 
-/** loader option. Wait screen icon audios source image file */
+/** Wait screen icon audios source image file */
 Ovoid.Loader.opt_iconaudiosSrc = '';
 
 
-/** loader option. Wait screen icon audios X and Y position */
+/** Wait screen icon audios X and Y position */
 Ovoid.Loader.opt_iconaudiosPos = [405, 270];
 
 
-/** loader option. Wait screen icon config source image file */
+/** Wait screen icon config source image file */
 Ovoid.Loader.opt_iconconfigSrc = '';
 
 
-/** loader option. Wait screen icon config X and Y position */
+/** Wait screen icon config X and Y position */
 Ovoid.Loader.opt_iconconfigPos = [436, 270];
 
 
-/** loader option. Wait screen loading cycle color */
+/** Wait screen loading cycle color */
 Ovoid.Loader.opt_loadcircleColor = [1.0, 1.0, 1.0, 0.5];
 
 
-/** loader option. Wait screen loading circle source image file */
+/** Wait screen loading circle source image file */
 Ovoid.Loader.opt_loadcircleSrc = '';
 
 
-/** loader option. Wait screen loading circle image size */
+/** Wait screen loading circle image size */
 Ovoid.Loader.opt_loadcircleSize = [64, 64];
 
 
-/** loader option. Wait screen loading circle X and Y position */
+/** Wait screen loading circle X and Y position */
 Ovoid.Loader.opt_loadcirclePos = [400, 230];
 
 
-/** loader option. Wait screen show or hide percentage */
+/** Wait screen show or hide percentage */
 Ovoid.Loader.opt_showPercentage = true;
 
 
-/** loader option. Wait screen percentage X, Y position and font size */
+/** Wait screen percentage X, Y position and font size */
 Ovoid.Loader.opt_percentageXys = [387, 224, 16];
 
 
-/** loader option. Wait screen show or hide title */
+/** Wait screen show or hide title */
 Ovoid.Loader.opt_showTitle = true;
 
 
-/** loader option. Wait screen title X, Y position and font size */
+/** Wait screen title X, Y position and font size */
 Ovoid.Loader.opt_titleXys = [387, 224, 16];
 
 
-/** loader option. Wait screen title string */
+/** Wait screen title string */
 Ovoid.Loader.opt_titleStr = 'Loading please wait...';
 
 
-/** loader option. Wait screen show or hide details */
+/** Wait screen show or hide details */
 Ovoid.Loader.opt_showDetails = true;
 
 
-/** loader option. Wait screen details X, Y position and font size */
+/** Wait screen details X, Y position and font size */
 Ovoid.Loader.opt_detailsXys = [387, 224, 16];
 
 
@@ -287,11 +284,10 @@ Ovoid.Loader._tcnt;
 
 
 /**
- * Loader initialization.
- * <br>
- * <br>
- * Global initialization method. This methode is called once during the Ovoid 
- * library's main initalization. It should not be called a second time.
+ * Loader initialization.<br><br>
+ * 
+ * Global initialization method. This methode is called once during the library 
+ * main initalization. It shouldn't be called a second time.
  * 
  * @see Ovoid.init
  *
@@ -759,16 +755,11 @@ Ovoid.Loader._launch = function() {
 
 
 /**
- * Include OJSON scene.
- * <br>
- * <br>
- * Includes an OJSON scene file to the preloading stacks. Note that this 
- * methode DON'T launch any loading at all: the loading occurs during the main 
- * OvoiD.JS Library's initialization.
- * <br>
- * <br>
- * For more information about OJSON format and OJSON importation see the 
- * <code>Ovoid.Ojson</code> class documentation.
+ * Include OJSON scene.<br><br>
+ * 
+ * Includes an OJSON scene file to the preloading stacks. 
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
  * 
  * @see Ovoid.Ojson
  *
@@ -799,16 +790,11 @@ Ovoid.Loader.includeOjson = function(url, scene) {
 
 
 /**
- * Include DAE scene.
- * <br>
- * <br>
- * Includes an COLLADA/DAE scene file to the preloading stacks. Note that this 
- * methode DON'T launch any loading at all: the loading occurs during the main 
- * OvoiD.JS Library's initialization.
- * <br>
- * <br>
- * For more information about COLLADA format and COLLADA importation see the 
- * <code>Ovoid.Collada</code> class documentation.
+ * Include DAE scene.<br><br>
+ * 
+ * Includes an COLLADA/DAE scene file to the preloading stacks. 
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
  *
  * @see Ovoid.Collada
  *
@@ -845,16 +831,11 @@ Ovoid.Loader.includeCollada = function(url, mask, scene, namespace, extension) {
 
 
 /**
- * Include texture.
- * <br>
- * <br>
- * Includes an image file (Texture object) to the preloading stacks. Note that 
- * this methode DON'T launch any loading at all: the loading occurs during the 
- * main OvoiD.JS Library's initialization.
- * <br>
- * <br>
- * For more information about Texture object and Texture loading see the 
- * <code>Ovoid.Texture</code> class documentation.
+ * Include texture.<br><br>
+ * 
+ * Includes an image file (Texture object) to the preloading stacks.  
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
  *
  * @see Ovoid.Texture
  *
@@ -873,16 +854,11 @@ Ovoid.Loader.includeTexture = function(texture, filter) {
 
 
 /**
- * Include audio.
- * <br>
- * <br>
- * Includes an audio file (Audio object) to the preloading stacks. Note that 
- * this methode DON'T launch any loading at all: the loading occurs during the 
- * main OvoiD.JS Library's initialization.
- * <br>
- * <br>
- * For more information about Audio object and Audio loading see the 
- * <code>Ovoid.Audio</code> class documentation.
+ * Include audio.<br><br>
+ * 
+ * Includes an audio file (Audio object) to the preloading stacks.  
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
  *
  * @see Ovoid.Audio
  * 
@@ -899,14 +875,12 @@ Ovoid.Loader.includeAudio = function(audio) {
 
 
 /**
- * Include GLSL shader.
- * <br>
- * <br>
- * Includes an GLSL shader program (Shader object) to the preloading stacks. 
- * Note that this methode DON'T launch any loading at all: the loading occurs 
- * during the main OvoiD.JS Library's initialization.
- * <br>
- * <br>
+ * Include GLSL shader.<br><br>
+ * 
+ * Includes an GLSL shader program (Shader object) to the preloading stacks.
+ * This methode don't launch any loading at all: the loading occurs during the
+ * main Library initialization.<br><br>
+ * 
  * @param {int} slot Symbolic constant for drawing pipeline. Can be -1 to
  * keep the sahder in the Drawer's stock without pluging it, or one of the 
  * following symbolic constants:
@@ -931,9 +905,6 @@ Ovoid.Loader.includeAudio = function(audio) {
  * the <code>Ovoid.opt_shadersPath</code> global option.
  * 
  * @param {string} name Optionnal shader name.
- * 
- * For more information about Audio object and Audio loading see the 
- * <code>Ovoid.Shader</code> class documentation.
  *
  * @see Ovoid.Shader
  * 

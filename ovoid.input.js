@@ -21,19 +21,32 @@
 /**
  * Input global static class.
  *
- * @namespace Input global class.
- * <br>
- * <br>
- * This class is a global static one, that means that it has no constructor and 
- * has only one instance. In the OvoiD.JS Library, global classes implements 
- * features for specific range of tasks. Global classes can be seen as several 
- * worker that accomplish their own job.
- * <br>
- * <br>
- * The Input global class is the main OvoiD.JS Library's inputs manager. It 
- * provides all the methods that are directly related to the mouse and
- * keyboard inputs events.
- * <br>
+ * @namespace Input global class.<br><br>
+ * 
+ * The Input class implements a global user inputs manager. It is a global 
+ * static (namespace) class. The Input class is typically both used to query 
+ * user input data and bind keys or buttons event to custom functions.<br><br>
+ * 
+ * <blockcode> <codecomment>// Check whether the keycode 14 is held</codecomment><br>
+ * if(Ovoid.Input.intHl[14]) {<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp; <codecomment>// Do something</codecomment><br>
+ * }<br>
+ * <codecomment>// Creates some key-binding </codecomment><br>
+ * <codecomment>// A function to rotate our camera in -X</codecomment><br>
+ * function lookright() {<br>
+ * &nbsp;&nbsp;Ovoid.Node("camera").rotateXyz(0.0, -0.05, 0.0);<br>
+ * };<br><br>
+ * 
+ * <codecomment>// A function to rotate our camera in X</codecomment><br>
+ * function lookleft() {<br>
+ * &nbsp;&nbsp;Ovoid.Node("camera").rotateXyz(0.0, 0.05, 0.0);<br>
+ * };<br><br>
+ * 
+ * <codecomment>// Define the input trigger to call lookright and lookleft functions</codecomment><br>
+ * Ovoid.Input.trigger(Ovoid.CTR_HELD, 39, Ovoid.HELD, lookright);<br>
+ * Ovoid.Input.trigger(Ovoid.CTR_HELD, Ovoid.KB_LARROW, Ovoid.HELD, lookleft);<br>
+ * </blockcode><br>
+ * 
  */
 Ovoid.Input = {};
 
@@ -219,11 +232,10 @@ Ovoid.Input._eventKeyUp = function(e) {
 
 
 /**
- * Input initialization.
- * <br>
- * <br>
- * Global initialization method. This methode is called once during the Ovoid 
- * library's main initalization. It should not be called a second time.
+ * Input initialization.<br><br>
+ * 
+ * Global initialization method. This methode is called once during the library 
+ * main initalization. It shouldn't be called a second time.
  * 
  * @see Ovoid.init
  *
@@ -250,12 +262,11 @@ Ovoid.Input.init = function() {
 
 
 /**
- * Input update.
- * <br>
- * <br>
- * Global class's update method. This methode is automaticaly called at each
- * main loop and is dedicated to refresh class's internal data.
- * It shoulds not be called manually.
+ * Input update.<br><br>
+ * 
+ * Global class update. This method is automaticaly called each
+ * frame during the library main loop and is dedicated to refresh internal data. 
+ * It shouldn't be called manually.
  */
 Ovoid.Input.update = function() {
 
@@ -322,37 +333,13 @@ Ovoid.Input.update = function() {
 
 
 /**
- * Define or modify an input trigger.
- * <br>
- * <br>
- * You can bind a key and/or mouse button combination to a specific function, 
- * so when the specified key/mouse combination happens, the function is called.
- * <br>
- * <br>
- * The combination is described by a main key event (down, up or held) with 
- * an optional modifier key held such as Control, Shift, Alt, Right Super or
- * Left Super.
- * <br>
- * Here is some examples:
- * <br>
- * <br>
- * <blockcode>
- * function lookright() {<br>
- * &nbsp;&nbsp;Ovoid.Node("camera").rotateXyz(0.0, -0.05, 0.0);<br>
- * };<br>
- * <br>
- * function lookleft() {<br>
- * &nbsp;&nbsp;Ovoid.Node("camera").rotateXyz(0.0, 0.05, 0.0);<br>
- * };<br>
- * <br>
- * Ovoid.Input.trigger(Ovoid.CTR_HELD, 39, Ovoid.HELD, lookright);<br>
- * Ovoid.Input.trigger(Ovoid.CTR_HELD, Ovoid.KB_LARROW, Ovoid.HELD, lookleft);<br>
- * </blockcode>
- * <br>
- * <br>
+ * Set or modify an input trigger.<br><br>
  * 
- * @param {enum} m Held key modifier, can be null or one of the following 
- * symbolic constants:<br>
+ * Sets or modifies an input combinaison who trigger a custom function. The 
+ * specified function will be called each time the input combinaison occur.
+ * 
+ * @param {enum} m Special Held key modifier, can be null or one of the 
+ * following symbolic constants:<br>
  * Ovoid.CTR_HELD,<br>
  * Ovoid.ALT_HELD,<br>
  * Ovoid.SHF_HELD,<br>
@@ -361,13 +348,13 @@ Ovoid.Input.update = function() {
  * 
  * @param {int} k Key/Mouse button numeric code, or one of the corresponding 
  * symbolic constants. The whole symbolic constants list is available in the
- * _global documentation page.
+ * _global_ documentation page.
  * 
- * @param {enum} s Key or button state, can be one of the following symbolic 
+ * @param {enum} s Key or button status, can be one of the following symbolic 
  * constants:<br>
- * Ovoid.UP,<br>
- * Ovoid.DOWN,<br>
- * Ovoid.HELD<br>
+ * Ovoid.UP (released),<br>
+ * Ovoid.DOWN (pressed),<br>
+ * Ovoid.HELD <br>
  * 
  * @param {Function} f Trigger function.
  * 
@@ -429,30 +416,27 @@ Ovoid.Input.trigger = function(m, s, k, f) {
 };
 
 /**
- * Grab node.
- * <br>
- * <br>
- * Grabs the specified node.
- * <br>
- * <br>
- * <b>Grabbing node</b>
- * <br>
- * The "node-grabbing" 
- * consists in focusing on a node while ignoring  events of others nodes. 
- * <br>
- * To understand, suppose you want to rotate a node by moving the mouse while
- * you maintain the left button pressed. While you move your mouse pointer to 
- * rotate the object, the pointer will leave the node's region, resulting the 
- * event stop, since the mouse now roll over another node. 
- * <br>
- * The "node-grabbing" prevents the side effects by forcing to focus on the 
- * grabbed node and to ignore the others. You also have to "release" the 
- * node when you want to restore the normal event dispatching.
- * <br>
- * <br>
+ * Grab node.<br><br>
+ * 
+ * Grabs the specified node.<br><br>
+ * 
+ * <b>Node Grabbing</b><br><br>
+ * 
+ * Node-grabbing consists in focusing on a node while ignoring events of 
+ * other nodes.<br><br>
+ * 
+ * Suppose you want to rotate a node by moving the mouse while you maintain the 
+ * left button pressed. While you move your mouse pointer to rotate the object, 
+ * the pointer should leave the node's region, resulting that the trigger 
+ * function stops, since the mouse now rolls over another node (or the 
+ * background).<br><br>
+ * 
+ * The "node-grabbing" prevents this kind of side effects by forcing to focus on 
+ * the grabbed node while ignoring the others. You also must release the grabbed 
+ * node to return in the normal interaction behaviour.<br><br>
+ * 
  * For more information about node-grabbing usage, see the 
  * <code>Ovoid.Action</code> node documentation page.
- * 
  * 
  * @param {Node} node Node object to be grabbed.
 */
@@ -462,32 +446,27 @@ Ovoid.Input.grabNode = function(node) {
 };
 
 /**
- * Release grab.
- * <br>
- * <br>
- * Releases the current grabbed node and restores the normal event dispatching.
- * <br>
- * <br>
- * <b>Grabbing node</b>
- * <br>
- * The "node-grabbing" 
- * consists in focusing on a node while ignoring  events of others nodes. 
- * <br>
- * To understand, suppose you want to rotate a node by moving the mouse while
- * you maintain the left button pressed. While you move your mouse pointer to 
- * rotate the object, the pointer will leave the node's region, resulting the 
- * event stop, since the mouse now roll over another node. 
- * <br>
- * The "node-grabbing" prevents the side effects by forcing to focus on the 
- * grabbed node and to ignore the others. You also have to "release" the 
- * node when you want to restore the normal event dispatching.
- * <br>
- * <br>
+ * Release grab.<br><br>
+ * 
+ * Releases the current grabbed node and restores the normal event dispatching.<br><br>
+ * 
+ * <b>Node Grabbing</b><br><br>
+ * 
+ * Node-grabbing consists in focusing on a node while ignoring events of 
+ * other nodes.<br><br>
+ * 
+ * Suppose you want to rotate a node by moving the mouse while you maintain the 
+ * left button pressed. While you move your mouse pointer to rotate the object, 
+ * the pointer should leave the node's region, resulting that the trigger 
+ * function stops, since the mouse now rolls over another node (or the 
+ * background).<br><br>
+ * 
+ * The "node-grabbing" prevents this kind of side effects by forcing to focus on 
+ * the grabbed node while ignoring the others. You also must release the grabbed 
+ * node to return in the normal interaction behaviour.<br><br>
+ * 
  * For more information about node-grabbing usage, see the 
  * <code>Ovoid.Action</code> node documentation page.
- * 
- * 
- * Release the current grabbed node.
  */
 Ovoid.Input.grabRelease = function() {
 
