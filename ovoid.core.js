@@ -539,13 +539,13 @@ Ovoid._mainloop = function() {
     
     /* USER CUSTOM LOOP FUNC */
     Ovoid.onloop();
+      
+    /* QUEUE STACK */
+    Ovoid.Queuer.queueScene(Ovoid.rscene);
     
     /* SOLVE PHYSICS QUEUE */
     if(Ovoid.Solver != undefined)   
       Ovoid.Solver.solveQueue();
-      
-    /* QUEUE STACK */
-    Ovoid.Queuer.queueScene(Ovoid.rscene);
     
     /* DRAW QUEUE */
     Ovoid.Drawer.drawQueue();
