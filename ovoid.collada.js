@@ -183,7 +183,7 @@
  * successive COLLADA importations which can cause name collision or simply 
  * confusing scene. This notably allows to use the searchMatches method of the 
  * Scene object to retrieve all nodes who contains the specified prefix or 
- * suffix in their name.
+ * suffix in their name.<br><br>
  * 
  * <blockcode>
  * var group1 = scene.searchMatches("group1.");<br>

@@ -22,9 +22,9 @@
 /**
  * Create a Quaternion object.
  *
- * @class Quaternion object.
+ * @class Quaternion object.<br><br>
  * 
- * <br><br>This class provides an implementation of a quaternion.
+ * This class provides an implementation of a quaternion.
  *
  * @param {float} x The X quaternion component.
  * @param {float} y The Y quaternion component.
@@ -41,9 +41,9 @@ Ovoid.Quaternion = function(x, y, z, w) {
 
 
 /**
- * Component assigment.
+ * Component assigment.<br><br>
  *
- * <br><br>Sets the values of the Quaternion components using the specified values.
+ * Sets the values of the Quaternion components using the specified values.
  * 
  * @param {float} x The X quaternion component.
  * @param {float} y The Y quaternion component.
@@ -57,9 +57,9 @@ Ovoid.Quaternion.prototype.set = function(x, y, z, w) {
 
 
 /**
- * Component assigment.
+ * Component assigment from array.<br><br>
  * 
- * <br><br>Sets the values of the Quaternion components using the specified array.
+ * Sets the values of the Quaternion components using the specified array.
  *
  * @param {float[]} a Float Array with x, y, z and w components.
  */
@@ -70,9 +70,9 @@ Ovoid.Quaternion.prototype.setv = function(a) {
 
 
 /**
- * Copy method.
+ * Copy method.<br><br>
  *
- * <br><br>Copies a Quaternion.
+ * Copies a Quaternion.
  * 
  * @param {Quaternion} quat The Quaternion object to copy.
  */
@@ -83,9 +83,9 @@ Ovoid.Quaternion.prototype.copy = function(quat) {
 
 
 /**
- * In place multiplication.
+ * In place multiplication.<br><br>
  * 
- * <br><br>Sets this instance to the result of the multiplication of this instance by an 
+ * Sets this instance to the result of the multiplication of this instance by an 
  * other one.
  *
  * @param {Quaternion} quat The Quaternion object to be multiplied with this.
@@ -120,9 +120,9 @@ Ovoid.Quaternion.prototype.multBy = function(quat) {
 
 
 /**
- * In place multiplication.
+ * In place multiplication.<br><br>
  * 
- * <br><br>Sets this instance to the result of the multiplication of this instance by 
+ * Sets this instance to the result of the multiplication of this instance by 
  * the specified quaternion component values.
  *
  * @param {float} x The X quaternion component.
@@ -152,9 +152,9 @@ Ovoid.Quaternion.prototype.multByXyzw = function(x, y, z, w) {
 
 
 /**
- * Operation result assignment.
+ * Multiplication result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the multiplication of two others.
+ * Sets this instance to the result of the multiplication of two others.
  *
  * @param {Quaternion} a Left operand of the operation.
  * @param {Quaternion} b Right operand of the operation.
@@ -184,9 +184,9 @@ Ovoid.Quaternion.prototype.multOf = function(a, b) {
 
 
 /**
- * In place swapped multiplication.
+ * In place swapped multiplication.<br><br>
  * 
- * <br><br>Sets this instance to the result of the multiplication of the specified 
+ * Sets this instance to the result of the multiplication of the specified 
  * Quaternion by this instance (The left operand become the right operand and
  * vice versa).
  * 
@@ -226,9 +226,9 @@ Ovoid.Quaternion.prototype.multSwapBy = function(quat) {
 
 
 /**
- * In place swapped multiplication.
+ * In place swapped multiplication.<br><br>
  * 
- * <br><br>Sets this instance to the result of the multiplication of the specified 
+ * Sets this instance to the result of the multiplication of the specified 
  * quaternion component values by this instance (The left operand become the 
  * right operand and vice versa).
  *
@@ -263,9 +263,9 @@ Ovoid.Quaternion.prototype.multSwapByXyz = function(x, y, z, w) {
 
 
 /**
- * In place rotation.
+ * In place rotation by Euler.<br><br>
  * 
- * <br><br>Sets this instance to the result of the rotation of this instance by the 
+ * Sets this instance to the result of the rotation of this instance by the 
  * specified Euler object.
  * 
  * @param {Euler} euler Euler object to rotate this.
@@ -313,9 +313,9 @@ Ovoid.Quaternion.prototype.rotateBy = function(euler) {
 
 
 /**
- * In place rotation.
+ * In place rotation by euler angles.<br><br>
  * 
- * <br><br>Sets this instance to the result of the rotation of this instance by the 
+ * Sets this instance to the result of the rotation of this instance by the 
  * specified euler angles.
  *
  * @param {float} rx The X Euler component.
@@ -364,9 +364,9 @@ Ovoid.Quaternion.prototype.rotateByXyz = function(rx, ry, rz) {
 
 
 /** 
- * In place swapped rotation.
+ * In place swapped rotation by Euler.<br><br>
  * 
- * <br><br>Sets this instance to the quaternion result of the rotation of the specified 
+ * Sets this instance to the quaternion result of the rotation of the specified 
  * Euler object by this instance (The left operand become the right operand and 
  * vice versa).
  * 
@@ -413,9 +413,9 @@ Ovoid.Quaternion.prototype.rotateSwapBy = function(euler) {
 
 
 /**
- * In place swapped rotation.
+ * In place swapped rotation by euler angles.<br><br>
  * 
- * <br><br>Sets this instance to the quaternion result of the rotation of the specified 
+ * Sets this instance to the quaternion result of the rotation of the specified 
  * euler angles by this instance (The left operand become the right operand and 
  * vice versa).
  * 
@@ -462,9 +462,9 @@ Ovoid.Quaternion.prototype.rotateSwapByXyz = function(rx, ry, rz) {
 
 
 /**
- * In place vector rotation.
+ * In place rotation by Vector.<br><br>
  * 
- * <br><br>Sets this instance to the result of the rotation of this instance along the
+ * Sets this instance to the result of the rotation of this instance along the
  * specified axis-angle vector.
  *
  * @param {Object} vect Axis-angle Vector to rotate this.
@@ -501,9 +501,9 @@ Ovoid.Quaternion.prototype.vectorRotateBy = function(vect) {
 
 
 /**
- * In place vector swapped rotation.
+ * In place swapped rotation by Vector.<br><br>
  * 
- * <br><br>Sets this instance to the result of the rotation of the specified axis-angle 
+ * Sets this instance to the result of the rotation of the specified axis-angle 
  * Vector by this instance.
  *
  * @param {Object} vect Axis-angle Vector to rotate.
@@ -540,9 +540,9 @@ Ovoid.Quaternion.prototype.vectorRotateSwapBy = function(vect) {
 
 
 /**
- * In place normalization.
+ * In place normalization.<br><br>
  * 
- * <br><br>Sets this instance to its normalized.
+ * Sets this instance to its normalized.
  */
 Ovoid.Quaternion.prototype.normalize = function() {
 
@@ -560,9 +560,9 @@ Ovoid.Quaternion.prototype.normalize = function() {
 
 
 /**
- * Component assigment from Euler.
+ * Component assigment from Euler.<br><br>
  * 
- * <br><br>Sets this instance's components according to the given Euler object rotation.
+ * Sets this instance's components according to the given Euler object rotation.
  *
  * @param {Euler} euler Euler object.
  */
@@ -591,9 +591,9 @@ Ovoid.Quaternion.prototype.fromEuler = function(euler) {
 
 
 /**
- * Component assigment from euler angles.
+ * Component assigment from euler angles.<br><br>
  * 
- * <br><br>Sets this instance's components according to the given euler angles.
+ * Sets this instance's components according to the given euler angles.
  *
  * @param {float} rx The X Euler component to set from.
  * @param {float} ry The Y Euler component to set from.
@@ -623,9 +623,9 @@ Ovoid.Quaternion.prototype.fromEulerXyz = function(rx, ry, rz) {
 
 
 /**
- * Component assigment from 4x4 matrix.
+ * Component assigment from 4x4 matrix.<br><br>
  * 
- * <br><br>Sets this instance's components according to the given 4x4 
+ * Sets this instance's components according to the given 4x4 
  * transformation matrix.
  *
  * @param {Matrix4} mat Matrix4 object.
@@ -684,9 +684,9 @@ Ovoid.Quaternion.prototype.fromMat4 = function(mat) {
 
 
 /**
- * Component conversion to Matrix4.
+ * Component conversion to Matrix4.<br><br>
  * 
- * <br><br>Convert this quaternion instance to a 4x4 transformation matrix with
+ * Convert this quaternion instance to a 4x4 transformation matrix with
  * rotation.
  *
  * @return {Matrix4} Transformation matrix with rotation.

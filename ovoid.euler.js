@@ -22,9 +22,9 @@
 /**
  * Create an Euler object.
  *
- * @class Euler angle rotation object.
+ * @class Euler angle rotation object.<br><br>
  * 
- * <br><br>This class provides methods for working with euler angle rotations.
+ * This class provides methods for working with euler angle rotations.
  *
  * @param {float} x The X component.
  * @param {float} y The Y component.
@@ -40,9 +40,9 @@ Ovoid.Euler = function(x, y, z) {
 
 
 /**
- * Component assigment.
+ * Component assigment.<br><br>
  *
- * <br><br>Sets the values of the Coord components using the specified values.
+ * Sets the values of the Coord components using the specified values.
  * 
  * @param {float} x The X angle component.
  * @param {float} y The Y angle component.
@@ -55,9 +55,9 @@ Ovoid.Euler.prototype.set = function(x, y, z) {
 
 
 /**
- * Component assigment.
+ * Component assigment from array.<br><br>
  * 
- * <br><br>Sets the values of the Coord components using the specified array.
+ * Sets the values of the Coord components using the specified array.
  *
  * @param {float[]} a Float Array with x, y and z components.
  */
@@ -68,9 +68,9 @@ Ovoid.Euler.prototype.setv = function(a) {
 
 
 /**
- * Copy method.
+ * Copy method.<br><br>
  *
- * <br><br>Copies an Euler.
+ * Copies an Euler.
  *
  * @param {Euler} euler The Euler Object to copy.
  */
@@ -83,9 +83,9 @@ Ovoid.Euler.prototype.copy = function(euler) {
 
 
 /**
- * In place addition.
+ * In place addition.<br><br>
  * 
- * <br><br>Sets this instance to the result of the addition of this instance by an 
+ * Sets this instance to the result of the addition of this instance by an 
  * other one.
  *
  * @param {Object} euler The Euler object to be added with this.
@@ -99,9 +99,9 @@ Ovoid.Euler.prototype.addBy = function(euler) {
 
 
 /**
- * In place addition.
+ * In place addition.<br><br>
  * 
- * <br><br>Sets this instance to the result of the addition of this instance by the 
+ * Sets this instance to the result of the addition of this instance by the 
  * specified x, y and z values.
  * 
  * @param {float} x The X angle component.
@@ -117,9 +117,9 @@ Ovoid.Euler.prototype.addByXyx = function(x, y, z) {
 
 
 /**
- * Component assigment from 3x3 matrix.
+ * Component assigment from 3x3 matrix.<br><br>
  * 
- * <br><br>Sets this instance according to the given 3x3 rotation matrix.
+ * Sets this instance according to the given 3x3 rotation matrix.
  *
  * @param {Matrix3} mat 3x3 rotation matrix.
  * 
@@ -141,9 +141,9 @@ Ovoid.Euler.prototype.fromMat3 = function(mat) {
 
 
 /**
- * Component assigment from 4x4 matrix.
+ * Component assigment from 4x4 matrix.<br><br>
  * 
- * <br><br>Sets this instance according to the given 4x4 transformation matrix.
+ * Sets this instance according to the given 4x4 transformation matrix.
  *
  * @param {Matrix4} mat 4x4 transformation matrix.
  * 
@@ -165,9 +165,9 @@ Ovoid.Euler.prototype.fromMat4 = function(mat) {
 
 
 /**
- * Component conversion to Matrix4.
+ * Component conversion to Matrix4.<br><br>
  * 
- * <br><br>Convert this euler instance to a 4x4 transformation matrix with
+ * Convert this euler instance to a 4x4 transformation matrix with
  * rotation.
  *
  * @return {Matrix4} Transformation matrix with rotation.
@@ -199,9 +199,8 @@ Ovoid.Euler.prototype.asMat4 = function() {
 
 
 /**
- * Component conversion to Quaternion.
- * <br>
- * <br>
+ * Component conversion to Quaternion.<br><br>
+ * 
  * Convert this euler instance to a Quaterion rotation.
  *
  * @return {Quaternion} Quaternion rotation.

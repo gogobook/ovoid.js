@@ -22,12 +22,10 @@
 /**
  * Create a Triangle object.
  *
- * @class Triangle face object.
- * <br>
- * <br>
+ * @class Triangle face object.<br><br>
+ * 
  * This class provides an implementation of a triangle face. The 
- * triangle face is defined by three vertices. This is one the main component
- * of Meshs.
+ * triangle face is mainly defined by three vertex indinces.
  * 
  * @see Ovoid.Mesh
  */
@@ -52,9 +50,9 @@ Ovoid.Triangle = function() {
 
 
 /**
- * Copy method.
+ * Copy method.<br><br>
  *
- * <br><br>Copies a triangle.
+ * Copies a triangle.
  * 
  * @param {Triangle} tri The Triangle object to copy.
  */
@@ -84,10 +82,10 @@ Ovoid.Triangle.newArray = function(count) {
 
 
 /**
- * Translate Triangles array in Uint16Array.
+ * Translate Triangles array in Uint16Array.<br><br>
  * 
- * <br><br>Translates the specified Triangle objects Array in an Uint16Array 
- * which can be used to fill GL Buffer Object (VBO).
+ * Translates the specified Triangles Array in Uint16Array 
+ * which can be used to fill Vertex Buffer Object (VBO).
  *
  * @param {Triangle[]} triangles Array of Triangle objects to translate.
  *

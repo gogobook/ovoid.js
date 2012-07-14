@@ -25,7 +25,7 @@
  * 
  * The Drawer class implements a WebGL rendering engine. It is a global 
  * static (namespace) class. The Drawer class is the main OvoiD.JS rendering 
- * engine. It provides all the methods that are directly related to the WebGL
+ * engine. It provides all the methods which are directly related to the WebGL
  * drawing pipeline.<br><br>
  * 
  * <b>Drawing Pipelines</b><br><br>
@@ -40,41 +40,41 @@
  * 
  * Flat color. Draws objets without shading nor lighting and only with a flat 
  * colours. The color is specified by an uniform. This drawing mode is used to 
- * draw the scene for the mouse Picking mecanism.</li>
+ * draw the scene for the mouse Picking mecanism.</li><br>
  * 
  * <li><b>Symbolic shapes pipeline</b> Ovoid.DRAWER_SP_VERTEX_COLOR<br><br>
  * 
  * Flat vertex color. Draws object without shading nor lighting and only with flat
  * colours using the vertices's color attribute. This drawing pipeline is used to
- * draw the symbolic shapes and object's helpers.</li>
+ * draw the symbolic shapes and object's helpers.</li><br>
  * 
  * <li><b>Z-Fail shadow casting pipeline</b> Ovoid.DRAWER_SP_1LIGHT<br><br>
  * 
  * Shading per-light passes. Draws objet with full shading and 
  * textures but with per-light drawing passes. This drawing pipeline is used to 
  * draw the scene for the Z-fail shadow casting which require a multi-passes 
- * drawing (one pass per light).</li>
+ * drawing (one pass per light).</li><br>
  * 
  * <li><b>Standard shading pipeline</b> Ovoid.DRAWER_SP_NLIGHT<br><br>
  * 
  * Shading N lights. Draws objet with full shading, textures and several light 
  * sources in one pass. This is the common and standard drawing pipeline.
- * (The built-in shader support up to eight light sources)</li>
+ * (The built-in shader support up to eight light sources)</li><br>
  * 
  * <li><b>Text dedicated pipeline</b> Ovoid.DRAWER_SP_TEXT<br><br>
  * 
  * Special text. Draws vertices in point-sprites mode according to a specific 
- * data storing to display texture mapped font text.</li>
+ * data storing to display texture mapped font text.</li><br>
  * 
  * <li><b>Layer dedicated pipeline</b> Ovoid.DRAWER_SP_LAYER<br><br>
  * 
  * Special layer. Draws a colored and/or textured sprite according to a specific
- * data storing to display overlays layers.</li>
+ * data storing to display overlays layers.</li><br>
  * 
  * <li><b>Particles pipeline</b> Ovoid.DRAWER_SP_PARTICLES<br><br>
  * 
  * Particles. Draws vertices in point-sprites mode with color and texture. This
- * drawing pipeline is used to draw particles.</li>
+ * drawing pipeline is used to draw particles.</li><br>
  * </ul><br><br>
  * 
  * <b>Custom Shaders</b><br><br>

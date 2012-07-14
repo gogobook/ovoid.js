@@ -22,9 +22,8 @@
 /**
  * Create a Particle object.
  * 
- * @class Particle object.
- * <br>
- * <br>
+ * @class Particle object.<br><br>
+ * 
  * This class provides an implementation of a particle. Particles are
  * used by the <code>Ovoid.Emitter</code> class.
  * 
@@ -51,6 +50,30 @@ Ovoid.Particle = function() {
 
 
 /**
+ * Copy components in buffer.<br><br>
+ * 
+ * Copies Particle components in the given Float32Array at the specified index.
+ *
+ * @param {Float32Array} buffer Float32Array buffer.
+ * @param {int} at Index to copies components in the buffer.
+ */
+Ovoid.Particle.prototype.bufferCopy = function(buffer, at) {
+
+    buffer[at] = this.p.v[0]; at++;
+    buffer[at] = this.p.v[1]; at++;
+    buffer[at] = this.p.v[2]; at++;
+    buffer[at] = 1.0; at++;
+    buffer[at] = this.u.v[0]; at++;
+    buffer[at] = this.u.v[1]; at++;
+    buffer[at] = this.u.v[2]; at++;
+    buffer[at] = this.c.v[0]; at++;
+    buffer[at] = this.c.v[1]; at++;
+    buffer[at] = this.c.v[2]; at++;
+    buffer[at] = this.c.v[3]; at++;
+};
+
+
+/**
  * Create a new array of Particles.
  *
  * @param {int} count Size of the new array.
@@ -66,10 +89,10 @@ Ovoid.Particle.newArray = function(count) {
 
 
 /**
- * Translate Particles array in Float32Array.
+ * Translate Particles array in Float32Array.<br><br>
  * 
- * <br><br>Translates the specified Particle objects Array in an Float32Array 
- * which can be used to fill GL Buffer Object (VBO).
+ * Translates the specified Particles Array in Float32Array 
+ * which can be used to fill Vertex Buffer Object (VBO).
  *
  * @param {Particle[]} particles Array of Particle objects to translate.
  *

@@ -39,19 +39,19 @@
  * } 
  * </blockcode><br><br>
  * 
- * You are NOT forced to use the Loader class. All the external data can be 
- * loaded "manualy" and selectively when you want by using the loadSource method 
- * of the concerned nodes or objects.<br><br>
+ * You are not forced to use the Loader class. All external data can be 
+ * manualy and selectively loaded at any time using the <code>loadSource</code>
+ * method of the concerned nodes or objects.<br><br>
  * 
  * <b>Why preloading</b><br><br>
  * 
  * Preloading data with a wait screen may appear heretic when all efforts (like 
- * asynchronous loading) are made to avoid this annoying wait screen. There some 
- * answers:<br><br>
+ * asynchronous loading) are made to avoid this annoying wait screen. There is 
+ * some answers:<br><br>
  * <ul>
  * <li>
  * <b>Asynchronous loading don't solves everything</b>. Suppose you have to load 
- * a scene, you HAVE to wait until the scene be loaded before displaying 
+ * a scene, you HAVE to wait until load finished before displaying 
  * something, asynchronously or not.
  * </li>
  * <li>
@@ -64,15 +64,14 @@
  * setting the <code>Ovoid.Loader.opt_drawWaitScreen</code> option to false.
  * </li>
  * </ul>
- * <b>Preloading stacks</b>
- * <br>
- * The Loader is more or less used as an online market (this is a vulgar 
- * comparison) : Before the library initialization, you say to Loader "I want 
- * this stuff, this one, and this one", the loader stores your orders in its 
- * preloading stacks, then during the library initialization, display a wait 
- * screen and load what you have ordered. Once loading done, the library 
- * automaticaly launchs the <code>Ovoid.onload</code> function to let you do 
- * what you have to do before entering the main loop.<br><br>
+ * 
+ * <b>Preloading stacks</b><br><br>
+ * 
+ * The Loader use a stacks mecanism to store loading requests and load the 
+ * requested external data. Once a loading request is added to the preloading 
+ * stack, loading does not begin until the main library initialize. This 
+ * behaviours also imply that loading requests must occur before the library 
+ * initialization (<code>Ovoid.init</code>).<br><br>
  * 
  * <b>Wait screen customization</b><br><br>
  * 

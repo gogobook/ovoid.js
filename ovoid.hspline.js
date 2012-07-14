@@ -22,16 +22,9 @@
 /**
  * Create a new hermite curve object.
  *
- * @class Hermite Interpolated curve object.
- * <br>
- * <br>
- * This class provides an implementation of a Cosine interpolated curve. 
- * Curves are used by Animation nodes as a description of the motion as a value 
- * variation along a time line.
- * <br>
- * <br>
- * The Hermite curve object use the hermite algorythme to interpolate
- * the keyframed values.
+ * @class Hermite Interpolated curve object.<br><br>
+ * 
+ * This class provides an implementation of a Hermite interpolation curve. 
  * 
  * @see Ovoid.Animation
  * 
@@ -67,9 +60,9 @@ Ovoid.Hspline = function(x, y, v) {
 
 
 /**
- * Place the time cursor to the begining.
+ * Place the time cursor to the begining.<br><br>
  *
- * <br><br>Place the curve's time cursor to the begining plus the given offset value, 
+ * Place the curve's time cursor to the begining plus the given offset value, 
  * and interpolate data according to the given interpolation option.
  * 
  * @param {bool} xerp Interpolation flag. Tell to use the linear or hermite 
@@ -99,9 +92,9 @@ Ovoid.Hspline.prototype.seekStart = function(xerp, offset) {
 
 
 /**
- * Place the time cursor to the end.
+ * Place the time cursor to the end.<br><br>
  *
- * <br><br>Place the curve's time cursor to the end minus the given offset value, 
+ * Place the curve's time cursor to the end minus the given offset value, 
  * and interpolate data according to the given interpolation option.
  * 
  * @param {bool} xerp Interpolation flag. Tell to use the linear or hermite 
@@ -131,9 +124,9 @@ Ovoid.Hspline.prototype.seekEnd = function(xerp, offset) {
 
 
 /**
- * Move the time cursor forward.
+ * Move the time cursor forward.<br><br>
  *
- * <br><br>Move the curve's time cursor forward according the given time offset, 
+ * Move the curve's time cursor forward according the given time offset, 
  * and interpolate data according to the given interpolation option.
  * 
  * @param {bool} xerp Interpolation flag. Tell to use the linear or hermite 
@@ -177,9 +170,9 @@ Ovoid.Hspline.prototype.seekForward = function(xerp, seconds) {
 
 
 /**
- * Move the time cursor backward.
+ * Move the time cursor backward.<br><br>
  *
- * <br><br>Move the curve's time cursor backward according the given time offset, 
+ * Move the curve's time cursor backward according the given time offset, 
  * and interpolate data according to the given interpolation option.
  * 
  * @param {bool} xerp Interpolation flag. Tell to use the linear or hermite 
@@ -223,9 +216,9 @@ Ovoid.Hspline.prototype.seekBackward = function(xerp, seconds) {
 
 
 /**
- * Get interpolated value.
+ * Get interpolated value.<br><br>
  * 
- * <br><br>Get the interpolated value at the current curve's time cursor according to 
+ * Get the interpolated value at the current curve's time cursor according to 
  * the given interpolation option.
  *
  * @param {bool} xerp Interpolation flag. Tell to use the linear or hermite 

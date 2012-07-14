@@ -48,7 +48,7 @@
  * To make the concept more understandable, think that Body nodes are like 
  * invisible spirits without shape floating in the 3D world. To make a visible 
  * spirit, you have to give it a shape. You can assign the same shape node to 
- * several Body nodes in the same scene, than you obtain several identical 
+ * several Body nodes in the same scene, then you obtain several identical 
  * shapes with different transformations (rotation, position, etc...).<br><br>
  * 
  * @see Ovoid.Body
@@ -251,6 +251,7 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
           body = this.link[i];
       }
     }
+    var n;
   }
   
   if (this._alives != 0 || NB != 0) {
@@ -338,10 +339,8 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         U.v[2] = this.size[1]+((this.size[0]-this.size[1])*L);
             
         /* Ajout de la particule au buffer */
-        this._fbuffer.set(this._particles[i].p.v, (this._alives * 11));
-        this._fbuffer.set(this._particles[i].u.v, (this._alives * 11) + 4);
-        this._fbuffer.set(this._particles[i].c.v, (this._alives * 11) + 7);
-        
+        this._particles[i].bufferCopy(this._fbuffer, this._alives * 11);
+
         // Une particule vivante en plus
         this._alives++;
 
@@ -414,6 +413,9 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
             U.set(0.0,1.0,this.size[0]);
             // Couleur de la particle
             C.copy(this.color[0]);
+            
+            /* Ajout de la particule au buffer */
+            this._particles[i].bufferCopy(this._fbuffer, this._alives * 11);
             // Alives en plus
             this._alives++
             // Nombre de particule a cree --

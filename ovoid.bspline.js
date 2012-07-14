@@ -22,16 +22,9 @@
 /**
  * Create a new bezier curve object.
  *
- * @class Bezier Interpolated curve object.
- * <br>
- * <br>
- * This class provides an implementation of a bezier interpolated curve. Curves
- * are used by Animation nodes as a description of the motion as a value 
- * variation along a time line.
- * <br>
- * <br>
- * The bezier curve object use the bezier algorythme to interpolate
- * the keyframed values.
+ * @class Bezier Interpolated curve object.<br><br>
+ * 
+ * This class provides an implementation of a Bezier interpolation curve.
  * 
  * @see Ovoid.Animation
  *
@@ -113,7 +106,7 @@ Ovoid.Bspline = function(x, y, cx, cy) {
 
 
 /**
- * Place the time cursor to the begining.
+ * Place the time cursor to the begining.<br><br>
  *
  * Place the curve's time cursor to the begining plus the given offset value, 
  * and interpolate data according to the given interpolation option.
@@ -157,7 +150,7 @@ Ovoid.Bspline.prototype.seekStart = function(xerp, offset) {
 
 
 /**
- * Place the time cursor to the end.
+ * Place the time cursor to the end.<br><br>
  *
  * Place the curve's time cursor to the end minus the given offset value, 
  * and interpolate data according to the given interpolation option.
@@ -201,7 +194,7 @@ Ovoid.Bspline.prototype.seekEnd = function(xerp, offset) {
 
 
 /**
- * Move the time cursor forward.
+ * Move the time cursor forward.<br><br>
  *
  * Move the curve's time cursor forward according the given time offset, 
  * and interpolate data according to the given interpolation option.
@@ -252,7 +245,7 @@ Ovoid.Bspline.prototype.seekForward = function(xerp, seconds) {
 
 
 /**
- * Move the time cursor backward.
+ * Move the time cursor backward.<br><br>
  *
  * Move the curve's time cursor backward according the given time offset, 
  * and interpolate data according to the given interpolation option.
@@ -302,7 +295,7 @@ Ovoid.Bspline.prototype.seekBackward = function(xerp, seconds) {
 
 
 /**
- * Get interpolated value.
+ * Get interpolated value.<br><br>
  * 
  * Get the interpolated value at the current curve's time cursor according to 
  * the given interpolation option.

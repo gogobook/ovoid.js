@@ -22,9 +22,8 @@
 /**
  * Bounding sphere object constructor.
  *
- * @class Bounding sphere object.
- * <br>
- * <br>
+ * @class Bounding sphere object.<br><br>
+ * 
  * This class provides an implementation of a bounding sphere. A bounding sphere 
  * describes a volume in space that bounds a piece of geometry. 
  * The sphere is defined by its radius.
@@ -48,9 +47,11 @@ Ovoid.Boundingsphere = function() {
 
 
 /**
- * Copy from another.
+ * Copy method.<br><br>
+ * 
+ * Copies a bounding sphere.
  *
- * @param {Boundingsphere} sphere Bounding sphere to copy from.
+ * @param {Boundingsphere} sphere Bounding sphere to be copied.
  */
 Ovoid.Boundingsphere.prototype.copy = function(bsphere) {
 
@@ -61,7 +62,7 @@ Ovoid.Boundingsphere.prototype.copy = function(bsphere) {
 
 
 /**
- * Set the bounding sphere's size and proportions.
+ * Set volume bounds.<br><br>
  * 
  * Set or modify the bounding sphere's radius and relative center according 
  * to the given min point, max point and squared radius.
@@ -90,7 +91,7 @@ Ovoid.Boundingsphere.prototype.setBound = function(min, max, rad2) {
 
 
 /**
- * Set the bounding sphere's radius.
+ * Set radius.<br><br>
  * 
  * Set the bounding sphere's radius and squared radius according to the given
  * radius.
@@ -107,7 +108,7 @@ Ovoid.Boundingsphere.prototype.setRadius = function(rad) {
 
 
 /**
- * Transform the bounding sphere.
+ * Transform center.<br><br>
  * 
  * Transform the bounding sphere's world center according to the given 
  * 4x4 transformation matrix.

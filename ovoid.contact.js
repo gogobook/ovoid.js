@@ -22,13 +22,11 @@
 /**
  * Contact object constructor.
  *
- * @class Contact object.
+ * @class Contact object.<br><br>
  * 
- * <br><br>This class provides an implementation of a collision contact. 
- * A collision contact describes the collision's contact point parameters 
- * between two rigid bodys. This class is internally used by the 
- * <code>Ovoid.Solver</code> global class to solve collisions and responses. 
- * This class is private since it is useless outside the solver context.
+ * This class provides an implementation of a collision contact point with
+ * local space velocity and responses data. 
+ * 
  */
 Ovoid.Contact = function() {
   
@@ -84,7 +82,7 @@ Ovoid.Contact = function() {
 
 
 /**
- * Calculate desired delta velocity.
+ * Calculate desired delta velocity.<br><br>
  * 
  * @param {float} q Time delta to adjust physical parameters.
  */
@@ -112,9 +110,9 @@ Ovoid.Contact.prototype._solveDelta = function(q) {
 }
 
 /**
- * Initialize contact data.
+ * Initialize contact data.<br><br>
  * 
- * <br><br>Initialize the collision contact data between two rigid body.
+ * Initialize the collision contact data between two rigid body.
  * 
  * @param {Physics} b0 The first body involved in the contact.
  * @param {Physics} b1 The second body involved in the contact.
@@ -224,7 +222,7 @@ Ovoid.Contact.prototype.set = function(b0, b1, c, n, p, q) {
 };
 
 /**
- * Adjust bodys's position and rotation to resolve interpenetration.
+ * Adjust bodys's position and rotation to resolve interpenetration.<br><br>
  * 
  * @param {float} p Penetration offset.
  */
@@ -311,7 +309,7 @@ Ovoid.Contact.prototype._adjustPositions = function(p) {
 
 
 /**
- * Apply the bodys's collision responses.
+ * Apply the bodys's collision responses.<br><br>
  */
 Ovoid.Contact.prototype._applyImpulses = function() {
 

@@ -22,9 +22,9 @@
 /**
  * Create a color object.
  *
- * @class RGBA color object.
+ * @class RGBA color object.<br><br>
  * 
- * <br><br>This class is used to store values of color attributes.
+ * This class is used to store values of color attributes.
  *
  * @param {float} r The red component.
  * @param {float} g The green component.
@@ -41,9 +41,9 @@ Ovoid.Color = function(r, g, b, a) {
 
 
 /**
- * Component assigment.
+ * Component assigment.<br><br>
  *
- * <br><br>Sets the values of the color components using the specified values.
+ * Sets the values of the color components using the specified values.
  * 
  * @param {float} r The red component.
  * @param {float} g The green component.
@@ -57,9 +57,9 @@ Ovoid.Color.prototype.set = function(r, g, b, a) {
 
 
 /**
- * Component assigment.
+ * Component assigment from array.<br><br>
  * 
- * <br><br>Sets the values of the color components using the specified array.
+ * Sets the values of the color components using the specified array.
  *
  * @param {float[]} a Float Array with red, green, blue and alpha components.
  */
@@ -70,7 +70,7 @@ Ovoid.Color.prototype.setv = function(a) {
 
 
 /**
- * Copy method.
+ * Copy method.<br><br>
  *
  * Copies a color.
  * 
@@ -86,9 +86,9 @@ Ovoid.Color.prototype.copy = function(color) {
 
 
 /**
- * Equality test.
+ * Equality test.<br><br>
  * 
- * <br><br>Compares the red, green, blue and alpha components of two color.
+ * Compares the red, green, blue and alpha components of two color.
  *
  * @param {Color} color Color to which this color will be compared.
  *
@@ -104,9 +104,9 @@ Ovoid.Color.prototype.equal = function(color) {
 
 
 /**
- * Component conversion to integer.
+ * Component conversion to integer.<br><br>
  * 
- * <br><br>Convert the red, green and blue component into an RGB 24 bits integer 
+ * Convert the red, green and blue component into an RGB 24 bits integer 
  * representation.
  *
  * @return {int} The RGB 24 bits integer representation of this
@@ -121,9 +121,9 @@ Ovoid.Color.prototype.asInt = function() {
 
 
 /**
- * Component assigment from integer.
+ * Component assigment from integer.<br><br>
  * 
- * <br><br>Sets the values of the color components using the specified RGB 24 Bits 
+ * Sets the values of the color components using the specified RGB 24 Bits 
  * integer representation.
  *
  * @param {int} i RGB 24 bits integer value.

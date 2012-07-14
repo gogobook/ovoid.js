@@ -540,15 +540,15 @@ Ovoid._mainloop = function() {
     /* USER CUSTOM LOOP FUNC */
     Ovoid.onloop();
     
+    /* SOLVE PHYSICS QUEUE */
+    if(Ovoid.Solver != undefined)   
+      Ovoid.Solver.solveQueue();
+      
     /* QUEUE STACK */
     Ovoid.Queuer.queueScene(Ovoid.rscene);
     
     /* DRAW QUEUE */
     Ovoid.Drawer.drawQueue();
-    
-    /* SOLVE PHYSICS QUEUE */
-    if(Ovoid.Solver != undefined)   
-      Ovoid.Solver.solveQueue();
 
     /* DRAW HUD */
     if (Ovoid.opt_showHud) {
@@ -896,7 +896,7 @@ Ovoid.includeShader = function(slot, vs, fs, wm, name) {
 
 
 /**
- * Use scene as active.<br><br>
+ * Set active scene.<br><br>
  * 
  * In OvoiD.JS, a scene must be assigned to the global pipeline as active one in 
  * order to be treated by the Library mecanism.<br><br>
@@ -921,7 +921,7 @@ Ovoid.useScene = function(scene) {
 };
 
 /**
- * Use camera as active.<br><br>
+ * Set active camera.<br><br>
  * 
  * Sets the specified Camera node as active camera. It must be 
  * in the current active scene.<br><br>
@@ -962,7 +962,7 @@ Ovoid.cameraYaw = function(y) {
 /**
  * Adjust active camera pitch.<br><br>
  * 
- * Rotate the current active camera by the specified value in yaw axis.
+ * Rotate the current active camera by the specified value in pitch axis.
  * 
  * @param {float} x Pitch value.
  */
@@ -973,11 +973,11 @@ Ovoid.cameraPitch = function(x) {
 
 
 /**
- * Adjust active camera pitch.<br><br>
+ * Adjust active camera roll.<br><br>
  * 
- * Rotate the current active camera by the specified value in yaw axis.
+ * Rotate the current active camera by the specified value in roll axis.
  * 
- * @param {float} z Pitch value.
+ * @param {float} z Roll value.
  */
 Ovoid.cameraRoll = function(z) {
 
@@ -1016,7 +1016,7 @@ Ovoid.search = function(name) {
 
 
 /**
- * Search by matches.<br><br>
+ * Search nodes by matches.<br><br>
  * 
  * Search and returns one or more nodes from the current active scene whose name 
  * contains the specified string, or nodes whose type matches with the specified

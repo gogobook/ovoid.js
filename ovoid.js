@@ -18,11 +18,91 @@
  */
 
 
-/** Main namespace.
+/** OvoiD.JS main namespace.
  * 
- * @namespace Main namespace.
+ * @namespace OvoiD.JS main namespace.<br><br>
  * 
- * This si the main OvoiD.JS namespace. You'll find here all the top-level methods.
+ * The Ovoid namespace gathers all the global and top level options and methods.<br><br>
+ * 
+ * <b>Global Methods</b><br><br>
+ * 
+ * Global methods provides library's fundamental features:
+ * 
+ * <ul>
+ * <li><a href="#.init"><code>Ovoid.init</code></a> (Library main initialization)</li>
+ * <li><a href="#.onload"><code>Ovoid.onload</code></a> (Overridable onload method)</li>
+ * <li><a href="#.onloop"><code>Ovoid.onloop</code></a> (Overridable onloop method)</li>
+ * <li><a href="#.error"><code>Ovoid.error</code></a> (Display error)</li>
+ * <li><a href="#.log"><code>Ovoid.log</code></a> (Log message and write console)</li>
+ * <li><a href="#.getLog"><code>Ovoid.getLog</code></a> (Get the log string)</li>
+ * </ul>
+ * 
+ * <b>Utility Methods</b><br><br>
+ * 
+ * Utility methods are some small functions for common i/o or mathematical tasks:
+ * 
+ * <ul>
+ * <li><a href="#.deg2Rad"><code>Ovoid.deg2Rad</code></a> (Degrees to radians conversion)</li>
+ * <li><a href="#.rad2Deg"><code>Ovoid.rad2Deg</code></a> (Radians to degrees conversion)</li>
+ * <li><a href="#.isPowerOfTwo"><code>Ovoid.isPowerOfTwo</code></a> (Is power of two test)</li>
+ * <li><a href="#.noise"><code>Ovoid.noise</code></a> (Perlin noise value generator)</li>
+ * <li><a href="#.randInt"><code>Ovoid.randInt</code></a> (Get random integer)</li>
+ * <li><a href="#.randFloat"><code>Ovoid.randFloat</code></a> (Get random float)</li>
+ * <li><a href="#.getContent"><code>Ovoid.getContent</code></a> (Get file content)</li>
+ * <li><a href="#.getXml"><code>Ovoid.getXml</code></a> (Get file parsed XML content)</li>
+ * <li><a href="#.getJson"><code>Ovoid.getJson</code></a> (Get file parsed JSON content)</li>
+ * <li><a href="#.getBinary"><code>Ovoid.getBinary</code></a> (Get file binary content)</li>
+ * <li><a href="#.extractName"><code>Ovoid.extractName</code></a> (Exctract file name from url)</li>
+ * <li><a href="#.extractExt"><code>Ovoid.extractExt</code></a> (Exctract file extention from url)</li>
+ * <li><a href="#.frnd"><code>Ovoid.frnd</code></a> (Decimal round)</li>
+ * </ul>
+ * 
+ * <b>Top-Level Prealoading Methods</b><br><br>
+ * 
+ * Preloading methods are top-level shortcuts methods to facilitate external 
+ * content preloading. These methods mainly refere to the 
+ * <code>Ovoid.Loader</code> global class.
+ * 
+ * <ul>
+ * <li><a href="#.includeShader"><code>Ovoid.includeShader</code></a> (Include GLSL shader)</li>
+ * <li><a href="#.includeTexture"><code>Ovoid.includeTexture</code></a> (Include texture)</li>
+ * <li><a href="#.includeAudio"><code>Ovoid.includeAudio</code></a> (Include audio)</li>
+ * <li><a href="#.includeDaeMesh"><code>Ovoid.includeDaeMesh</code></a> (Include meshs from DAE scene)</li>
+ * <li><a href="#.includeDaeAnimation"><code>Ovoid.includeDaeAnimation</code></a> (Include animations from DAE scene)</li>
+ * <li><a href="#.includeDaeScene"><code>Ovoid.includeDaeScene</code></a> (Include DAE scene)</li>
+ * <li><a href="#.includeOjsScene"><code>Ovoid.includeOjsScene</code></a> (Include OJSON scene)</li>
+ * </ul>
+ * 
+ * <b>Top-Level Interface methods</b><br><br>
+ * 
+ * Interface methods are top-level shortcuts methods to facilitate the most 
+ * common tasks.
+ * 
+ * <ul>
+ * <li><a href="#.useScene"><code>Ovoid.useScene</code></a> (Set active scene)</li>
+ * <li><a href="#.useCamera"><code>Ovoid.useCamera</code></a> (Set active camera)</li>
+ * <li><a href="#.search"><code>Ovoid.search</code></a> (Search node)</li>
+ * <li><a href="#.searchMatches"><code>Ovoid.searchMatches</code></a> (Search nodes by matches)</li>
+ * <li><a href="#.cameraYaw"><code>Ovoid.cameraYaw</code></a> (Adjust active camera yaw)</li>
+ * <li><a href="#.cameraPitch"><code>Ovoid.cameraPitch</code></a> (Adjust active camera pitch)</li>
+ * <li><a href="#.cameraRoll"><code>Ovoid.cameraRoll</code></a> (Adjust active camera roll)</li>
+ * <li><a href="#.cameraDolly"><code>Ovoid.cameraDolly</code></a> (Adjust active camera dolly)</li>
+ * <li><a href="#.move"><code>Ovoid.move</code></a> (Move a Transform node)</li>
+ * <li><a href="#.rotate"><code>Ovoid.rotate</code></a> (Rotate a Transform node)</li>
+ * <li><a href="#.scale"><code>Ovoid.scale</code></a> (Scale a Transform node)</li>
+ * <li><a href="#.trackRewind"><code>Ovoid.trackRewind</code></a> (Rewind a Track node)</li>
+ * <li><a href="#.trackPlay"><code>Ovoid.trackPlay</code></a> (Play a Track node)</li>
+ * <li><a href="#.trackPause"><code>Ovoid.trackPause</code></a> (Pause a Track node)</li>
+ * <li><a href="#.soundRewind"><code>Ovoid.soundRewind</code></a> (Rewind a Sound node)</li>
+ * <li><a href="#.soundPlay"><code>Ovoid.soundPlay</code></a> (Play a Sound node)</li>
+ * <li><a href="#.soundPause"><code>Ovoid.soundPause</code></a> (Pause a Sound node)</li>
+ * <li><a href="#.inputTrigger"><code>Ovoid.inputTrigger</code></a> (Set or modify an input trigger)</li>
+ * <li><a href="#.setAction"><code>Ovoid.setAction</code></a> (Assign an Action node to one or several pickable nodes)</li>
+ * <li><a href="#.setConstraint"><code>Ovoid.setConstraint</code></a> (Assign Constraint nodes to one or several Transform nodes)</li>
+ * <li><a href="#.grabNode"><code>Ovoid.grabNode</code></a> (Grab node)</li>
+ * <li><a href="#.grabRelease"><code>Ovoid.grabRelease</code></a> (Release grab)</li>
+ * </ul>
+ * 
  */
 var Ovoid = {};
 
@@ -47,32 +127,21 @@ Ovoid._lwarning = 0;
 Ovoid._glerror = 0;
 
 
-/** Environment option.
- * Log verbosity level.
+/** 
+ * Log verbosity level.<br><br>
  * 
- * <br><br>Verbosity level correspond to log severity level, and are the following:
- * 0:Fatal error,
- * 1:Error,
- * 2:Warning,
- * 3:Comment 
- * 
- * <br><br>For example a value of 0 will log fatal errors only and a value of 3 will
- * log all of fatal errors, errors, warnings and comments. 
- * 
- * <br><br>Global Options are modifiables by definition, so for convenience, 
- * all of them are gathered in the ovoid.config.js file to allow you to do it.
- * @see <a href="/symbols/src/ovoid.config.js.html">ovoid.config.js</a>.
+ * Verbosity level correspond to log severity level, and are the following:<br><br>
+ * 0:Fatal error,<br>
+ * 1:Error,<br>
+ * 2:Warning,<br>
+ * 3:Comment<br>
  */
 Ovoid.opt_logLevel = 2;
 
 
-/** Display a global error.
- * <br>
- * <br>
- * This function stop the main application loop and display an anxiogenic 
- * error message on the window. This function is used to display internal 
- * library's errors and can be used to display custom error with the 
- * appropriate error code.
+/** Display a global error.<br><br>
+ * 
+ * Stops the library process and display a general error message.
  *
  * @param {int} code Error code. The error codes are the following ones:<br> 
  * 1: Non-compatible Web Browser, <br>
@@ -88,6 +157,11 @@ Ovoid.opt_logLevel = 2;
 */
 Ovoid.error = function(code, message) {
 
+  /* Delete WebGL Context */
+  Ovoid.gl = null;
+  /* Delete Audio Context */
+  Ovoid.al = null;
+  
   var canvas;
   /* Retrouve le canvas pour le reduire a taille minimum */
   var canvas_list = document.getElementsByTagName('canvas');
@@ -173,27 +247,16 @@ if(typeof(console) == "undefined") {
 }
 
 /**
- * Write a message in log string.
- * <br>
- * <br>
- * This function allow to write a preformated error, warning or information 
- * message in the log string and the javascript's console. This function is 
- * used to write library's internal log messages and can be used to write 
- * custom logs. The submited message can be effectively written or not 
- * depending on the current log level setting. For more informations see 
- * the <code>Ovoid.opt_logLevel</code> option details.
- * <br>
- * <br>
- * The written line is preformated as follow:
- * <br>
- * <br>
+ * Write a message in log string.<br><br>
+ * 
+ * Append a message in the library global log string and output to the browser
+ * javascript console.<br><br>
+ * 
+ * The written line is formated as follow:<br><br>
+ * 
  * <blockcode>
  * [hh:mm:ss] LEVEL: scope :: message. <br>
- * </blockcode>
- * <br>
- * <br>
- * Note that log isn't  written in a file, but in string. You can get the log 
- * string content at any time using the <code>Ovoid.getLog</code> function.
+ * </blockcode><br><br>
  * 
  * @see Ovoid.getLog
  * @see Ovoid.opt_logLevel
@@ -205,7 +268,7 @@ if(typeof(console) == "undefined") {
  * 2: WARNING,<br>
  * 3: NOTICE<br>
  * 
- * @param {string} scope Log scope. commonly the class or function from 
+ * @param {string} scope Log scope. Usually the class or function from 
  * where the log is written.
  *
  * @param {string} message Details of the log message.

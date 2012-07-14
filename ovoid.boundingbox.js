@@ -21,9 +21,8 @@
 /**
  * Bounding box object constructor.
  *
- * @class Bounding box object.
- * <br>
- * <br>
+ * @class Bounding box object.<br><br>
+ * 
  * This class provides an implementation of a bounding box. A bounding box 
  * describes a volume in space that bounds a piece of geometry. 
  * The box is defined by two points which describe the minimum and maximum 
@@ -51,9 +50,11 @@ Ovoid.Boundingbox = function() {
 
 
 /**
- * Copy from another.
+ * Copy method.<br><br>
+ * 
+ * Copies a bounding box.
  *
- * @param {Boundingbox} bbox Bounding box to copy from.
+ * @param {Boundingbox} bbox Bounding box to be copied.
  */
 Ovoid.Boundingbox.prototype.copy = function(bbox) {
 
@@ -65,7 +66,7 @@ Ovoid.Boundingbox.prototype.copy = function(bbox) {
 
 
 /**
- * Set the bounding box's size and relative center .
+ * Set volume bounds.<br><br>
  * 
  * Set or modify the bounding box's size and relative center according to the given
  * min and max points.
@@ -92,7 +93,7 @@ Ovoid.Boundingbox.prototype.setBound = function(min, max) {
 
 
 /**
- * Transform the bounding box.
+ * Transform center.<br><br>
  * 
  * Transform the bounding box's world center according to the given 
  * 4x4 transformation matrix.
@@ -108,9 +109,9 @@ Ovoid.Boundingbox.prototype.transform = function(matrix) {
 
 
 /**
- * Project the bouding box along an axis.
+ * Project on axis.<br><br>
  *
- * Project the bounding box in a one-dimensionnal line along the given axis and
+ * Projects the bounding box in a one-dimensionnal line along the given axis and
  * 4x4 transformation matrix. This function returns the size of the line that 
  * represents the projected box in the given axis.
  * 
@@ -118,7 +119,7 @@ Ovoid.Boundingbox.prototype.transform = function(matrix) {
  * @param {Matrix4} transform 4x4 transformation matrix to transform the 
  * bounding box
  * 
- * @return {float} Resulting One-dimensionnal projected line's size.
+ * @return {float} Resulting One-dimensionnal projected line size.
  * 
  * @see Ovoid.Vector
  * @see Ovoid.Matrix4

@@ -40,7 +40,7 @@
  * To make the concept more understandable, think that Body nodes are like 
  * invisible spirits without shape floating in the 3D world. To make a visible 
  * spirit, you have to give it a shape. You can assign the same shape node to 
- * several Body nodes in the same scene, than you obtain several identical 
+ * several Body nodes in the same scene, then you obtain several identical 
  * shapes with different transformations (rotation, position, etc...).<br><br>
  * 
  * <blockcode>

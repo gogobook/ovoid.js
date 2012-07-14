@@ -20,12 +20,9 @@
 
 
 /**
- * Degrees to radians conversion.
- * <br>
- * <br>
- * Converts the specified value from degrees to radians.
+ * Degrees to radians conversion.<br><br>
  * 
- * @memberOf _global_
+ * Converts the specified value from degrees to radians.
  *
  * @param {float} degrees Degrees value.
  *
@@ -40,12 +37,9 @@ Ovoid.deg2Rad = function(degrees) {
 
 
 /**
- * Radians to degrees conversion.
- * <br>
- * <br>
- * Converts the specified value from radians to degrees.
+ * Radians to degrees conversion.<br><br>
  * 
- * @memberOf _global_
+ * Converts the specified value from radians to degrees.
  *
  * @param {float} radians Radians value.
  *
@@ -60,12 +54,9 @@ Ovoid.rad2Deg = function(radians) {
 
 
 /**
- * Power of two number.
- * <br>
- * <br>
- * Checks whether a number is a power of two.
+ * Power of two number.<br><br>
  * 
- * @memberOf _global_
+ * Checks whether a number is a power of two.
  *
  * @param {int} val Number to check.
  *
@@ -79,12 +70,9 @@ Ovoid.isPowerOfTwo = function(val) {
 
 
 /**
- * Get perlin noise.
- * <br>
- * <br>
- * Returns a perlin noise value according to the specified seed.
+ * Get perlin noise.<br><br>
  * 
- * @memberOf _global_
+ * Returns a perlin noise value according to the specified seed.
  *
  * @param {int} f Perlin noise seed.
  *
@@ -103,12 +91,9 @@ Ovoid.noise = function(f) {
 
 
 /**
- * Get random integer.
- * <br>
- * <br>
- * Returns a random integer between the specified values.
+ * Get random integer.<br><br>
  * 
- * @memberOf _global_
+ * Returns a random integer between the specified values.
  *
  * @param {int} min Range min interger value.
  * @param {int} max Range max interger value.
@@ -122,12 +107,9 @@ Ovoid.randInt = function(min, max) {
 
 
 /**
- * Get random float.
- * <br>
- * <br>
- * Returns a random float between the specified values.
+ * Get random float.<br><br>
  * 
- * @memberOf _global_
+ * Returns a random float between the specified values.
  *
  * @param {int} min Range min float value.
  * @param {int} max Range max float value.
@@ -141,12 +123,9 @@ Ovoid.randFloat = function(min, max) {
 
 
 /**
- * Get file content.
- * <br>
- * <br>
- * Load and returns the contents of the file at the specified url.
+ * Get file content.<br><br>
  * 
- * @memberOf _global_
+ * Load and returns the contents of the file at the specified url.
  *
  * @param {string} url File URL.
  * @param {bool} freload Avoid browser cache and force reloading file.
@@ -176,12 +155,9 @@ Ovoid.getContent = function(url) {
 
 
 /**
- * Get file XML content.
- * <br>
- * <br>
- * Load and returns the XML object of the file at the specified url.
+ * Get file XML content.<br><br>
  * 
- * @memberOf _global_
+ * Load and returns the XML object of the file at the specified url.
  *
  * @param {string} url File URL.
  * @param {bool} freload Avoid browser cache and force reloading file.
@@ -212,12 +188,9 @@ Ovoid.getXml = function(url) {
 
 
 /**
- * Get file JSON content.
- * <br>
- * <br>
- * Load and returns the JSON object of the file at the specified url.
+ * Get file JSON content.<br><br>
  * 
- * @memberOf _global_
+ * Load and returns the JSON object of the file at the specified url.
  *
  * @param {string} url File URL.
  * @param {bool} freload Avoid browser cache and force reloading file.
@@ -247,12 +220,9 @@ Ovoid.getJson = function(url) {
 
 
 /**
- * Get file binary content.
- * <br>
- * <br>
- * Load and returns the binary content of the file at the specified url.
+ * Get file binary content.<br><br>
  * 
- * @memberOf _global_
+ * Load and returns the binary content of the file at the specified url.
  *
  * @param {string} url File URL.
  * @param {bool} freload Avoid browser cache and force reloading file.
@@ -282,12 +252,9 @@ Ovoid.getBinary = function(url) {
 
 
 /**
- * Exctract file name.
- * <br>
- * <br>
- * Extrats the file name from the specified full URL string.
+ * Exctract file name.<br><br>
  * 
- * @memberOf _global_
+ * Extrats the file name from the specified full URL string.
  *
  * @param {string} url URL string to extract name.
  * @param {bool} ext Keep the file extention.
@@ -307,12 +274,9 @@ Ovoid.extractName = function(url, ext) {
 
 
 /**
- * Exctract file extention.
- * <br>
- * <br>
- * Extrats the file extention from the specified full URL string.
+ * Exctract file extention.<br><br>
  * 
- * @memberOf _global_
+ * Extrats the file extention from the specified full URL string.
  *
  * @param {string} url URL string to extract extention.
  *
@@ -328,12 +292,9 @@ Ovoid.extractExt = function(url) {
 
 
 /**
- * Decimal round.
- * <br>
- * <br>
- * Round number at its four decimal.
+ * Decimal round.<br><br>
  * 
- * @memberOf _global_
+ * Round number at its four decimal.
  *
  * @param {float} f Float value to be rounded.
  *

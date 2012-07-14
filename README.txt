@@ -18,25 +18,24 @@
 --------------------------------------------------------------------------------
 
 OvoiD.JS is a WebGL wrapper library which includes sound and interactive support 
-with a whole environnement for  WebGL interactives applications developpment. 
-For that, OvoiD.JS can be considered as a middleware. However OvoiD.JS also 
-allows a more low-level (or mixed low and high-level) developpment by providing 
-an onion architecture.
+with a whole environnement for WebGL interactives applications developpment. 
+OvoiD.JS can be considered as a middleware but it also allows a more low-level 
+(or mixed low and high-level) developpment by providing an onion architecture.
 
 OvoiD.JS is thought from both programmer and 3D artist's point of view. The goal 
 is to provide a set of top-level methods for instant access to easily and 
 quickly create interactives contents, and keep the possibility to create an 
-custom "high-level" layer for more fine tweaks. 
+custom "high-level" layer for more fine tweaks.
 
-For more information, examples and samples you can visit
-the project's home page at : http://www.ovoid.org/js/
+For more information, documentation and samples see
+the OvoiD.JS project home page at : http://www.ovoid.org/js/
 
 
 --------------------------------------------------------------------------------
 DOCUMENTATION
 --------------------------------------------------------------------------------
 OvoiD.JS Library's reference documentation is available at 
-http://www.ovoid.org/js/doc
+http://www.ovoid.org/js/doc/
 
 
 
@@ -44,7 +43,8 @@ http://www.ovoid.org/js/doc
 BUG REPPORTS & COMMENTS
 --------------------------------------------------------------------------------
 OvoiD.JS Library still in developpment, is not fully tested, the 
-documentation may have some misstakes, and it obviously remains some 
-unknown bugs. Please send comments and bugs repports at: 
+documentation may have some misstakes. Please send comments and bugs repports: 
 
-root (@) ovoid.org
+E-mail: root (@) ovoid.org
+Blog page: http://www.ovoid.org/?page_id=412
+GitHub: https://github.com/sedenion/ovoid.js/issues

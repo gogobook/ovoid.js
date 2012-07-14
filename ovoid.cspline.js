@@ -22,16 +22,9 @@
 /**
  * Create a new cosine curve object.
  *
- * @class Cosine Interpolated curve object.
- * <br>
- * <br>
+ * @class Cosine Interpolated curve object.<br><br>
+ * 
  * This class provides an implementation of a Cosine interpolated curve. 
- * Curves are used by Animation nodes as a description of the motion as a value 
- * variation along a time line.
- * <br>
- * <br>
- * The Cosine curve object use the Cosine algorythme to interpolate
- * the keyframed values.
  * 
  * @see Ovoid.Animation
  * 
@@ -64,9 +57,9 @@ Ovoid.Cspline = function(x, y) {
 
 
 /**
- * Place the time cursor to the begining.
+ * Place the time cursor to the begining.<br><br>
  *
- * <br><br>Place the curve's time cursor to the begining plus the given offset value, 
+ * Place the curve's time cursor to the begining plus the given offset value, 
  * and interpolate data according to the given interpolation option.
  * 
  * @param {bool} xerp Interpolation flag. Tell to use the linear or cosine 
@@ -96,9 +89,9 @@ Ovoid.Cspline.prototype.seekStart = function(xerp, offset) {
 
 
 /**
- * Place the time cursor to the end.
+ * Place the time cursor to the end.<br><br>
  *
- * <br><br>Place the curve's time cursor to the end minus the given offset value, 
+ * Place the curve's time cursor to the end minus the given offset value, 
  * and interpolate data according to the given interpolation option.
  * 
  * @param {bool} xerp Interpolation flag. Tell to use the linear or cosine 
@@ -128,9 +121,9 @@ Ovoid.Cspline.prototype.seekEnd = function(xerp, offset) {
 
 
 /**
- * Move the time cursor forward.
+ * Move the time cursor forward.<br><br>
  *
- * <br><br>Move the curve's time cursor forward according the given time offset, 
+ * Move the curve's time cursor forward according the given time offset, 
  * and interpolate data according to the given interpolation option.
  * 
  * @param {bool} xerp Interpolation flag. Tell to use the linear or cosine 
@@ -174,9 +167,9 @@ Ovoid.Cspline.prototype.seekForward = function(xerp, seconds) {
 
 
 /**
- * Move the time cursor backward.
+ * Move the time cursor backward.<br><br>
  *
- * <br><br>Move the curve's time cursor backward according the given time offset, 
+ * Move the curve's time cursor backward according the given time offset, 
  * and interpolate data according to the given interpolation option.
  * 
  * @param {bool} xerp Interpolation flag. Tell to use the linear or cosine 
@@ -219,9 +212,9 @@ Ovoid.Cspline.prototype.seekBackward = function(xerp, seconds) {
 
 
 /**
- * Get interpolated value.
+ * Get interpolated value.<br><br>
  * 
- * <br><br>Get the interpolated value at the current curve's time cursor according to 
+ * Get the interpolated value at the current curve's time cursor according to 
  * the given interpolation option.
  *
  * @param {bool} xerp Interpolation flag. Tell to use the linear or cosine 

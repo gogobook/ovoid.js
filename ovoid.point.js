@@ -22,9 +22,9 @@
 /**
  * Create a Point object.
  *
- * @class Point object.
+ * @class Point object.<br><br>
  * 
- * <br><br>This class provides an implementation of a tridimentionnal weighted point.
+ * This class provides an implementation of a tridimentionnal weighted point.
  *
  * @param {float} x The X component.
  * @param {float} y The Y component.
@@ -41,9 +41,9 @@ Ovoid.Point = function(x, y, z, w) {
 
 
 /**
- * Component assigment.
+ * Component assigment.<br><br>
  *
- * <br><br>Sets the values of the Point components using the specified values.
+ * Sets the values of the Point components using the specified values.
  * 
  * @param {float} x The X component.
  * @param {float} y The Y component.
@@ -57,9 +57,9 @@ Ovoid.Point.prototype.set = function(x, y, z, w) {
 
 
 /**
- * Component assigment.
+ * Component assigment from array.<br><br>
  * 
- * <br><br>Sets the values of the Point components using the specified array.
+ * Sets the values of the Point components using the specified array.
  *
  * @param {float[]} a Float Array with x, y, z and w components.
  */
@@ -70,9 +70,9 @@ Ovoid.Point.prototype.setv = function(a) {
 
 
 /**
- * Copy method.
+ * Copy method.<br><br>
  *
- * <br><br>Copies a Point.
+ * Copies a Point.
  * 
  * @param {Point} point The Point object to copy.
  */
@@ -86,9 +86,9 @@ Ovoid.Point.prototype.copy = function(point) {
 
 
 /**
- * Equality test.
+ * Equality test.<br><br>
  * 
- * <br><br>Compares the x, y, z and w components of two Point.
+ * Compares the x, y, z and w components of two Point.
  *
  * @param {Point} point Point to which this Coord will be compared.
  *
@@ -103,9 +103,9 @@ Ovoid.Point.prototype.equal = function(point) {
 
 
 /**
- * In place subtraction.
+ * In place subtraction.<br><br>
  * 
- * <br><br>Sets this instance to the result of the substraction of this instance by an 
+ * Sets this instance to the result of the substraction of this instance by an 
  * other one.
  *
  * @param {Point} point The Point object to be subtracted with this.
@@ -120,9 +120,9 @@ Ovoid.Point.prototype.subBy = function(point) {
 
 
 /**
- * In place addition.
+ * In place addition.<br><br>
  * 
- * <br><br>Sets this instance to the result of the addition of this instance by an 
+ * Sets this instance to the result of the addition of this instance by an 
  * other one.
  *
  * @param {Point} point The Point object to be added with this.
@@ -137,9 +137,9 @@ Ovoid.Point.prototype.addBy = function(point) {
 
 
 /**
- * Operation result assignment.
+ * Subtraction result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the subtraction of two others.
+ * Sets this instance to the result of the subtraction of two others.
  *
  * @param {Point} a Left operand of the operation.
  * @param {Point} b Right operand of the operation.
@@ -154,9 +154,9 @@ Ovoid.Point.prototype.subOf = function(a, b) {
 
 
 /**
- * Operation result assignment.
+ * Addition result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the addition of two others.
+ * Sets this instance to the result of the addition of two others.
  *
  * @param {Point} a Left operand of the operation.
  * @param {Point} b Right operand of the operation.
@@ -171,9 +171,9 @@ Ovoid.Point.prototype.addOf = function(pointa, pointb) {
 
 
 /**
- * In place normalization.
+ * In place normalization.<br><br>
  * 
- * <br><br>Sets this instance to its normalized.
+ * Sets this instance to its normalized.
  */
 Ovoid.Point.prototype.normalize = function() {
 
@@ -189,9 +189,9 @@ Ovoid.Point.prototype.normalize = function() {
 
 
 /**
- * Vector dot product.
+ * Vector dot product.<br><br>
  * 
- * <br><br>Returns the the dot product of the vector component of this instance by an 
+ * Returns the the dot product of the vector component of this instance by an 
  * other Point or Vector.
  * 
  * param {Point|Vector} vect Point or Vector object to take the dot product with.
@@ -207,9 +207,9 @@ Ovoid.Point.prototype.dot = function(vect) {
 
 
 /**
- * Vector size.
+ * Vector size.<br><br>
  *
- * <br><br>Returns the size of the vector component of this instance.
+ * Returns the size of the vector component of this instance.
  * 
  * @return {float} The vector component size.
  */
@@ -222,9 +222,9 @@ Ovoid.Point.prototype.size = function() {
 
 
 /**
- * Vector magnitude.
+ * Vector magnitude.<br><br>
  * 
- * <br><br>Returns the magnitude (or squared size) of the vector component of this instance.
+ * Returns the magnitude (or squared size) of the vector component of this instance.
  *
  * @return {float} The vector component magnitude.
  */
@@ -237,9 +237,9 @@ Ovoid.Point.prototype.size2 = function() {
 
 
 /**
- * Point distance.
+ * Point distance.<br><br>
  * 
- * <br><br>Measures the distance in space between this instance and an orher one.
+ * Measures the distance in space between this instance and an orher one.
  *
  * @param {Point} point Point to measure distance.
  *
@@ -255,9 +255,9 @@ Ovoid.Point.prototype.dist = function(point) {
 
 
 /**
- * Point squared distance.
+ * Point squared distance.<br><br>
  * 
- * <br><br>Measures the squared distance in space between this instance and an orher one.
+ * Measures the squared distance in space between this instance and an orher one.
  *
  * @param {Point} point Point to measure squared distance.
  *
@@ -273,9 +273,9 @@ Ovoid.Point.prototype.dist2 = function(point) {
 
 
 /**
- * In place transformation.
+ * In place transformation.<br><br>
  * 
- * <br><br>Transform this instance by the specified 4x4 transformation matrix.
+ * Transform this instance by the specified 4x4 transformation matrix.
  *
  * @param {Matrix4} mat4 4x4 transformation matrix.
  */
@@ -303,9 +303,9 @@ Ovoid.Point.prototype.transform4 = function(mat4) {
 
 
 /**
- * Transformation result assignment.
+ * Transformation result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the specified Point transformed
+ * Sets this instance to the result of the specified Point transformed
  * by the given 4x4 transformation matrix.
  * 
  * @param {Point} point Point for the base of transformation.
@@ -332,9 +332,9 @@ Ovoid.Point.prototype.transform4Of = function(point, mat4) {
 
 
 /**
- * In place inverse transformation.
+ * In place inverse transformation.<br><br>
  * 
- * <br><br>Transform inverse this instance by the specified 4x4 transformation matrix.
+ * Transform inverse this instance by the specified 4x4 transformation matrix.
  *
  * @param {Matrix4} mat4 4x4 transformation matrix.
  */
@@ -351,9 +351,9 @@ Ovoid.Point.prototype.transform4Inverse = function(mat4) {
 
 
 /**
- * Inverse transformation result assignment.
+ * Inverse transformation result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the specified Point inverse transformed
+ * Sets this instance to the result of the specified Point inverse transformed
  * by the given 4x4 transformation matrix.
  * 
  * @param {Point} point Point for the base of transformation.
@@ -371,9 +371,9 @@ Ovoid.Point.prototype.transform4InverseOf = function(point, mat4) {
 
 
 /**
- * Weighted transformation result addition.
+ * Weighted transformation result addition.<br><br>
  * 
- * <br><br>Sets this instance to the result of the specified Point weighted transformed
+ * Sets this instance to the result of the specified Point weighted transformed
  * by the given wieght and 4x4 matrix.
  * 
  * @param {Point} point Point for the base of transformation.
@@ -400,9 +400,9 @@ Ovoid.Point.prototype.addWeightTransform4Of = function(point, mat4, w) {
 
 
 /**
- * In place transformation.
+ * In place transformation.<br><br>
  * 
- * <br><br>Transform this instance by the specified 3x3 rotation matrix.
+ * Transform this instance by the specified 3x3 rotation matrix.
  *
  * @param {Matrix4} mat4 3x3 rotation matrix.
  */
@@ -427,9 +427,9 @@ Ovoid.Point.prototype.transform3 = function(mat3) {
 
 
 /**
- * Transformation result assignment.
+ * Transformation result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the specified Point transformed
+ * Sets this instance to the result of the specified Point transformed
  * by the given 3x3 rotation matrix.
  * 
  * @param {Point} point Point for the base of transformation.
@@ -452,9 +452,9 @@ Ovoid.Point.prototype.transform3Of = function(point, mat3) {
 
 
 /**
- * In place inverse transformation.
+ * In place inverse transformation.<br><br>
  * 
- * <br><br>Transform inverse this instance by the specified 3x3 rotation matrix.
+ * Transform inverse this instance by the specified 3x3 rotation matrix.
  *
  * @param {Matrix4} mat3 3x3 rotation matrix.
  */
@@ -479,9 +479,9 @@ Ovoid.Point.prototype.transform3Inverse = function(mat3) {
 
 
 /**
- * Inverse transformation result assignment.
+ * Inverse transformation result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the specified Point inverse transformed
+ * Sets this instance to the result of the specified Point inverse transformed
  * by the given 3x3 rotation matrix.
  * 
  * @param {Point} point Point for the base of transformation.
@@ -504,9 +504,9 @@ Ovoid.Point.prototype.transform3InverseOf = function(point, mat3) {
 
 
 /**
- * Not a number test.
+ * Not a number test.<br><br>
  * 
- * <br><br>Checks whether this instance contains a "NaN" (Not a Number) component.
+ * Checks whether this instance contains a "NaN" (Not a Number) component.
  *
  * @return {bool} True if one or more component is NaN, false otherwise.
  */

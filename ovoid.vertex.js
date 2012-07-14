@@ -22,12 +22,10 @@
 /**
  * Create a Vertex object.
  *
- * @class Vertex object.
- * <br>
- * <br>
- * This class provides an implementation of a mesh's vertex. The 
+ * @class Vertex object.<br><br>
+ * 
+ * This class provides an implementation of a mesh/geometry vertex. The 
  * vertex is defined by several parameters such as position, normal, etc. 
- * This is one the main component of Meshs.
  * 
  * @see Ovoid.Mesh
  */
@@ -61,7 +59,7 @@ Ovoid.Vertex = function() {
 
 
 /**
- * Copy method.
+ * Copy method.<br><br>
  *
  * Copies a vertex.
  * 
@@ -81,9 +79,9 @@ Ovoid.Vertex.prototype.copy = function(other) {
 
 
 /**
- * Equality test.
+ * Equality test.<br><br>
  * 
- * <br><br>Compares position, normal, texture coords and color components of 
+ * Compares position, normal, texture coords and color components of 
  * two vertices.
  *
  * @param {Vertex} other Vertex to which this Vertex will be compared.
@@ -107,10 +105,10 @@ Ovoid.Vertex.prototype.equal = function(other) {
 
 
 /**
- * Component assigment from Float32Array.
+ * Component assigment from Float32Array.<br><br>
  * 
- * <br><br>Sets the values of the vertex components using the specified 
- * Float32Array content and the given Vertex format.
+ * Sets the values of the vertex components using the given 
+ * Float32Array and the specified Vertex format.
  *
  * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
  * following symbolic constants:<br>
@@ -156,9 +154,9 @@ Ovoid.Vertex.prototype.fromFloat32Array = function(format, floatArray) {
 
 
 /**
- * Component conversion to Float32Array.
+ * Component conversion to Float32Array.<br><br>
  *
- * <br><br>Convert the vertex components into an Float32Array according to the
+ * Convert the vertex components into an Float32Array according to the
  * specified vertex format.
  * 
  * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
@@ -217,9 +215,9 @@ Ovoid.Vertex.prototype.asFloat32Array = function(format) {
 
 
 /**
- * Vertex format stride.
+ * Get Vertex Format stride.<br><br>
  * 
- * <br><br>Returns the vertex's float components count (stride) according
+ * Returns the vertex float components count (stride) according
  * to the specified vertex format.
  *
  * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
@@ -251,9 +249,9 @@ Ovoid.Vertex.getFormatStride = function(format) {
 
 
 /**
- * Vertex format bytes.
+ * Get Vertex Format bytes.<br><br>
  * 
- * <br><br>Returns the vertex's size in bytes (stride) according
+ * Returns the vertex's size in bytes (stride) according
  * to the specified vertex format.
  *
  * @param {bitmask} format Vertex format.
@@ -276,11 +274,10 @@ Ovoid.Vertex.getFormatSize = function(format) {
 
 
 /**
- * Translate Vertices array in Float32Array.
+ * Translate Vertices array in Float32Array.<br><br>
  * 
- * <br><br>Translates the specified Vertex objects Array in an Float32Array 
- * which can be used to fill GL Buffer Object (VBO) according to the specified
- * vertex format.
+ * Translates the given Vertices Array in Float32Array according to the 
+ * specified vertex format which can be used to fill Vertex Buffer Object (VBO). 
  *
  * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
  * following symbolic constants:<br>

@@ -671,7 +671,7 @@ Ovoid.Scene.prototype.transplant = function(tree) {
 
 
 /**
- * Use camera as active.<br><br>
+ * Set active camera.<br><br>
  * 
  * Sets the specified Camera node as active camera. It must be 
  * in the scene.
@@ -751,7 +751,7 @@ Ovoid.Scene.prototype.search = function(item) {
 
 
 /**
- * Search by matches.<br><br>
+ * Search nodes by matches.<br><br>
  * 
  * Search and returns one or more nodes whose name contains the 
  * specified string, or nodes whose type matches with the specified bitmask.
@@ -784,7 +784,7 @@ Ovoid.Scene.prototype.searchMatches = function(item) {
 
 
 /**
- * Remove by matches.<br><br>
+ * Remove nodes by matches.<br><br>
  * 
  * Search and removes one or more nodes whose name contains the 
  * specified string, or nodes whose type matches with the specified bitmask.

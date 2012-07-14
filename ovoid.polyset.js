@@ -22,12 +22,10 @@
 /**
  * Create a Polygon polyset object.
  *
- * @class Polygon polyset object.
- * <br>
- * <br>
- * This class provides an implementation of a polygon set. The 
- * polygon set is used by Mesh to define a trangle faces (polygons) ranges 
- * that use a specific material.
+ * @class Polygon polyset object.<br><br>
+ * 
+ * This class provides an implementation of a polygons set. A Polyset defines a 
+ * trangles list assigned to a specific material.
  * 
  * @see Ovoid.Mesh
  */

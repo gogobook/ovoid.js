@@ -22,9 +22,9 @@
 /**
  * Create a 4x4 Matrix object.
  *
- * @class 4x4 Matrix object.
+ * @class 4x4 Matrix object.<br><br>
  * 
- * <br><br>This class provides an implementation of a 4x4 matrix.
+ * This class provides an implementation of a 4x4 matrix.
  *
  * @param {float[]} array Array of sixteen values in row major.
  */
@@ -53,9 +53,9 @@ Ovoid.Matrix4 = function(array) {
 
 
 /**
- * Component assigment.
+ * Component assigment. <br><br>
  *
- * <br><br>Sets the values of the matrix using the specified Array.
+ * Sets the values of the matrix using the specified Array.
  *
  * @param {float[]} array Array of sixteen values in row major.
  */
@@ -66,9 +66,9 @@ Ovoid.Matrix4.prototype.setv = function(array) {
 
 
 /**
- * Copy method.
+ * Copy method.<br><br>
  *
- * <br><br>Copies an Matrix4.
+ * Copies an Matrix4.
  *
  * @param {Matrix4} mat Matrix4 object to copy.
  */
@@ -79,9 +79,9 @@ Ovoid.Matrix4.prototype.copy = function(mat) {
 
 
 /**
- * In place multiplication.
+ * In place multiplication.<br><br>
  * 
- * <br><br>Sets this instance to the result of the multiplication of this instance by an 
+ * Sets this instance to the result of the multiplication of this instance by an 
  * other one.
  *
  * @param {Matrix4} mat The Matrix4 object to be multiplied with this.
@@ -157,9 +157,9 @@ Ovoid.Matrix4.prototype.multBy = function(mat) {
 
 
 /**
- * Operation result assignment.
+ * Multiplication result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the multiplication of two others.
+ * Sets this instance to the result of the multiplication of two others.
  *
  * @param {Matrix4} a Left operand of the operation.
  * @param {Matrix4} b Right operand of the operation.
@@ -217,9 +217,9 @@ Ovoid.Matrix4.prototype.multOf = function(a, b) {
 
 
 /**
- * Component assigment from 3x3 matrix.
+ * Component assigment from 3x3 matrix.<br><br>
  * 
- * <br><br>Sets this instance's components according to the given 3x3 matrix.
+ * Sets this instance's components according to the given 3x3 matrix.
  *
  * @param {Matrix3} mat Matrix3 object.
  */
@@ -238,9 +238,9 @@ Ovoid.Matrix4.prototype.fromMatrix3 = function(mat) {
 
 
 /**
- * In place transposition.
+ * In place transposition.<br><br>
  * 
- * <br><br>Sets this instance to its transposed.
+ * Sets this instance to its transposed.
  */
 Ovoid.Matrix4.prototype.toTranspose = function() {
 
@@ -267,9 +267,9 @@ Ovoid.Matrix4.prototype.toTranspose = function() {
 
 
 /**
- * In place inversion.
+ * In place inversion.<br><br>
  * 
- * <br><br>Sets this instance to its inverse.
+ * Sets this instance to its inverse.
  */
 Ovoid.Matrix4.prototype.toInverse = function() {
 
@@ -392,9 +392,9 @@ Ovoid.Matrix4.prototype.toInverse = function() {
 
 
 /**
- * In place transformation inversion.
+ * In place transformation inversion.<br><br>
  * 
- * <br><br>Sets this instance to its inverse transformation matrix.
+ * Sets this instance to its inverse transformation matrix.
  */
 Ovoid.Matrix4.prototype.toInverseTransform = function() {
 

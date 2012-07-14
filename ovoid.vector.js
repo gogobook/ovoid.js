@@ -22,9 +22,9 @@
 /**
  * Create a Vector object.
  *
- * @class Vector object.
+ * @class Vector object.<br><br>
  * 
- * <br><br>This class provides an implementation of a tridimentionnal vector.
+ * This class provides an implementation of a tridimentionnal vector.
  *
  * @param {float} x The X component.
  * @param {float} y The Y component.
@@ -40,9 +40,9 @@ Ovoid.Vector = function(x, y, z) {
 
 
 /**
- * Component assigment.
+ * Component assigment.<br><br>
  *
- * <br><br>Sets the values of the Vector components using the specified values.
+ * Sets the values of the Vector components using the specified values.
  * 
  * @param {float} x The X component.
  * @param {float} y The Y component.
@@ -55,9 +55,9 @@ Ovoid.Vector.prototype.set = function(x, y, z) {
 
 
 /**
- * Component assigment.
+ * Component assigment from array.<br><br>
  * 
- * <br><br>Sets the values of the Vector components using the specified array.
+ * Sets the values of the Vector components using the specified array.
  *
  * @param {float[]} a Float Array with x, y and z components.
  */
@@ -68,9 +68,9 @@ Ovoid.Vector.prototype.setv = function(a) {
 
 
 /**
- * Copy method.
+ * Copy method.<br><br>
  *
- * <br><br>Copies a Vector.
+ * Copies a Vector.
  * 
  * @param {Vector} vect The Vector object to copy.
  */
@@ -83,9 +83,9 @@ Ovoid.Vector.prototype.copy = function(vect) {
 
 
 /**
- * Equality test.
+ * Equality test.<br><br>
  * 
- * <br><br>Compares the x, y and z components of two Vector.
+ * Compares the x, y and z components of two Vector.
  *
  * @param {Vector} vect Vector to which this Coord will be compared.
  *
@@ -100,9 +100,9 @@ Ovoid.Vector.prototype.equal = function(vect) {
 
 
 /**
- * In place subtraction.
+ * In place subtraction.<br><br>
  * 
- * <br><br>Sets this instance to the result of the subtraction of this instance by an 
+ * Sets this instance to the result of the subtraction of this instance by an 
  * other one.
  *
  * @param {Vector} vect The Vector object to be subtracted with this.
@@ -117,9 +117,9 @@ Ovoid.Vector.prototype.subBy = function(vect) {
 
 
 /**
- * In place scalar multiplication.
+ * In place scalar multiplication.<br><br>
  * 
- * <br><br>Sets this instance to the result of the multiplication of this instance by a
+ * Sets this instance to the result of the multiplication of this instance by a
  * scalar.
  *
  * @param {float} scale Scalar value.
@@ -133,9 +133,9 @@ Ovoid.Vector.prototype.scaleBy = function(scale) {
 
 
 /**
- * In place addition.
+ * In place addition.<br><br>
  * 
- * <br><br>Sets this instance to the result of the addition of this instance by an 
+ * Sets this instance to the result of the addition of this instance by an 
  * other one.
  *
  * @param {Vector} vect The Vector object to be added with this.
@@ -149,9 +149,9 @@ Ovoid.Vector.prototype.addBy = function(vect) {
 
 
 /**
- * In place vector cross product.
+ * In place vector cross product.<br><br>
  *
- * <br><br>Sets this instance to the result of the cross product of this instance by an 
+ * Sets this instance to the result of the cross product of this instance by an 
  * other one.
  * 
  * @param {Vector} vect Vector object to take the cross product with.
@@ -170,9 +170,9 @@ Ovoid.Vector.prototype.crossBy = function(vect) {
 
 
 /**
- * Operation result assignment.
+ * Subtraction result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the subtraction of two others.
+ * Sets this instance to the result of the subtraction of two others.
  *
  * @param {Vector} a Left operand of the operation.
  * @param {Vector} b Right operand of the operation.
@@ -186,9 +186,9 @@ Ovoid.Vector.prototype.subOf = function(a, b) {
 
 
 /**
- * Operation result assignment.
+ * Addition result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the addition of two others.
+ * Sets this instance to the result of the addition of two others.
  *
  * @param {Vector} a Left operand of the operation.
  * @param {Vector} b Right operand of the operation.
@@ -202,9 +202,9 @@ Ovoid.Vector.prototype.addOf = function(a, b) {
 
 
 /**
- * In place normalization.
+ * In place normalization.<br><br>
  * 
- * <br><br>Sets this instance to its normalized.
+ * Sets this instance to its normalized.
  */
 Ovoid.Vector.prototype.normalize = function() {
   /* methode la plus rapide */
@@ -218,9 +218,9 @@ Ovoid.Vector.prototype.normalize = function() {
 
 
 /**
- * Vector dot product.
+ * Vector dot product.<br><br>
  * 
- * <br><br>Returns the the dot product of this instance by an other Point or Vector.
+ * Returns the the dot product of this instance by an other Point or Vector.
  * 
  * param {Point|Vector} vect Point or Vector object to take the dot product with.
 
@@ -235,9 +235,9 @@ Ovoid.Vector.prototype.dot = function(vect) {
 
 
 /**
- * Vector size.
+ * Vector size.<br><br>
  *
- * <br><br>Returns the size of this instance.
+ * Returns the size of this instance.
  * 
  * @return {float} The Vector size.
  */
@@ -250,9 +250,9 @@ Ovoid.Vector.prototype.size = function() {
 
 
 /**
- * Vector magnitude.
+ * Vector magnitude.<br><br>
  * 
- * <br><br>Returns the magnitude (or squared size) of this instance.
+ * Returns the magnitude (or squared size) of this instance.
  *
  * @return {float} The Vector magnitude.
  */
@@ -265,9 +265,9 @@ Ovoid.Vector.prototype.size2 = function() {
 
 
 /**
- * Operation result assignment.
+ * Cross product result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the cross product of two others.
+ * Sets this instance to the result of the cross product of two others.
  *
  * @param {Vector} a Left operand of the operation.
  * @param {Vector} b Right operand of the operation.
@@ -281,9 +281,9 @@ Ovoid.Vector.prototype.crossOf = function(a, b) {
 
 
 /**
- * Vector distance.
+ * Vector distance.<br><br>
  * 
- * <br><br>Measures the distance in space between this instance and an orher one.
+ * Measures the distance in space between this instance and an orher one.
  *
  * @param {Vector} vect Vector to measure distance.
  *
@@ -300,9 +300,9 @@ Ovoid.Vector.prototype.dist = function(vect) {
 
 
 /**
- * Vector squared distance.
+ * Vector squared distance.<br><br>
  * 
- * <br><br>Measures the squared distance in space between this instance and an orher one.
+ * Measures the squared distance in space between this instance and an orher one.
  *
  * @param {Vector} vect Vector to measure squared distance.
  *
@@ -319,9 +319,9 @@ Ovoid.Vector.prototype.dist2 = function(vect) {
 
 
 /**
- * In place transformation.
+ * In place transformation.<br><br>
  * 
- * <br><br>Transform this instance by the specified 4x4 transformation matrix.
+ * Transform this instance by the specified 4x4 transformation matrix.
  *
  * @param {Matrix4} mat4 4x4 transformation matrix.
  */
@@ -346,9 +346,9 @@ Ovoid.Vector.prototype.transform4 = function(mat4) {
 
 
 /**
- * Transformation result assignment.
+ * Transformation result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the specified Vector transformed
+ * Sets this instance to the result of the specified Vector transformed
  * by the given 4x4 transformation matrix.
  * 
  * @param {Vector} vect Vector for the base of transformation.
@@ -371,9 +371,9 @@ Ovoid.Vector.prototype.transform4Of = function(vect, mat4) {
 
 
 /**
- * In place inverse transformation.
+ * In place inverse transformation.<br><br>
  * 
- * <br><br>Transform inverse this instance by the specified 4x4 transformation matrix.
+ * Transform inverse this instance by the specified 4x4 transformation matrix.
  *
  * @param {Matrix4} mat4 4x4 transformation matrix.
  */
@@ -398,9 +398,9 @@ Ovoid.Vector.prototype.transform4Inverse = function(mat4) {
 
 
 /**
- * Inverse transformation result assignment.
+ * Inverse transformation result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the specified Vector inverse transformed
+ * Sets this instance to the result of the specified Vector inverse transformed
  * by the given 4x4 transformation matrix.
  * 
  * @param {Vector} vect Vector for the base of transformation.
@@ -423,9 +423,9 @@ Ovoid.Vector.prototype.transform4InverseOf = function(vect, mat4) {
 
 
 /**
- * In place transformation.
+ * In place transformation.<br><br>
  * 
- * <br><br>Transform this instance by the specified 3x3 rotation matrix.
+ * Transform this instance by the specified 3x3 rotation matrix.
  *
  * @param {Matrix4} mat4 3x3 rotation matrix.
  */
@@ -450,9 +450,9 @@ Ovoid.Vector.prototype.transform3 = function(mat3) {
 
 
 /**
- * In place inverse transformation.
+ * In place inverse transformation.<br><br>
  * 
- * <br><br>Transform inverse this instance by the specified 3x3 rotation matrix.
+ * Transform inverse this instance by the specified 3x3 rotation matrix.
  *
  * @param {Matrix4} mat3 3x3 rotation matrix.
  */
@@ -477,9 +477,9 @@ Ovoid.Vector.prototype.transform3Inverse = function(mat3) {
 
 
 /**
- * Inverse transformation result assignment.
+ * Inverse transformation result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the specified Vector inverse transformed
+ * Sets this instance to the result of the specified Vector inverse transformed
  * by the given 3x3 rotation matrix.
  * 
  * @param {Vector} vect Vector for the base of transformation.
@@ -502,9 +502,8 @@ Ovoid.Vector.prototype.transform3InverseOf = function(vect, mat3) {
 
 
 /**
- * Weighted transformation result addition.
- * <br>
- * <br>
+ * Weighted transformation result addition.<br><br>
+ * 
  * Sets this instance to the result of the specified Point weighted transformed
  * by the given wieght and 3x3 matrix.
  * 
@@ -529,9 +528,9 @@ Ovoid.Vector.prototype.addWeightTransform3Of = function(vect, mat3, w) {
 
 
 /**
- * In place vector reflection.
+ * In place vector reflection.<br><br>
  *
- * <br><br>Reflect this instance according to the the specified normal.
+ * Reflect this instance according to the the specified normal.
  * 
  * @param {Vector} vect Normal Vector to reflect.
  */
@@ -548,9 +547,9 @@ Ovoid.Vector.prototype.reflect = function(vect) {
 
 
 /**
- * Not a number test.
+ * Not a number test.<br><br>
  * 
- * <br><br>Checks whether this instance contains a "NaN" (Not a Number) component.
+ * Checks whether this instance contains a "NaN" (Not a Number) component.
  *
  * @return {bool} True if one or more component is NaN, false otherwise.
  */

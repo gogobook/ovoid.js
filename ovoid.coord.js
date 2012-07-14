@@ -22,9 +22,9 @@
 /**
  * Create a Coord object.
  *
- * @class Coord object.
+ * @class Coord object.<br><br>
  * 
- * <br><br>This class provides an implementation of a tridimentionnal coordinate.
+ * This class provides an implementation of a tridimentionnal coordinate.
  *
  * @param {float} u The U component.
  * @param {float} v The V component.
@@ -42,9 +42,9 @@ Ovoid.Coord = function(u, v, w) {
 
 
 /**
- * Component assigment.
+ * Component assigment.<br><br>
  *
- * <br><br>Sets the values of the Coord components using the specified values.
+ * Sets the values of the Coord components using the specified values.
  * 
  * @param {float} u The U component.
  * @param {float} v The V component.
@@ -59,9 +59,9 @@ Ovoid.Coord.prototype.set = function(u, v, w) {
 
 
 /**
- * Component assigment.
+ * Component assigment from array.<br><br>
  * 
- * <br><br>Sets the values of the Coord components using the specified array.
+ * Sets the values of the Coord components using the specified array.
  *
  * @param {float[]} a Float Array with x, y and z components.
  */
@@ -72,9 +72,9 @@ Ovoid.Coord.prototype.setv = function(a) {
 
 
 /**
- * Copy method.
+ * Copy method.<br><br>
  *
- * <br><br>Copies a Coord.
+ * Copies a Coord.
  * 
  * @param {Coord} coord The Coord object to copy.
  */
@@ -87,9 +87,9 @@ Ovoid.Coord.prototype.copy = function(coord) {
 
 
 /**
- * Equality test.
+ * Equality test.<br><br>
  * 
- * <br><br>Compares the u, v and w components of two Coord.
+ * Compares the u, v and w components of two Coord.
  *
  * @param {Coord} coord Coord to which this Coord will be compared.
  *
@@ -104,9 +104,9 @@ Ovoid.Coord.prototype.equal = function(coord) {
 
 
 /**
- * Operation result assignment.
+ * Subtraction result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the subtraction of two others.
+ * Sets this instance to the result of the subtraction of two others.
  *
  * @param {Coord} a Left operand of the operation.
  * @param {Coord} b Right operand of the operation.
@@ -120,9 +120,9 @@ Ovoid.Coord.prototype.subOf = function(l, r) {
 
 
 /**
- * Operation result assignment.
+ * Addition result assignment.<br><br>
  * 
- * <br><br>Sets this instance to the result of the addition of two others.
+ * Sets this instance to the result of the addition of two others.
  *
  * @param {Coord} a Left operand of the operation.
  * @param {Coord} b Right operand of the operation.
@@ -136,9 +136,9 @@ Ovoid.Coord.prototype.addOf = function(l, r) {
 
 
 /**
- * In place transformation.
+ * In place transformation.<br><br>
  * 
- * <br><br>Transform this instance by the specified 4x4 transformation matrix.
+ * Transform this instance by the specified 4x4 transformation matrix.
  *
  * @param {Matrix4} mat4 4x4 transformation matrix.
  */
