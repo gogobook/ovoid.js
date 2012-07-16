@@ -2688,14 +2688,14 @@ Ovoid.DEFAULT_GLSL_WRAPMAP = '{"OJSON":1,"type":"glslmap","wrapmap": {"attribute
  * @constant
  * @memberOf _global_
  */
-Ovoid.OVOI3D_VERSION = '1.0';
+Ovoid.OVOI3D_VERSION = '1.1';
 
 
 /** OvoiD.JS Library first-build date.
  * @constant
  * @memberOf _global_
  */
-Ovoid.OVOI3D_FIRSTBUILD_DATE = '20-04-2012';
+Ovoid.OVOI3D_FIRSTBUILD_DATE = '16-07-2012';
 
 /** OvoiD.JS Library release date.
  * @constant
