@@ -74,6 +74,8 @@ Ovoid.Queuer.opt_defaultCameraRot = [0.0, 0.0, 0.0];
 Ovoid.Drawer.opt_clearColor = [1.0, 1.0, 1.0, 1.0];
 /* Global ambient lighting color */
 Ovoid.Drawer.opt_ambientColor = [0.2, 0.2, 0.2, 1.0];
+/* Enable or disable per-light pass render */
+Ovoid.Drawer.opt_perLightPass = false;
 /* Enable or disable Z-fail shadow casting */
 Ovoid.Drawer.opt_shadowCasting = false; 
 /* Z-fail shadow casting object exclusion tolerence (object minimum size) */

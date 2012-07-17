@@ -113,8 +113,12 @@ Ovoid.Drawer.opt_clearColor = [1.0, 1.0, 1.0, 1.0];
 Ovoid.Drawer.opt_ambientColor = [0.2, 0.2, 0.2, 1.0];
 
 
+/** Enable per-light pass rendering (required for shadow casting) */
+Ovoid.Drawer.opt_perLightPass = false;
+
+
 /** Enable Z-fail shadow casting rendering */
-Ovoid.Drawer.opt_shadowCasting = true;
+Ovoid.Drawer.opt_shadowCasting = false;
 
 
 /** Minimum average size to build shadow volum for */
@@ -155,6 +159,10 @@ Ovoid.Drawer.opt_drawCameras = false;
 
 /** Joint helpers's size */
 Ovoid.Drawer.opt_jointSize = 2.0;
+
+
+/** Renderer info */
+Ovoid.Drawer._rdrinfo = new Object();
 
 
 /** Private class member for drawing shader set stock. */
@@ -250,7 +258,7 @@ Ovoid.Drawer._colorshdw = new Ovoid.Color(0.0, 0.0, 0.0, 1.0);
 
 
 /** Private class member for blank texture handle. */
-Ovoid.Drawer._blanktexture = null;
+Ovoid.Drawer._tblank = new Ovoid.Texture("blank_texture");
 
 
 /** Private class member for default fontmap texture handle. */
@@ -319,19 +327,50 @@ Ovoid.Drawer.init = function() {
   /* performance counter */
   var t = (new Date().getTime());
 
+  /* récupere les infos du renderer*/
+  Ovoid.Drawer._rdrinfo.VENDOR = Ovoid.gl.getParameter(Ovoid.gl.VENDOR);
+  Ovoid.log(3, 'Ovoid.Drawer', 'VENDOR : ' + Ovoid.Drawer._rdrinfo.VENDOR);
+  
+  Ovoid.Drawer._rdrinfo.VERSION = Ovoid.gl.getParameter(Ovoid.gl.VERSION);
+  Ovoid.log(3, 'Ovoid.Drawer', 'VERSION : ' + Ovoid.Drawer._rdrinfo.VERSION);
+  
+  Ovoid.Drawer._rdrinfo.MAX_TEXTURE_IMAGE_UNITS = Ovoid.gl.getParameter(Ovoid.gl.MAX_TEXTURE_IMAGE_UNITS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_TEXTURE_IMAGE_UNITS : ' + Ovoid.Drawer._rdrinfo.MAX_TEXTURE_IMAGE_UNITS);
+  
+  Ovoid.Drawer._rdrinfo.MAX_COMBINED_TEXTURE_IMAGE_UNITS = Ovoid.gl.getParameter(Ovoid.gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_COMBINED_TEXTURE_IMAGE_UNITS : ' + Ovoid.Drawer._rdrinfo.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+  
+  Ovoid.Drawer._rdrinfo.MAX_VARYING_VECTORS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VARYING_VECTORS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VARYING_VECTORS : ' + Ovoid.Drawer._rdrinfo.MAX_VARYING_VECTORS);
+  
+  Ovoid.Drawer._rdrinfo.MAX_VERTEX_ATTRIBS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VERTEX_ATTRIBS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VERTEX_ATTRIBS : ' + Ovoid.Drawer._rdrinfo.MAX_VERTEX_ATTRIBS);
+  
+  Ovoid.Drawer._rdrinfo.MAX_VERTEX_UNIFORM_VECTORS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VERTEX_UNIFORM_VECTORS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VERTEX_UNIFORM_VECTORS : ' + Ovoid.Drawer._rdrinfo.MAX_VERTEX_UNIFORM_VECTORS);
+  
+  Ovoid.Drawer._rdrinfo.MAX_FRAGMENT_UNIFORM_VECTORS = Ovoid.gl.getParameter(Ovoid.gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_FRAGMENT_UNIFORM_VECTORS : ' + Ovoid.Drawer._rdrinfo.MAX_FRAGMENT_UNIFORM_VECTORS);
+
+  Ovoid.Drawer._rdrinfo.MAX_VERTEX_TEXTURE_IMAGE_UNITS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VERTEX_TEXTURE_IMAGE_UNITS : ' + Ovoid.Drawer._rdrinfo.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+  
+  Ovoid.Drawer._rdrinfo.SHADING_LANGUAGE_VERSION = Ovoid.gl.getParameter(Ovoid.gl.SHADING_LANGUAGE_VERSION);
+  Ovoid.log(3, 'Ovoid.Drawer', 'SHADING_LANGUAGE_VERSION : ' + Ovoid.Drawer._rdrinfo.SHADING_LANGUAGE_VERSION);
+  
   /* toutes les textures flip en Y */
   Ovoid.gl.pixelStorei(Ovoid.gl.UNPACK_FLIP_Y_WEBGL, true);
   
   /* chargement de la texture blank par defaut */
-  Ovoid.Drawer._blanktexture = Ovoid.gl.createTexture();
-
   var px = new Uint8Array(256); /* (8 * 8 * RGBA) */
 
   for (var i = 0; i < 256; i++)  /* (8 * 8 * RGBA) */
     px[i] = 255;
 
-  Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D, Ovoid.Drawer._blanktexture);
-
+  Ovoid.Drawer._tblank.handle = Ovoid.gl.createTexture();
+  Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D, Ovoid.Drawer._tblank.handle);
+  Ovoid.Drawer._tblank.target = Ovoid.gl.TEXTURE_2D;
+  
   Ovoid.gl.texImage2D(Ovoid.gl.TEXTURE_2D,
                       0, Ovoid.gl.RGBA,
                       8, 8, 0,
@@ -345,12 +384,20 @@ Ovoid.Drawer.init = function() {
   Ovoid.gl.texParameteri(Ovoid.gl.TEXTURE_2D,
                           Ovoid.gl.TEXTURE_MIN_FILTER,
                           Ovoid.gl.NEAREST);
-                          
+       
+  Ovoid.gl.texParameteri(Ovoid.gl.TEXTURE_2D,
+                          Ovoid.gl.TEXTURE_WRAP_S,
+                          Ovoid.gl.CLAMP_TO_EDGE);
+
+  Ovoid.gl.texParameteri(Ovoid.gl.TEXTURE_2D,
+                          Ovoid.gl.TEXTURE_WRAP_T,
+                          Ovoid.gl.CLAMP_TO_EDGE);
+
   Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D, null);
   
-  Ovoid.Drawer._fontmap = new Ovoid.Texture();
-
   
+  
+  Ovoid.Drawer._fontmap = new Ovoid.Texture();
 
   Ovoid.Drawer._fontmap.loadSource(Ovoid.opt_defaultFontmapUrl,
                           Ovoid.opt_defaultFontmapFilter,true);
@@ -392,7 +439,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer.plugShader(7,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("sp_flat_color");
-  sp.setSources(Ovoid.DEFAULT_GLSL_PNUTBCIW_VS, Ovoid.DEFAULT_GLSL_FCOLOR_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
+  sp.setSources(Ovoid.DEFAULT_GLSL_PNUIW_HYBRID_VS, Ovoid.DEFAULT_GLSL_FCOLOR_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default sp_flat_color shader program.");
     return false;
@@ -400,7 +447,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer.plugShader(2,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("sp_vertex_color");
-  sp.setSources(Ovoid.DEFAULT_GLSL_PNUTBCIW_VS, Ovoid.DEFAULT_GLSL_VCOLOR_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
+  sp.setSources(Ovoid.DEFAULT_GLSL_PC_VS, Ovoid.DEFAULT_GLSL_VCOLOR_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default sp_vertex_color shader program.");
     return false;
@@ -408,7 +455,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer.plugShader(3,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("sp_shading_1l");
-  sp.setSources(Ovoid.DEFAULT_GLSL_PNUTBCIW_VS, Ovoid.DEFAULT_GLSL_S1LIGHT_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
+  sp.setSources(Ovoid.DEFAULT_GLSL_PNUIW_HYBRID_VS, Ovoid.DEFAULT_GLSL_AERDS_1L_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default sp_shading_1l shader program.");
     return false;
@@ -416,7 +463,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer.plugShader(4,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("sp_shading_nl");
-  sp.setSources(Ovoid.DEFAULT_GLSL_PNUTBCIW_VS, Ovoid.DEFAULT_GLSL_SNLIGHT_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
+  sp.setSources(Ovoid.DEFAULT_GLSL_PNUIW_HYBRID_VS, Ovoid.DEFAULT_GLSL_BASIC_Nl_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default sp_shading_nl shader program.");
     return false;
@@ -446,11 +493,6 @@ Ovoid.Drawer.init = function() {
                       
   Ovoid.gl.viewport(0, 0, Ovoid.Frame.size.v[0], Ovoid.Frame.size.v[1]);
 
-  Ovoid.gl.clearColor(Ovoid.Drawer.opt_clearColor[0],
-      Ovoid.Drawer.opt_clearColor[1],
-      Ovoid.Drawer.opt_clearColor[2],
-      Ovoid.Drawer.opt_clearColor[3]);
-
   Ovoid.gl.clear(Ovoid.gl.COLOR_BUFFER_BIT | Ovoid.gl.DEPTH_BUFFER_BIT);
   
   /* blending */
@@ -477,38 +519,32 @@ Ovoid.Drawer.init = function() {
 
   /* Performance counter */
   var t = (new Date().getTime());
-  
-  /* ambient color par defaut */
-  Ovoid.Drawer._f32aryac[0] = Ovoid.Drawer.opt_ambientColor[0];
-  Ovoid.Drawer._f32aryac[1] = Ovoid.Drawer.opt_ambientColor[1];
-  Ovoid.Drawer._f32aryac[2] = Ovoid.Drawer.opt_ambientColor[2];
-  Ovoid.Drawer._f32aryac[3] = Ovoid.Drawer.opt_ambientColor[3];
 
   /* creation du mesh wire box par defaut */
   var boxbuf = [
-    0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, 0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, 0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, 0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, 0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, -0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, -0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, -0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
     -0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
     -0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, -0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, -0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, -0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, 0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, 0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
     -0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0];
 
   Ovoid.Drawer._bostock[0] = Ovoid.gl.createBuffer();
@@ -569,12 +605,12 @@ Ovoid.Drawer.init = function() {
   
   /* creation du mesh axis par defaut */
   var axisbuf = [
-    0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-    0.25, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-    0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
-    0.0, 0.25, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
-    0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
-    0.0, 0.0, 0.25, 1.0, 0.0, 0.0, 1.0, 1.0];
+     0.0,  0.0,  0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+    0.25,  0.0,  0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+     0.0,  0.0,  0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
+     0.0, 0.25,  0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
+     0.0,  0.0,  0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
+     0.0,  0.0, 0.25, 1.0, 0.0, 0.0, 1.0, 1.0];
 
   Ovoid.Drawer._bostock[2] = Ovoid.gl.createBuffer();
 
@@ -630,22 +666,22 @@ Ovoid.Drawer.init = function() {
 
   /* creation du mesh light par defaut */
   var coneBuf = [
-    0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.25, 0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.25, 0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+      0.0,   0.0,  0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+      0.0,   0.0,  0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+      0.0,   0.0,  0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
     -0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.25, 0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.25, 0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.25, 0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+      0.0,   0.0,  0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    -0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
     -0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
     -0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    0.25, 0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
+     0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+     0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
 
   Ovoid.Drawer._bostock[5] = Ovoid.gl.createBuffer();
 
@@ -770,13 +806,13 @@ Ovoid.Drawer.plugShader = function(slot, id) {
 
 
 /**
- * Switch shader program.
- * This function is typically used as class's private member and should not be 
- * called independently.
+ * Switch shader program.<br><br>
+ * 
+ * Switch the current shader program to the specified one.
  * 
  * @param {int} id Shader id to swith.
  */
-Ovoid.Drawer._switchSp = function(id) {
+Ovoid.Drawer.switchSp = function(id) {
 
   Ovoid.Drawer._sp = Ovoid.Drawer._splib[Ovoid.Drawer._spslot[id]];
   Ovoid.Drawer._spslot[0] = Ovoid.Drawer._spslot[1];
@@ -786,12 +822,11 @@ Ovoid.Drawer._switchSp = function(id) {
 
 
 /**
- * Restore the preview used shader.
- * This function is typically used as class's private member and should not be 
- * called independently.
+ * Restore shader program.<br><br>
  * 
+ * Restores the last used shader program before the current one.
  */
-Ovoid.Drawer._restorSp = function() {
+Ovoid.Drawer.restorSp = function() {
   
   Ovoid.Drawer._sp = Ovoid.Drawer._splib[Ovoid.Drawer._spslot[0]];
   Ovoid.Drawer._spslot[1] = Ovoid.Drawer._spslot[0];
@@ -799,44 +834,55 @@ Ovoid.Drawer._restorSp = function() {
 };
 
 
-Ovoid.Drawer._switchBlend = function(id) {
+/**
+ * Switch blend parameters.<br><br>
+ * 
+ * Switchs the current blend parameters to the specified configuration.
+ */
+Ovoid.Drawer.switchBlend = function(id) {
 
   Ovoid.Drawer._blswap[0] = Ovoid.Drawer._blswap[1];
   Ovoid.Drawer._blswap[1] = id;
+  
   switch(id)
   {
+    case 0: 
+      Ovoid.gl.disable(Ovoid.gl.BLEND);
+    break;
     case 1:
       // Blend alpha additif
+      Ovoid.gl.enable(Ovoid.gl.BLEND);
       Ovoid.gl.blendFunc(Ovoid.gl.SRC_ALPHA, Ovoid.gl.ONE);
     break;
     case 2:
       // Blend couleur additive
+      Ovoid.gl.enable(Ovoid.gl.BLEND);
       Ovoid.gl.blendFunc(Ovoid.gl.ONE, Ovoid.gl.ONE);
     break;
     default:
       // Blend soustractif 
+      Ovoid.gl.enable(Ovoid.gl.BLEND);
       Ovoid.gl.blendFunc(Ovoid.gl.SRC_ALPHA, Ovoid.gl.ONE_MINUS_SRC_ALPHA);
     break;
   }
 };
 
-Ovoid.Drawer._restoreBlend = function() {
-  
-  Ovoid.Drawer._switchBlend(Ovoid.Drawer._blswap[0]);
-};
 
 /**
- * Draw the rendering queue.
- * <br>
- * <br>
- * Draw the current render queue according drawing options.
- * This function take no argument because it work directly with Ovoid.Queuer's
- * node stacks to draw the scene. This function should be called after an
- * <code>Ovoid.Queuer.QueueScene()</code> call. 
- * <br>
- * <br>
- * This methode is automaticaly called at each main loop. 
- * It shoulds not be called manually.
+ * Restore blend parameters.<br><br>
+ * 
+ * Restores the last used blend parameters before the current one.
+ */
+Ovoid.Drawer.restoreBlend = function() {
+  
+  Ovoid.Drawer.switchBlend(Ovoid.Drawer._blswap[0]);
+};
+
+
+/**
+ * Draw the rendering queue.<br><br>
+ * 
+ * Draws the current available builded queues from Ovoid.Queuer global class.
  * 
  * @see Ovoid.Queuer
  */
@@ -846,8 +892,19 @@ Ovoid.Drawer.drawQueue = function() {
     Ovoid.Drawer.updateViewport();
   }
 
+  Ovoid.gl.clearColor(Ovoid.Drawer.opt_clearColor[0],
+      Ovoid.Drawer.opt_clearColor[1],
+      Ovoid.Drawer.opt_clearColor[2],
+      Ovoid.Drawer.opt_clearColor[3]);
+  
   Ovoid.gl.clear(Ovoid.gl.COLOR_BUFFER_BIT | Ovoid.gl.DEPTH_BUFFER_BIT);
-
+  
+  /* ambient color par defaut */
+  Ovoid.Drawer._f32aryac[0] = Ovoid.Drawer.opt_ambientColor[0];
+  Ovoid.Drawer._f32aryac[1] = Ovoid.Drawer.opt_ambientColor[1];
+  Ovoid.Drawer._f32aryac[2] = Ovoid.Drawer.opt_ambientColor[2];
+  Ovoid.Drawer._f32aryac[3] = Ovoid.Drawer.opt_ambientColor[3];
+  
   Ovoid.Drawer._drawnpolyset = 0;
   Ovoid.Drawer._drawnlayer = 0;
   Ovoid.Drawer._drawnhelper = 0;
@@ -862,10 +919,10 @@ Ovoid.Drawer.drawQueue = function() {
   }
 
   /* dessins des body de la scene */
-  if (Ovoid.Drawer.opt_shadowCasting) {
+  if (Ovoid.Drawer.opt_perLightPass) {
     Ovoid.Drawer._drawnshadow = 0;
     /* Dessin en mode per-light pass Z-fail cast shadow */
-    Ovoid.Drawer.drawStackWorldZfail(Ovoid.Queuer._rcamera, 
+    Ovoid.Drawer.drawStackWorldPerLight(Ovoid.Queuer._rcamera, 
           Ovoid.Queuer._qlight, 
           Ovoid.Queuer._qbody);
   } else {
@@ -916,7 +973,11 @@ Ovoid.Drawer.drawStacksRPixel = function(reye, bodyq, layerq) {
   var color = new Ovoid.Color();
   
   /* switch sur le shader */
-  Ovoid.Drawer._switchSp(Ovoid.DRAWER_SP_COLOR);
+  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_COLOR);
+  
+  /* Desactive le blend */
+  Ovoid.Drawer.switchBlend(0);
+  
   /* eyeview matrix; MEV */
   Ovoid.Drawer._sp.setUniformMatrix4fv(3, reye.eyeview.m);
 
@@ -963,8 +1024,6 @@ Ovoid.Drawer.drawStacksRPixel = function(reye, bodyq, layerq) {
   /* -- Dessin des overlays -- */
   /* desactive le depth test */
   Ovoid.gl.disable(Ovoid.gl.DEPTH_TEST);
-  /* blending de tran_sparence soustraction standard */
-  Ovoid.Drawer._switchBlend(0);
   /* les overlay sont dessiné dans l'ordre pour respecté la mise en
    * avant plan selon le parentage */
   var c = layerq.count;
@@ -1092,24 +1151,24 @@ Ovoid.Drawer.drawBodyStack = function(bodyq) {
 Ovoid.Drawer.drawStackWorld = function(reye, lightq, bodyq) {
   
   var i;
-  /* switch sur le shader */
-  Ovoid.Drawer._switchSp(Ovoid.DRAWER_SP_NLIGHT);
-  /* eyeview matrix; MEV */
+  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_NLIGHT); // switch shader
+  Ovoid.Drawer.switchBlend(3); // blend soustractif
+  
+  /* eyeview matrix */
   Ovoid.Drawer._sp.setUniformMatrix4fv(3, reye.eyeview.m);
-  /* eye position; Ep */
+  /* projection matrix */
+  Ovoid.Drawer._sp.setUniformMatrix4fv(4, reye.perspective.m);
+  /* lookat matrix */
+  Ovoid.Drawer._sp.setUniformMatrix4fv(5, reye.lookat.m);
+  /* eye position */
   Ovoid.Drawer._sp.setUniform4fv(30, reye.worldPosition.v);
-  /* ambient color; Ac */
+  /* Ambient light */
   Ovoid.Drawer._sp.setUniform4fv(40, Ovoid.Drawer._f32aryac);
-
-  /* blending de tran_sparence soustraction standard */
-  Ovoid.gl.enable(Ovoid.gl.BLEND);
-  Ovoid.Drawer._switchBlend(0);
+  
   /* Depth testing */
   Ovoid.gl.enable(Ovoid.gl.DEPTH_TEST);
-  Ovoid.gl.depthFunc(Ovoid.gl.LESS);
 
-  /* light attribs ; Le, Lp, Ld, Lc, Li, Lr, Lf, La */
-  /* Construction du tableau */
+  /* light attribs */
   var lc = lightq.count;
   for (i = 0; i < Ovoid.MAX_LIGHT_BY_DRAW; i++) {
     if (i < lc) {
@@ -1125,7 +1184,6 @@ Ovoid.Drawer.drawStackWorld = function(reye, lightq, bodyq) {
       Ovoid.Drawer._f32aryle[i] = 0;
     }
   }
-  /* Passe le tableau au shader */
   Ovoid.Drawer._sp.setUniform1iv(28, Ovoid.Drawer._f32aryle);
   Ovoid.Drawer._sp.setUniform4fv(20, Ovoid.Drawer._f32arylp);
   Ovoid.Drawer._sp.setUniform3fv(21, Ovoid.Drawer._f32aryld);
@@ -1134,7 +1192,7 @@ Ovoid.Drawer.drawStackWorld = function(reye, lightq, bodyq) {
   Ovoid.Drawer._sp.setUniform1fv(24, Ovoid.Drawer._f32arylr);
   Ovoid.Drawer._sp.setUniform1fv(25, Ovoid.Drawer._f32arylf);
   Ovoid.Drawer._sp.setUniform1fv(26, Ovoid.Drawer._f32aryla);
-
+    
   Ovoid.Drawer._sp.setUniform1i(0, 1);    /* enable diffuse; ENd */
   Ovoid.Drawer._sp.setUniform1i(1, 1);    /* enable ambient; ENa */
 
@@ -1161,50 +1219,55 @@ Ovoid.Drawer.drawStackWorld = function(reye, lightq, bodyq) {
  * @see Ovoid.Light
  * @see Ovoid.Body
  */
-Ovoid.Drawer.drawStackWorldZfail = function(reye, lightq, bodyq) {
+Ovoid.Drawer.drawStackWorldPerLight = function(reye, lightq, bodyq) {
   
   /* On force le face culling */    
   Ovoid.gl.enable(Ovoid.gl.CULL_FACE);
   
   Ovoid.gl.enable(Ovoid.gl.BLEND);
-  /* Premiere passe : dessin de la scene lumiere & effets ambients */
+  /** Premiere passe : dessin de la scene lumiere & effets ambients **/
 
   /* switch sur le shader */
-  Ovoid.Drawer._switchSp(Ovoid.DRAWER_SP_1LIGHT);
-  /* eyeview matrix; MEV */
+  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_1LIGHT);
+  /* eyeview matrix */
   Ovoid.Drawer._sp.setUniformMatrix4fv(3, reye.eyeview.m);
-  /* eye position; Ep */
+  /* projection matrix */
+  Ovoid.Drawer._sp.setUniformMatrix4fv(4, reye.perspective.m);
+  /* lookat matrix */
+  Ovoid.Drawer._sp.setUniformMatrix4fv(5, reye.lookat.m);
+  /* eye position */
   Ovoid.Drawer._sp.setUniform4fv(30, reye.worldPosition.v);
-  /* ambient color; Ac */
+  /* Ambient light */
   Ovoid.Drawer._sp.setUniform4fv(40, Ovoid.Drawer._f32aryac);
 
   Ovoid.Drawer._sp.setUniform1i(0, 0);    /* disable diffuse; ENd */
   Ovoid.Drawer._sp.setUniform1i(1, 1);    /* enable ambient; ENa */
 
   Ovoid.gl.enable(Ovoid.gl.DEPTH_TEST);
-  Ovoid.gl.depthFunc(Ovoid.gl.LESS);
 
   /* Blend func standard */
-  Ovoid.Drawer._switchBlend(0);
+  Ovoid.Drawer.switchBlend(3);
   /* Dessins des bodys */
   Ovoid.Drawer.drawBodyStack(bodyq);
 
+  /* blending additif pour les passes by-light */
+  Ovoid.Drawer.switchBlend(2);
   /* ecriture du depth buffer desactivé */
   Ovoid.gl.depthMask(0);
-  /* blending additif pour les passes by-light */
-  Ovoid.Drawer._switchBlend(2);
-  /* Passe de dessin par-lumière */
+  /* disable ambient / env shading */
+  Ovoid.Drawer._sp.setUniform1i(1, 0);
+  /* enable diffuse shading */
+  Ovoid.Drawer._sp.setUniform1i(0, 1);
+  
+  /** Per-light passe : dessin des volumes & eclairage **/
   var l = lightq.count;
   while (l--)
   {
-    /* si la lumiere projette des ombres */
-    if (lightq[l].shadowCasting)
+    /** Per-light passe A: dessin des volumes **/
+    if (lightq[l].shadowCasting && Ovoid.Drawer.opt_shadowCasting)
     {
-      /* Dessin des shadow volums */
-      
-      /* disable ambient; ENa */
-      Ovoid.Drawer._sp.setUniform1i(1, 0);
-      Ovoid.gl.depthFunc(Ovoid.gl.LESS);
+      /* disable diffuse shading */
+      Ovoid.Drawer._sp.setUniform1i(0, 1);
       /* enable le stencil test */
       Ovoid.gl.enable(Ovoid.gl.STENCIL_TEST);
       /* on efface le stencil buffer */
@@ -1244,17 +1307,15 @@ Ovoid.Drawer.drawStackWorldZfail = function(reye, lightq, bodyq) {
       Ovoid.gl.stencilOp(Ovoid.gl.KEEP, Ovoid.gl.KEEP, Ovoid.gl.KEEP);
       /* reactive l'ecriture du buffer RGBA */
       Ovoid.gl.colorMask(1, 1, 1, 1);
+      /* enable diffuse shading */
+      Ovoid.Drawer._sp.setUniform1i(0, 1);
     }
 
-    /* Dessins de la scenne en blend additif pour ajouter l'éclairage
-     * diffus */
-  
-    /* enable diffuse ENd */
-    Ovoid.Drawer._sp.setUniform1i(0, 1);
+    /** Per-light passe B: ajout eclairage diffus **/
     /* changement du depth func */
     Ovoid.gl.depthFunc(Ovoid.gl.EQUAL);
-
-    /* light attribs ; Le, Lp, Ld, Lc, Li, Lr, Lf, La */
+    
+    /* light attribs */
     Ovoid.Drawer._sp.setUniform4fv(20, lightq[l].worldPosition.v);
     Ovoid.Drawer._sp.setUniform3fv(21, lightq[l].worldDirection.v);
     Ovoid.Drawer._sp.setUniform4fv(22, lightq[l].color.v);
@@ -1262,17 +1323,15 @@ Ovoid.Drawer.drawStackWorldZfail = function(reye, lightq, bodyq) {
     Ovoid.Drawer._sp.setUniform1f(24, lightq[l].range);
     Ovoid.Drawer._sp.setUniform1f(25, lightq[l].falloff);
     Ovoid.Drawer._sp.setUniform1f(26, lightq[l].spotAngle);
-
+    
     /* Dessins des bodys */
     Ovoid.Drawer.drawBodyStack(bodyq);
   }
-  /* activation de l'ecriture du depth buffer */
-  Ovoid.gl.depthMask(1);
-  Ovoid.gl.depthFunc(Ovoid.gl.LESS);
   /* disable le stencil test */
   Ovoid.gl.disable(Ovoid.gl.STENCIL_TEST);
-  /* blending de transparence soustraction standard */
-  Ovoid.Drawer._switchBlend(0);
+  /* retablissement des parametres depth */
+  Ovoid.gl.depthMask(1);
+  Ovoid.gl.depthFunc(Ovoid.gl.LESS);
 };
 
 
@@ -1298,9 +1357,14 @@ Ovoid.Drawer.drawStackHelper = function(reye, transformq) {
   /* desactive le depth test */
   Ovoid.gl.disable(Ovoid.gl.DEPTH_TEST);
   /* switch sur le shader */
-  Ovoid.Drawer._switchSp(Ovoid.DRAWER_SP_VERTEX_COLOR);
-  /* eyeview matrix; MEV */
+  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_VERTEX_COLOR);
+  /* eyeview matrix */
   Ovoid.Drawer._sp.setUniformMatrix4fv(3, reye.eyeview.m);
+  /* projection matrix */
+  Ovoid.Drawer._sp.setUniformMatrix4fv(4, reye.perspective.m);
+  /* lookat matrix */
+  Ovoid.Drawer._sp.setUniformMatrix4fv(5, reye.lookat.m);
+  
   var i = transformq.count;
   while (i--) {
     Ovoid.Drawer.drawSymbolic(transformq[i]);
@@ -1325,8 +1389,6 @@ Ovoid.Drawer.drawStackLayer = function(layerq) {
   
   /* desactive le depth test */
   Ovoid.gl.disable(Ovoid.gl.DEPTH_TEST);
-  /* blending de tran_sparence soustraction standard */
-  Ovoid.Drawer._switchBlend(0);
   /* les overlay sont dessiné dans l'ordre pour re_specté la mise en
    * avant plan selon le parentage */
   var c = layerq.count;
@@ -1357,7 +1419,7 @@ Ovoid.Drawer.drawStackLayer = function(layerq) {
 Ovoid.Drawer.drawLayer = function(layer) {
 
   /* switch sur le shader */
-  Ovoid.Drawer._switchSp(Ovoid.DRAWER_SP_LAYER);
+  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_LAYER);
   /* transform matrix; MXF */
   Ovoid.Drawer._sp.setUniformMatrix4fv(0, layer.worldMatrix.m);
   /* layer size */
@@ -1366,9 +1428,7 @@ Ovoid.Drawer.drawLayer = function(layer) {
   Ovoid.Drawer._sp.setUniform4fv(9, layer.bgColor.v);
   Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + 1);
   
-  (layer.bgTexture != null)?
-      layer.bgTexture.bind():
-      Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D, Ovoid.Drawer._blanktexture);
+  (layer.bgTexture != null)?layer.bgTexture.bind():Ovoid.Drawer._tblank.bind();
       
   /* texture sampler diffuse; Sd */
   Ovoid.Drawer._sp.setUniformSampler(1, 1);
@@ -1397,16 +1457,16 @@ Ovoid.Drawer.drawLayer = function(layer) {
 Ovoid.Drawer.drawLayerRPixel = function(layer, color) {
 
   /* switch sur le shader */
-  Ovoid.Drawer._switchSp(Ovoid.DRAWER_SP_LAYER);
+  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_LAYER);
   /* transform matrix; MXF */
   Ovoid.Drawer._sp.setUniformMatrix4fv(0, layer.worldMatrix.m);
   /* layer size */
   Ovoid.Drawer._sp.setUniform3fv(42, layer.size.v);
+  
   /* color; C */
   Ovoid.Drawer._sp.setUniform4fv(9, color.v);
   Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + 1);
-  
-  Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D, Ovoid.Drawer._blanktexture);
+  Ovoid.Drawer._tblank.bind();
       
   /* texture sampler diffuse; Sd */
   Ovoid.Drawer._sp.setUniformSampler(1, 1);
@@ -1434,7 +1494,7 @@ Ovoid.Drawer.drawLayerRPixel = function(layer, color) {
 Ovoid.Drawer.drawText = function(text) {
   
   /* switch sur le shader */
-  Ovoid.Drawer._switchSp(Ovoid.DRAWER_SP_TEXT);
+  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_TEXT);
 
   var c = 0;
   var u = 0;
@@ -1874,7 +1934,7 @@ Ovoid.Drawer.drawShadowVolum = function(body, light) {
 Ovoid.Drawer.drawParticles = function(emitter) {
 
   /* switch sur le shader */
-  Ovoid.Drawer._switchSp(Ovoid.DRAWER_SP_PARTICLES);
+  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_PARTICLES);
   /* eyeview matrix; MEV */
   Ovoid.Drawer._sp.setUniformMatrix4fv(3, 
       Ovoid.Queuer._rcamera.eyeview.m);
@@ -1884,7 +1944,7 @@ Ovoid.Drawer.drawParticles = function(emitter) {
       
   /* model de rendu pour les particules */
   if(emitter.model == Ovoid.EMISSIVE)
-    Ovoid.Drawer._switchBlend(1);
+    Ovoid.Drawer.switchBlend(1);
     
   /* desactive le depth mask*/
   Ovoid.gl.disable(Ovoid.gl.DEPTH_TEST);
@@ -1892,9 +1952,7 @@ Ovoid.Drawer.drawParticles = function(emitter) {
   
   /* bind texture */
   Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + 1);
-  (emitter.texture != null) ?
-      Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D,emitter.texture.handle) :
-      Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D,Ovoid.Drawer._blanktexture);
+  (emitter.texture != null)?emitter.texture.bind():Ovoid.Drawer._tblank.bind();
   /* texture sampler diffuse; Sd */
   if (-1 != Ovoid.Drawer._sp.uniformSampler[1])
     Ovoid.Drawer._sp.setUniformSampler(1, 1);
@@ -1911,11 +1969,11 @@ Ovoid.Drawer.drawParticles = function(emitter) {
   Ovoid.Drawer._drawnparticle += emitter._alives;
 
   /* reprend le shader précédepent utilisé pour dessiner la scene */
-  Ovoid.Drawer._restorSp();
+  Ovoid.Drawer.restorSp();
   
   /* model de rendu normal */
   if(emitter.model == Ovoid.EMISSIVE)
-    Ovoid.Drawer._restoreBlend();
+    Ovoid.Drawer.restoreBlend();
     
   /* reactive le depth mask*/
   Ovoid.gl.depthMask(1);
@@ -1983,44 +2041,26 @@ Ovoid.Drawer.drawMesh = function(mesh) {
 
   j = mesh.polyset[l].length;
   while (j--) {
-    /* set material uniforms Md, Ma, Ms, Me, Mr, Mi, Mo, My*/
-    if (-1 != Ovoid.Drawer._sp.uniform[10])
-      Ovoid.gl.uniform4fv(Ovoid.Drawer._sp.uniform[10],
-                          mesh.polyset[l][j].material.color[0].v);
-    if (-1 != Ovoid.Drawer._sp.uniform[13])
-      Ovoid.gl.uniform4fv(Ovoid.Drawer._sp.uniform[13],
-                          mesh.polyset[l][j].material.color[3].v);
-    if (-1 != Ovoid.Drawer._sp.uniform[14])
-      Ovoid.gl.uniform4fv(Ovoid.Drawer._sp.uniform[14],
-                          mesh.polyset[l][j].material.color[4].v);
-    if (-1 != Ovoid.Drawer._sp.uniform[11])
-      Ovoid.gl.uniform4fv(Ovoid.Drawer._sp.uniform[11],
-                          mesh.polyset[l][j].material.color[1].v);
-    if (-1 != Ovoid.Drawer._sp.uniform[12])
-      Ovoid.gl.uniform4fv(Ovoid.Drawer._sp.uniform[12],
-                          mesh.polyset[l][j].material.color[2].v);
-    if (-1 != Ovoid.Drawer._sp.uniform[15])
-      Ovoid.gl.uniform1f(Ovoid.Drawer._sp.uniform[15],
-          mesh.polyset[l][j].material.shininess);
-    if (-1 != Ovoid.Drawer._sp.uniform[16])
-      Ovoid.gl.uniform1f(Ovoid.Drawer._sp.uniform[16],
-          mesh.polyset[l][j].material.opacity);
-    if (-1 != Ovoid.Drawer._sp.uniform[17])
-      Ovoid.gl.uniform1f(Ovoid.Drawer._sp.uniform[17],
-          mesh.polyset[l][j].material.reflectivity);
 
-    /* bind texture & set texture samplers Sd, Se, Ss, Sa */
-    for (var k = 0; k < 6; k++)
-    {
-      Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + k);
-      (mesh.polyset[l][j].material.texture[k] != null) ?
-          Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D,
-              mesh.polyset[l][j].material.texture[k].handle) :
-          Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D, 
-              Ovoid.Drawer._blanktexture);
-      /* set texture sampler S* */
-      if (-1 != Ovoid.Drawer._sp.uniformSampler[k])
+    /* set material uniforms */
+    Ovoid.Drawer._sp.setUniform4fv(10, mesh.polyset[l][j].material.color[0].v);
+    Ovoid.Drawer._sp.setUniform4fv(11, mesh.polyset[l][j].material.color[1].v);
+    Ovoid.Drawer._sp.setUniform4fv(12, mesh.polyset[l][j].material.color[2].v);
+    Ovoid.Drawer._sp.setUniform4fv(13, mesh.polyset[l][j].material.color[3].v);
+    Ovoid.Drawer._sp.setUniform4fv(14, mesh.polyset[l][j].material.color[4].v);
+    Ovoid.Drawer._sp.setUniform1f(15, mesh.polyset[l][j].material.shininess);
+    Ovoid.Drawer._sp.setUniform1f(16, mesh.polyset[l][j].material.opacity);
+    Ovoid.Drawer._sp.setUniform1f(17, mesh.polyset[l][j].material.reflectivity);
+
+    /* bind texture & set texture samplers */
+    for (var k = 0; k < 6; k++) {
+      if(Ovoid.Drawer._sp.uniformSampler[k] != -1) {
+        Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + k);
+        (mesh.polyset[l][j].material.texture[k])?
+          mesh.polyset[l][j].material.texture[k].bind():
+          Ovoid.Drawer._tblank.bind();
         Ovoid.gl.uniform1i(Ovoid.Drawer._sp.uniformSampler[k], k);
+      }
     }
     
     Ovoid.gl.drawElements(Ovoid.gl.TRIANGLES,

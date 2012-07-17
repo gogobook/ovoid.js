@@ -104,7 +104,7 @@ Ovoid.Material = function(name) {
    * @type Color[] */
   this.color = Ovoid.Color.newArray(5);
 
-  this.color[0].set(0.0, 0.0, 0.0, 1.0);
+  this.color[0].set(1.0, 1.0, 1.0, 1.0);
   this.color[1].set(0.0, 1.0, 0.0, 1.0);
   this.color[2].set(1.0, 1.0, 1.0, 1.0);
   this.color[3].set(0.0, 0.0, 0.0, 1.0);

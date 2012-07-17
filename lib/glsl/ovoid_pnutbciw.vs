@@ -6,9 +6,6 @@
 attribute vec4 p;
 attribute vec3 n;
 attribute vec3 u;
-attribute vec3 t;
-attribute vec3 b;
-attribute vec4 c;
 attribute vec4 i;
 attribute vec4 w;
 
@@ -31,9 +28,6 @@ uniform mat3 MNR[MATRIX_ARRAY_SIZE];
 varying vec4 Vp;
 varying vec3 Vn;
 varying vec2 Vu;
-varying vec3 Vt;
-varying vec3 Vb;
-varying vec4 Vc;
 
 void main(void) {
 
@@ -61,29 +55,7 @@ void main(void) {
 		Vn = MNR[0] * n;
 	}
 	
-	/* Tangent et Binormal transform */
-	if(ENt) { /* enable comput tangent */
-	
-		vec3 Cz = cross(Vn, vec3(0.0, 0.0, 1.0));
-		vec3 Cy = cross(Vn, vec3(0.0, 1.0, 0.0));
-		
-		if(length(Cz) > length(Cy)) {
-			Vt = Cz;
-		} else {
-			Vt = Cy;
-		}
-		
-		Vb = cross(Vn, Vt); 
-		
-	} else {
-	
-		Vt = t;
-		Vb = b;
-	}
-	
 	/* Texcoord et color */
 	Vu = u.xy;
-	Vc = c;
-	gl_PointSize = u.z;
 	gl_Position = MEV * Vp;
 }

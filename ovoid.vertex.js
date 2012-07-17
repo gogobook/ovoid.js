@@ -51,10 +51,15 @@ Ovoid.Vertex = function() {
   this.c = new Ovoid.Color();
   /** Influence indices component.
    * @type Point */
-  this.i = new Ovoid.Point();
+  this.i = new Ovoid.Point(0.0,0.0,0.0,0.0);
   /** Influence Weights component.
    * @type Point */
   this.w = new Ovoid.Point();
+  
+  /* On passe tous les index de matrice influences (i) à zero pour rester
+   * sur la premiere matrice dans le vertex shader. La derniere valeur
+   * du poids (w) sera 1.0, ce qui calculera automatiquement l'influence 1
+   * pour la premiere matrice. */
 };
 
 

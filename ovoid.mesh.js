@@ -256,7 +256,7 @@ Ovoid.Mesh.prototype.addPolyset = function(l, vertices, material) {
   var v1 = new Ovoid.Vector();
 
   /* construction des indices, normale et centre pour chaque nouveau
-   * triangle */
+   * triangle et on configure et poids et influences par defaut */
   var triangle;
   var c = vertices.length / 3;
   for (var f = 0; f < c; f++)
