@@ -415,6 +415,26 @@ Ovoid.onload = function () {};
 Ovoid.onloop = function () {};
 
 
+/** Global overidable Ondraw function.<br><br> 
+ * 
+ * This function can be user defined.<br><br>
+ * 
+ * The <code>Ovoid.ondraw</code> function is called at each frame's refresh. 
+ * Which means, between each application global refresh. It is the drawing 
+ * process method where you can create your own rendering pipelines. The default 
+ * value of this method is the <code>drawQueue</code> method from the 
+ * <code>Ovoid.Drawer</code> global class. By overriding this method you empty 
+ * the drawing process. You can create a new rendering pipeline using the 
+ * <code>Ovoid.Drawer</code> methods or at low-level WebGL.<br><br>
+ * 
+ * For more informations about <code>Ovoid.onload</code> and 
+ * <code>Ovoid.onloop</code> method see the 
+ * <a href="http://www.ovoid.org/js/doc/#onloadonloop">"The Onload And Onloop 
+ * Methods" General documentation chapter</a>
+ */
+Ovoid.ondraw = Ovoid.Drawer.drawQueue;
+
+
 /**
  * Check whether error(s) was logged.
  *
@@ -564,7 +584,7 @@ Ovoid._mainloop = function() {
       Ovoid.Solver.solveQueue();
     
     /* DRAW QUEUE */
-    Ovoid.Drawer.drawQueue();
+    Ovoid.ondraw();
 
     /* DRAW HUD */
     if (Ovoid.opt_showHud) {
