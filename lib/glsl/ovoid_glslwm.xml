@@ -30,7 +30,6 @@
 		<s symbol="UNIFORM_MATERIAL_OPACITY_FLOAT" 			id="16">Mo</s>
 		<s symbol="UNIFORM_MATERIAL_REFLECTIVITY_FLOAT" 		id="17">My</s>
 		<s symbol="UNIFORM_MATERIAL_BUMPINESS_FLOAT" 			id="18">Mb</s>
-    <s symbol="UNIFORM_LIGHT_WEIGHT_FLOAT" 				id="19">Lw</s>
 		<s symbol="UNIFORM_LIGHT_POSITION_VEC4" 				id="20">Lp</s>
 		<s symbol="UNIFORM_LIGHT_DIRECTION_VEC3" 				id="21">Ld</s>
 		<s symbol="UNIFORM_LIGHT_COLOR_VEC4" 					id="22">Lc</s>
