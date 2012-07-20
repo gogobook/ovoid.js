@@ -157,28 +157,19 @@ Ovoid.Drawer.opt_drawLights = false;
 Ovoid.Drawer.opt_drawCameras = false;
 
 
+/** Enable face normal drawing */
+Ovoid.Drawer.opt_drawNormals = false;
+
+
 /** Joint helpers's size */
-Ovoid.Drawer.opt_jointSize = 2.0;
+Ovoid.Drawer.opt_jointSize = 1.0;
+
+/** Normals scale */
+Ovoid.Drawer.opt_normalScale = 0.7;
 
 
-/** Renderer info */
-Ovoid.Drawer._rdrinfo = new Object();
-
-
-/** Private class member for drawing shader set stock. */
-Ovoid.Drawer._splib = new Array();
-
-
-/** Private class member for drawing shader set stock. */
-Ovoid.Drawer._spslot = new Array(9);
-
-
-/** Private class member for current used shader for drawing. */
-Ovoid.Drawer._sp;
-
-
-/** Private class member for blend mode slot. */
-Ovoid.Drawer._blswap = new Array(2);
+/** WebGL rendrer informations **/
+Ovoid.Drawer.glInfo = {};
 
 
 /** Drawn layer count during the last queue drawing. */
@@ -209,105 +200,79 @@ Ovoid.Drawer._drawnparticle = 0;
 Ovoid.Drawer._renderpasses = 0;
 
 
-/** Private class member for picking render texture handle. */
-Ovoid.Drawer._rprendrtex = null;
+/** Theme colors **/
+Ovoid.Drawer._tcolor = Ovoid.Color.newArray(12);
+/* white */
+Ovoid.Drawer._tcolor[0].set(1.0,1.0,1.0,1.0);
+/* black */
+Ovoid.Drawer._tcolor[1].set(0.0,0.0,0.0,1.0);
+/* grey */
+Ovoid.Drawer._tcolor[2].set(0.5,0.5,0.5,1.0);
+/* red */
+Ovoid.Drawer._tcolor[3].set(1.0,0.0,0.0,1.0);
+/* orange */
+Ovoid.Drawer._tcolor[4].set(1.0,0.5,0.0,1.0);
+/* yellow */
+Ovoid.Drawer._tcolor[5].set(1.0,1.0,0.0,1.0);
+/* light-green */
+Ovoid.Drawer._tcolor[6].set(0.5,1.0,0.5,1.0);
+/* green */
+Ovoid.Drawer._tcolor[7].set(0.0,1.0,0.0,1.0);
+/* cyan */
+Ovoid.Drawer._tcolor[8].set(0.3,0.6,1.0,1.0);
+/* blue */
+Ovoid.Drawer._tcolor[9].set(0.0,0.0,1.0,1.0);
+/* indigo */
+Ovoid.Drawer._tcolor[10].set(0.5,0.0,1.0,1.0);
+/* magenta */
+Ovoid.Drawer._tcolor[11].set(0.1,0.0,1.0,1.0);
+
+/** Default blank texture **/
+Ovoid.Drawer._tblank = null;
 
 
-/** Private class member for picking render buffer handle. */
-Ovoid.Drawer._rprendrbuf = null;
+/** Default font mapping texture **/
+Ovoid.Drawer._tfontm = null;
 
 
-/** Private class member for picking frame buffer handle. */
-Ovoid.Drawer._rpframebuf = null;
+/** Primitives buffer handles array **/
+Ovoid.Drawer._bprimitive = null;
 
 
-/** Private class member for picking readed pixel buffer. */
-Ovoid.Drawer._rpcolbytes = new Uint8Array(4);
+/** Dynamic temporary buffer handle **/
+Ovoid.Drawer._bdynamic = null;
 
 
-/** Prvate class member for internal Vertex Buffer Objects */
-Ovoid.Drawer._bostock = new Array(12);
+/** Picking frame buffer handle **/
+Ovoid.Drawer._fbrpixel = null;
 
 
-/** Private class member for bounding box color. */
-Ovoid.Drawer._colorbbox = new Ovoid.Color(0.0, 0.7, 1.0, 1.0);
+/** Shader program stock **/
+Ovoid.Drawer._splib = new Array();
 
 
-/** Private class member for bounding sphere color. */
-Ovoid.Drawer._colorbsph = new Ovoid.Color(0.0, 1.0, 0.7, 1.0);
+/** Shader program slots **/
+Ovoid.Drawer._spslot = new Array();
 
 
-/** Private class member for axis color. */
-Ovoid.Drawer._coloraxis = new Ovoid.Color(1.0, 1.0, 1.0, 1.0);
+/** Current used shader program **/
+Ovoid.Drawer.sp = null;
 
 
-/** Private class member for bones color. */
-Ovoid.Drawer._colorbone = new Ovoid.Color(0.5, 0.5, 0.5, 1.0);
+/** Blend swapper **/
+Ovoid.Drawer._swblend = new Array(2);
 
 
-/** Private class member for light symbol color. */
-Ovoid.Drawer._colorligh = new Ovoid.Color(1.0, 0.7, 0.0, 1.0);
+/** Depth swapper **/
+Ovoid.Drawer._swdepth = new Array(2);
 
 
-/** Private class member for camera symbol color. */
-Ovoid.Drawer._colorcame = new Ovoid.Color(0.0, 0.2, 1.0, 1.0);
+/** Internal ambiant color **/
+Ovoid.Drawer._abcolor = new Float32Array(4);
 
 
-/** Private class member for shadow volum color. */
-Ovoid.Drawer._colorshdw = new Ovoid.Color(0.0, 0.0, 0.0, 1.0);
-
-
-/** Private class member for blank texture handle. */
-Ovoid.Drawer._tblank = new Ovoid.Texture("blank_texture");
-
-
-/** Private class member for default fontmap texture handle. */
-Ovoid.Drawer._fontmap = null;
-
-
-/** temporary transformation matrix */
-Ovoid.Drawer._f32arymxf = new Float32Array(16);
-
-
-/** temporary orthographic projection matrix */
-Ovoid.Drawer._f32arymor = new Float32Array(16);
-
-
-/** temporary light point array */
-Ovoid.Drawer._f32arylp = new Float32Array(4 * Ovoid.MAX_LIGHT_BY_DRAW);
-
-
-/** temporary direction vector array */
-Ovoid.Drawer._f32aryld = new Float32Array(3 * Ovoid.MAX_LIGHT_BY_DRAW);
-
-
-/** temporary color array */
-Ovoid.Drawer._f32arylc = new Float32Array(4 * Ovoid.MAX_LIGHT_BY_DRAW);
-
-
-/** temporary light intensity array */
-Ovoid.Drawer._f32aryli = new Float32Array(Ovoid.MAX_LIGHT_BY_DRAW);
-
-
-/** temporary light range array */
-Ovoid.Drawer._f32arylr = new Float32Array(Ovoid.MAX_LIGHT_BY_DRAW);
-
-
-/** temporary light falloff array */
-Ovoid.Drawer._f32arylf = new Float32Array(Ovoid.MAX_LIGHT_BY_DRAW);
-
-
-/** temporary light spot-angle array */
-Ovoid.Drawer._f32aryla = new Float32Array(Ovoid.MAX_LIGHT_BY_DRAW);
-
-
-/** temporary light enabled array */
-Ovoid.Drawer._f32aryle = new Int32Array(Ovoid.MAX_LIGHT_BY_DRAW);
-
-
-/** Private class member for ambient color. */
-Ovoid.Drawer._f32aryac = new Float32Array(4);
-
+/** Picking readed pixel buffer. */
+Ovoid.Drawer._rpcolor = new Uint8Array(256);
 
 
 /**
@@ -323,103 +288,208 @@ Ovoid.Drawer._f32aryac = new Float32Array(4);
 Ovoid.Drawer.init = function() {
 
   Ovoid.log(3, 'Ovoid.Drawer', 'initialization');
-
+  
+  Ovoid._clearGlerror();
+  
   /* performance counter */
   var t = (new Date().getTime());
-
-  /* récupere les infos du renderer*/
-  Ovoid.Drawer._rdrinfo.VENDOR = Ovoid.gl.getParameter(Ovoid.gl.VENDOR);
-  Ovoid.log(3, 'Ovoid.Drawer', 'VENDOR : ' + Ovoid.Drawer._rdrinfo.VENDOR);
   
-  Ovoid.Drawer._rdrinfo.VERSION = Ovoid.gl.getParameter(Ovoid.gl.VERSION);
-  Ovoid.log(3, 'Ovoid.Drawer', 'VERSION : ' + Ovoid.Drawer._rdrinfo.VERSION);
-  
-  Ovoid.Drawer._rdrinfo.MAX_TEXTURE_IMAGE_UNITS = Ovoid.gl.getParameter(Ovoid.gl.MAX_TEXTURE_IMAGE_UNITS);
-  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_TEXTURE_IMAGE_UNITS : ' + Ovoid.Drawer._rdrinfo.MAX_TEXTURE_IMAGE_UNITS);
-  
-  Ovoid.Drawer._rdrinfo.MAX_COMBINED_TEXTURE_IMAGE_UNITS = Ovoid.gl.getParameter(Ovoid.gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
-  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_COMBINED_TEXTURE_IMAGE_UNITS : ' + Ovoid.Drawer._rdrinfo.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
-  
-  Ovoid.Drawer._rdrinfo.MAX_VARYING_VECTORS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VARYING_VECTORS);
-  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VARYING_VECTORS : ' + Ovoid.Drawer._rdrinfo.MAX_VARYING_VECTORS);
-  
-  Ovoid.Drawer._rdrinfo.MAX_VERTEX_ATTRIBS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VERTEX_ATTRIBS);
-  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VERTEX_ATTRIBS : ' + Ovoid.Drawer._rdrinfo.MAX_VERTEX_ATTRIBS);
-  
-  Ovoid.Drawer._rdrinfo.MAX_VERTEX_UNIFORM_VECTORS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VERTEX_UNIFORM_VECTORS);
-  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VERTEX_UNIFORM_VECTORS : ' + Ovoid.Drawer._rdrinfo.MAX_VERTEX_UNIFORM_VECTORS);
-  
-  Ovoid.Drawer._rdrinfo.MAX_FRAGMENT_UNIFORM_VECTORS = Ovoid.gl.getParameter(Ovoid.gl.MAX_FRAGMENT_UNIFORM_VECTORS);
-  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_FRAGMENT_UNIFORM_VECTORS : ' + Ovoid.Drawer._rdrinfo.MAX_FRAGMENT_UNIFORM_VECTORS);
-
-  Ovoid.Drawer._rdrinfo.MAX_VERTEX_TEXTURE_IMAGE_UNITS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
-  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VERTEX_TEXTURE_IMAGE_UNITS : ' + Ovoid.Drawer._rdrinfo.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
-  
-  Ovoid.Drawer._rdrinfo.SHADING_LANGUAGE_VERSION = Ovoid.gl.getParameter(Ovoid.gl.SHADING_LANGUAGE_VERSION);
-  Ovoid.log(3, 'Ovoid.Drawer', 'SHADING_LANGUAGE_VERSION : ' + Ovoid.Drawer._rdrinfo.SHADING_LANGUAGE_VERSION);
+  /* recupere les informations du renderer */
+  Ovoid.Drawer.glInfo.VENDOR = Ovoid.gl.getParameter(Ovoid.gl.VENDOR);
+  Ovoid.log(3, 'Ovoid.Drawer', 'VENDOR : ' + Ovoid.Drawer.glInfo.VENDOR);
+  Ovoid.Drawer.glInfo.VERSION = Ovoid.gl.getParameter(Ovoid.gl.VERSION);
+  Ovoid.log(3, 'Ovoid.Drawer', 'VERSION : ' + Ovoid.Drawer.glInfo.VERSION);
+  Ovoid.Drawer.glInfo.SHADING_LANGUAGE_VERSION = Ovoid.gl.getParameter(Ovoid.gl.SHADING_LANGUAGE_VERSION);
+  Ovoid.log(3, 'Ovoid.Drawer', 'SHADING_LANGUAGE_VERSION : ' + Ovoid.Drawer.glInfo.SHADING_LANGUAGE_VERSION);
+  Ovoid.Drawer.glInfo.MAX_TEXTURE_IMAGE_UNITS = Ovoid.gl.getParameter(Ovoid.gl.MAX_TEXTURE_IMAGE_UNITS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_TEXTURE_IMAGE_UNITS : ' + Ovoid.Drawer.glInfo.MAX_TEXTURE_IMAGE_UNITS);
+  Ovoid.Drawer.glInfo.MAX_COMBINED_TEXTURE_IMAGE_UNITS = Ovoid.gl.getParameter(Ovoid.gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_COMBINED_TEXTURE_IMAGE_UNITS : ' + Ovoid.Drawer.glInfo.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+  Ovoid.Drawer.glInfo.MAX_VARYING_VECTORS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VARYING_VECTORS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VARYING_VECTORS : ' + Ovoid.Drawer.glInfo.MAX_VARYING_VECTORS);
+  Ovoid.Drawer.glInfo.MAX_VERTEX_ATTRIBS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VERTEX_ATTRIBS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VERTEX_ATTRIBS : ' + Ovoid.Drawer.glInfo.MAX_VERTEX_ATTRIBS);
+  Ovoid.Drawer.glInfo.MAX_VERTEX_UNIFORM_VECTORS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VERTEX_UNIFORM_VECTORS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VERTEX_UNIFORM_VECTORS : ' + Ovoid.Drawer.glInfo.MAX_VERTEX_UNIFORM_VECTORS);
+  Ovoid.Drawer.glInfo.MAX_FRAGMENT_UNIFORM_VECTORS = Ovoid.gl.getParameter(Ovoid.gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_FRAGMENT_UNIFORM_VECTORS : ' + Ovoid.Drawer.glInfo.MAX_FRAGMENT_UNIFORM_VECTORS);
+  Ovoid.Drawer.glInfo.MAX_VERTEX_TEXTURE_IMAGE_UNITS = Ovoid.gl.getParameter(Ovoid.gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+  Ovoid.log(3, 'Ovoid.Drawer', 'MAX_VERTEX_TEXTURE_IMAGE_UNITS : ' + Ovoid.Drawer.glInfo.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
   
   /* toutes les textures flip en Y */
   Ovoid.gl.pixelStorei(Ovoid.gl.UNPACK_FLIP_Y_WEBGL, true);
   
-  /* chargement de la texture blank par defaut */
+  /* Nouvelle texture blank */
+  Ovoid.Drawer._tblank = new Ovoid.Texture("blank");
   var px = new Uint8Array(256); /* (8 * 8 * RGBA) */
-
-  for (var i = 0; i < 256; i++)  /* (8 * 8 * RGBA) */
-    px[i] = 255;
-
-  Ovoid.Drawer._tblank.handle = Ovoid.gl.createTexture();
-  Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D, Ovoid.Drawer._tblank.handle);
-  Ovoid.Drawer._tblank.target = Ovoid.gl.TEXTURE_2D;
+  for (var i = 0; i < 256; i++) px[i] = 255;
+  Ovoid.Drawer._tblank.create2d(Ovoid.gl.RGBA, 8, 8, px);
+  Ovoid.Drawer._tblank.setFilter(false);
   
-  Ovoid.gl.texImage2D(Ovoid.gl.TEXTURE_2D,
-                      0, Ovoid.gl.RGBA,
-                      8, 8, 0,
-                      Ovoid.gl.RGBA,
-                      Ovoid.gl.UNSIGNED_BYTE, px);
-
-  Ovoid.gl.texParameteri(Ovoid.gl.TEXTURE_2D,
-                          Ovoid.gl.TEXTURE_MAG_FILTER,
-                          Ovoid.gl.NEAREST);
-
-  Ovoid.gl.texParameteri(Ovoid.gl.TEXTURE_2D,
-                          Ovoid.gl.TEXTURE_MIN_FILTER,
-                          Ovoid.gl.NEAREST);
-       
-  Ovoid.gl.texParameteri(Ovoid.gl.TEXTURE_2D,
-                          Ovoid.gl.TEXTURE_WRAP_S,
-                          Ovoid.gl.CLAMP_TO_EDGE);
-
-  Ovoid.gl.texParameteri(Ovoid.gl.TEXTURE_2D,
-                          Ovoid.gl.TEXTURE_WRAP_T,
-                          Ovoid.gl.CLAMP_TO_EDGE);
-
-  Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D, null);
-  
-  
-  
-  Ovoid.Drawer._fontmap = new Ovoid.Texture();
-
-  Ovoid.Drawer._fontmap.loadSource(Ovoid.opt_defaultFontmapUrl,
+  if (Ovoid._logGlerror('Ovoid.Drawer.init:: Blank texture creation'))
+    return false;
+    
+  /* fontmap par defaut */
+  Ovoid.Drawer._tfontm = new Ovoid.Texture("fontm");
+  Ovoid.Drawer._tfontm.loadSource(Ovoid.opt_defaultFontmapUrl,
                           Ovoid.opt_defaultFontmapFilter,true);
-
-  /* buffer layer pour afficher les images */
-  var layerbuf = [
-    0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-    1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0,
-    1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0];
-
-  Ovoid.Drawer._bostock[6] = Ovoid.gl.createBuffer();
-
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[6]);
-
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-                      new Float32Array(layerbuf),
-                      Ovoid.gl.STATIC_DRAW);
   
-  /* les deux shaders text et layer de base */
+  if (Ovoid._logGlerror('Ovoid.Drawer.init:: Font map creation'))
+    return false;
+  
+  /* Cree les buffers de primitives */
+  var buffdata;
+  Ovoid.Drawer._bprimitive = new Array(6);
+  
+  /* Sprite rectangle */ 
+  buffdata = [0.0,0.0,0.0,1.0,0.0,1.0,0.0,/**/0.0,1.0,0.0,1.0,0.0,0.0,0.0,/**/
+            1.0,1.0,0.0,1.0,1.0,0.0,0.0,/**/0.0,0.0,0.0,1.0,0.0,1.0,0.0,/**/
+            1.0,1.0,0.0,1.0,1.0,0.0,0.0,/**/1.0,0.0,0.0,1.0,1.0,1.0,0.0];
+            
+  Ovoid.Drawer._bprimitive[0] = Ovoid.gl.createBuffer();
+  Ovoid.gl.bindBuffer(0x8892, Ovoid.Drawer._bprimitive[0]);
+  Ovoid.gl.bufferData(0x8892,new Float32Array(buffdata),0x88E4);
+  
+  /* Symoblic box */
+  buffdata = [0.5,0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/-0.5,0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/
+    -0.5,0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/-0.5,0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/
+    0.5,0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/-0.5,0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/
+    0.5,0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/0.5,0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/
+     0.5,-0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/-0.5,-0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/
+    -0.5,-0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/-0.5,-0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/
+     0.5,-0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/-0.5,-0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/
+     0.5,-0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/0.5,-0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/
+     0.5,0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/0.5,-0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/
+     -0.5,0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/-0.5,-0.5,0.5,1.0,1.0,1.0,1.0,1.0,/**/
+     0.5,0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/0.5,-0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/
+    -0.5,0.5,-0.5,1.0,1.0,1.0,1.0,1.0,/**/-0.5,-0.5,-0.5,1.0,1.0,1.0,1.0,1.0];
+    
+  Ovoid.Drawer._bprimitive[1] = Ovoid.gl.createBuffer();
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[1]);
+  Ovoid.gl.bufferData(0x8892,new Float32Array(buffdata),0x88E4);
+  
+  /* Symbolic sphere */
+  buffdata = Ovoid.Vertex.newArray(24 * 3 * 2);
+
+  var sd = 24.0;
+  var sinI, cosI, sinII, cosII;
+
+  var ix, iy, iz;
+
+  var j = 0;
+  for (var i = 0; i < 24 * 2; i += 2)
+  {
+    sinI = Math.sin((Ovoid._2PI) * (j / sd));
+    cosI = Math.cos((Ovoid._2PI) * (j / sd));
+    sinII = Math.sin((Ovoid._2PI) * ((j + 1) / sd));
+    cosII = Math.cos((Ovoid._2PI) * ((j + 1) / sd));
+
+    ix = i;
+    iy = ix + (24 * 2);
+    iz = iy + (24 * 2);
+
+    buffdata[ix].p.set(cosI, 0.0, sinI, 1.0);
+    buffdata[ix + 1].p.set(cosII, 0.0, sinII, 1.0);
+    buffdata[iy].p.set(cosI, sinI, 0.0, 1.0);
+    buffdata[iy + 1].p.set(cosII, sinII, 0.0, 1.0);
+    buffdata[iz].p.set(0.0, cosI, sinI, 1.0);
+    buffdata[iz + 1].p.set(0.0, cosII, sinII, 1.0);
+
+    buffdata[ix].c.set(1.0, 1.0, 1.0, 1.0);
+    buffdata[ix + 1].c.set(1.0, 1.0, 1.0, 1.0);
+    buffdata[iy].c.set(1.0, 1.0, 1.0, 1.0);
+    buffdata[iy + 1].c.set(1.0, 1.0, 1.0, 1.0);
+    buffdata[iz].c.set(1.0, 1.0, 1.0, 1.0);
+    buffdata[iz + 1].c.set(1.0, 1.0, 1.0, 1.0);
+
+    j++;
+  }
+  
+  Ovoid.Drawer._bprimitive[2] = Ovoid.gl.createBuffer();
+  Ovoid.gl.bindBuffer(0x8892, Ovoid.Drawer._bprimitive[2]);
+  Ovoid.gl.bufferData(0x8892,
+      Ovoid.Vertex.arrayAsVbo(Ovoid.VERTEX_VEC4_P|Ovoid.VERTEX_VEC4_C,buffdata),
+      0x88E4);
+  
+  /* Tricolor axis */
+  buffdata = [0.0,0.0,0.0,1.0,1.0,0.0,0.0,1.0,/**/0.25,0.0,0.0,1.0,1.0,0.0,0.0,1.0,/**/
+     0.0,0.0,0.0,1.0,0.0,1.0,0.0,1.0,/**/0.0,0.25,0.0,1.0,0.0,1.0,0.0,1.0,/**/
+     0.0,0.0,0.0,1.0,0.0,0.0,1.0,1.0,/**/0.0,0.0,0.25,1.0,0.0,0.0,1.0,1.0];
+  
+  Ovoid.Drawer._bprimitive[3] = Ovoid.gl.createBuffer();
+  Ovoid.gl.bindBuffer(0x8892, Ovoid.Drawer._bprimitive[3]);
+  Ovoid.gl.bufferData(0x8892,new Float32Array(buffdata),0x88E4);
+
+  /* Symbolic pyramid */
+  buffdata = [0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,/**/0.5,0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/
+    0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,/**/-0.5,0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/
+    0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,/**/-0.5,-0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/
+    0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,/**/0.5,-0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/
+    0.5,0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/-0.5,0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/
+    -0.5,0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/-0.5,-0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/
+    -0.5,-0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/0.5,-0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/
+    0.5,-0.5,-1.0,1.0,1.0,1.0,1.0,1.0,/**/0.5,0.5,-1.0,1.0,1.0,1.0,1.0,1.0];
+  
+  Ovoid.Drawer._bprimitive[4] = Ovoid.gl.createBuffer();
+  Ovoid.gl.bindBuffer(0x8892, Ovoid.Drawer._bprimitive[4]);
+  Ovoid.gl.bufferData(0x8892,new Float32Array(buffdata),0x88E4);
+    
+  /* Symbolic star */
+  buffdata = [0.25,0.0,0.0,1.0,1.0,1.0,1.0,1.0,/**/-0.25,0.0,0.0,1.0,1.0,1.0,1.0,1.0,/**/
+  0.0,0.25,0.0,1.0,1.0,1.0,1.0,1.0,/**/0.0,-0.25,0.0,1.0,1.0,1.0,1.0,1.0,/**/
+  0.0,0.0,0.25,1.0,1.0,1.0,1.0,1.0,/**/0.0,0.0,-1.0,1.0,1.0,1.0,1.0,1.0,/**/
+  0.125,0.125,0.125,1.0,1.0,1.0,1.0,1.0,/**/-0.125,-0.125,-0.125,1.0,1.0,1.0,1.0,1.0,/**/
+  -0.125,0.125,0.125,1.0,1.0,1.0,1.0,1.0,/**/0.125,-0.125,-0.125,1.0,1.0,1.0,1.0,1.0];
+  
+  Ovoid.Drawer._bprimitive[5] = Ovoid.gl.createBuffer();
+  Ovoid.gl.bindBuffer(0x8892, Ovoid.Drawer._bprimitive[5]);
+  Ovoid.gl.bufferData(0x8892,new Float32Array(buffdata),0x88E4);
+
+  if (Ovoid._logGlerror('Ovoid.Drawer.init:: Primitive buffer creation'))
+    return false;
+    
+  /* Cree le buffer dynamique temporaire */  
+  Ovoid.Drawer._bdynamic = Ovoid.gl.createBuffer();
+  Ovoid.gl.bindBuffer(0x8892, Ovoid.Drawer._bdynamic);
+  Ovoid.gl.bufferData(0x8892,new Float32Array(9),0x88E8);
+  
+  if (Ovoid._logGlerror('Ovoid.Drawer.init:: Dynamic buffer creation'))
+    return false;
+    
+  /* unbind les buffers */
+  Ovoid.gl.bindBuffer(0x8892, null);
+  Ovoid.gl.bindBuffer(0x8893, null);
+  
+  /* Creation du frame buffer pour le picking */
+  
+  /* Frame buffer render texture */
+  var x = Ovoid.PICKING_OFFSCREEN_FRAME_X;
+  var y = Ovoid.PICKING_OFFSCREEN_FRAME_Y;
+  var rdrtex = Ovoid.gl.createTexture();
+  Ovoid.gl.bindTexture(0x0DE1, rdrtex);
+  Ovoid.gl.texImage2D(0x0DE1,0,0x1908,x,y,0,0x1908,0x1401,null);
+  
+  Ovoid.gl.bindTexture(0x0DE1, null);
+  
+  /* Frame buffer render buffer */
+  var rdrbuf = Ovoid.gl.createRenderbuffer();
+  Ovoid.gl.bindRenderbuffer(0x8D41, rdrbuf);
+  Ovoid.gl.renderbufferStorage(0x8D41,0x81A5,x,y);
+      
+  Ovoid.gl.bindRenderbuffer(0x8D41, null);
+  
+  /* Frame buffer */
+  Ovoid.Drawer._fbrpixel = Ovoid.gl.createFramebuffer();
+  Ovoid.gl.bindFramebuffer(0x8D40, Ovoid.Drawer._fbrpixel);
+  Ovoid.gl.framebufferTexture2D(0x8D40,0x8CE0,0x0DE1,rdrtex,0);
+  Ovoid.gl.framebufferRenderbuffer(0x8D40,0x8D00,0x8D41,rdrbuf);
+      
+  Ovoid.gl.bindFramebuffer(0x8D40, null);
+
+  if (Ovoid._logGlerror('Ovoid.Drawer.init:: RP Frame buffer creation'))
+    return false;
+
+ /* Ajout des shaders par défaut */
   var sp;
 
   sp = new Ovoid.Shader("sp_text");
@@ -464,6 +534,7 @@ Ovoid.Drawer.init = function() {
   
   sp = new Ovoid.Shader("sp_shading_nl");
   sp.setSources(Ovoid.DEFAULT_GLSL_PNUIW_HYBRID_VS, Ovoid.DEFAULT_GLSL_BASIC_Nl_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
+  //sp.setSources(Ovoid.DEFAULT_GLSL_PNUIW_HYBRID_VS, Ovoid.DEFAULT_GLSL_SNLIGHT_FS, Ovoid.DEFAULT_GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default sp_shading_nl shader program.");
     return false;
@@ -478,277 +549,38 @@ Ovoid.Drawer.init = function() {
   }
   Ovoid.Drawer.plugShader(8,Ovoid.Drawer.addShader(sp));
   
-  /* buffer de rendu a la volée */
-  Ovoid.Drawer._bostock[7] = Ovoid.gl.createBuffer();
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[7]);
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-                      new Float32Array(5),
-                      Ovoid.gl.DYNAMIC_DRAW);
-
-  Ovoid.Drawer._bostock[8] = Ovoid.gl.createBuffer();
-  Ovoid.gl.bindBuffer(Ovoid.gl.ELEMENT_ARRAY_BUFFER, Ovoid.Drawer._bostock[8]);
-  Ovoid.gl.bufferData(Ovoid.gl.ELEMENT_ARRAY_BUFFER,
-                      new Float32Array(5),
-                      Ovoid.gl.DYNAMIC_DRAW);
-                      
+  if (Ovoid._logGlerror('Ovoid.Drawer.init:: Shader program creation.'))
+    return false;
+    
+  /* Initialization des parameteres WebGL par defaut */
   Ovoid.gl.viewport(0, 0, Ovoid.Frame.size.v[0], Ovoid.Frame.size.v[1]);
-
-  Ovoid.gl.clear(Ovoid.gl.COLOR_BUFFER_BIT | Ovoid.gl.DEPTH_BUFFER_BIT);
+  Ovoid.gl.clear(0x4000|0x100); /* COLOR_BUFFER_BIT, DEPTH_BUFFER_BIT*/
   
-  /* blending */
-  Ovoid.gl.enable(Ovoid.gl.BLEND);
-  Ovoid.gl.blendFunc(Ovoid.gl.SRC_ALPHA, Ovoid.gl.ONE_MINUS_SRC_ALPHA);
+  // Blend soustractif 
+  Ovoid.gl.enable(0x0BE2); // BLEND
+  Ovoid.gl.blendFunc(0x0302, 0x0303); // SRC_ALPHA, ONE_MINUS_SRC_ALPHA
   /* geometrie */
   Ovoid.gl.lineWidth(1.0);
-  /* genere INVALID_ENUM */
-  //Ovoid.gl.enable(Ovoid.gl.VERTEX_PROGRAM_POINT_SIZE);
   /* face culling par defaut */
-  Ovoid.gl.disable(Ovoid.gl.CULL_FACE);
-  Ovoid.gl.cullFace(Ovoid.gl.BACK);
-  Ovoid.gl.enable(Ovoid.gl.DEPTH_TEST);
-  /* configuration depth par defaut */
-  Ovoid.gl.depthMask(true);
-  Ovoid.gl.depthFunc(Ovoid.gl.LESS);
+  Ovoid.gl.disable(0x0B44); // CULL_FACE
+  Ovoid.gl.cullFace(0x0405); // BACK
+  /* Cconfiguration depth par defaut */
+  Ovoid.gl.depthMask(1);
+  Ovoid.gl.enable(0x0B71); // DEPTH_TEST
+  Ovoid.gl.depthFunc(0x0201); // LESS
   /* configuration du stencil */
-  Ovoid.gl.disable(Ovoid.gl.STENCIL_TEST);
-
-  Ovoid.Drawer.updateViewport();
-
-  if (Ovoid._logGlerror('Ovoid.Drawer.init:base'))
+  Ovoid.gl.disable(0x0B90); /* STENCIL_TEST */ 
+  
+  if (Ovoid._logGlerror('Ovoid.Drawer.init:: Default settings'))
     return false;
-
-  /* Performance counter */
-  var t = (new Date().getTime());
-
-  /* creation du mesh wire box par defaut */
-  var boxbuf = [
-     0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5,  0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, -0.5,  0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5,  0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.5, -0.5, -0.5, 1.0, 1.0, 1.0, 1.0, 1.0];
-
-  Ovoid.Drawer._bostock[0] = Ovoid.gl.createBuffer();
-
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[0]);
-
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-                      new Float32Array(boxbuf),
-                      Ovoid.gl.STATIC_DRAW);
-
-
-  /* creation du mesh wire _sphere par defaut */
-  var spherebuf = Ovoid.Vertex.newArray(24 * 3 * 2);
-
-  var sd = 24.0;
-  var sinI, cosI, sinII, cosII;
-
-  var ix, iy, iz;
-
-  var j = 0;
-  for (var i = 0; i < 24 * 2; i += 2)
-  {
-    sinI = Math.sin((Ovoid._2PI) * (j / sd));
-    cosI = Math.cos((Ovoid._2PI) * (j / sd));
-    sinII = Math.sin((Ovoid._2PI) * ((j + 1) / sd));
-    cosII = Math.cos((Ovoid._2PI) * ((j + 1) / sd));
-
-    ix = i;
-    iy = ix + (24 * 2);
-    iz = iy + (24 * 2);
-
-    spherebuf[ix].p.set(cosI, 0.0, sinI, 1.0);
-    spherebuf[ix + 1].p.set(cosII, 0.0, sinII, 1.0);
-    spherebuf[iy].p.set(cosI, sinI, 0.0, 1.0);
-    spherebuf[iy + 1].p.set(cosII, sinII, 0.0, 1.0);
-    spherebuf[iz].p.set(0.0, cosI, sinI, 1.0);
-    spherebuf[iz + 1].p.set(0.0, cosII, sinII, 1.0);
-
-    spherebuf[ix].c.set(1.0, 1.0, 1.0, 1.0);
-    spherebuf[ix + 1].c.set(1.0, 1.0, 1.0, 1.0);
-    spherebuf[iy].c.set(1.0, 1.0, 1.0, 1.0);
-    spherebuf[iy + 1].c.set(1.0, 1.0, 1.0, 1.0);
-    spherebuf[iz].c.set(1.0, 1.0, 1.0, 1.0);
-    spherebuf[iz + 1].c.set(1.0, 1.0, 1.0, 1.0);
-
-    j++;
-  }
-
-  Ovoid.Drawer._bostock[1] = Ovoid.gl.createBuffer();
-
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[1]);
-
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-                      Ovoid.Vertex.arrayAsVbo(Ovoid.VERTEX_VEC4_P |
-                                              Ovoid.VERTEX_VEC4_C,
-                                              spherebuf),
-                      Ovoid.gl.STATIC_DRAW);
   
-  /* creation du mesh axis par defaut */
-  var axisbuf = [
-     0.0,  0.0,  0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-    0.25,  0.0,  0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-     0.0,  0.0,  0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
-     0.0, 0.25,  0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
-     0.0,  0.0,  0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
-     0.0,  0.0, 0.25, 1.0, 0.0, 0.0, 1.0, 1.0];
-
-  Ovoid.Drawer._bostock[2] = Ovoid.gl.createBuffer();
-
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[2]);
-
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-                      new Float32Array(axisbuf),
-                      Ovoid.gl.STATIC_DRAW);
-
-
-  /* creation du mesh joint-bone par defaut */
-  var jointbuf = Ovoid.Vertex.newArray(12 * 3 * 2);
-
-  /* d'abord la _sphere Joint : 72 vertices */
-  sd = 12.0;
-  var j = 0;
-  for (var i = 0; i < 12 * 2; i += 2)
-  {
-    sinI = Math.sin((Ovoid._2PI) * (j / sd)) * 0.07;
-    cosI = Math.cos((Ovoid._2PI) * (j / sd)) * 0.07;
-    sinII = Math.sin((Ovoid._2PI) * ((j + 1) / sd)) * 0.07;
-    cosII = Math.cos((Ovoid._2PI) * ((j + 1) / sd)) * 0.07;
-
-    ix = i;
-    iy = ix + (12 * 2);
-    iz = iy + (12 * 2);
-
-    jointbuf[ix].p.set(cosI, 0.0, sinI, 1.0);
-    jointbuf[ix + 1].p.set(cosII, 0.0, sinII, 1.0);
-    jointbuf[iy].p.set(cosI, sinI, 0.0, 1.0);
-    jointbuf[iy + 1].p.set(cosII, sinII, 0.0, 1.0);
-    jointbuf[iz].p.set(0.0, cosI, sinI, 1.0);
-    jointbuf[iz + 1].p.set(0.0, cosII, sinII, 1.0);
-
-    jointbuf[ix].c.set(1.0, 1.0, 1.0, 1.0);
-    jointbuf[ix + 1].c.set(1.0, 1.0, 1.0, 1.0);
-    jointbuf[iy].c.set(1.0, 1.0, 1.0, 1.0);
-    jointbuf[iy + 1].c.set(1.0, 1.0, 1.0, 1.0);
-    jointbuf[iz].c.set(1.0, 1.0, 1.0, 1.0);
-    jointbuf[iz + 1].c.set(1.0, 1.0, 1.0, 1.0);
-
-    j++;
-  }
-  Ovoid.Drawer._bostock[3] = Ovoid.gl.createBuffer();
-
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[3]);
-
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-                      Ovoid.Vertex.arrayAsVbo(Ovoid.VERTEX_VEC4_P |
-                                                  Ovoid.VERTEX_VEC4_C,
-                                                  jointbuf),
-                      Ovoid.gl.STATIC_DRAW);
-
-  /* creation du mesh light par defaut */
-  var coneBuf = [
-      0.0,   0.0,  0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-      0.0,   0.0,  0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-      0.0,   0.0,  0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-      0.0,   0.0,  0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    -0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.25, -0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-     0.25,  0.25, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
-
-  Ovoid.Drawer._bostock[5] = Ovoid.gl.createBuffer();
-
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER,
-                      Ovoid.Drawer._bostock[5]);
-
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-                      new Float32Array(coneBuf),
-                      Ovoid.gl.STATIC_DRAW);
-  
-  /* unbind tous les buffers */
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, null);
-  Ovoid.gl.bindBuffer(Ovoid.gl.ELEMENT_ARRAY_BUFFER, null);
-  
-  /* creation du frame buffer object pour le picking */
-  Ovoid.Drawer._rprendrtex = Ovoid.gl.createTexture();
-
-  Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D,
-      Ovoid.Drawer._rprendrtex);
-
-  Ovoid.gl.texImage2D(Ovoid.gl.TEXTURE_2D,
-      0, Ovoid.gl.RGBA,
-      Ovoid.PICKING_OFFSCREEN_FRAME_X,
-      Ovoid.PICKING_OFFSCREEN_FRAME_Y,
-      0, Ovoid.gl.RGBA,
-      Ovoid.gl.UNSIGNED_BYTE, null);
-
-  /* unbind la texture, c'est TRES important */
-  Ovoid.gl.bindTexture(Ovoid.gl.TEXTURE_2D, null);
-
-  Ovoid.Drawer._rprendrbuf = Ovoid.gl.createRenderbuffer();
-
-  Ovoid.gl.bindRenderbuffer(Ovoid.gl.RENDERBUFFER,
-      Ovoid.Drawer._rprendrbuf);
-
-  Ovoid.gl.renderbufferStorage(Ovoid.gl.RENDERBUFFER,
-      Ovoid.gl.DEPTH_COMPONENT16,
-      Ovoid.PICKING_OFFSCREEN_FRAME_X,
-      Ovoid.PICKING_OFFSCREEN_FRAME_Y);
-
-  Ovoid.Drawer._rpframebuf = Ovoid.gl.createFramebuffer();
-
-  Ovoid.gl.bindFramebuffer(Ovoid.gl.FRAMEBUFFER, Ovoid.Drawer._rpframebuf);
-
-  Ovoid.gl.framebufferTexture2D(Ovoid.gl.FRAMEBUFFER,
-                                Ovoid.gl.COLOR_ATTACHMENT0,
-                                Ovoid.gl.TEXTURE_2D,
-                                Ovoid.Drawer._rprendrtex, 0);
-
-  Ovoid.gl.framebufferRenderbuffer(Ovoid.gl.FRAMEBUFFER,
-      Ovoid.gl.DEPTH_ATTACHMENT,
-      Ovoid.gl.RENDERBUFFER,
-      Ovoid.Drawer._rprendrbuf);
-  
-  /* unbind tous les buffers */
-  Ovoid.gl.bindFramebuffer(Ovoid.gl.FRAMEBUFFER, null);
-  Ovoid.gl.bindRenderbuffer(Ovoid.gl.RENDERBUFFER, null);
-  
-  if (Ovoid._logGlerror('Ovoid.Drawer.init:config'))
-    return false;
-
   Ovoid.log(3, 'Ovoid.Drawer', 'initialized in: ' + 
       ((new Date().getTime() - t) * 0.001) + 's');
 
   return true;
-};
+}
 
+/* **************************** PIPELINE METHODS **************************** */
 
 /**
  * Add a shader to shader stock.<br><br>
@@ -804,7 +636,7 @@ Ovoid.Drawer.plugShader = function(slot, id) {
   return true;
 };
 
-
+/* ****************** DRAWING CONTEXT PARAMETERS METHODS ******************** */
 /**
  * Switch shader program.<br><br>
  * 
@@ -814,10 +646,10 @@ Ovoid.Drawer.plugShader = function(slot, id) {
  */
 Ovoid.Drawer.switchSp = function(id) {
 
-  Ovoid.Drawer._sp = Ovoid.Drawer._splib[Ovoid.Drawer._spslot[id]];
+  Ovoid.Drawer.sp = Ovoid.Drawer._splib[Ovoid.Drawer._spslot[id]];
   Ovoid.Drawer._spslot[0] = Ovoid.Drawer._spslot[1];
   Ovoid.Drawer._spslot[1] = Ovoid.Drawer._spslot[id];
-  Ovoid.gl.useProgram(Ovoid.Drawer._sp.proghandle);
+  Ovoid.Drawer.sp.use();
 };
 
 
@@ -828,9 +660,9 @@ Ovoid.Drawer.switchSp = function(id) {
  */
 Ovoid.Drawer.restorSp = function() {
   
-  Ovoid.Drawer._sp = Ovoid.Drawer._splib[Ovoid.Drawer._spslot[0]];
+  Ovoid.Drawer.sp = Ovoid.Drawer._splib[Ovoid.Drawer._spslot[0]];
   Ovoid.Drawer._spslot[1] = Ovoid.Drawer._spslot[0];
-  Ovoid.gl.useProgram(Ovoid.Drawer._sp.proghandle);
+  Ovoid.Drawer.sp.use();
 };
 
 
@@ -838,32 +670,37 @@ Ovoid.Drawer.restorSp = function() {
  * Switch blend parameters.<br><br>
  * 
  * Switchs the current blend parameters to the specified configuration.
+ * 
+ * @param {int} id Blend type, can be 0, 1, 2, or 3.<br><br>
+ * 0 : blending disabled.<br><br>
+ * 1 : additive alpha. SRC_ALPHA, ONE<br><br>
+ * 2 : additive colors. ONE, ONE<br><br>
+ * 3 : substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA<br><br>
  */
 Ovoid.Drawer.switchBlend = function(id) {
 
-  Ovoid.Drawer._blswap[0] = Ovoid.Drawer._blswap[1];
-  Ovoid.Drawer._blswap[1] = id;
-  
+  Ovoid.Drawer._swblend[0] = Ovoid.Drawer._swblend[1];
+  Ovoid.Drawer._swblend[1] = id;
   switch(id)
   {
     case 0: 
-      Ovoid.gl.disable(Ovoid.gl.BLEND);
-    break;
+      Ovoid.gl.disable(0x0BE2);
+    return;
     case 1:
       // Blend alpha additif
-      Ovoid.gl.enable(Ovoid.gl.BLEND);
-      Ovoid.gl.blendFunc(Ovoid.gl.SRC_ALPHA, Ovoid.gl.ONE);
-    break;
+      Ovoid.gl.enable(0x0BE2);
+      Ovoid.gl.blendFunc(0x0302, 1);
+    return;
     case 2:
       // Blend couleur additive
-      Ovoid.gl.enable(Ovoid.gl.BLEND);
-      Ovoid.gl.blendFunc(Ovoid.gl.ONE, Ovoid.gl.ONE);
-    break;
+      Ovoid.gl.enable(0x0BE2);
+      Ovoid.gl.blendFunc(1, 1);
+    return;
     default:
       // Blend soustractif 
-      Ovoid.gl.enable(Ovoid.gl.BLEND);
-      Ovoid.gl.blendFunc(Ovoid.gl.SRC_ALPHA, Ovoid.gl.ONE_MINUS_SRC_ALPHA);
-    break;
+      Ovoid.gl.enable(0x0BE2);
+      Ovoid.gl.blendFunc(0x0302, 0x0303);
+    return;
   }
 };
 
@@ -871,7 +708,7 @@ Ovoid.Drawer.switchBlend = function(id) {
 /**
  * Restore blend parameters.<br><br>
  * 
- * Restores the last used blend parameters before the current one.
+ * Restores the last previous used blend parameters.
  */
 Ovoid.Drawer.restoreBlend = function() {
   
@@ -880,30 +717,122 @@ Ovoid.Drawer.restoreBlend = function() {
 
 
 /**
- * Draw the rendering queue.<br><br>
+ * Switch depth parameters.<br><br>
  * 
- * Draws the current available builded queues from Ovoid.Queuer global class.
+ * Switchs the current depth parameters to the specified configuration.
  * 
- * @see Ovoid.Queuer
+ * @param {int} id Depth type, can be 0, 1, 2, or 3.<br><br>
+ * 0 : all disabled.<br><br>
+ * 1 : depthMask on, depth test less.<br><br>
+ * 2 : depthMask off, depth test less.<br><br>
+ * 3 : depthMask off, depth test less equal.<br><br>
  */
-Ovoid.Drawer.drawQueue = function() {
+Ovoid.Drawer.switchDepth = function(id) {
+
+  Ovoid.Drawer._swdepth[0] = Ovoid.Drawer._swdepth[1];
+  Ovoid.Drawer._swdepth[1] = id;
+  switch(id)
+  {
+    case 0: 
+      Ovoid.gl.depthMask(0);
+      Ovoid.gl.disable(0x0B71);
+    return;
+    case 1:
+      Ovoid.gl.depthMask(1);
+      Ovoid.gl.enable(0x0B71);
+      Ovoid.gl.depthFunc(0x0201);
+    return;
+    case 2:
+      Ovoid.gl.depthMask(0);
+      Ovoid.gl.enable(0x0B71);
+      Ovoid.gl.depthFunc(0x0201);
+    return;
+    default:
+      Ovoid.gl.depthMask(0);
+      Ovoid.gl.enable(0x0B71);
+      Ovoid.gl.depthFunc(0x0203);
+    return;
+  }
+};
+
+
+/**
+ * Restore depth parameters.<br><br>
+ * 
+ * Restores the last previous used depth parameters.
+ */
+Ovoid.Drawer.restoreDepth = function() {
+  
+  Ovoid.Drawer.switchBlend(Ovoid.Drawer._blswap[0]);
+};
+
+
+/**
+ * Set culling parameters.<br><br>
+ * 
+ * Sets face culling parameters.
+ * 
+ * @param {int} id Blend type, can be 0, 1, 2, or 3.<br><br>
+ * 0 : disabled.<br><br>
+ * 1 : cull back.<br><br>
+ * 2 : cull front.<br><br>
+ */
+Ovoid.Drawer.setCull = function(id) {
+
+  Ovoid.Drawer._swdepth[0] = Ovoid.Drawer._swdepth[1];
+  Ovoid.Drawer._swdepth[1] = id;
+  switch(id)
+  {
+    case 0: 
+      Ovoid.gl.disable(0x0B44); // CULL_FACE
+    return;
+    case 2:
+      Ovoid.gl.enable(0x0B44); // CULL_FACE
+      Ovoid.gl.cullFace(0x0404); // FRONT
+    return;
+    default:
+      Ovoid.gl.enable(0x0B44); // CULL_FACE
+      Ovoid.gl.cullFace(0x0405); // BACK
+    return;
+  }
+};
+
+
+/**
+ * Restore depth parameters.<br><br>
+ * 
+ * Restores the last previous used depth parameters.
+ */
+Ovoid.Drawer.restoreDepth = function() {
+  
+  Ovoid.Drawer.switchBlend(Ovoid.Drawer._swdepth[0]);
+};
+
+
+/**
+ * Begin draw session.<br><br>
+ * 
+ * Initializes for a new drawing session.
+ */
+Ovoid.Drawer.beginDraw = function() {
   
   if (Ovoid.Frame.changed) {
-    Ovoid.Drawer.updateViewport();
+    Ovoid.gl.viewport(0,0,Ovoid.Frame.size.v[0],Ovoid.Frame.size.v[1]);
   }
-
-  Ovoid.gl.clearColor(Ovoid.Drawer.opt_clearColor[0],
-      Ovoid.Drawer.opt_clearColor[1],
-      Ovoid.Drawer.opt_clearColor[2],
-      Ovoid.Drawer.opt_clearColor[3]);
-  
-  Ovoid.gl.clear(Ovoid.gl.COLOR_BUFFER_BIT | Ovoid.gl.DEPTH_BUFFER_BIT);
   
   /* ambient color par defaut */
-  Ovoid.Drawer._f32aryac[0] = Ovoid.Drawer.opt_ambientColor[0];
-  Ovoid.Drawer._f32aryac[1] = Ovoid.Drawer.opt_ambientColor[1];
-  Ovoid.Drawer._f32aryac[2] = Ovoid.Drawer.opt_ambientColor[2];
-  Ovoid.Drawer._f32aryac[3] = Ovoid.Drawer.opt_ambientColor[3];
+  var c;
+  c = Ovoid.Drawer.opt_ambientColor;
+  Ovoid.Drawer._abcolor[0] = c[0];
+  Ovoid.Drawer._abcolor[1] = c[1];
+  Ovoid.Drawer._abcolor[2] = c[2];
+  Ovoid.Drawer._abcolor[3] = c[3];
+
+  c = Ovoid.Drawer.opt_clearColor;
+  Ovoid.gl.clearColor(c[0],c[1],c[2],c[3]);
+  
+  Ovoid.gl.depthMask(1);
+  Ovoid.gl.clear(0x4000|0x100); /* COLOR_BUFFER_BIT, DEPTH_BUFFER_BIT*/
   
   Ovoid.Drawer._drawnpolyset = 0;
   Ovoid.Drawer._drawnlayer = 0;
@@ -911,904 +840,602 @@ Ovoid.Drawer.drawQueue = function() {
   Ovoid.Drawer._drawnmesh = 0;
   Ovoid.Drawer._drawnparticle = 0;
   Ovoid.Drawer._renderpasses = 0;
-
-  /* dessin de la scene en mode coleur plate pour le picking */
-  if (Ovoid.opt_enablePicking) {
-    Ovoid.Drawer.drawStacksRPixel(Ovoid.Queuer._rcamera, 
-          Ovoid.Queuer._qbody, Ovoid.Queuer._qlayer);
-  }
-
-  /* dessins des body de la scene */
-  if (Ovoid.Drawer.opt_perLightPass) {
-    Ovoid.Drawer._drawnshadow = 0;
-    /* Dessin en mode per-light pass Z-fail cast shadow */
-    Ovoid.Drawer.drawStackWorldPerLight(Ovoid.Queuer._rcamera, 
-          Ovoid.Queuer._qlight, 
-          Ovoid.Queuer._qbody);
-  } else {
-    /* Dessin en mode normal une passe N lights */
-    Ovoid.Drawer.drawStackWorld(Ovoid.Queuer._rcamera, 
-          Ovoid.Queuer._qlight, 
-          Ovoid.Queuer._qbody);
-  }
-
-  /* dessin des helpers */
-  if (Ovoid.Drawer.opt_drawHelpers) {
-    Ovoid.Drawer.drawStackHelper(Ovoid.Queuer._rcamera, 
-        Ovoid.Queuer._qtform);
-  }
-
-  /* dessin des layers textes et images */
-  if (Ovoid.Drawer.opt_drawLayers) {
-    Ovoid.Drawer.drawStackLayer(Ovoid.Queuer._qlayer);
-  }
   
-  /* Sais pas si c'est très utile... */
-  Ovoid.gl.flush();
+  Ovoid._logGlerror('Ovoid.Drawer.beginDraw::');
 };
 
 
 /**
- * Draw world stack for readPixels.
- * <br>
- * <br>
- * Draw scene from the given camera, body and light stacks in flat color way 
- * for picking frame.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
+ * End draw session.<br><br>
  * 
- * @param {Camera} reye Camera Object to use as point of view.
- * @param {Stack} bodyq Stack of Body Objects to draw.
- * @param {Stack} layerq Stack of Layer Objects to draw.
- * 
- * @see Ovoid.Stack
- * @see Ovoid.Camera
- * @see Ovoid.Body
+ * Conclude the current drawing session.
  */
-Ovoid.Drawer.drawStacksRPixel = function(reye, bodyq, layerq) {
-  
-  /* active le depth test */
-  Ovoid.gl.enable(Ovoid.gl.DEPTH_TEST);
+Ovoid.Drawer.endDraw = function() {
+  /* Sais pas si c'est très utile... */
+  Ovoid.gl.flush();
+  Ovoid._logGlerror('Ovoid.Drawer.endDraw::');
+};
 
-  var color = new Ovoid.Color();
-  
-  /* switch sur le shader */
-  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_COLOR);
-  
-  /* Desactive le blend */
-  Ovoid.Drawer.switchBlend(0);
-  
-  /* eyeview matrix; MEV */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(3, reye.eyeview.m);
 
-  Ovoid.gl.bindFramebuffer(Ovoid.gl.FRAMEBUFFER, Ovoid.Drawer._rpframebuf);
+/**
+ * Begin readPixels draw session.<br><br>
+ * 
+ * Initializes for a new readPixels drawing sub-session.
+ */
+Ovoid.Drawer.beginRpDraw = function() {
+  
+  Ovoid.gl.bindFramebuffer(0x8D40, Ovoid.Drawer._fbrpixel); /* FRAMEBUFFER */
   /* clear avec un fond noir */
   Ovoid.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  Ovoid.gl.clear(Ovoid.gl.COLOR_BUFFER_BIT | Ovoid.gl.DEPTH_BUFFER_BIT);
+  Ovoid.gl.clear(0x4000|0x100); /* COLOR_BUFFER_BIT, DEPTH_BUFFER_BIT*/
+  Ovoid._logGlerror('Ovoid.Drawer.beginRpDraw::');
+}
 
-  /* -- Dessin du monde -- */
-  var i = bodyq.count;
-  while (i--)
-  {
-    /* ne dessinge que les nodes pickable (linked a un Action) sauf si 
-     * en mode debug */
-    if(!bodyq[i].pickable && !Ovoid.opt_debugMode)
-      continue;
-      
-    color.fromInt(bodyq[i].uid);
-    /* set color C */
-    Ovoid.Drawer._sp.setUniform4fv(9, color.v);
-    
-    if (bodyq[i].shape.type & Ovoid.MESH) {
-      /* transform matrix; MXF */
-      Ovoid.Drawer._sp.setUniformMatrix4fv(0, bodyq[i].worldMatrix.m);
-      /* draw mesh */
-      Ovoid.Drawer.drawMeshRPixel(bodyq[i].shape);
-      continue;
-    }
-
-    if (bodyq[i].shape.type & Ovoid.SKIN)  {
-      if (bodyq[i].shape.mesh) {
-        /* enable vertex weight; ENw */
-        Ovoid.Drawer._sp.setUniform1i(6, 1);
-        /* set transform matrix; MXF Array */
-        Ovoid.Drawer._sp.setUniformMatrix4fv(0, bodyq[i].shape.infMxfArray);
-        /* draw mesh */
-        Ovoid.Drawer.drawMeshRPixel(bodyq[i].shape.mesh);
-        /* disable vertex weight; ENw */
-        Ovoid.Drawer._sp.setUniform1i(6, 0);
-      }
-    }
-  }
-  
-  /* -- Dessin des overlays -- */
-  /* desactive le depth test */
-  Ovoid.gl.disable(Ovoid.gl.DEPTH_TEST);
-  /* les overlay sont dessiné dans l'ordre pour respecté la mise en
-   * avant plan selon le parentage */
-  var c = layerq.count;
-  for (var i = 0; i < c; i++) {
-    if (layerq[i].type & Ovoid.LAYER) {
-      
-      color.fromInt(layerq[i].uid);
-
-      Ovoid.Drawer.drawLayerRPixel(layerq[i], color);
-    }
-  }
+/**
+ * End readPixels draw session.<br><br>
+ * 
+ * Conclude the current readPixels drawing sub-session.
+ */
+Ovoid.Drawer.endRpDraw = function() {
   
   /* Read pixel a la position du pointeur actuel */
-  Ovoid.gl.readPixels(Ovoid.Input.mousePosition.v[0],
-                      (Ovoid.Frame.size.v[1] - Ovoid.Input.mousePosition.v[1]),
-                      1,
-                      1,
-                      Ovoid.gl.RGBA,
-                      Ovoid.gl.UNSIGNED_BYTE,
-                      Ovoid.Drawer._rpcolbytes);
-
-  Ovoid.gl.bindFramebuffer(Ovoid.gl.FRAMEBUFFER, null);
-
+  Ovoid.gl.readPixels(Ovoid.Input.mousePosition.v[0],(Ovoid.Frame.size.v[1] - Ovoid.Input.mousePosition.v[1]),1,1,0x1908,0x1401,/* RGBA, UNSIGNED_BYTE */Ovoid.Drawer._rpcolor);
+  
+  Ovoid.gl.bindFramebuffer(0x8D40, null); /* FRAMEBUFFER */
+  
   Ovoid.Input.mouseLeaveUid = Ovoid.Input.mouseOverUid;
   
   /* convertis RGB en entier */
   Ovoid.Input.mouseOverUid = 0x000000 |
-      ((Ovoid.Drawer._rpcolbytes[0]) << 16) |
-      ((Ovoid.Drawer._rpcolbytes[1]) << 8) |
-      ((Ovoid.Drawer._rpcolbytes[2]));
+      ((Ovoid.Drawer._rpcolor[0]) << 16) |
+      ((Ovoid.Drawer._rpcolor[1]) << 8) |
+      ((Ovoid.Drawer._rpcolor[2]));
   
   if(Ovoid.Input.mouseLeaveUid != Ovoid.Input.mouseOverUid) {
     Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseOverUid;
   } else {
     Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseLeaveUid = 0;
   }
-
-  /* replace le clear color original */
-  Ovoid.gl.clearColor(Ovoid.Drawer.opt_clearColor[0],
-                      Ovoid.Drawer.opt_clearColor[1],
-                      Ovoid.Drawer.opt_clearColor[2],
-                      Ovoid.Drawer.opt_clearColor[3]);
+  Ovoid._logGlerror('Ovoid.Drawer.endRpDraw::');
+}
   
-  Ovoid.Drawer._renderpasses++;
-};
-
+/* ********************** DRAWING SHADER SETUP METHODS ********************** */
 
 /**
- * Draw body stack.
- * <br>
- * <br>
- * Draw all bodys of the given stack.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
+ * Set light.<br><br>
  * 
- * @param {Stack} bodyq Stack of Body Objects to draw.
+ * Setup one or more light for the current used shader.
  * 
- * @see Ovoid.Stack
- * @see Ovoid.Body
+ * @param {Light|Stack<Light>} light Light node or Stack containing Light nodes.
  */
-Ovoid.Drawer.drawBodyStack = function(bodyq) {
+Ovoid.Drawer.light = function(light) {
   
-  var i = bodyq.count;
-  while (i--) {
-    if (bodyq[i].shape.type & Ovoid.MESH) {
-      /*  transform matrix MXF */
-      Ovoid.Drawer._sp.setUniformMatrix4fv(0,bodyq[i].worldMatrix.m);
-      /* normal matrix MNR */
-      Ovoid.Drawer._sp.setUniformMatrix3fv(1,bodyq[i].normalMatrix.m);
-      /* draw mesh */
-      Ovoid.Drawer.drawMesh(bodyq[i].shape);
-      /* les body sont world-cach si ils sont dessinés */
-      bodyq[i].addCach(Ovoid.CACH_WORLD);
-      continue;
-    }
-    if (bodyq[i].shape.type & Ovoid.SKIN) {
-      if (bodyq[i].shape.mesh) {
-        /* enable vertex weight; ENw */
-        Ovoid.Drawer._sp.setUniform1i(6, 1);
-        /* transform matrix; MXF Array */
-        Ovoid.Drawer._sp.setUniformMatrix4fv(0,bodyq[i].shape.infMxfArray);
-        /* normal matrix; MNR Array */
-        Ovoid.Drawer._sp.setUniformMatrix3fv(1,bodyq[i].shape.infMnrArray);
-        /* draw mesh */
-        Ovoid.Drawer.drawMesh(bodyq[i].shape.mesh);
-        /* disable vertex weight ENw */
-        Ovoid.Drawer._sp.setUniform1i(6, 0);
-        /* les skin sont world-cach si ils sont dessinés */
-        bodyq[i].addCach(Ovoid.CACH_WORLD);
+  if (light.count) { /* stack ? */
+    var c = Ovoid.MAX_LIGHT_BY_DRAW;
+    /* A priori recréer les array à chaque frame a un impact negligable
+     * sur les performances, surtout vu la taille des arrays */
+    var lp = new Float32Array(4*c);
+    var ld = new Float32Array(3*c);
+    var lc = new Float32Array(4*c);
+    var li = new Float32Array(c);
+    var lr = new Float32Array(c);
+    var lf = new Float32Array(c);
+    var la = new Float32Array(c);
+    var le = new Int32Array(c);
+    
+    for (var i = 0; i < Ovoid.MAX_LIGHT_BY_DRAW; i++) {
+      if (i < light.count) {
+        lp.set(light[i].worldPosition.v, i*4);
+        ld.set(light[i].worldDirection.v, i*3); 
+        lc.set(light[i].color.v, i*4);
+        li[i] = light[i].intensity;
+        lr[i] = light[i].range;
+        lf[i] = light[i].falloff;
+        la[i] = light[i].spotAngle;
+        le[i] = 1; /*enabled*/
+      } else {
+        le[i] = 0; /*enabled*/
       }
-      continue;
-    }
-    if (bodyq[i].shape.type & Ovoid.EMITTER) {
-      /*  transform matrix MXF */
-      Ovoid.Drawer._sp.setUniformMatrix4fv(0,bodyq[i].worldMatrix.m);
-      /* draw particles */
-      Ovoid.Drawer.drawParticles(bodyq[i].shape);
-      /* les body sont world-cach si ils sont dessinés */
-      bodyq[i].addCach(Ovoid.CACH_WORLD);
-    }
-  }
-  
-  Ovoid.Drawer._renderpasses++;
-};
-
-
-/**
- * Draw world stack.
- * <br>
- * <br>
- * Draw scene from the given camera, body and light stacks in shading way with 
- * multiple lights in one render pass.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Camera} reye Camera Object to use as point of view.
- * @param {Stack} lightq Stack of Light Objects to use for scene lighting.
- * @param {Stack} bodyq Stack of Body Objects to draw.
- * 
- * @see Ovoid.Stack
- * @see Ovoid.Camera
- * @see Ovoid.Light
- * @see Ovoid.Body
- */
-Ovoid.Drawer.drawStackWorld = function(reye, lightq, bodyq) {
-  
-  var i;
-  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_NLIGHT); // switch shader
-  Ovoid.Drawer.switchBlend(3); // blend soustractif
-  
-  /* eyeview matrix */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(3, reye.eyeview.m);
-  /* projection matrix */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(4, reye.perspective.m);
-  /* lookat matrix */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(5, reye.lookat.m);
-  /* eye position */
-  Ovoid.Drawer._sp.setUniform4fv(30, reye.worldPosition.v);
-  /* Ambient light */
-  Ovoid.Drawer._sp.setUniform4fv(40, Ovoid.Drawer._f32aryac);
-  
-  /* Depth testing */
-  Ovoid.gl.enable(Ovoid.gl.DEPTH_TEST);
-
-  /* light attribs */
-  var lc = lightq.count;
-  for (i = 0; i < Ovoid.MAX_LIGHT_BY_DRAW; i++) {
-    if (i < lc) {
-      Ovoid.Drawer._f32aryle[i] = 1;
-      Ovoid.Drawer._f32arylp.set(lightq[i].worldPosition.v, i * 4);
-      Ovoid.Drawer._f32aryld.set(lightq[i].worldDirection.v, i * 3);
-      Ovoid.Drawer._f32arylc.set(lightq[i].color.v, i * 4);
-      Ovoid.Drawer._f32aryli[i] = lightq[i].intensity;
-      Ovoid.Drawer._f32arylr[i] = lightq[i].range;
-      Ovoid.Drawer._f32arylf[i] = lightq[i].falloff;
-      Ovoid.Drawer._f32aryla[i] = lightq[i].spotAngle;
-    } else {
-      Ovoid.Drawer._f32aryle[i] = 0;
-    }
-  }
-  Ovoid.Drawer._sp.setUniform1iv(28, Ovoid.Drawer._f32aryle);
-  Ovoid.Drawer._sp.setUniform4fv(20, Ovoid.Drawer._f32arylp);
-  Ovoid.Drawer._sp.setUniform3fv(21, Ovoid.Drawer._f32aryld);
-  Ovoid.Drawer._sp.setUniform4fv(22, Ovoid.Drawer._f32arylc);
-  Ovoid.Drawer._sp.setUniform1fv(23, Ovoid.Drawer._f32aryli);
-  Ovoid.Drawer._sp.setUniform1fv(24, Ovoid.Drawer._f32arylr);
-  Ovoid.Drawer._sp.setUniform1fv(25, Ovoid.Drawer._f32arylf);
-  Ovoid.Drawer._sp.setUniform1fv(26, Ovoid.Drawer._f32aryla);
-    
-  Ovoid.Drawer._sp.setUniform1i(0, 1);    /* enable diffuse; ENd */
-  Ovoid.Drawer._sp.setUniform1i(1, 1);    /* enable ambient; ENa */
-
-  /* Dessins des bodys */
-  Ovoid.Drawer.drawBodyStack(bodyq);
-};
-
-
-/**
- * Draw world stack in Z-fail.
- * <br>
- * <br>
- * Draw scene from the given camera, body and light stacks in shading way with 
- * multiple lights in z-fail cast shadow per-light render pass.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Camera} reye Camera Object to use as point of view.
- * @param {Stack} lightq Stack of Light Objects to use for scene lighting.
- * @param {Stack} bodyq Stack of Body Objects to draw.
- * 
- * @see Ovoid.Stack
- * @see Ovoid.Camera
- * @see Ovoid.Light
- * @see Ovoid.Body
- */
-Ovoid.Drawer.drawStackWorldPerLight = function(reye, lightq, bodyq) {
-  
-  /* On force le face culling */    
-  Ovoid.gl.enable(Ovoid.gl.CULL_FACE);
-  
-  Ovoid.gl.enable(Ovoid.gl.BLEND);
-  /** Premiere passe : dessin de la scene lumiere & effets ambients **/
-
-  /* switch sur le shader */
-  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_1LIGHT);
-  /* eyeview matrix */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(3, reye.eyeview.m);
-  /* projection matrix */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(4, reye.perspective.m);
-  /* lookat matrix */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(5, reye.lookat.m);
-  /* eye position */
-  Ovoid.Drawer._sp.setUniform4fv(30, reye.worldPosition.v);
-  /* Ambient light */
-  Ovoid.Drawer._sp.setUniform4fv(40, Ovoid.Drawer._f32aryac);
-
-  Ovoid.Drawer._sp.setUniform1i(0, 0);    /* disable diffuse; ENd */
-  Ovoid.Drawer._sp.setUniform1i(1, 1);    /* enable ambient; ENa */
-
-  Ovoid.gl.enable(Ovoid.gl.DEPTH_TEST);
-
-  /* Blend func standard */
-  Ovoid.Drawer.switchBlend(3);
-  /* Dessins des bodys */
-  Ovoid.Drawer.drawBodyStack(bodyq);
-
-  /* blending additif pour les passes by-light */
-  Ovoid.Drawer.switchBlend(2);
-  /* ecriture du depth buffer desactivé */
-  Ovoid.gl.depthMask(0);
-  /* disable ambient / env shading */
-  Ovoid.Drawer._sp.setUniform1i(1, 0);
-  /* enable diffuse shading */
-  Ovoid.Drawer._sp.setUniform1i(0, 1);
-  
-  /** Per-light passe : dessin des volumes & eclairage **/
-  var l = lightq.count;
-  while (l--)
-  {
-    /** Per-light passe A: dessin des volumes **/
-    if (lightq[l].shadowCasting && Ovoid.Drawer.opt_shadowCasting)
-    {
-      /* disable diffuse shading */
-      Ovoid.Drawer._sp.setUniform1i(0, 1);
-      /* enable le stencil test */
-      Ovoid.gl.enable(Ovoid.gl.STENCIL_TEST);
-      /* on efface le stencil buffer */
-      Ovoid.gl.clear(Ovoid.gl.STENCIL_BUFFER_BIT);
-      /* desactive l'ecriture du buffer RGBA */
-      Ovoid.gl.colorMask(0, 0, 0, 0);
-      /* stencil func en passe toujours */
-      Ovoid.gl.stencilFunc(Ovoid.gl.ALWAYS, 0, 0);
-
-      var i = bodyq.count;
-      while (i--) {
-        if (bodyq[i].shape.type & Ovoid.MESH) {
-          /* transform matrix; MXF */
-          Ovoid.Drawer._sp.setUniformMatrix4fv(0, bodyq[i].worldMatrix.m);
-          /* draw shadow volum */
-          Ovoid.Drawer.drawShadowVolum(bodyq[i], lightq[l]);
-        }
-
-        if (bodyq[i].shape.type & Ovoid.SKIN) {
-          if (bodyq[i].shape.mesh) {
-            /* transform matrix; MXF */
-            Ovoid.Drawer._sp.setUniformMatrix4fv(0, bodyq[i].worldMatrix.m);
-            /* draw shadow volum */
-            /* Le dessins des shadow volum pour les skin n'est pas
-             * encore implémenté. Ne le sera peut-être jamais, vu que
-             * l'opération s'avèrerait très gourmande en calculs */
-            /* MAJ : tentative d'implémentation des shadow volum pour les skin */
-            if (Ovoid.opt_localSkinData) {
-                Ovoid.Drawer.drawShadowVolum(bodyq[i], lightq[l]);
-            }
-          }
-        }
-      }
-
-      /* configuration stencil _speciale z-fail */
-      Ovoid.gl.stencilFunc(Ovoid.gl.EQUAL, 0, -1);
-      Ovoid.gl.stencilOp(Ovoid.gl.KEEP, Ovoid.gl.KEEP, Ovoid.gl.KEEP);
-      /* reactive l'ecriture du buffer RGBA */
-      Ovoid.gl.colorMask(1, 1, 1, 1);
-      /* enable diffuse shading */
-      Ovoid.Drawer._sp.setUniform1i(0, 1);
-    }
-
-    /** Per-light passe B: ajout eclairage diffus **/
-    /* changement du depth func */
-    Ovoid.gl.depthFunc(Ovoid.gl.EQUAL);
-    
-    /* light attribs */
-    Ovoid.Drawer._sp.setUniform4fv(20, lightq[l].worldPosition.v);
-    Ovoid.Drawer._sp.setUniform3fv(21, lightq[l].worldDirection.v);
-    Ovoid.Drawer._sp.setUniform4fv(22, lightq[l].color.v);
-    Ovoid.Drawer._sp.setUniform1f(23, lightq[l].intensity);
-    Ovoid.Drawer._sp.setUniform1f(24, lightq[l].range);
-    Ovoid.Drawer._sp.setUniform1f(25, lightq[l].falloff);
-    Ovoid.Drawer._sp.setUniform1f(26, lightq[l].spotAngle);
-    
-    /* Dessins des bodys */
-    Ovoid.Drawer.drawBodyStack(bodyq);
-  }
-  /* disable le stencil test */
-  Ovoid.gl.disable(Ovoid.gl.STENCIL_TEST);
-  /* retablissement des parametres depth */
-  Ovoid.gl.depthMask(1);
-  Ovoid.gl.depthFunc(Ovoid.gl.LESS);
-};
-
-
-/**
- * Draw helper stack.
- * <br>
- * <br>
- * Draw helpers and dummy of the given transform's inherited stack.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Camera} reye Camera Object to use as point of view.
- * @param {Stack} transformq Stack of Transform's inherited Object to draw 
- * helpers.
- * 
- * @see Ovoid.Stack
- * @see Ovoid.Camera
- * @see Ovoid.Transform
- */
-Ovoid.Drawer.drawStackHelper = function(reye, transformq) {
-
-  /* Dessins des elements symboliques et helpers */
-  /* desactive le depth test */
-  Ovoid.gl.disable(Ovoid.gl.DEPTH_TEST);
-  /* switch sur le shader */
-  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_VERTEX_COLOR);
-  /* eyeview matrix */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(3, reye.eyeview.m);
-  /* projection matrix */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(4, reye.perspective.m);
-  /* lookat matrix */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(5, reye.lookat.m);
-  
-  var i = transformq.count;
-  while (i--) {
-    Ovoid.Drawer.drawSymbolic(transformq[i]);
-  }
-};
-
-
-/**
- * Draw layer stack.
- * <br>
- * <br>
- * Draw layers from the given stack.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Stack} layerq Stack of Layer Objects to draw.
- * 
- * @see Ovoid.Stack
- * @see Ovoid.Layer
- */
-Ovoid.Drawer.drawStackLayer = function(layerq) {
-  
-  /* desactive le depth test */
-  Ovoid.gl.disable(Ovoid.gl.DEPTH_TEST);
-  /* les overlay sont dessiné dans l'ordre pour re_specté la mise en
-   * avant plan selon le parentage */
-  var c = layerq.count;
-  for (var i = 0; i < c; i++) {
-    if (layerq[i].type & Ovoid.TEXT) {
-      Ovoid.Drawer.drawText(layerq[i]);
-      continue;
-    }
-    if (layerq[i].type & Ovoid.LAYER) {
-      Ovoid.Drawer.drawLayer(layerq[i]);
-    }
-  }
-};
-
-
-/**
- * Draw layer overlay.
- * <br>
- * <br>
- * Draw a Layer Object.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Layer} layer Layer Object to draw.
- * 
- * @see Ovoid.Layer
- */
-Ovoid.Drawer.drawLayer = function(layer) {
-
-  /* switch sur le shader */
-  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_LAYER);
-  /* transform matrix; MXF */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(0, layer.worldMatrix.m);
-  /* layer size */
-  Ovoid.Drawer._sp.setUniform3fv(42, layer.size.v);
-  /* color; C */
-  Ovoid.Drawer._sp.setUniform4fv(9, layer.bgColor.v);
-  Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + 1);
-  
-  (layer.bgTexture != null)?layer.bgTexture.bind():Ovoid.Drawer._tblank.bind();
-      
-  /* texture sampler diffuse; Sd */
-  Ovoid.Drawer._sp.setUniformSampler(1, 1);
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[6]);
-  Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-                                            Ovoid.VERTEX_VEC3_U,
-                                            28);
-  Ovoid.gl.drawArrays(Ovoid.gl.TRIANGLES, 0, 6);
-  Ovoid.Drawer._drawnlayer++;
-};
-
-
-/**
- * Draw layer overlay for readPixels.
- * <br>
- * <br>
- * Draw a Layer Object.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Layer} layer Layer Object to draw.
- * @param {Color} color Symbolic color for this layer.
- * 
- * @see Ovoid.Layer
- */
-Ovoid.Drawer.drawLayerRPixel = function(layer, color) {
-
-  /* switch sur le shader */
-  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_LAYER);
-  /* transform matrix; MXF */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(0, layer.worldMatrix.m);
-  /* layer size */
-  Ovoid.Drawer._sp.setUniform3fv(42, layer.size.v);
-  
-  /* color; C */
-  Ovoid.Drawer._sp.setUniform4fv(9, color.v);
-  Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + 1);
-  Ovoid.Drawer._tblank.bind();
-      
-  /* texture sampler diffuse; Sd */
-  Ovoid.Drawer._sp.setUniformSampler(1, 1);
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[6]);
-  Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-                                            Ovoid.VERTEX_VEC3_U,
-                                            28);
-  Ovoid.gl.drawArrays(Ovoid.gl.TRIANGLES, 0, 6);
-  Ovoid.Drawer._drawnlayer++;
-};
-
-
-/**
- * Draw text overlay.
- * <br>
- * <br>
- * Draw a Text Object. 
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Text} text Text Object to draw.
- * 
- * @see Ovoid.Text
- */
-Ovoid.Drawer.drawText = function(text) {
-  
-  /* switch sur le shader */
-  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_TEXT);
-
-  var c = 0;
-  var u = 0;
-  var l = 0;
-  var a;
-  var b;
-  var x = (text.size.v[0] * text.size.v[1]);
-  var y = (text.size.v[0] * text.size.v[2]);
-  var z = text.size.v[0];
-
-  var n = text.string.length;
-  var V = new Float32Array(n*4);
-  
-  for (var i = 0; i < n; i++)
-  {
-    b = a; /* old a == charCodeAt(i - 1) */
-    a = text.string.charCodeAt(i);
-    if (a == 0x0A) { /* \n */
-      l++; u = 0; continue;
-    }
-    if (a == 0x09) { /* \t */
-      u += 4; continue;
-    }
-    if (a == 0xC2 || a == 0xC3) { /* unicod premier octect */
-      continue;
-    }
-    if (b == 0xC3) { /* unicod correction d'index */
-      a += 64;
-    }
-    V[c] = x + (u * x);
-    V[c + 1] = (y * 0.5) + (l * y);
-    V[c + 2] = z;
-    V[c + 3] = a - 32;
-    c += 4; u++;
-  }
-  /* transform matrix; MXF */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(0, text.worldMatrix.m);
-  /* color; C */
-  Ovoid.Drawer._sp.setUniform4fv(9, text.fgColor.v);
-  Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + 1);
-
-  (text.fontmapTexture != null) ?
-      text.fontmapTexture.bind() :
-      Ovoid.Drawer._fontmap.bind();
-
-  /* texture sampler diffuse; Sd */
-  Ovoid.Drawer._sp.setUniformSampler(1, 1);
-  
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[7]);
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,V,Ovoid.gl.DYNAMIC_DRAW);
-  Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P, 16);
-  Ovoid.gl.drawArrays(Ovoid.gl.POINTS, 0, c*0.25);
-  
-  Ovoid.Drawer._drawnlayer++;
-};
-
-
-/**
- * Draw pseudo-box shape.
- * <br>
- * <br>
- * Draw symbolic pseudo box.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Matrix4} matrix Transformation matrix.
- * @param {Vector} scale Vector for box's X, Y and Z size.
- * @param {Color} color Box color.
- * 
- * @see Ovoid.Matrix4
- * @see Ovoid.Vector
- * @see Ovoid.Color
- */
-Ovoid.Drawer.drawPseudoBox = function(matrix, scale, color) {
-  
-  Ovoid.Drawer._f32arymxf.set(matrix.m);
-  Ovoid.Drawer._f32arymxf[0] *= scale.v[0];
-  Ovoid.Drawer._f32arymxf[1] *= scale.v[1];
-  Ovoid.Drawer._f32arymxf[2] *= scale.v[2];
-  Ovoid.Drawer._f32arymxf[4] *= scale.v[0];
-  Ovoid.Drawer._f32arymxf[5] *= scale.v[1];
-  Ovoid.Drawer._f32arymxf[6] *= scale.v[2];
-  Ovoid.Drawer._f32arymxf[8] *= scale.v[0];
-  Ovoid.Drawer._f32arymxf[9] *= scale.v[1];
-  Ovoid.Drawer._f32arymxf[10] *= scale.v[2];
-  /* color; C */
-  Ovoid.Drawer._sp.setUniform4fv(9, color.v);
-  /* transform matrix; MXF */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(0, Ovoid.Drawer._f32arymxf);
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[0]);
-  Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-      Ovoid.VERTEX_VEC4_C,
-      32);
-  Ovoid.gl.drawArrays(Ovoid.gl.LINES, 0, 24);
-  Ovoid.Drawer._drawnhelper++;
-};
-
-
-/**
- * Draw pseudo-sphere shape.
- * <br>
- * <br>
- * Draw a symbolic pseudo sphere.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Matrix4} matrix Transformation matrix.
- * @param {Vector} scale Vector for sphere's X, Y and Z size.
- * @param {Color} color Sphere color.
- * 
- * @see Ovoid.Matrix4
- * @see Ovoid.Vector
- * @see Ovoid.Color
- */
-Ovoid.Drawer.drawPseudoSphere = function(matrix, scale, color) {
-  
-  Ovoid.Drawer._f32arymxf.set(matrix.m);
-  Ovoid.Drawer._f32arymxf[0] *= scale.v[0];
-  Ovoid.Drawer._f32arymxf[1] *= scale.v[1];
-  Ovoid.Drawer._f32arymxf[2] *= scale.v[2];
-  Ovoid.Drawer._f32arymxf[4] *= scale.v[0];
-  Ovoid.Drawer._f32arymxf[5] *= scale.v[1];
-  Ovoid.Drawer._f32arymxf[6] *= scale.v[2];
-  Ovoid.Drawer._f32arymxf[8] *= scale.v[0];
-  Ovoid.Drawer._f32arymxf[9] *= scale.v[1];
-  Ovoid.Drawer._f32arymxf[10] *= scale.v[2];
-  /* color; C */
-  Ovoid.Drawer._sp.setUniform4fv(9, color.v);
-  /* transform matrix; MXF */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(0, Ovoid.Drawer._f32arymxf);
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[1]);
-  Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-                                    Ovoid.VERTEX_VEC4_C,
-                                    32);
-  Ovoid.gl.drawArrays(Ovoid.gl.LINES, 0, 24);
-  Ovoid.Drawer._drawnhelper++;
-};
-
-/**
- * Draw symbolic shape.
- * <br>
- * <br>
- * Draw, if exist, the given transform object's symbolic form.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Transform} transform Transform inherited object to draw as symbolic form.
- * 
- * @see Ovoid.Transform
- */
-Ovoid.Drawer.drawSymbolic = function(transform) {
-
-  /* transform matrix; MXF */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(0, transform.worldMatrix.m);
-  
-  if (Ovoid.Drawer.opt_drawAxis) {
-    /* color; C */
-    Ovoid.Drawer._sp.setUniform4fv(9, Ovoid.Drawer._coloraxis.v);
-    Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[2]);
-    Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-        Ovoid.VERTEX_VEC4_C,
-        32);
-    Ovoid.gl.drawArrays(Ovoid.gl.LINES, 0, 6);
-    Ovoid.Drawer._drawnhelper++;
-  }
-  
-  if ((transform.type & Ovoid.CAMERA) && Ovoid.Drawer.opt_drawCameras) {
-    /* color; C */
-    Ovoid.Drawer._sp.setUniform4fv(9, Ovoid.Drawer._colorcame.v);
-    Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[5]);
-    Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-                                      Ovoid.VERTEX_VEC4_C,
-                                      32);
-    Ovoid.gl.drawArrays(Ovoid.gl.LINES, 0, 16);
-    Ovoid.Drawer._drawnhelper++;
-    return;
-  }
-  
-  if ((transform.type & Ovoid.LIGHT) && Ovoid.Drawer.opt_drawLights) {
-    /* color; C */
-    Ovoid.Drawer._sp.setUniform4fv(9, Ovoid.Drawer._colorligh.v);
-    Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[5]);
-    Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-        Ovoid.VERTEX_VEC4_C,
-        32);
-    Ovoid.gl.drawArrays(Ovoid.gl.LINES, 0, 16);
-    Ovoid.Drawer._drawnhelper++;
-    return;
-  }
-  
-  if ((transform.type & Ovoid.JOINT) && Ovoid.Drawer.opt_drawJointBones) {
-
-    Ovoid.Drawer._f32arymxf.set(transform.worldMatrix.m);
-    var S = Ovoid.Drawer.opt_jointSize * transform.size;
-    Ovoid.Drawer._f32arymxf[0] *= S; 
-    Ovoid.Drawer._f32arymxf[1] *= S; 
-    Ovoid.Drawer._f32arymxf[2] *= S;
-    Ovoid.Drawer._f32arymxf[4] *= S; 
-    Ovoid.Drawer._f32arymxf[5] *= S; 
-    Ovoid.Drawer._f32arymxf[6] *= S;
-    Ovoid.Drawer._f32arymxf[8] *= S; 
-    Ovoid.Drawer._f32arymxf[9] *= S; 
-    Ovoid.Drawer._f32arymxf[10] *= S;
-    /* transform matrix; MXF */
-    Ovoid.Drawer._sp.setUniformMatrix4fv(0, Ovoid.Drawer._f32arymxf);
-    /* color; C */
-    Ovoid.Drawer._sp.setUniform4fv(9, Ovoid.Drawer._colorbone.v);
-    Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[3]);
-    Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-        Ovoid.VERTEX_VEC4_C,
-        32);
-    Ovoid.gl.drawArrays(Ovoid.gl.LINES, 0, 72);
-
-    Ovoid.Drawer._drawnhelper++;
-    return;
-  }
-  
-  if(transform.type & Ovoid.BODY) {
-    
-    if (Ovoid.Drawer.opt_drawBoundingBox) {
-      var box = transform.boundingBox;
-      
-      Ovoid.Drawer._f32arymxf.set(transform.worldMatrix.m);
-      Ovoid.Drawer._f32arymxf[0] *= box.hsize.v[0] * 2.0;
-      Ovoid.Drawer._f32arymxf[1] *= box.hsize.v[0] * 2.0;
-      Ovoid.Drawer._f32arymxf[2] *= box.hsize.v[0] * 2.0;
-      Ovoid.Drawer._f32arymxf[4] *= box.hsize.v[1] * 2.0;
-      Ovoid.Drawer._f32arymxf[5] *= box.hsize.v[1] * 2.0;
-      Ovoid.Drawer._f32arymxf[6] *= box.hsize.v[1] * 2.0;
-      Ovoid.Drawer._f32arymxf[8] *= box.hsize.v[2] * 2.0;
-      Ovoid.Drawer._f32arymxf[9] *= box.hsize.v[2] * 2.0;
-      Ovoid.Drawer._f32arymxf[10] *= box.hsize.v[2] * 2.0;
-
-      Ovoid.Drawer._f32arymxf[12] += box.center.v[0] * transform.worldMatrix.m[0] +
-                        box.center.v[1] * transform.worldMatrix.m[4] +
-                        box.center.v[2] * transform.worldMatrix.m[8];
-      Ovoid.Drawer._f32arymxf[13] += box.center.v[0] * transform.worldMatrix.m[1] +
-                        box.center.v[1] * transform.worldMatrix.m[5] +
-                        box.center.v[2] * transform.worldMatrix.m[9];
-      Ovoid.Drawer._f32arymxf[14] += box.center.v[0] * transform.worldMatrix.m[2] +
-                        box.center.v[1] * transform.worldMatrix.m[6] +
-                        box.center.v[2] * transform.worldMatrix.m[10];
-
-      /* color; C */
-      Ovoid.Drawer._sp.setUniform4fv(9, Ovoid.Drawer._colorbbox.v);
-      /* transform matrix; MXF */
-      Ovoid.Drawer._sp.setUniformMatrix4fv(0, Ovoid.Drawer._f32arymxf);
-      Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[0]);
-      Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-          Ovoid.VERTEX_VEC4_C,
-          32);
-      Ovoid.gl.drawArrays(Ovoid.gl.LINES, 0, 24);
-      Ovoid.Drawer._drawnhelper++;
     }
     
-    if (Ovoid.Drawer.opt_drawBoundingSphere) {
-      var sph = transform.boundingSphere;
-      Ovoid.Drawer._f32arymxf.set(transform.worldMatrix.m);
-      Ovoid.Drawer._f32arymxf[0] *= sph.radius;
-      Ovoid.Drawer._f32arymxf[1] *= sph.radius;
-      Ovoid.Drawer._f32arymxf[2] *= sph.radius;
-      Ovoid.Drawer._f32arymxf[4] *= sph.radius;
-      Ovoid.Drawer._f32arymxf[5] *= sph.radius;
-      Ovoid.Drawer._f32arymxf[6] *= sph.radius;
-      Ovoid.Drawer._f32arymxf[8] *= sph.radius;
-      Ovoid.Drawer._f32arymxf[9] *= sph.radius;
-      Ovoid.Drawer._f32arymxf[10] *= sph.radius;
-
-      Ovoid.Drawer._f32arymxf[12] += sph.center.v[0] * transform.worldMatrix.m[0] +
-                        sph.center.v[1] * transform.worldMatrix.m[4] +
-                        sph.center.v[2] * transform.worldMatrix.m[8];
-      Ovoid.Drawer._f32arymxf[13] += sph.center.v[0] * transform.worldMatrix.m[1] +
-                        sph.center.v[1] * transform.worldMatrix.m[5] +
-                        sph.center.v[2] * transform.worldMatrix.m[9];
-      Ovoid.Drawer._f32arymxf[14] += sph.center.v[0] * transform.worldMatrix.m[2] +
-                        sph.center.v[1] * transform.worldMatrix.m[6] +
-                        sph.center.v[2] * transform.worldMatrix.m[10];
-      /* color; C */
-      Ovoid.Drawer._sp.setUniform4fv(9, Ovoid.Drawer._colorbsph.v);
-      /* transform matrix; MXF */
-      Ovoid.Drawer._sp.setUniformMatrix4fv(0, Ovoid.Drawer._f32arymxf);
-      Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[1]);
-      Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P |
-          Ovoid.VERTEX_VEC4_C,
-          32);
-      Ovoid.gl.drawArrays(Ovoid.gl.LINES, 0, 144);
-      Ovoid.Drawer._drawnhelper++;
-    }
+    Ovoid.Drawer.sp.setUniform4fv(20, lp); /*position*/
+    Ovoid.Drawer.sp.setUniform3fv(21, ld); /*direction*/
+    Ovoid.Drawer.sp.setUniform4fv(22, lc); /*color*/
+    Ovoid.Drawer.sp.setUniform1fv(23, li); /*intensity*/
+    Ovoid.Drawer.sp.setUniform1fv(24, lr); /*range*/
+    Ovoid.Drawer.sp.setUniform1fv(25, lf); /*falloff*/
+    Ovoid.Drawer.sp.setUniform1fv(26, la); /*spotangle*/
+    Ovoid.Drawer.sp.setUniform1iv(28, le); /*enabled*/
+    
+  } else {
+    
+    Ovoid.Drawer.sp.setUniform4fv(20, light.worldPosition.v);
+    Ovoid.Drawer.sp.setUniform3fv(21, light.worldDirection.v);
+    Ovoid.Drawer.sp.setUniform4fv(22, light.color.v);
+    Ovoid.Drawer.sp.setUniform1f(23, light.intensity);
+    Ovoid.Drawer.sp.setUniform1f(24, light.range);
+    Ovoid.Drawer.sp.setUniform1f(25, light.falloff);
+    Ovoid.Drawer.sp.setUniform1f(26, light.spotAngle);
   }
+  Ovoid._logGlerror('Ovoid.Drawer.light::');
+};
+
+
+/**
+ * Set ambient.<br><br>
+ * 
+ * Setup ambient lighting color for the current used shader.
+ */
+Ovoid.Drawer.ambient = function() {
+  
+  Ovoid.Drawer.sp.setUniform4fv(40, Ovoid.Drawer._abcolor);
 }
 
+
 /**
- * Draw shadow volum.
- * <br>
- * <br>
- * Draw the given body's shadow volum projected by the given light.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
+ * Set perspective.<br><br>
  * 
- * @param {Body} body Body Object to use as light occluder.
- * @param {Light} light Light Object to project shadow volum from.
+ * Setup view perspective matrices and positions of the specified camera for 
+ * the current used shader.
  * 
- * @see Ovoid.Body
- * @see Ovoid.Light
+ * @param {Camera} camera Camera node.
  */
-Ovoid.Drawer.drawShadowVolum = function(body, light) {
+Ovoid.Drawer.persp = function(camera) {
 
-  if (((body.boundingBox.hsize.v[0] + body.boundingBox.hsize.v[1] + body.boundingBox.hsize.v[2])) < Ovoid.Drawer.opt_shadowCastingExclusion)
-    return;
+  Ovoid.Drawer.sp.setUniformMatrix4fv(3, camera.eyeview.m);
+  Ovoid.Drawer.sp.setUniformMatrix4fv(4, camera.perspective.m);
+  Ovoid.Drawer.sp.setUniformMatrix4fv(5, camera.lookat.m);
+  Ovoid.Drawer.sp.setUniform4fv(30, camera.worldPosition.v);
+};
 
-  var polyset, l, j, k, i, a, n, c;
+
+/**
+ * Set orthographic.<br><br>
+ * 
+ * Setup view orthographic matrix of the specified camera for the current 
+ * used shader.
+ * 
+ * @param {Camera} camera Camera node.
+ */
+Ovoid.Drawer.ortho = function(camera) {
+
+  Ovoid.Drawer.sp.setUniformMatrix4fv(3, camera.orthographic.m);
+};
+
+
+/**
+ * Set screen.<br><br>
+ * 
+ * Setup screen view orthographic matrix for the current used shader.
+ * 
+ * @param {Matrix4} matrix Screen orthographic matrix.
+ */
+Ovoid.Drawer.screen = function(matrix) {
+
+  Ovoid.Drawer.sp.setUniformMatrix4fv(3, matrix.m);
+};
+
+
+/**
+ * Set camera.<br><br>
+ * 
+ * Setup transform and normal matrices matrices for the current 
+ * used shader.
+ * 
+ * @param {Matrix4} tmatrix Transformation matrix.
+ * @param {Matrix3} [nmatrix] Normal matrix.
+ */
+Ovoid.Drawer.model = function(tmatrix, nmatrix) {
+
+    if (tmatrix.m) {
+      Ovoid.Drawer.sp.setUniformMatrix4fv(0,tmatrix.m);
+      if (nmatrix)
+        Ovoid.Drawer.sp.setUniformMatrix3fv(1,nmatrix.m);
+    } else {
+      Ovoid.Drawer.sp.setUniformMatrix4fv(0,tmatrix);
+      if (nmatrix)
+        Ovoid.Drawer.sp.setUniformMatrix3fv(1,nmatrix);
+    }
+};
+
+
+/**
+ * Enable option.<br><br>
+ * 
+ * Enables the specified shader parameter.
+ * 
+ * @param {enum} u Shader boolean option to enable. Can be one the followings 
+ * symbolic constants:<br>
+ * UNIFORM_ENABLE_DIFFUSE_LIGHTING_BOOL (0)<br>
+ * UNIFORM_ENABLE_AMBIENT_LIGHTING_BOOL (1)<br>
+ * UNIFORM_ENABLE_SPECULAR_BOOL (2)<br>
+ * UNIFORM_ENABLE_REFLECT_BOOL (3)<br>
+ * UNIFORM_ENABLE_PARALAX_BOOL (4)<br>
+ * UNIFORM_ENABLE_MATERIAL_BOOL (5)<br>
+ * UNIFORM_ENABLE_VERTEX_WEIGHT_BOOL (6)<br>
+ * UNIFORM_ENABLE_COMPUT_TANGENT_BOOL (7)<br>
+ */
+Ovoid.Drawer.enable = function(u) {
+
+  Ovoid.Drawer.sp.setUniform1i(u, 1);
+};
+
+
+/**
+ * Disable option.<br><br>
+ * 
+ * Disable the specified shader parameter.
+ * 
+ * @param {enum} u Shader boolean option to enable. Can be one the followings 
+ * symbolic constants:<br>
+ * UNIFORM_ENABLE_DIFFUSE_LIGHTING_BOOL (0)<br>
+ * UNIFORM_ENABLE_AMBIENT_LIGHTING_BOOL (1)<br>
+ * UNIFORM_ENABLE_SPECULAR_BOOL (2)<br>
+ * UNIFORM_ENABLE_REFLECT_BOOL (3)<br>
+ * UNIFORM_ENABLE_PARALAX_BOOL (4)<br>
+ * UNIFORM_ENABLE_MATERIAL_BOOL (5)<br>
+ * UNIFORM_ENABLE_VERTEX_WEIGHT_BOOL (6)<br>
+ * UNIFORM_ENABLE_COMPUT_TANGENT_BOOL (7)<br>
+ */
+Ovoid.Drawer.disable = function(u) {
+
+  Ovoid.Drawer.sp.setUniform1i(u, 0);
+};
+
+
+/* *********************** DRAWING PRIMITIVES METHODS *********************** */
+/**
+ * Draw sprite.<br><br>
+ * 
+ * Draws a sprite transformed according to the specified transformation matrix.
+ */
+Ovoid.Drawer.sprite = function() {
   
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[0]);
+  Ovoid.Drawer.sp.setVertexAttribPointers(5,28); /* VEC4_P|VEC3_U == 5 */
+  Ovoid.gl.drawArrays(4,0,6);
+};
+
+
+/**
+ * Draw symbolic box.<br><br>
+ * 
+ * Draws a symbolic box.
+ * 
+ * @param {Color} color Drawing color.
+ */
+Ovoid.Drawer.symBox = function(color) {
+  
+  Ovoid.Drawer.sp.setUniform4fv(9, color.v);
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[1]);
+  Ovoid.Drawer.sp.setVertexAttribPointers(33,32); /* VEC4_P|VEC4_C == 33 */
+  Ovoid.gl.drawArrays(1,0,24);
+};
+
+
+/**
+ * Draw symbolic sphere.<br><br>
+ * 
+ * Draws a symbolic sphere.
+ * 
+ * @param {Color} color Drawing color.
+ */
+Ovoid.Drawer.symSphere = function(color) {
+  
+  Ovoid.Drawer.sp.setUniform4fv(9, color.v);
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[2]);
+  Ovoid.Drawer.sp.setVertexAttribPointers(33,32); /* VEC4_P|VEC4_C == 33 */
+  Ovoid.gl.drawArrays(1,0,144);
+};
+
+
+/**
+ * Draw symbolic axis.<br><br>
+ * 
+ * Draws a symbolic axis.
+ * 
+ * @param {Color} color Drawing color.
+ */
+Ovoid.Drawer.symAxis = function(color) {
+  
+  Ovoid.Drawer.sp.setUniform4fv(9, color.v);
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[3]);
+  Ovoid.Drawer.sp.setVertexAttribPointers(33,32); /* VEC4_P|VEC4_C == 33 */
+  Ovoid.gl.drawArrays(1,0,6);
+};
+
+
+/**
+ * Draw symbolic pyramid.<br><br>
+ * 
+ * Draws a symbolic pyramid.
+ * 
+ * @param {Color} color Drawing color.
+ */
+Ovoid.Drawer.symPyramid = function(color) {
+  
+  Ovoid.Drawer.sp.setUniform4fv(9, color.v);
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[4]);
+  Ovoid.Drawer.sp.setVertexAttribPointers(33,32); /* VEC4_P|VEC4_C == 33 */
+  Ovoid.gl.drawArrays(1,0,16);
+};
+
+
+/**
+ * Draw symbolic star.<br><br>
+ * 
+ * Draws a symbolic star.
+ * 
+ * @param {Color} color Drawing color.
+ */
+Ovoid.Drawer.symStar = function(color) {
+  
+  Ovoid.Drawer.sp.setUniform4fv(9, color.v);
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[5]);
+  Ovoid.Drawer.sp.setVertexAttribPointers(33,32); /* VEC4_P|VEC4_C == 33 */
+  Ovoid.gl.drawArrays(1,0,10);
+};
+
+
+/**
+ * Draw point sprite string.<br><br>
+ * 
+ * Draws a point-sprite string. This method should use a special shader. The 
+ * generated point-sprite vertices embeds special data instead of z position
+ * and traditionnal "1.0" w value:<br><br>
+ * 
+ * [x position, y position, point-size, char code]
+ * 
+ * @param {float} w Horizontal point-sprite spacing (interchar).
+ * @param {float} r Vertical point-sprite spacing (interline).
+ * @param {float} s Point-sprite size.
+ * @param {String} string String to generates as point-sprites.
+ */
+Ovoid.Drawer.string = function(w, r, s, string) {
+  
+  var data = new Float32Array(string.length*4);
+  var v = 0; /* pointeur */
+  var a, b; /* char, old char */
+  var u = 0; /* colone */
+  var l = 0; /* ligne */
+  /* point coord & size */
+  var x = s * w;
+  var y = s * r;
+  for (var i = 0; i < string.length; i++) {
+    b = a;
+    a = string.charCodeAt(i);
+    /* \n */
+    if (a == 0x0A) { l++; u = 0; continue; }
+    /* \t */
+    if (a == 0x09) { u += 4; continue; }
+    /* unicod 1er octect */
+    if (a == 0xC2 || a == 0xC3) { continue; }
+    /* unicod correction d'index */
+    if (b == 0xC3) { a += 64; }
+    data[v]   = x + (u * x);
+    data[v+1] = (y * 0.5) + (l * y);
+    data[v+2] = s;
+    data[v+3] = a - 32;
+    v += 4;
+    u++;
+  }
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bdynamic);
+  Ovoid.gl.bufferData(0x8892,data,0x88E8);
+  Ovoid.Drawer.sp.setVertexAttribPointers(1,16); /* VEC4_P == 1 */
+  Ovoid.gl.drawArrays(0,0,v/4);
+};
+
+
+/**
+ * Draw raw data.<br><br>
+ * 
+ * Draws the given data according to the specified parameters.
+ * 
+ * @param {Matrix4} matrix Transformation matrix.
+ * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
+ * following symbolic constants:<br>
+ * Ovoid.VERTEX_VEC4_P,<br>
+ * Ovoid.VERTEX_VEC3_N,<br>
+ * Ovoid.VERTEX_VEC3_U,<br>
+ * Ovoid.VERTEX_VEC3_T,<br>
+ * Ovoid.VERTEX_VEC3_B,<br>
+ * Ovoid.VERTEX_VEC4_C,<br>
+ * Ovoid.VERTEX_VEC4_I,<br>
+ * Ovoid.VERTEX_VEC4_W.<br><br>
+ * @param {int} stride Vertex size in bytes.
+ * @param {enum} type WebGL primitive type. Can one of the standard 
+ * WeGL primitives.
+ * @param {int} count Vertices count.
+ * @param {Float32Array} data Buffer data.
+ */
+Ovoid.Drawer.raw = function(format, stride, type, count, data) {
+  
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bdynamic);
+  Ovoid.gl.bufferData(0x8892,data,0x88E8);
+  Ovoid.Drawer.sp.setVertexAttribPointers(format,stride);
+  Ovoid.gl.drawArrays(type,0,count);
+};
+
+
+/* ********************* DRAWING RAW NODES METHODS ************************** */
+/**
+ * Draw Layer.<br><br>
+ * 
+ * Draws a Layer node with the current used shader.
+ * 
+ * @param {Layer} layer Layer node to be drawn.
+ * @param {Color} [color] Optionnal flat color.
+ */
+Ovoid.Drawer.layer = function(layer, color) {
+  
+  //Ovoid.Drawer.sp.setUniform3fv(42, layer.size.v); /* layer size */
+  Ovoid.gl.activeTexture(0x84C1); /* TEXTURE1 */
+  if (color) {
+    Ovoid.Drawer.sp.setUniform4fv(9, color.v); /* set color */
+    /* change texture */
+    Ovoid.Drawer._tblank.bind();
+  } else {
+    Ovoid.Drawer.sp.setUniform4fv(9, layer.bgColor.v); /* set color */
+    /* change texture */
+    (layer.bgTexture)?layer.bgTexture.bind():Ovoid.Drawer._tblank.bind();
+  }
+  Ovoid.Drawer.sp.setUniformSampler(1,1);
+  /* Draw a sprite */
+  Ovoid.Drawer.sprite();
+};
+
+
+/**
+ * Draw Text.<br><br>
+ * 
+ * Draws a Text node with the current used shader.
+ * 
+ * @param {Text} text Text node to be drawn.
+ * @param {Color} [color] Optionnal flat color.
+ */
+Ovoid.Drawer.text = function(text, color) {
+
+  Ovoid.gl.activeTexture(0x84C1); /* TEXTURE1 */
+  if (color) {
+    Ovoid.Drawer.sp.setUniform4fv(9, color.v); /* set color */
+    /* change texture */
+    Ovoid.Drawer._tblank.bind();
+  } else {
+    Ovoid.Drawer.sp.setUniform4fv(9, text.fgColor.v); /* set color */
+    /* change texture */
+    (text.fontmapTexture)?text.fontmapTexture.bind():Ovoid.Drawer._tfontm.bind();
+  }
+  Ovoid.Drawer.sp.setUniformSampler(1,1);
+  /* Draw a string */
+  Ovoid.Drawer.string(text.param.v[1],text.param.v[2],text.param.v[0],text.string);
+};
+
+
+/**
+ * Draw Mesh.<br><br>
+ * 
+ * Draws a Mesh node with the current used shader.
+ * 
+ * @param {Mesh} mesh Mesh node to be drawn.
+ * @param {Color} [color] Optionnal flat color.
+ */
+Ovoid.Drawer.mesh = function(mesh, color) {
+
+  var l, j, k, s;
   l = 0; /* TODO: implementation du Lod si besoin */
-  c = body.shape.triangles[l].length;
+  Ovoid.gl.bindBuffer(0x8892, mesh._vbuffer[l]);
+  Ovoid.gl.bindBuffer(0x8893, mesh._ibuffer[l]);
+  Ovoid.Drawer.sp.setVertexAttribPointers(mesh._vformat, mesh._vfbytes);
+  if (color) {
+    Ovoid.Drawer.sp.setUniform4fv(9, color.v); /* set color */
+    while (j--) {
+      s = mesh.polyset[l][j];
+      /* TRIANGLES, count, UNSIGNED_SHORT, offset */
+      Ovoid.gl.drawElements(4,s.icount,0x1403,s.ioffset); 
+    }
+  } else {
+    /* parcour des polysets */
+    j = mesh.polyset[l].length;
+    while (j--) {
+      s = mesh.polyset[l][j];
+      /* set material  */
+      Ovoid.Drawer.sp.setUniform4fv(10,s.material.color[0].v);
+      Ovoid.Drawer.sp.setUniform4fv(11,s.material.color[1].v);
+      Ovoid.Drawer.sp.setUniform4fv(12,s.material.color[2].v);
+      Ovoid.Drawer.sp.setUniform4fv(13,s.material.color[3].v);
+      Ovoid.Drawer.sp.setUniform4fv(14,s.material.color[4].v);
+      Ovoid.Drawer.sp.setUniform1f(15,s.material.shininess);
+      Ovoid.Drawer.sp.setUniform1f(16,s.material.opacity);
+      Ovoid.Drawer.sp.setUniform1f(17,s.material.reflectivity);
+      /* bind texture */
+      for (k = 0; k < 6; k++) {
+        if(Ovoid.Drawer.sp.uniformSampler[k] != -1) {
+          Ovoid.gl.activeTexture(0x84C0+k); /* TEXTURE0+k */
+          (s.material.texture[k])?s.material.texture[k].bind():Ovoid.Drawer._tblank.bind();
+          Ovoid.gl.uniform1i(Ovoid.Drawer.sp.uniformSampler[k], k);
+        }
+      }
+      /* TRIANGLES, count, UNSIGNED_SHORT, offset */
+      Ovoid.gl.drawElements(4,s.icount,0x1403,s.ioffset); 
+    }
+  }
+};
+
+
+/**
+ * Draw Emitter.<br><br>
+ * 
+ * Draws a Emitter node's particles with the current used shader.
+ * 
+ * @param {Emitter} emitter Emitter node to be drawn.
+ * @param {Color} [color] Optionnal flat color.
+ */
+Ovoid.Drawer.emitter = function(emitter, color) {
+  
+  if (color) {
+    Ovoid.Drawer.sp.setUniform4fv(9, color.v); /* set color */
+    /* change texture */
+    Ovoid.gl.activeTexture(0x84C1); /* TEXTURE1 */
+    Ovoid.Drawer._tblank.bind();
+    Ovoid.Drawer.sp.setUniformSampler(1,1);
+    Ovoid.Drawer.switchBlend(3); /* substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA */
+  } else {
+    /* model de rendu pour les particules */
+    switch(emitter.model) 
+    {
+      case 3: /* Ovoid.EMISSIVE */
+        Ovoid.Drawer.switchBlend(1); /* additive alpha. SRC_ALPHA, ONE */
+        break;
+      default: /* Ovoid.DIFFUSE */
+        Ovoid.Drawer.switchBlend(3); /* substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA */
+        break;
+    }
+    /* change texture */
+    Ovoid.gl.activeTexture(0x84C1); /* TEXTURE1 */
+    (emitter.texture)?emitter.texture.bind():Ovoid.Drawer._tblank.bind();
+    Ovoid.Drawer.sp.setUniformSampler(1,1);
+  }
+  /* disable depth */
+  Ovoid.Drawer.switchDepth(0);
+  /* Ovoid.VERTEX_PARTICLE, stride, gl.POINTS, */
+  Ovoid.Drawer.raw(37, 44, 0, emitter._alives, emitter._fbuffer);
+  /* restore depth et blend */
+  Ovoid.Drawer.restoreBlend();
+  Ovoid.Drawer.restoreDepth();
+  
+};
+
+
+/* ************************ DRAWING SPECIAL METHODS ************************* */
+
+/**
+ * Draw shadow volume.<br><br>
+ * 
+ * Draws shadow volume of the given Body's shape according to the specified 
+ * light and in Z-Fail stencil way.
+ * 
+ * @param {Light} light Light for shadow projection.
+ * @param {Body} body Body node to project shape's shadow.
+ */
+Ovoid.Drawer.shadow = function(light, body) {
+  
+  var shape;
+  if (body.shape.type & Ovoid.MESH) {
+    Ovoid.Drawer.model(body.worldMatrix);
+    shape = body.shape;
+  }
+  if (body.shape.type & Ovoid.SKIN) {
+    if (body.shape.mesh) {
+      /* tentative d'implémentation des shadow volume pour les skin */
+      if (!Ovoid.opt_localSkinData)
+        return;
+      Ovoid.Drawer.model(body.worldMatrix);
+      shape = body.shape.mesh;
+    }
+  }
+  
+  var l = 0; /* TODO: implementation du Lod si besoin */
+  var c = shape.triangles[l].length;
   
   var P = new Array(6);
   P[3] = new Ovoid.Point();
@@ -1822,10 +1449,10 @@ Ovoid.Drawer.drawShadowVolum = function(body, light) {
   // position de la lumiere en coordonnée locale à l'objet 
   LP.copy(light.worldPosition);
   LP.transform4Inverse(body.worldMatrix);
-
+  
   // on parcour la liste de triangles pour creer le vertex buffer du shadow volum
-  n = 0;
-  for (i = 0; i < c; i++)
+  var n = 0;
+  for (var i = 0; i < c; i++)
   {
     LD.subOf(LP, body.shape.triangles[l][i].center);
     if (LD.dot(body.shape.triangles[l][i].normal) > 0.0)
@@ -1834,17 +1461,14 @@ Ovoid.Drawer.drawShadowVolum = function(body, light) {
       P[0] = body.shape.vertices[l][body.shape.triangles[l][i].index[0]].p;
       P[1] = body.shape.vertices[l][body.shape.triangles[l][i].index[1]].p;
       P[2] = body.shape.vertices[l][body.shape.triangles[l][i].index[2]].p;
-      
       /* triangle extrudé à l'infini lumiere */
       P[3].subOf(P[0], LP);
       P[4].subOf(P[1], LP);
       P[5].subOf(P[2], LP);
-
       // ( La methode d'assignation est bête et brute, mais c'est la plus rapide )
       V[n] = P[0].v[0]; n++; V[n] = P[0].v[1]; n++; V[n] = P[0].v[2]; n++; V[n] = 1.0; n++;
       V[n] = P[1].v[0]; n++; V[n] = P[1].v[1]; n++; V[n] = P[1].v[2]; n++; V[n] = 1.0; n++;
       V[n] = P[2].v[0]; n++; V[n] = P[2].v[1]; n++; V[n] = P[2].v[2]; n++; V[n] = 1.0; n++;
-      
       // doivent être dessiné a l'envers pour le face-culling Front/Back 
       V[n] = P[3].v[0]; n++; V[n] = P[3].v[1]; n++; V[n] = P[3].v[2]; n++; V[n] = 0.0; n++;
       V[n] = P[5].v[0]; n++; V[n] = P[5].v[1]; n++; V[n] = P[5].v[2]; n++; V[n] = 0.0; n++;
@@ -1864,7 +1488,6 @@ Ovoid.Drawer.drawShadowVolum = function(body, light) {
              * est trouvé car l'ordre des edges est 01-12-20 le second
              * peut donc être trouvé grace à un modulo :
              * (0+1)%3 = 1, (1+1)%3 = 2, (1+2)%3 = 0*/
-            
             k = (j + 1) % 3;
             P[3].subOf(P[j], LP);
             P[4].subOf(P[k], LP);
@@ -1876,13 +1499,10 @@ Ovoid.Drawer.drawShadowVolum = function(body, light) {
             V[n] = P[j].v[0]; n++;V[n] = P[j].v[1]; n++;V[n] = P[j].v[2]; n++;V[n] = 1.0; n++;
             V[n] = P[3].v[0]; n++;V[n] = P[3].v[1]; n++;V[n] = P[3].v[2]; n++;V[n] = 0.0; n++;
             V[n] = P[4].v[0]; n++;V[n] = P[4].v[1]; n++;V[n] = P[4].v[2]; n++;V[n] = 0.0; n++;
-            
           }
         } else {
-
           /* si pas de face adjacente c'est un face de bordure
              on extrude les bords */
-          
           k = (j + 1) % 3;
           P[3].subOf(P[j], LP);
           P[4].subOf(P[k], LP);
@@ -1894,224 +1514,348 @@ Ovoid.Drawer.drawShadowVolum = function(body, light) {
           V[n] = P[j].v[0]; n++;V[n] = P[j].v[1]; n++;V[n] = P[j].v[2]; n++;V[n] = 1.0; n++;
           V[n] = P[3].v[0]; n++;V[n] = P[3].v[1]; n++;V[n] = P[3].v[2]; n++;V[n] = 0.0; n++;
           V[n] = P[4].v[0]; n++;V[n] = P[4].v[1]; n++;V[n] = P[4].v[2]; n++;V[n] = 0.0; n++;
-          
         }
       }
     }
   }
   
-  /* bind les buffers */
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[7]);
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER, V, Ovoid.gl.DYNAMIC_DRAW);
-  Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_VEC4_P, 16);
-
+  /* buffer dynamique */
+  Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bdynamic);
+  Ovoid.gl.bufferData(0x8892,V,0x88E8);
+  Ovoid.Drawer.sp.setVertexAttribPointers(1,16);
+  
   /* dessins des faces arrieres, incremente le stencil */
-  Ovoid.gl.cullFace(Ovoid.gl.FRONT);
-  Ovoid.gl.stencilOp(Ovoid.gl.KEEP, Ovoid.gl.INCR, Ovoid.gl.KEEP);
-  Ovoid.gl.drawArrays(Ovoid.gl.TRIANGLES, 0, n*0.25);
+  Ovoid.gl.cullFace(0x0404); /* FRONT */
+  Ovoid.gl.stencilOp(0x1E00, 0x1E02, 0x1E00); /* KEEP, INCR, KEEP */
+  Ovoid.gl.drawArrays(4, 0, n/4);
 
   /* dessins des faces avant, decremente le stencil */
-  Ovoid.gl.cullFace(Ovoid.gl.BACK);
-  Ovoid.gl.stencilOp(Ovoid.gl.KEEP, Ovoid.gl.DECR, Ovoid.gl.KEEP);
-  Ovoid.gl.drawArrays(Ovoid.gl.TRIANGLES, 0, n*0.25);
-
-  Ovoid.Drawer._drawnshadow++;
+  Ovoid.gl.cullFace(0x0405); /* BACK */
+  Ovoid.gl.stencilOp(0x1E00, 0x1E03, 0x1E00); /* KEEP, DECR, KEEP */
+  Ovoid.gl.drawArrays(4, 0, n/4);
 };
 
 
-/**
- * Draw particles.
- * <br>
- * <br>
- * Draw emitter's particles.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
- * 
- * @param {Emitter} emitter Emitter Object to draw particles.
- * 
- * @see Ovoid.Emitter
- */
-Ovoid.Drawer.drawParticles = function(emitter) {
-
-  /* switch sur le shader */
-  Ovoid.Drawer.switchSp(Ovoid.DRAWER_SP_PARTICLES);
-  /* eyeview matrix; MEV */
-  Ovoid.Drawer._sp.setUniformMatrix4fv(3, 
-      Ovoid.Queuer._rcamera.eyeview.m);
-  /* eye position */
-  Ovoid.Drawer._sp.setUniform4fv(30, 
-      Ovoid.Queuer._rcamera.worldPosition.v);
-      
-  /* model de rendu pour les particules */
-  if(emitter.model == Ovoid.EMISSIVE)
-    Ovoid.Drawer.switchBlend(1);
-    
-  /* desactive le depth mask*/
-  Ovoid.gl.disable(Ovoid.gl.DEPTH_TEST);
-  Ovoid.gl.depthMask(0);
-  
-  /* bind texture */
-  Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + 1);
-  (emitter.texture != null)?emitter.texture.bind():Ovoid.Drawer._tblank.bind();
-  /* texture sampler diffuse; Sd */
-  if (-1 != Ovoid.Drawer._sp.uniformSampler[1])
-    Ovoid.Drawer._sp.setUniformSampler(1, 1);
-  
-  /* bind buffers */
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, Ovoid.Drawer._bostock[7]);
-  Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER, emitter._fbuffer, 
-      Ovoid.gl.DYNAMIC_DRAW);
-
-  Ovoid.Drawer._sp.setVertexAttribPointers(Ovoid.VERTEX_PARTICLE, 44);  
-  /* draw */
-  Ovoid.gl.drawArrays(Ovoid.gl.POINTS, 0, emitter._alives);
-  
-  Ovoid.Drawer._drawnparticle += emitter._alives;
-
-  /* reprend le shader précédepent utilisé pour dessiner la scene */
-  Ovoid.Drawer.restorSp();
-  
-  /* model de rendu normal */
-  if(emitter.model == Ovoid.EMISSIVE)
-    Ovoid.Drawer.restoreBlend();
-    
-  /* reactive le depth mask*/
-  Ovoid.gl.depthMask(1);
-  Ovoid.gl.enable(Ovoid.gl.DEPTH_TEST);
-
-};
-
-
+/* ************************ DRAWING STACK METHODS *************************** */
 
 /**
- * Draw a mesh for readPixels.
- * <br>
- * <br>
- * Draw a mesh in flat color way for picking frame.
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
+ * Draw Body shape.<br><br>
  * 
- * @param {Mesh} mesh Mesh Object to draw.
+ * Draws Body's shape using the current used shader.
  * 
- * @see Ovoid.Mesh
+ * @param {Body} body Body node.
+ * @param {Color} [color] Optionnal flat color.
  */
-Ovoid.Drawer.drawMeshRPixel = function(mesh) {
-  var l, j;
-  l = 0; /* TODO: implementation du Lod si besoin */
-
-  /* bind buffers */
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, mesh._vbuffer[l]);
-  Ovoid.gl.bindBuffer(Ovoid.gl.ELEMENT_ARRAY_BUFFER, mesh._ibuffer[l]);
-  Ovoid.Drawer._sp.setVertexAttribPointers(mesh._vformat, mesh._vfbytes);
+Ovoid.Drawer.body = function(body, color) {
   
-  /* draw */
-  j = mesh.polyset[l].length;
-  while (j--) {
-    Ovoid.gl.drawElements(Ovoid.gl.TRIANGLES,
-                          mesh.polyset[l][j].icount,
-                          Ovoid.gl.UNSIGNED_SHORT,
-                          mesh.polyset[l][j].ioffset);
-                          
-    Ovoid.Drawer._drawnpolyset++;
+  if (body.shape.type & Ovoid.MESH) {
+    Ovoid.Drawer.model(body.worldMatrix, body.normalMatrix);
+    Ovoid.Drawer.mesh(body.shape, color);
+    body.addCach(Ovoid.CACH_WORLD);
+    return;
   }
-  Ovoid.Drawer._drawnmesh++;
+  if (body.shape.type & Ovoid.SKIN) {
+    if (body.shape.mesh) {
+      Ovoid.Drawer.model(body.shape.infMxfArray, body.shape.infMnrArray);
+      Ovoid.Drawer.enable(6);
+      Ovoid.Drawer.mesh(body.shape.mesh, color);
+      Ovoid.Drawer.disable(6);
+    }
+    body.addCach(Ovoid.CACH_WORLD);
+    return;
+  }
+  if (body.shape.type & Ovoid.EMITTER) {
+    Ovoid.Drawer.model(body.worldMatrix, body.normalMatrix);
+    Ovoid.Drawer.emitter(body.shape, color);
+    body.addCach(Ovoid.CACH_WORLD);
+  }
 };
 
 
 /**
- * Draw a mesh.
- * <br>
- * <br>
- * This function is typically used as class's private member but can be called
- * independently for custom render flow.
+ * Draw overlay.<br><br>
  * 
- * @param {Mesh} mesh Mesh Object to draw.
+ * Draws Layer or Text node overlay using the current used shader.
  * 
- * @see Ovoid.Mesh
+ * @param {Layer|Text} overlay Layer or Text node.
+ * @param {Color} [color] Optionnal flat color.
  */
-Ovoid.Drawer.drawMesh = function(mesh) {
+Ovoid.Drawer.overlay = function(overlay, color) {
+  
+  if(overlay.type & Ovoid.LAYER) {
+    if(overlay.type & Ovoid.TEXT) {
+      Ovoid.Drawer.switchSp(6);
+      Ovoid.Drawer.model(overlay.layerMatrix);
+      Ovoid.Drawer.text(overlay, color);
+      overlay.addCach(Ovoid.CACH_WORLD);
+      return;
+    }
+    Ovoid.Drawer.switchSp(7);
+    Ovoid.Drawer.model(overlay.layerMatrix);
+    Ovoid.Drawer.layer(overlay, color);
+    overlay.addCach(Ovoid.CACH_WORLD);
+  }
+};
 
-  var l, j, k;
-  l = 0; /* TODO: implementation du Lod si besoin */
 
-  /* bind les buffers */
-  Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, mesh._vbuffer[l]);
-  Ovoid.gl.bindBuffer(Ovoid.gl.ELEMENT_ARRAY_BUFFER, mesh._ibuffer[l]);
-  Ovoid.Drawer._sp.setVertexAttribPointers(mesh._vformat, mesh._vfbytes);
+/**
+ * Draw helpers.<br><br>
+ * 
+ * Draws helpers and symbols for the given Transform node.
+ * 
+ * @param {Transform} tform Transform node.
+ */
+Ovoid.Drawer.helpers = function(tform) {
+  
+  Ovoid.Drawer.model(tform.worldMatrix);
+  if (Ovoid.Drawer.opt_drawAxis) {
+    Ovoid.Drawer.symAxis(Ovoid.Drawer._tcolor[0]);
+  }
+  
+  if ((tform.type & Ovoid.CAMERA) && Ovoid.Drawer.opt_drawCameras) {
+    Ovoid.Drawer.symPyramid(Ovoid.Drawer._tcolor[1]);
+  }
+  
+  if ((tform.type & Ovoid.LIGHT) && Ovoid.Drawer.opt_drawLights) {
+    Ovoid.Drawer.symStar(Ovoid.Drawer._tcolor[4]);
+  }
+  
+  if ((tform.type & Ovoid.JOINT) && Ovoid.Drawer.opt_drawJointBones) {
+    var m = new Float32Array(tform.worldMatrix.m);
+    var s = Ovoid.Drawer.opt_jointSize * tform.size;
+    m[0] *= s; m[1] *= s; m[2] *= s;
+    m[4] *= s; m[5] *= s; m[6] *= s;
+    m[8] *= s; m[9] *= s; m[10] *= s;
+    Ovoid.Drawer.model(m);
+    Ovoid.Drawer.symSphere(Ovoid.Drawer._tcolor[2]);
+  }
+  
+  if(tform.type & Ovoid.BODY) {
+    
+    if (Ovoid.Drawer.opt_drawBoundingBox) {
+      var m = new Float32Array(tform.worldMatrix.m);
+      var sx = tform.boundingBox.hsize.v[0] * 2.0;
+      var sy = tform.boundingBox.hsize.v[1] * 2.0;
+      var sz = tform.boundingBox.hsize.v[2] * 2.0;
+      var cx = tform.boundingBox.center.v[0];
+      var cy = tform.boundingBox.center.v[1];
+      var cz = tform.boundingBox.center.v[2];
+      m[0] *= sx; m[1] *= sx; m[2] *= sx;
+      m[4] *= sy; m[5] *= sy; m[6] *= sy;
+      m[8] *= sz; m[9] *= sz; m[10] *= sz;
+      m[12] += cx * tform.worldMatrix.m[0] +
+                cy * tform.worldMatrix.m[4] +
+                cz * tform.worldMatrix.m[8];
+      m[13] += cx * tform.worldMatrix.m[1] +
+                cy * tform.worldMatrix.m[5] +
+                cz * tform.worldMatrix.m[9];
+      m[14] += cx * tform.worldMatrix.m[2] +
+                cy * tform.worldMatrix.m[6] +
+                cz * tform.worldMatrix.m[10];
+      Ovoid.Drawer.model(m);
+      Ovoid.Drawer.symBox(Ovoid.Drawer._tcolor[8]);
+                        
+    }
+    if (Ovoid.Drawer.opt_drawBoundingSphere) {
+      var m = new Float32Array(tform.worldMatrix.m);
+      var s = tform.boundingSphere.radius;
+      var cx = tform.boundingSphere.center.v[0];
+      var cy = tform.boundingSphere.center.v[1];
+      var cz = tform.boundingSphere.center.v[2];
+      m[0] *= s; m[1] *= s; m[2] *= s;
+      m[4] *= s; m[5] *= s; m[6] *= s;
+      m[8] *= s; m[9] *= s; m[10] *= s;
+      m[12] += cx * tform.worldMatrix.m[0] +
+                cy * tform.worldMatrix.m[4] +
+                cz * tform.worldMatrix.m[8];
+      m[13] += cx * tform.worldMatrix.m[1] +
+                cy * tform.worldMatrix.m[5] +
+                cz * tform.worldMatrix.m[9];
+      m[14] += cx * tform.worldMatrix.m[2] +
+                cy * tform.worldMatrix.m[6] +
+                cz * tform.worldMatrix.m[10];
+      Ovoid.Drawer.model(m);
+      Ovoid.Drawer.symSphere(Ovoid.Drawer._tcolor[6]);
+    }
+  }
+  
+};
 
-  j = mesh.polyset[l].length;
-  while (j--) {
 
-    /* set material uniforms */
-    Ovoid.Drawer._sp.setUniform4fv(10, mesh.polyset[l][j].material.color[0].v);
-    Ovoid.Drawer._sp.setUniform4fv(11, mesh.polyset[l][j].material.color[1].v);
-    Ovoid.Drawer._sp.setUniform4fv(12, mesh.polyset[l][j].material.color[2].v);
-    Ovoid.Drawer._sp.setUniform4fv(13, mesh.polyset[l][j].material.color[3].v);
-    Ovoid.Drawer._sp.setUniform4fv(14, mesh.polyset[l][j].material.color[4].v);
-    Ovoid.Drawer._sp.setUniform1f(15, mesh.polyset[l][j].material.shininess);
-    Ovoid.Drawer._sp.setUniform1f(16, mesh.polyset[l][j].material.opacity);
-    Ovoid.Drawer._sp.setUniform1f(17, mesh.polyset[l][j].material.reflectivity);
+/**
+ * Draw faces normals.<br><br>
+ * 
+ * Draws shape's faces normals of the given Body node.
+ * 
+ * @param {Body} body Body node.
+ * @param {float} scale Normal scale.
+ */
+Ovoid.Drawer.normals = function(body, scale) {
+  
+  var l = 0; /* Lod */
+  
+  Ovoid.Drawer.model(body.worldMatrix);
+  triangles = body.shape.triangles[l];
 
-    /* bind texture & set texture samplers */
-    for (var k = 0; k < 6; k++) {
-      if(Ovoid.Drawer._sp.uniformSampler[k] != -1) {
-        Ovoid.gl.activeTexture(Ovoid.gl.TEXTURE0 + k);
-        (mesh.polyset[l][j].material.texture[k])?
-          mesh.polyset[l][j].material.texture[k].bind():
-          Ovoid.Drawer._tblank.bind();
-        Ovoid.gl.uniform1i(Ovoid.Drawer._sp.uniformSampler[k], k);
+  var V = new Float32Array(triangles.length*2*8);
+  var C, N;
+  var n = 0;
+  for (var t = 0; t < triangles.length; t++) {
+    C = triangles[t].center;
+    N = triangles[t].normal;
+    V[n] = C.v[0]; n++;
+    V[n] = C.v[1]; n++;
+    V[n] = C.v[2]; n++;
+    V[n] = 1.0; n++;
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++;
+    V[n] = C.v[0] + N.v[0] * scale; n++;
+    V[n] = C.v[1] + N.v[1] * scale; n++;
+    V[n] = C.v[2] + N.v[2] * scale; n++;
+    V[n] = 1.0; n++;
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++;
+  }
+  
+  Ovoid.Drawer.sp.setUniform4fv(9, Ovoid.Drawer._tcolor[10].v);
+  Ovoid.Drawer.raw(33, 32, 1, n/8, V);
+};
+
+/* *************************** GLOBAL METHODS ******************************* */
+Ovoid.Drawer.drawQueue = function() {
+  
+  Ovoid.Drawer.beginDraw();
+  
+  var i;
+  
+  // initialize la projection pour les shader text et layer
+  
+  Ovoid.Drawer.switchSp(6);
+  Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+  Ovoid.Drawer.switchSp(7);
+  Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+  
+  Ovoid.Drawer.setCull(1);
+  
+  // Picking frame
+  if (Ovoid.opt_enablePicking) { 
+    
+    Ovoid.Drawer.switchBlend(0);
+    Ovoid.Drawer.switchSp(2);
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+    Ovoid.Drawer.beginRpDraw();
+    Ovoid.Drawer.switchDepth(1);
+    var color = new Ovoid.Color();
+    i = Ovoid.Queuer._qbody.count;
+    while(i--) {
+      if(Ovoid.Queuer._qbody[i].pickable && Ovoid.opt_debugMode) {
+        color.fromInt(Ovoid.Queuer._qbody[i].uid);
+        Ovoid.Drawer.body(Ovoid.Queuer._qbody[i], color);
       }
     }
-    
-    Ovoid.gl.drawElements(Ovoid.gl.TRIANGLES,
-                          mesh.polyset[l][j].icount,
-                          Ovoid.gl.UNSIGNED_SHORT,
-                          mesh.polyset[l][j].ioffset);
-
-    Ovoid.Drawer._drawnpolyset++;
+    if (Ovoid.Drawer.opt_drawLayers) {
+      Ovoid.Drawer.switchDepth(0);
+      for (i = 0; i < Ovoid.Queuer._qlayer.count; i++) {
+        if(Ovoid.Queuer._qlayer[i].pickable && Ovoid.opt_debugMode) {
+          color.fromInt(Ovoid.Queuer._qlayer[i].uid);
+          Ovoid.Drawer.overlay(Ovoid.Queuer._qlayer[i], color);
+        }
+      }
+    }
+    Ovoid.Drawer.endRpDraw();
   }
-  Ovoid.Drawer._drawnmesh++;
-};
-
-
-
-
-/**
- * Update viewport.
- * <br>
- * <br>
- * Force update GL viewport and orthographic matrix.
- */
-Ovoid.Drawer.updateViewport = function() {
   
-  /* Creation de la matrice orthographique pour le dessins 
-   * des layers et des texts en overlay */
-  Ovoid.Drawer._f32arymor[0] = 2.0 / Ovoid.Frame.size.v[0];
-  Ovoid.Drawer._f32arymor[5] = 2.0 / -Ovoid.Frame.size.v[1];
-  Ovoid.Drawer._f32arymor[10] = 1.0;
+  Ovoid.Drawer.switchBlend(3);
+  Ovoid.Drawer.switchDepth(1);
+  if (Ovoid.Drawer.opt_perLightPass) {
+    // Shading 1light
+    Ovoid.Drawer.switchSp(4);
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+    Ovoid.Drawer.ambient();
+    Ovoid.Drawer.disable(0);   /* disable diffuse; ENd */
+    Ovoid.Drawer.enable(1);    /* enable ambient; ENa */
+    i = Ovoid.Queuer._qbody.count;
+    while(i--) {
+      Ovoid.Drawer.body(Ovoid.Queuer._qbody[i]);
+    }
+    // Per-light passes
+    Ovoid.Drawer.switchBlend(2); /* one, one */
+    Ovoid.Drawer.switchDepth(3); /* mask off, test equal */
+    var l = Ovoid.Queuer._qlight.count
+    Ovoid.Drawer.enable(0);   /* enable diffuse */
+    Ovoid.Drawer.disable(1);  /* disable ambient */
+    while (l--) {
+      if (Ovoid.Queuer._qlight[l].shadowCasting && 
+            Ovoid.Drawer.opt_shadowCasting) {
+              
+        Ovoid.Drawer.switchBlend(0);
+        Ovoid.Drawer.disable(0);
+        Ovoid.Drawer.switchDepth(2); /* mask off, test less */
+        Ovoid.gl.enable(0x0B90); /* STENCIL_TEST */
+        Ovoid.gl.clear(0x00000400); /* STENCIL_BUFFER_BIT */
+        Ovoid.gl.colorMask(0,0,0,0); 
+        Ovoid.gl.stencilFunc(0x0207,0,0); /* ALWAYS,0,0 */
+        i = Ovoid.Queuer._qbody.count;
+        while(i--) {
+          Ovoid.Drawer.shadow(Ovoid.Queuer._qlight[l],Ovoid.Queuer._qbody[i]);
+        }
+        Ovoid.gl.stencilFunc(0x0202,0,-1); /* EQUAL */
+        Ovoid.gl.stencilOp(0x1E00,0x1E00,0x1E00); /* KEEP,KEEP,KEEP */
+        Ovoid.gl.colorMask(1,1,1,1);
+        Ovoid.Drawer.enable(0); 
+        Ovoid.Drawer.switchDepth(3); /* mask off, test less equal */
+      }
 
-  Ovoid.Drawer._f32arymor[3] = 0.0;
-  Ovoid.Drawer._f32arymor[7] = 0.0;
-  Ovoid.Drawer._f32arymor[11] = 0.0;
-
-  Ovoid.Drawer._f32arymor[12] = -1.0;
-  Ovoid.Drawer._f32arymor[13] = 1.0;
-  Ovoid.Drawer._f32arymor[14] = 0.0;
-  Ovoid.Drawer._f32arymor[15] = 1.0;
-
-  /* On ajuste la matrice orthographiques dans les shaders text et layer */
-  /* switch DRAWER_SP_LAYER */
-  Ovoid.Drawer._splib[Ovoid.Drawer._spslot[7]].use();
-  /* eyeview matrix; MEV */
-  Ovoid.Drawer._splib[Ovoid.Drawer._spslot[7]].setUniformMatrix4fv(3, 
-        Ovoid.Drawer._f32arymor);
-  /* switch DRAWER_SP_TEXT */
-  Ovoid.Drawer._splib[Ovoid.Drawer._spslot[6]].use();
-  /* eyeview matrix; MEV */
-  Ovoid.Drawer._splib[Ovoid.Drawer._spslot[6]].setUniformMatrix4fv(3, 
-        Ovoid.Drawer._f32arymor);
-
-  /* Update du viewport GL */
-  Ovoid.gl.viewport(0, 0, Ovoid.Frame.size.v[0],
-      Ovoid.Frame.size.v[1]);
+      Ovoid.Drawer.light(Ovoid.Queuer._qlight[l]);
+      i = Ovoid.Queuer._qbody.count;
+      while(i--) {
+        Ovoid.Drawer.body(Ovoid.Queuer._qbody[i]);
+      }
+    }
+    Ovoid.gl.disable(0x0B90); /* STENCIL_TEST */
+    Ovoid.Drawer.switchBlend(3);
+  } else {
+    // Shading Nlights 
+    Ovoid.Drawer.switchSp(5);
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+    Ovoid.Drawer.ambient();
+    Ovoid.Drawer.light(Ovoid.Queuer._qlight);
+    i = Ovoid.Queuer._qbody.count;
+    while(i--) {
+      Ovoid.Drawer.body(Ovoid.Queuer._qbody[i]);
+    }
+  }
+  
+  // Desactive de depth
+  Ovoid.Drawer.switchDepth(0);
+  
+  // Helpers 
+  if (Ovoid.Drawer.opt_drawHelpers) {
+    Ovoid.Drawer.switchSp(3);
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+    if (Ovoid.Drawer.opt_drawNormals) {
+      i = Ovoid.Queuer._qbody.count;
+      while(i--) {
+        Ovoid.Drawer.normals(Ovoid.Queuer._qbody[i], Ovoid.Drawer.opt_normalScale);
+      }
+    }
+    i = Ovoid.Queuer._qtform.count;
+    while(i--) {
+      Ovoid.Drawer.helpers(Ovoid.Queuer._qtform[i]);
+    }
+  }
+  
+  // Layers
+  if (Ovoid.Drawer.opt_drawLayers) {
+    for (i = 0; i < Ovoid.Queuer._qlayer.count; i++) {
+      Ovoid.Drawer.overlay(Ovoid.Queuer._qlayer[i]);
+    }
+  }
+  
+  Ovoid.Drawer.endDraw();
+  
 }

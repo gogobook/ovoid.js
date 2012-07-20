@@ -101,9 +101,9 @@ Ovoid.Timer.update = function() {
 
   /* prévient les eventuels bugs en cas de blocage de frame ou de timer incorrecte */
   if (Ovoid.Timer.quantum > 0.25) Ovoid.Timer.quantum = 0.01;
-
   Ovoid.Timer._fcount++;
   Ovoid.Timer._fcumul+=Ovoid.Timer.quantum;
+  
   if(Ovoid.Timer._fcumul > 0.1) {
     Ovoid.Timer.framerate = Math.floor(Ovoid.Timer._fcount / Ovoid.Timer._fcumul);
     Ovoid.Timer._fcount = 0;

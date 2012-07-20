@@ -138,6 +138,8 @@ Ovoid.Queuer.init = function() {
   Ovoid.Queuer._dcamera.cachTransform();
 
   Ovoid.Queuer._dcamera.cachCamera();
+  
+  Ovoid.Queuer._rcamera = Ovoid.Queuer._dcamera;
 
   return true;
 };
@@ -437,6 +439,7 @@ Ovoid.Queuer.queueScene = function(sc) {
       if (o.type & Ovoid.TRANSFORM) {
         o.cachTransform();
         if (o.type & Ovoid.LAYER) {
+          o.cachLayer();
           Ovoid.Queuer._qlayer.add(o);
         }
       }

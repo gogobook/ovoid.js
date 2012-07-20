@@ -38,7 +38,8 @@ Ovoid.opt_audioPath = '';
 /* Environment: GLSL sahders source files search path */
 Ovoid.opt_shadersPath = Ovoid.opt_libPath + "lib/glsl/";
 /* Environment: Default fontmap Texture source image URL */
-Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_DroidSansMono.png";
+Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_monofonto.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_DroidSansMono.png";
 //Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_UbuntuMono.png";
 //Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_texgyrecursor.png";
 //Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_OxygenMono.png";
@@ -50,7 +51,7 @@ Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_DroidSansMono.p
 //Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_CPMonoPlain.png";
 //Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_saxmono.png";
 /* Environment: Default fontmap Texture filtering */
-Ovoid.opt_defaultFontmapFilter = 0;
+Ovoid.opt_defaultFontmapFilter = true;
 /* Global gravity vector */
 Ovoid.opt_gravity = [0.0,-0.98,0.0];
 
@@ -97,8 +98,12 @@ Ovoid.Drawer.opt_drawJointBones = true;
 Ovoid.Drawer.opt_drawLights = true;
 /* Enable or disable (helpers) camera draws */
 Ovoid.Drawer.opt_drawCameras = true; 
+/* Enable or disable (helpers) face normal draws */
+Ovoid.Drawer.opt_drawNormals = false;
 /* Joint helpers's size */
 Ovoid.Drawer.opt_jointSize = 2.0;
+/* Normals scale */
+Ovoid.Drawer.opt_normalScale = 0.7;
 
 /* --------------------------- LOADER OPTIONS ------------------------------- */
 /* Draw the Wait screen or let blank during loading process */

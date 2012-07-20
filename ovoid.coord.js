@@ -35,8 +35,8 @@ Ovoid.Coord = function(u, v, w) {
   this.v = new Float32Array(3);
   if (u != undefined) {
     this.v[0] = u;
-    this.v[1] = u;
-    this.v[2] = v;
+    this.v[1] = v;
+    this.v[2] = w;
   }
 };
 

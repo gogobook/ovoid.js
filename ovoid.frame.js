@@ -85,6 +85,10 @@ Ovoid.Frame.size = new Ovoid.Coord(0.0, 0.0, 0.0);
 Ovoid.Frame.scroll = new Ovoid.Coord(0.0, 0.0, 0.0);
 
 
+/** Current frame screen orthographic projection matrix. */
+Ovoid.Frame.matrix = new Ovoid.Matrix4();
+
+
 /** Frame modification flag. */
 Ovoid.Frame.changed = false;
 
@@ -105,6 +109,18 @@ Ovoid.Frame._handleResize = function() {
     Ovoid.Frame.canvas.height = Ovoid.Frame.page.clientHeight;
     Ovoid.Frame.size.set(Ovoid.Frame.page.clientWidth, 
         Ovoid.Frame.page.clientHeight, 0.0);
+    
+    Ovoid.Frame.matrix.m[0] = 2.0 / Ovoid.Frame.size.v[0];
+    Ovoid.Frame.matrix.m[5] = 2.0 / -Ovoid.Frame.size.v[1];
+    Ovoid.Frame.matrix.m[10] = 1.0;
+    Ovoid.Frame.matrix.m[3] = 0.0;
+    Ovoid.Frame.matrix.m[7] = 0.0;
+    Ovoid.Frame.matrix.m[11] = 0.0;
+    Ovoid.Frame.matrix.m[12] = -1.0;
+    Ovoid.Frame.matrix.m[13] = 1.0;
+    Ovoid.Frame.matrix.m[14] = 0.0;
+    Ovoid.Frame.matrix.m[15] = 1.0;
+    
     Ovoid.Frame.changed = true;
   }
 };
@@ -180,6 +196,17 @@ Ovoid.Frame.init = function(canvas) {
     }
   }
 
+  Ovoid.Frame.matrix.m[0] = 2.0 / Ovoid.Frame.size.v[0];
+  Ovoid.Frame.matrix.m[5] = 2.0 / -Ovoid.Frame.size.v[1];
+  Ovoid.Frame.matrix.m[10] = 1.0;
+  Ovoid.Frame.matrix.m[3] = 0.0;
+  Ovoid.Frame.matrix.m[7] = 0.0;
+  Ovoid.Frame.matrix.m[11] = 0.0;
+  Ovoid.Frame.matrix.m[12] = -1.0;
+  Ovoid.Frame.matrix.m[13] = 1.0;
+  Ovoid.Frame.matrix.m[14] = 0.0;
+  Ovoid.Frame.matrix.m[15] = 1.0;
+      
   Ovoid.Frame.changed = true;
 
   return true;
@@ -229,6 +256,17 @@ Ovoid.Frame.setMode = function(mode) {
       Ovoid.Frame.canvas.height = Ovoid.Frame.page.clientHeight;
     }
   }
+
+  Ovoid.Frame.matrix.m[0] = 2.0 / Ovoid.Frame.size.v[0];
+  Ovoid.Frame.matrix.m[5] = 2.0 / -Ovoid.Frame.size.v[1];
+  Ovoid.Frame.matrix.m[10] = 1.0;
+  Ovoid.Frame.matrix.m[3] = 0.0;
+  Ovoid.Frame.matrix.m[7] = 0.0;
+  Ovoid.Frame.matrix.m[11] = 0.0;
+  Ovoid.Frame.matrix.m[12] = -1.0;
+  Ovoid.Frame.matrix.m[13] = 1.0;
+  Ovoid.Frame.matrix.m[14] = 0.0;
+  Ovoid.Frame.matrix.m[15] = 1.0;
   
   Ovoid.Frame.changed = true;
   

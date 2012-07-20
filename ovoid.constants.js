@@ -2622,7 +2622,7 @@ Ovoid.KB_SQUOTE = 222;
 /** Default GLSL text vertex shader string for Text dedicated pipeline.
  * @constant
  * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_TEXT_VS = "attribute vec4 	p; uniform mat4 MXF; uniform mat4 MEV;varying float a; void main(void) {a=p.w;gl_PointSize=p.z;gl_Position=MEV*MXF*vec4(p.xy,0.0,1.0);}";
+Ovoid.DEFAULT_GLSL_TEXT_VS = "attribute vec4 	p;uniform mat4 MXF;uniform mat4 MEV;varying float a;void main(void) {a=p.w;gl_PointSize=p.z;gl_Position=MEV*MXF*vec4(p.xy,0.0,1.0);}";
 
 /** Default GLSL text fragment shader string for Text dedicated pipeline.
  * @constant
@@ -2633,7 +2633,8 @@ Ovoid.DEFAULT_GLSL_TEXT_FS = "precision highp float; uniform vec4 C; uniform sam
 /** Default GLSL layer vertex shader string for Layer dedicated pipeline.
  * @constant
  * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_LAYER_VS = "attribute vec4 p; attribute vec3 u;uniform vec3 Ls; uniform mat4 MXF; uniform mat4 MEV; varying vec2 Vu; vec4 Vp; void main(void){Vp=p;Vp.x*=Ls.x;Vp.y*=Ls.y;Vu=u.xy;gl_Position=MEV*MXF*Vp;}";
+//Ovoid.DEFAULT_GLSL_LAYER_VS = "attribute vec4 p; attribute vec3 u;uniform vec3 Ls; uniform mat4 MXF; uniform mat4 MEV; varying vec2 Vu; vec4 Vp; void main(void){Vp=p;Vp.x*=Ls.x;Vp.y*=Ls.y;Vu=u.xy;gl_Position=MEV*MXF*Vp;}";
+Ovoid.DEFAULT_GLSL_LAYER_VS = "attribute vec4 p; attribute vec3 u;uniform mat4 MXF; uniform mat4 MEV; varying vec2 Vu; vec4 Vp; void main(void){Vp=p;Vu=u.xy;gl_Position=MEV*MXF*Vp;}";
 
 
 /** Default GLSL layer fragment shader string for Layer dedicated pipeline.

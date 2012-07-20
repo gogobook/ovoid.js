@@ -84,7 +84,7 @@ Ovoid.Boundingsphere.prototype.setBound = function(min, max, rad2) {
       hsy + min.v[1],
       hsz + min.v[2], 
       1.0);
-
+      
   this.radius2 = rad2;
   this.radius = Math.sqrt(this.radius2);
 };

@@ -57,7 +57,7 @@ Ovoid.Layer = function(name) {
 
   /** Layer size.
    * @type Coord */
-  this.size = new Ovoid.Coord(0.0, 0.0, 0.0);
+  this.size = new Ovoid.Coord(1.0, 1.0, 1.0);
   /** Layer foreground color.
    * @type Color */
   this.fgColor = new Ovoid.Color(0.0, 0.0, 0.0, 1.0);
@@ -67,6 +67,9 @@ Ovoid.Layer = function(name) {
   /** Layer background texture.
    * @type Texture */
   this.bgTexture = null;
+  /** Layer transformation matrix.
+   * @type Matrix1 */
+  this.layerMatrix = new Ovoid.Matrix4();
 
   this.unCach(Ovoid.CACH_LAYER);
 };
@@ -84,7 +87,7 @@ Ovoid.Layer.prototype.constructor = Ovoid.Layer;
  */
 Ovoid.Layer.prototype.setSize = function(x, y) {
 
-  this.size.set(x, y, 0.0);
+  this.size.set(x, y, 1.0);
 };
 
 
@@ -133,6 +136,31 @@ Ovoid.Layer.prototype.setBgTexture = function(texture) {
 Ovoid.Layer.prototype.setFgColor = function(r, g, b, a) {
 
   this.fgColor.set(r, g, b, a);
+};
+
+
+/**
+ * Node's caching function.
+ *
+ * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
+ * and so optimize global performances. This function is used internally by the
+ * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * 
+ * @private
+ */
+Ovoid.Layer.prototype.cachLayer = function() {
+  
+  if ( !(this.cach & Ovoid.CACH_WORLD) || !(this.cach & Ovoid.CACH_LAYER))
+  {
+    this.layerMatrix.copy(this.worldMatrix);
+    this.layerMatrix.m[0] *= this.size.v[0];
+    this.layerMatrix.m[1] *= this.size.v[1];
+    this.layerMatrix.m[4] *= this.size.v[0];
+    this.layerMatrix.m[5] *= this.size.v[1];
+    this.layerMatrix.m[8] *= this.size.v[0];
+    this.layerMatrix.m[9] *= this.size.v[1];
+    this.addCach(Ovoid.CACH_LAYER);
+  }
 };
 
 

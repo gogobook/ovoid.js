@@ -189,6 +189,20 @@ Ovoid.Point.prototype.normalize = function() {
 
 
 /**
+ * In place weight normalization.<br><br>
+ * 
+ * Sets this instance to its normalized.
+ */
+Ovoid.Point.prototype.normalizeWeight = function() {
+
+  this.v[0] /= this.v[3];
+  this.v[1] /= this.v[3];
+  this.v[2] /= this.v[3];
+  this.v[3] = 1.0;
+};
+
+
+/**
  * Vector dot product.<br><br>
  * 
  * Returns the the dot product of the vector component of this instance by an 
@@ -381,21 +395,24 @@ Ovoid.Point.prototype.transform4InverseOf = function(point, mat4) {
  * @param {float} w Weight.
  */
 Ovoid.Point.prototype.addWeightTransform4Of = function(point, mat4, w) {
-  
+
   this.v[0] += (point.v[0] * mat4.m[0] +
       point.v[1] * mat4.m[4] +
       point.v[2] * mat4.m[8] +
-      point.v[3] * mat4.m[12]) * w;
+      mat4.m[12]) * w;
 
   this.v[1] += (point.v[0] * mat4.m[1] +
       point.v[1] * mat4.m[5] +
       point.v[2] * mat4.m[9] +
-      point.v[3] * mat4.m[13]) * w;
+      mat4.m[13]) * w;
 
   this.v[2] += (point.v[0] * mat4.m[2] +
       point.v[1] * mat4.m[6] +
       point.v[2] * mat4.m[10] +
-      point.v[3] * mat4.m[14]) * w;
+      mat4.m[14]) * w;
+      
+  this.v[3] += w;
+      
 };
 
 

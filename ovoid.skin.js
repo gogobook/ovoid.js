@@ -299,69 +299,70 @@ Ovoid.Skin.prototype.cachSkin = function() {
           Ovoid.FLOAT_MIN,
           1.0);
           
-      var rad = 0.0;
+      var rad2 = 0.0;
       var S;
-      
-      // pour la maj des triangles
       var mv, sv, p0, p1, p2;
-      var v0 = new Ovoid.Vector();
-      var v1 = new Ovoid.Vector();
       
-      for (var l = 0; l < Ovoid.MAX_MESH_LOD; l++) {
-        for (var v = 0; v < this.vertices[l].length; v++) {
-          sv = this.vertices[l][v];
-          mv = this.mesh.vertices[l][v];
-          // remet le vertice a zero
-          sv.p.set(0.0,0.0,0.0,1.0);
-          // ajoute les influences
-          if(mv.w.v[0] != 0.0)
-            sv.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[0]], mv.w.v[0]);
-          if(mv.w.v[1] != 0.0)
-            sv.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[1]], mv.w.v[1]);
-          if(mv.w.v[2] != 0.0)
-            sv.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[2]], mv.w.v[2]);
-          if(mv.w.v[3] != 0.0)
-            sv.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[3]], mv.w.v[3]);
-          // calcul min et max pour le bounding volum
-          if(l == 0) {
-            S = sv.p.size2();
-            if (S > rad) rad = S;
-            if (sv.p.v[0] > max.v[0]) max.v[0] = sv.p.v[0];
-            if (sv.p.v[1] > max.v[1]) max.v[1] = sv.p.v[1];
-            if (sv.p.v[2] > max.v[2]) max.v[2] = sv.p.v[2];
+      var l = 0; /* Lod */
+      var c = this.mesh.vertices[l].length;
+      for (var i = 0; i < c; i++) {
+        sv = this.vertices[l][i];
+        mv = this.mesh.vertices[l][i];
+        // remet le vertice a zero
+        sv.p.set(0.0,0.0,0.0,0.0);
+        // ajoute les influences
 
-            if (sv.p.v[0] < min.v[0]) min.v[0] = sv.p.v[0];
-            if (sv.p.v[1] < min.v[1]) min.v[1] = sv.p.v[1];
-            if (sv.p.v[2] < min.v[2]) min.v[2] = sv.p.v[2];
-          }
-        }
-        // On met a jour les infos triangles si le shadow-volum est enabled
-        if (Ovoid.Drawer.opt_shadowCasting) {
-          for (var t = 0; t < this.triangles[l].length; t++) {
-            // les 3 vertices du triangle
-            p0 = this.vertices[l][this.triangles[l][t].index[0]].p;
-            p1 = this.vertices[l][this.triangles[l][t].index[1]].p;
-            p2 = this.vertices[l][this.triangles[l][t].index[2]].p;
-            
-            // calcul de la normale
-            v0.subOf(p0, p1);
-            v1.subOf(p0, p2);
+        if(mv.w.v[0]!=0.0)
+          sv.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[0]], mv.w.v[0]); 
+        if(mv.w.v[1]!=0.0)
+          sv.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[1]], mv.w.v[1]); 
+        if(mv.w.v[2]!=0.0)
+          sv.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[2]], mv.w.v[2]); 
+        if(mv.w.v[3]!=0.0)
+          sv.p.addWeightTransform4Of(mv.p, this.infWorldMatrix[mv.i.v[3]], mv.w.v[3]);
+          
+        /* normalise le poids */
+        sv.p.normalizeWeight();
+        
+        // calcul min et max pour le bounding volum
+        S = sv.p.size2();
+        if (S > rad2) rad2 = S;
+        if (sv.p.v[0] > max.v[0]) max.v[0] = sv.p.v[0];
+        if (sv.p.v[1] > max.v[1]) max.v[1] = sv.p.v[1];
+        if (sv.p.v[2] > max.v[2]) max.v[2] = sv.p.v[2];
 
-            this.triangles[l][t].normal.crossOf(v0, v1);
-            //this.triangles[l][t].normal.normalize();
+        if (sv.p.v[0] < min.v[0]) min.v[0] = sv.p.v[0];
+        if (sv.p.v[1] < min.v[1]) min.v[1] = sv.p.v[1];
+        if (sv.p.v[2] < min.v[2]) min.v[2] = sv.p.v[2];
+      }
+      // On met a jour les infos triangles si le shadow-volum est enabled
+      if (Ovoid.Drawer.opt_shadowCasting) {
+        // pour la maj des triangles
+        var v0 = new Ovoid.Vector();
+        var v1 = new Ovoid.Vector();
+        for (var t = 0; t < this.triangles[l].length; t++) {
+          // les 3 vertices du triangle
+          p0 = this.vertices[l][this.triangles[l][t].index[0]].p;
+          p1 = this.vertices[l][this.triangles[l][t].index[1]].p;
+          p2 = this.vertices[l][this.triangles[l][t].index[2]].p;
+          
+          // calcul de la normale
+          v0.subOf(p0, p1);
+          v1.subOf(p0, p2);
 
-            // calcule du centre
-            this.triangles[l][t].center.set(
-                (p0.v[0] + p1.v[0] + p2.v[0]) / 3,
-                (p0.v[1] + p1.v[1] + p2.v[1]) / 3,
-                (p0.v[2] + p1.v[2] + p2.v[2]) / 3,
-                1.0);
-          }
+          this.triangles[l][t].normal.crossOf(v0, v1);
+
+          // calcule du centre
+          this.triangles[l][t].center.set(
+              (p0.v[0] + p1.v[0] + p2.v[0]) / 3,
+              (p0.v[1] + p1.v[1] + p2.v[1]) / 3,
+              (p0.v[2] + p1.v[2] + p2.v[2]) / 3,
+              1.0);
         }
       }
 
       this.boundingBox.setBound(min, max);
-      this.boundingSphere.setBound(min, max, rad);
+      this.boundingSphere.setBound(min, max, rad2*0.5);
 
       // propage l'uncach du shape
       for (var i = 0; i < this.link.length; i++)

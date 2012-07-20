@@ -232,8 +232,11 @@ Ovoid.error = function(code, message) {
   content += '<div style="text-align:left;padding:10px;border-radius:8px;background-color:#eee;color:#000;font-family:courier,monospace;font-size:10pt;margin:0px;">';
   content += '- Message - <br><span style="color:#a00">' + dcode + " :: " + message + '</span><br>';
   content += '- last log/backtrace -<br>';
-  var logs = Ovoid._log.replace(/\n/g, '<br>');
+  var logs = Ovoid._log;
   logs = logs.replace(/    /g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+  logs = logs.replace(/</g, '&lt;');
+  logs = logs.replace(/>/g, '&gt;');
+  logs = logs.replace(/\n/g, '<br>');
   content += '<span style="color:#00a">' + logs;
   content += '</div></div>';
   document.write(content);

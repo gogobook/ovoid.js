@@ -319,13 +319,20 @@ Ovoid.init = function(canvas) {
                 Ovoid._dbg[6].setFgColor(1.0,1.0,1.0,1.0);
                 
                 Ovoid._dbg[0].cachTransform();
+                Ovoid._dbg[0].cachLayer();
                 Ovoid._dbg[1].cachTransform();
+                Ovoid._dbg[1].cachLayer();
                 Ovoid._dbg[2].cachTransform();
+                Ovoid._dbg[2].cachLayer();
                 Ovoid._dbg[3].cachTransform();
+                Ovoid._dbg[3].cachLayer();
                 Ovoid._dbg[4].cachTransform();
+                Ovoid._dbg[4].cachLayer();
                 Ovoid._dbg[5].cachTransform();
+                Ovoid._dbg[5].cachLayer();
                 Ovoid._dbg[6].cachTransform();
-
+                Ovoid._dbg[6].cachLayer();
+      
                 /* Lance le chargement */
                 Ovoid.Loader._launch();
               } else {
@@ -445,6 +452,15 @@ Ovoid.getLog = function() {
 
 
 /**
+ * Clear WebGL error if there is any.
+*/
+Ovoid._clearGlerror = function() {
+
+  Ovoid.gl.getError();
+};
+
+
+/**
  * Get WebGL error if there is any.
  *
  * @return {bool} True if a WebGL error was found, false otherwise.
@@ -553,21 +569,33 @@ Ovoid._mainloop = function() {
     /* DRAW HUD */
     if (Ovoid.opt_showHud) {
 
+      Ovoid.Drawer.switchSp(6); /* SP_TEXT */
+      Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+      Ovoid.Drawer.switchSp(7); /* SP_LAYER */
+      Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+      Ovoid.Drawer.switchDepth(0);
+      Ovoid.Drawer.switchBlend(3);
+    
       Ovoid._hudbg.setSize(Ovoid.Frame.size.v[0], 17.0, 1.0);
                   
       Ovoid._dbg[7].string = Ovoid.Debug.Sumary();
       
       Ovoid._hudbg.cachTransform();
-      Ovoid._dbg[7].cachTransform();
+      Ovoid._hudbg.cachLayer();
 
-      Ovoid.Drawer.drawLayer(Ovoid._hudbg);
-      Ovoid.Drawer.drawText(Ovoid._dbg[7]);
+      Ovoid.Drawer.model(Ovoid._hudbg.layerMatrix);
+      Ovoid.Drawer.layer(Ovoid._hudbg);
+  
+      Ovoid.Drawer.switchSp(6); /* SP_TEXT */
+      Ovoid.Drawer.model(Ovoid._dbg[7].layerMatrix);
+      Ovoid.Drawer.text(Ovoid._dbg[7]);
 
       if (Ovoid.opt_showDebug) {
         
         Ovoid._dbgbg.setSize(Ovoid.Frame.size.v[0], 
                   Ovoid.Frame.size.v[1]-17.0, 1.0);
         Ovoid._dbgbg.cachTransform();
+        Ovoid._dbgbg.cachLayer();
                   
         if (Ovoid.Input.mouseOverUid) {
           var n = Ovoid.rscene.search(Ovoid.Input.mouseOverUid);
@@ -583,6 +611,9 @@ Ovoid._mainloop = function() {
                   Ovoid._dbg[5].string += Ovoid.Debug.Mesh(n.shape.mesh, true);
               }
             }
+            if(n.type & Ovoid.LAYER) {
+              Ovoid._dbg[5].string += Ovoid.Debug.Layer(n, false);
+            }
             Ovoid._dbg[6].string = Ovoid.Debug.DependTree(n);
           }
         } else {
@@ -596,10 +627,16 @@ Ovoid._mainloop = function() {
         Ovoid._dbg[3].string = Ovoid.Debug.Timer()+'\n'; 
         Ovoid._dbg[3].string += Ovoid.Debug.Frame();
         Ovoid._dbg[4].string = Ovoid.Debug.WorldGraph(Ovoid.rscene);
-        Ovoid.Drawer.drawLayer(Ovoid._dbgbg);
         
-        for ( var i = 0; i < 7; i++)
-          Ovoid.Drawer.drawText(Ovoid._dbg[i]);
+        Ovoid.Drawer.switchSp(7); /* SP_LAYER */
+        Ovoid.Drawer.model(Ovoid._dbgbg.layerMatrix);
+        Ovoid.Drawer.layer(Ovoid._dbgbg);
+        
+        Ovoid.Drawer.switchSp(6); /* SP_TEXT */
+        for ( var i = 0; i < 7; i++) {
+          Ovoid.Drawer.model(Ovoid._dbg[i].layerMatrix);
+          Ovoid.Drawer.text(Ovoid._dbg[i]);
+        }
       }
     }
     

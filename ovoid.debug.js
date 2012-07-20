@@ -363,6 +363,33 @@ Ovoid.Debug.Camera = function(o, s) {
 
 
 /**
+ * Layer debug.
+ * <br>
+ * <br>
+ * Returns node debuging informations in text format.
+ * 
+ * @param {Layer} o Layer node.
+ * @param {bool} s Sumarize.
+ * @return {string} Node debuging infos.
+ */
+Ovoid.Debug.Layer = function(o, s) {
+
+  var d = 'Ovoid.Layer "' + o.name + '" infos\n{\n';
+  d += '  size:      ' + Ovoid.Debug.Float3v(o.size.v, '') + '\n';
+  d += '  fgColor:   ' + Ovoid.Debug.Float4v(o.fgColor.v, '') + '\n';
+  d += '  bgColor:   ' + Ovoid.Debug.Float4v(o.bgColor.v, '') + '\n';
+  d += '  bgTexture: ';
+  (o.bgTexture)?d+=o.bgTexture.name+'\n':d+='null\n';
+  if(!s) {
+    d += '  layerMatrix {\n';
+    d += Ovoid.Debug.Float16v(o.layerMatrix.m, '    ') + '\n';
+    d += '  }\n';
+  }
+  d += '}';
+  return d;
+};
+
+/**
  * Scene node list debug.
  * <br>
  * <br>

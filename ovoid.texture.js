@@ -86,24 +86,18 @@ Ovoid.Texture.prototype.constructor = Ovoid.Texture;
  */
 Ovoid.Texture.prototype._handleLoad = function() {
 
+  Ovoid._clearGlerror();
+
   this.owner.width = this.width;
   this.owner.height = this.height;
   Ovoid.gl.bindTexture(this.owner.target, this.owner.handle);
-
-  Ovoid.gl.texImage2D(this.owner.target,
-      0,
-      Ovoid.gl.RGBA,
-      Ovoid.gl.RGBA,
-      Ovoid.gl.UNSIGNED_BYTE,
-      this);
+  Ovoid.gl.texImage2D(this.owner.target,0,0x1908,0x1908,0x1401,this);
   
-  this.owner.setFilter(this.owner.filter);
-
-  if (Ovoid.isPowerOfTwo(this.width) &&
-      Ovoid.isPowerOfTwo(this.height))
-  {
+  if (Ovoid.isPowerOfTwo(this.width) && Ovoid.isPowerOfTwo(this.height)) {
     Ovoid.gl.generateMipmap(this.owner.target);
   }
+  
+  this.owner.setFilter(this.owner.filter);
   
   /* unbind la texture */
   Ovoid.gl.bindTexture(this.owner.target, null);
@@ -141,54 +135,30 @@ Ovoid.Texture.prototype._handleError = function() {
  */
 Ovoid.Texture.prototype.setFilter = function(filter) {
 
+  Ovoid._clearGlerror();
+
   this.filter = filter;
   Ovoid.gl.bindTexture(this.target, this.handle);
   if (filter) {
     
-    if (Ovoid.isPowerOfTwo(this.width) &&
-        Ovoid.isPowerOfTwo(this.height))
+    if (Ovoid.isPowerOfTwo(this.width) && Ovoid.isPowerOfTwo(this.height))
     {
-      Ovoid.gl.texParameteri(this.target,
-          Ovoid.gl.TEXTURE_MAG_FILTER,
-          Ovoid.gl.LINEAR);
-
-      Ovoid.gl.texParameteri(this.target,
-          Ovoid.gl.TEXTURE_MIN_FILTER,
-          Ovoid.gl.LINEAR_MIPMAP_LINEAR);
+      Ovoid.gl.texParameteri(this.target,0x2800,0x2601);
+      Ovoid.gl.texParameteri(this.target,0x2801,0x2703);
     } else {
-      Ovoid.gl.texParameteri(this.target,
-          Ovoid.gl.TEXTURE_WRAP_S,
-          Ovoid.gl.CLAMP_TO_EDGE);
-
-      Ovoid.gl.texParameteri(this.target,
-          Ovoid.gl.TEXTURE_WRAP_T,
-          Ovoid.gl.CLAMP_TO_EDGE);
-
-      Ovoid.gl.texParameteri(this.target,
-          Ovoid.gl.TEXTURE_MAG_FILTER,
-          Ovoid.gl.LINEAR);
-
-      Ovoid.gl.texParameteri(this.target,
-          Ovoid.gl.TEXTURE_MIN_FILTER,
-          Ovoid.gl.LINEAR);
+      Ovoid.gl.texParameteri(this.target,0x2802,0x812F);
+      Ovoid.gl.texParameteri(this.target,0x2803,0x812F);
+      Ovoid.gl.texParameteri(this.target,0x2800,0x2601);
+      Ovoid.gl.texParameteri(this.target,0x2801,0x2601);
     }
   } else {
-    Ovoid.gl.texParameteri(this.target,
-        Ovoid.gl.TEXTURE_MAG_FILTER,
-        Ovoid.gl.NEAREST);
-
-    Ovoid.gl.texParameteri(this.target,
-        Ovoid.gl.TEXTURE_MIN_FILTER,
-        Ovoid.gl.NEAREST);
-        
-    Ovoid.gl.texParameteri(this.target,
-        Ovoid.gl.TEXTURE_WRAP_S,
-        Ovoid.gl.CLAMP_TO_EDGE);
-
-    Ovoid.gl.texParameteri(this.target,
-        Ovoid.gl.TEXTURE_WRAP_T,
-        Ovoid.gl.CLAMP_TO_EDGE);
+    Ovoid.gl.texParameteri(this.target,0x2800,0x2600);
+    Ovoid.gl.texParameteri(this.target,0x2801,0x2600);
+    Ovoid.gl.texParameteri(this.target,0x2802,0x812F);
+    Ovoid.gl.texParameteri(this.target,0x2803,0x812F);
   }
+
+  Ovoid.gl.bindTexture(this.target, null);
 
   Ovoid._logGlerror('Ovoid.Texture.setFilter :: ' + this.url);
 };
@@ -225,7 +195,7 @@ Ovoid.Texture.prototype.loadSource = function(url, filter, nopath) {
     src += '?' + Math.random();
   
   this.handle = Ovoid.gl.createTexture();
-  this.target = Ovoid.gl.TEXTURE_2D;
+  this.target = 0x0DE1;
 
   this.filter = filter;
 
@@ -235,6 +205,44 @@ Ovoid.Texture.prototype.loadSource = function(url, filter, nopath) {
   this.pixmap.onerror = this._handleError;
   /*this.pixmap.addEventListener('error', this._handleError, false);*/
   this.pixmap.src = src;
+};
+
+
+
+/**
+ * Create texture.<br><br>
+ * 
+ * Creates a 2D texture according to the specified parameters with the given 
+ * texels data.<br><br>
+ *  
+ *
+ * @param {enum} format WebGL texture pixel format.
+ * 
+ * @param {int} width Texel image data width.
+ * 
+ * @param {int} height Texel image data height.
+ * 
+ * @param {Uint8Array} data Image pixels data.
+ */
+Ovoid.Texture.prototype.create2d = function(format, width, height, data) {
+  
+  Ovoid._clearGlerror();
+  
+  this.handle = Ovoid.gl.createTexture();
+  this.target = Ovoid.gl.TEXTURE_2D;
+
+  Ovoid.gl.bindTexture(this.target, this.handle);
+
+  Ovoid.gl.texImage2D(Ovoid.gl.TEXTURE_2D,
+                      0, format,
+                      width, height, 0,
+                      format,
+                      Ovoid.gl.UNSIGNED_BYTE, data);
+                      
+  Ovoid.gl.bindTexture(this.target, null);
+  
+  Ovoid._logGlerror('Ovoid.Texture.create2d :: ' + this.name);
+                      
 };
 
 

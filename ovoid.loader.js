@@ -330,19 +330,20 @@ Ovoid.Loader.init = function() {
     
     Ovoid.Loader._lcirclea.moveXyz(Ovoid.Loader.opt_loadcirclePos[0],Ovoid.Loader.opt_loadcirclePos[1],0);
     Ovoid.Loader._lcirclea.cachTransform();
+    Ovoid.Loader._lcirclea.cachLayer();
   }
 
   if (Ovoid.Loader.opt_backgroundSrc.length > 1)
   {
     Ovoid.Loader._bg.bgTexture = new Ovoid.Texture();
     Ovoid.Loader._bg.bgTexture.loadSource(dp+Ovoid.Loader.opt_backgroundSrc, 0, true);
-
-    Ovoid.Loader._bg.bgColor.setv(Ovoid.Loader.opt_backgroundColor);
-    Ovoid.Loader._bg.moveXyz(0.0, 0.0, 0.0);
-    Ovoid.Loader._bg.size.set(Ovoid.Frame.size.v[0], Ovoid.Frame.size.v[1], 0.0);
-    Ovoid.Loader._bg.cachTransform();
   }
-
+  Ovoid.Loader._bg.bgColor.setv(Ovoid.Loader.opt_backgroundColor);
+  Ovoid.Loader._bg.moveXyz(0.0, 0.0, 0.0);
+  Ovoid.Loader._bg.size.set(Ovoid.Frame.size.v[0], Ovoid.Frame.size.v[1], 0.0);
+  Ovoid.Loader._bg.cachTransform();
+  Ovoid.Loader._bg.cachLayer();
+    
   if (Ovoid.Loader.opt_iconscenesSrc.length > 1) {
     
     Ovoid.Loader._iconscn.bgTexture = new Ovoid.Texture();
@@ -351,6 +352,7 @@ Ovoid.Loader.init = function() {
     Ovoid.Loader._iconscn.moveXyz(Ovoid.Loader.opt_iconscenesPos[0],Ovoid.Loader.opt_iconscenesPos[1],0.0);
     Ovoid.Loader._iconscn.setSize(Ovoid.Loader.opt_iconsSize[0],Ovoid.Loader.opt_iconsSize[1]);
     Ovoid.Loader._iconscn.cachTransform();
+    Ovoid.Loader._iconscn.cachLayer();
   }
 
   if (Ovoid.Loader.opt_icontexturesSrc.length > 1) {
@@ -361,6 +363,7 @@ Ovoid.Loader.init = function() {
     Ovoid.Loader._icontex.moveXyz(Ovoid.Loader.opt_icontexturesPos[0],Ovoid.Loader.opt_icontexturesPos[1],0.0);
     Ovoid.Loader._icontex.setSize(Ovoid.Loader.opt_iconsSize[0],Ovoid.Loader.opt_iconsSize[1]);
     Ovoid.Loader._icontex.cachTransform();
+    Ovoid.Loader._icontex.cachLayer();
   }
 
   if (Ovoid.Loader.opt_iconaudiosSrc.length > 1)
@@ -371,6 +374,7 @@ Ovoid.Loader.init = function() {
     Ovoid.Loader._iconaud.moveXyz(Ovoid.Loader.opt_iconaudiosPos[0],Ovoid.Loader.opt_iconaudiosPos[1],0.0);
     Ovoid.Loader._iconaud.setSize(Ovoid.Loader.opt_iconsSize[0], Ovoid.Loader.opt_iconsSize[1]);
     Ovoid.Loader._iconaud.cachTransform();
+    Ovoid.Loader._iconaud.cachLayer();
   }
 
   if (Ovoid.Loader.opt_iconconfigSrc.length > 1)
@@ -381,24 +385,28 @@ Ovoid.Loader.init = function() {
     Ovoid.Loader._iconcgf.moveXyz(Ovoid.Loader.opt_iconconfigPos[0],Ovoid.Loader.opt_iconconfigPos[1],0.0);
     Ovoid.Loader._iconcgf.setSize(Ovoid.Loader.opt_iconsSize[0], Ovoid.Loader.opt_iconsSize[1]);
     Ovoid.Loader._iconcgf.cachTransform();
+    Ovoid.Loader._iconcgf.cachLayer();
   }
 
   Ovoid.Loader._percent.setFormat(Ovoid.Loader.opt_percentageXys[2],0.5,1.0);
   Ovoid.Loader._percent.fgColor.setv(Ovoid.Loader.opt_foregroundColor);
   Ovoid.Loader._percent.moveXyz(Ovoid.Loader.opt_percentageXys[0]-(Ovoid.Loader._percent.getWidth()*0.5),Ovoid.Loader.opt_percentageXys[1],0.0);
   Ovoid.Loader._percent.cachTransform();
+  Ovoid.Loader._percent.cachLayer();
 
   Ovoid.Loader._title.string = Ovoid.Loader.opt_titleStr;
   Ovoid.Loader._title.setFormat(Ovoid.Loader.opt_titleXys[2],0.5,1.0);
   Ovoid.Loader._title.fgColor.setv(Ovoid.Loader.opt_foregroundColor);
   Ovoid.Loader._title.moveXyz(Ovoid.Loader.opt_titleXys[0]-(Ovoid.Loader._title.getWidth()*0.5), Ovoid.Loader.opt_titleXys[1], 0.0);
   Ovoid.Loader._title.cachTransform();
+  Ovoid.Loader._title.cachLayer();
 
   Ovoid.Loader._details.string = 'Scenes...';
   Ovoid.Loader._details.setFormat(Ovoid.Loader.opt_detailsXys[2],0.5,1.0);
   Ovoid.Loader._details.fgColor.setv(Ovoid.Loader.opt_foregroundColor);
   Ovoid.Loader._details.moveXyz(Ovoid.Loader.opt_detailsXys[0]-(Ovoid.Loader._details.getWidth()*0.5),Ovoid.Loader.opt_detailsXys[1],0.0);
   Ovoid.Loader._details.cachTransform();
+  Ovoid.Loader._details.cachLayer();
 
   if (Ovoid._logGlerror('Ovoid.Loader.init'))
     return false;
@@ -412,62 +420,74 @@ Ovoid.Loader.init = function() {
  */
 Ovoid.Loader._drawStep = function() {
 
-  Ovoid.gl.clear(Ovoid.gl.COLOR_BUFFER_BIT | Ovoid.gl.DEPTH_BUFFER_BIT);
-
-  Ovoid.gl.disable(Ovoid.gl.DEPTH_TEST);
-
+  Ovoid.gl.clear(Ovoid.gl.COLOR_BUFFER_BIT|Ovoid.gl.DEPTH_BUFFER_BIT);
+  
+  Ovoid.Drawer.switchSp(7); /* SP_LAYER */
   /* background */
-  Ovoid.Drawer.drawLayer(Ovoid.Loader._bg);
-
+  Ovoid.Drawer.model(Ovoid.Loader._bg.layerMatrix);
+  Ovoid.Drawer.layer(Ovoid.Loader._bg);
+  
   Ovoid.Loader._iconscn.bgColor.setv(Ovoid.Loader.opt_iconsColor);
   if (!Ovoid.Loader._loadstage[0])
     Ovoid.Loader._iconscn.bgColor.v[3] = 0.1;
   
-  Ovoid.Drawer.drawLayer(Ovoid.Loader._iconscn);
+  Ovoid.Drawer.model(Ovoid.Loader._iconscn.layerMatrix);
+  Ovoid.Drawer.layer(Ovoid.Loader._iconscn);
 
   Ovoid.Loader._icontex.bgColor.setv(Ovoid.Loader.opt_iconsColor);
   if (!Ovoid.Loader._loadstage[1])
     Ovoid.Loader._icontex.bgColor.v[3] = 0.1;
   
-  Ovoid.Drawer.drawLayer(Ovoid.Loader._icontex);
+  Ovoid.Drawer.model(Ovoid.Loader._icontex.layerMatrix);
+  Ovoid.Drawer.layer(Ovoid.Loader._icontex);
 
   Ovoid.Loader._iconaud.bgColor.setv(Ovoid.Loader.opt_iconsColor);
   if (!Ovoid.Loader._loadstage[2])
     Ovoid.Loader._iconaud.bgColor.v[3] = 0.1;
   
-  Ovoid.Drawer.drawLayer(Ovoid.Loader._iconaud);
-
+  Ovoid.Drawer.model(Ovoid.Loader._iconaud.layerMatrix);
+  Ovoid.Drawer.layer(Ovoid.Loader._iconaud);
+  
   Ovoid.Loader._iconcgf.bgColor.setv(Ovoid.Loader.opt_iconsColor);
   if (!Ovoid.Loader._loadstage[3])
     Ovoid.Loader._iconcgf.bgColor.v[3] = 0.1;
   
-  Ovoid.Drawer.drawLayer(Ovoid.Loader._iconcgf);
+  Ovoid.Drawer.model(Ovoid.Loader._iconcgf.layerMatrix);
+  Ovoid.Drawer.layer(Ovoid.Loader._iconcgf);
 
+  if(Ovoid.Loader._lcirclei.bgTexture) {
+    Ovoid.Loader._lcirclea.rotateXyz(0.0, 0.0, 0.2, Ovoid.WORLD, Ovoid.RELATIVE);
+    Ovoid.Loader._lcirclea.cachTransform();
+    Ovoid.Loader._lcirclei.cachTransform();
+    Ovoid.Loader._lcirclei.cachLayer();
+    Ovoid.Drawer.model(Ovoid.Loader._lcirclei.layerMatrix);
+    Ovoid.Drawer.layer(Ovoid.Loader._lcirclei);
+  }
+  
+  Ovoid.Drawer.switchSp(6); /* SP_TEXT */
+  
   if (Ovoid.Loader.opt_showPercentage) {
     Ovoid.Loader._percent.string = Math.floor(Ovoid.Loader._nratio).toString() + '%';
     Ovoid.Loader._percent.moveXyz(Ovoid.Loader.opt_percentageXys[0]-(Ovoid.Loader._percent.getWidth()*0.5),Ovoid.Loader.opt_percentageXys[1],0.0,0,1);
     Ovoid.Loader._percent.cachTransform();
-    Ovoid.Drawer.drawText(Ovoid.Loader._percent);
+    Ovoid.Drawer.model(Ovoid.Loader._percent.layerMatrix);
+    Ovoid.Drawer.text(Ovoid.Loader._percent);
   }
 
   if (Ovoid.Loader.opt_showTitle) {
     Ovoid.Drawer.drawText(Ovoid.Loader._title);
+    Ovoid.Drawer.model(Ovoid.Loader._title.layerMatrix);
+    Ovoid.Drawer.text(Ovoid.Loader._title);
   }
 
   if (Ovoid.Loader.opt_showDetails) {
     Ovoid.Loader._details.string = Ovoid.Loader._detailsStr;
     Ovoid.Loader._details.moveXyz(Ovoid.Loader.opt_detailsXys[0]-(Ovoid.Loader._details.getWidth()*0.5),Ovoid.Loader.opt_detailsXys[1],0.0,0,1);
     Ovoid.Loader._details.cachTransform();
-    Ovoid.Drawer.drawText(Ovoid.Loader._details);
+    Ovoid.Drawer.model(Ovoid.Loader._details.layerMatrix);
+    Ovoid.Drawer.text(Ovoid.Loader._details);
   }
   
-  if(Ovoid.Loader._lcirclei.bgTexture) {
-    Ovoid.Loader._lcirclea.rotateXyz(0.0, 0.0, 0.2, Ovoid.WORLD, Ovoid.RELATIVE);
-    Ovoid.Loader._lcirclea.cachTransform();
-    Ovoid.Loader._lcirclei.cachTransform();
-    Ovoid.Drawer.drawLayer(Ovoid.Loader._lcirclei);
-  }
-
   /* vide le cach error */
   Ovoid._logGlerror('Ovoid.Loader._drawStep');
 };
@@ -652,7 +672,7 @@ Ovoid.Loader._loadingDone = function() {
     /* frame mode en mode demandé */
     Ovoid.Frame.setMode(Ovoid.Frame.opt_frameMode);
     /* update viewport drawer */
-    Ovoid.Drawer.updateViewport();
+    Ovoid.gl.viewport(0,0,Ovoid.Frame.size.v[0],Ovoid.Frame.size.v[1]);
     Ovoid.log(3, 'Ovoid.Loader', 'run onload()');
     /* appelle la function onload */
     if (Ovoid._mainload()) {
@@ -691,8 +711,16 @@ Ovoid.Loader._launch = function() {
   if (Ovoid.Loader.opt_drawWaitScreen) {
     /* frame mode en mode fix */
     Ovoid.Frame.setMode(0);
-    /* update viewport drawer */
-    Ovoid.Drawer.updateViewport();
+    
+    /* Initialize pour dessiner le wait screen */
+    Ovoid.gl.viewport(0,0,Ovoid.Frame.size.v[0],Ovoid.Frame.size.v[1]);
+    Ovoid.Drawer.switchSp(6); /* SP_TEXT */
+    Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+    Ovoid.Drawer.switchSp(7); /* SP_LAYER */
+    Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+    Ovoid.Drawer.switchDepth(0);
+    Ovoid.Drawer.switchBlend(3);
+    
     Ovoid.Loader._loadingLoop();
   } else {
     /* chargement brute de décofrage synchronisé pour les scenes */

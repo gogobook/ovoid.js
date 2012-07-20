@@ -64,8 +64,9 @@ Ovoid.Text = function(name) {
   /** Text string.
    * @type string */
   this.string = '';
-  /* default size */
-  this.size.set(16.0, 0.5, 1.0);
+  /** Text parameters.
+   * @type Coord */
+  this.param = new Ovoid.Coord(16.0, 0.5, 1.0);
 };
 Ovoid.Text.prototype = new Ovoid.Layer;
 Ovoid.Text.prototype.constructor = Ovoid.Text;
@@ -82,7 +83,7 @@ Ovoid.Text.prototype.constructor = Ovoid.Text;
  */
 Ovoid.Text.prototype.setFormat = function(s, c, l) {
 
-  this.size.set(s, c, l);
+  this.param.set(s, c, l);
 };
 
 
@@ -111,7 +112,7 @@ Ovoid.Text.prototype.setFontmap = function(texture) {
  */
 Ovoid.Text.prototype.getWidth = function(texture) {
 
-  return (this.string.length * (this.size.v[0] * this.size.v[1]));
+  return (this.string.length * (this.param.v[0] * this.param.v[1]));
 };
 
 
