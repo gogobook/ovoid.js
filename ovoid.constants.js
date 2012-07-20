@@ -1199,6 +1199,110 @@ Ovoid.MOZ_AUDIO_API = 2;
 Ovoid.WEBKIT_AUDIO_API = 3;
 
 
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_RP_GEOMETRY = 20;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_RP_PARTICLE = 22;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_RP_LAYER = 23;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_RP_STRING = 24;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_GEOMETRY_1L = 0;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_GEOMETRY_NL = 1;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_VL_GEOMETRY_1L = 10;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_VL_GEOMETRY_NL = 11;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_PARTICLE = 2;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_LAYER = 3;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_STRING = 4;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_HELPER = 5;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
+Ovoid.PIPE_SHADOW_VOLUME = 6;
+
+
 /** Symbolic constant for shader's slot. Keep in stock.
  * @constant
  * @memberOf _global_
@@ -2618,126 +2722,129 @@ Ovoid.KB_RBRACKET = 221;
  * @memberOf _global_ */
 Ovoid.KB_SQUOTE = 222;
 
-
-/** Default GLSL text vertex shader string for Text dedicated pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_TEXT_VS = "attribute vec4 	p;uniform mat4 MXF;uniform mat4 MEV;varying float a;void main(void) {a=p.w;gl_PointSize=p.z;gl_Position=MEV*MXF*vec4(p.xy,0.0,1.0);}";
-
-/** Default GLSL text fragment shader string for Text dedicated pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_TEXT_FS = "precision highp float; uniform vec4 C; uniform sampler2D Sd; varying float a; vec2 Gu; void main(void) {Gu.s=(gl_PointCoord.s*0.0625)+(floor(mod(a,16.0))*0.0625);Gu.t=(1.0-(gl_PointCoord.t*0.0625))-(floor(a/16.0)*0.0625);gl_FragColor=texture2D(Sd,Gu)*C;}";
-
-
-/** Default GLSL layer vertex shader string for Layer dedicated pipeline.
- * @constant
- * @memberOf _global_ */
-//Ovoid.DEFAULT_GLSL_LAYER_VS = "attribute vec4 p; attribute vec3 u;uniform vec3 Ls; uniform mat4 MXF; uniform mat4 MEV; varying vec2 Vu; vec4 Vp; void main(void){Vp=p;Vp.x*=Ls.x;Vp.y*=Ls.y;Vu=u.xy;gl_Position=MEV*MXF*Vp;}";
-Ovoid.DEFAULT_GLSL_LAYER_VS = "attribute vec4 p; attribute vec3 u;uniform mat4 MXF; uniform mat4 MEV; varying vec2 Vu; vec4 Vp; void main(void){Vp=p;Vu=u.xy;gl_Position=MEV*MXF*Vp;}";
-
-
-/** Default GLSL layer fragment shader string for Layer dedicated pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_LAYER_FS = 'precision highp float;uniform vec4 C;uniform vec3 Es;uniform sampler2D Sd;varying vec2 Vu;void main(void){gl_FragColor=texture2D(Sd,Vu)*C;}';
-
-
-/** Default GLSL particle vertex shader string for particle pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_PARTICLE_VS = 'attribute vec4 p;attribute vec3 u;attribute vec4 c;uniform mat4 MEV;uniform vec4 Ep;uniform mat4 MXF;varying vec4 Vp;varying vec2 Vu;varying vec4 Vc;float d;void main(void) {Vp = p;d = distance(p, Ep);Vu = u.xy;Vc = c;gl_PointSize = ((u.z * 10.0) / d);gl_Position = MEV * Vp;}'
-
-
-/** Default GLSL particle fragment shader string for particle pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_PARTICLE_FS = 'precision highp float;uniform vec4 C;uniform sampler2D Sd;varying vec4 Vp;varying vec2 Vu;varying vec4 Vc;void main(void) {gl_FragColor=texture2D(Sd,gl_PointCoord)*Vc;}';
-
-
-/** Default GLSL versatil vertex shader string for drawing pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_PNUTBCIW_VS = '#define MATRIX_ARRAY_SIZE '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec3 t;attribute vec3 b;attribute vec4 c;attribute vec4 i;attribute vec4 w;uniform bool ENw;uniform bool ENt;uniform mat4 MEV;uniform mat4 MXF[MATRIX_ARRAY_SIZE];uniform mat3 MNR[MATRIX_ARRAY_SIZE];varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;varying vec3 Vt;varying vec3 Vb;varying vec4 Vc;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;}else{Vp=MXF[0]*p;Vn=MNR[0]*n;}if(ENt){vec3 Cz=cross(Vn,vec3(0.0,0.0,1.0));vec3 Cy=cross(Vn,vec3(0.0,1.0,0.0));if(length(Cz)>length(Cy)){Vt=Cz;}else{Vt=Cy;}Vb=cross(Vn,Vt);}else{Vt=t;Vb=b;}Vu=u.xy;Vc=c;gl_PointSize=u.z;gl_Position=MEV*Vp;}';
-
-
-/** Default GLSL vertex shader string for hybrid PNU/PNUIW.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_PNUIW_HYBRID_VS = '#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec4 i;attribute vec4 w;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];uniform mat3 MNR[MA];varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;}else{Vp=MXF[0]*p;Vn=MNR[0]*n;}Vu=u.xy;gl_Position=MEV*Vp;}'
-
-
-/** Default GLSL P vertex shader string for Position.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_P_VS = 'attribute vec4 p;uniform mat4 MEV;uniform mat4 MXF;void main(void){gl_Position=MEV*(MXF*p);}';
-
-
-/** Default GLSL vertex shader string for Position, Color.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_PC_VS = 'attribute vec4 p;attribute vec4 c;uniform mat4 MEV;uniform mat4 MXF;varying vec4 Vc;void main(void){Vc=c;gl_Position=MEV*(MXF*p);}';
-
-
-
-/** Default GLSL vertex shader string for Position, Normal, Uv.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_PNU_VS = 'attribute vec4 p;attribute vec3 n;attribute vec3 u;uniform mat4 MEV;uniform mat4 MXF;uniform mat3 MNR;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;void main(void){Vp=MXF*p;Vn=MNR*n;Vu=u.xy;gl_Position=MEV*Vp;}';
-
-
-
-/** Default GLSL vertex shader string for Position, Normal, Uv, Influence, Weight.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_PNUIW_VS = '#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec4 i;attribute vec4 w;uniform mat4 MEV;uniform mat4 MXF[MA];uniform mat3 MNR[MA];varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;void main(void){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;Vu=u.xy;gl_Position=MEV*Vp;}';
-
-
-
-/** Default GLSL fragment shader string for readPixel picking pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_FCOLOR_FS = 'precision highp float;uniform vec4 C;void main(void){gl_FragColor=C;}';
-
-
-
-/** Default GLSL fragment shader string for Symbolic shapes pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_VCOLOR_FS = 'precision highp float;uniform vec4 C;varying vec4 Vc;void main(void){gl_FragColor=Vc*C;}';
-
-
-/** Default GLSL fragment shader string for N-lights pass pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_AERDS_NL_FS = '#define ML '+Ovoid.MAX_LIGHT_BY_DRAW+'\nprecision highp float;uniform bool ENa;uniform bool ENd;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp[ML];uniform vec3 Ld[ML];uniform vec4 Lc[ML];uniform float Li[ML];uniform float Lr[ML];uniform float Lf[ML];uniform float La[ML];uniform bool Le[ML];uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;float Fw,Dw,Sw;vec3 EV,R,LV;vec2 Ru;void main(void){EV=normalize(Ep-Vp).xyz;if(ENa){gl_FragColor=(Ma*Md*texture2D(Sd,Vu))*Ac;gl_FragColor+=(Me*texture2D(Se,Vu));R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}if(ENd){for(int i=0;i<ML;i++){if(Le[i]==false)continue;LV=normalize(Lp[i]-Vp).xyz;Fw=clamp((-dot(LV,Ld[i])-(cos(La[i])))/(Lf[i]),0.0,1.0);Dw=max(dot(Vn,LV),0.0)*Li[i]*Fw;R=normalize(reflect(-LV,Vn));Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Md*texture2D(Sd,Vu))*((Lc[i]*Li[i])*Dw);gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc[i]*Li[i])*Sw);}}gl_FragColor.a=Mo;}';
-
-
-/** Default GLSL fragment shader string per-light pass pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_AERDS_1L_FS = 'precision highp float;uniform bool ENa;uniform bool ENd;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp;uniform vec3 Ld;uniform vec4 Lc;uniform float Li;uniform float Lr;uniform float Lf;uniform float La;uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;float Fw,Dw,Sw;vec3 EV,R,LV;vec2 Ru;void main(void){EV=normalize(Ep-Vp).xyz;if(ENa){gl_FragColor=(Ma*Md*texture2D(Sd,Vu))*Ac;gl_FragColor+=(Me*texture2D(Se,Vu));R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}if(ENd){LV=normalize(Lp-Vp).xyz;Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf),0.0,1.0);Dw=max(dot(Vn,LV),0.0)*Li*Fw;R=normalize(reflect(-LV,Vn));Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Md*texture2D(Sd,Vu))*((Lc*Li)*Dw);gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc*Li)*Sw);}gl_FragColor.a=Mo;}';
-
-
-/** Default GLSL fragment shader string for Z-Fail shadow casting pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_S1LIGHT_FS = 'precision highp float;uniform bool ENa;uniform bool ENd;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp;uniform vec3 Ld;uniform vec4 Lc;uniform float Li;uniform float Lr;uniform float Lf;uniform float La;uniform bool Le;uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sa;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;uniform sampler2D Sn;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;varying vec4 Vc;float Fw,Dw,Sw;vec3 EV,R,LV;vec2 Ru;void main(void){gl_FragColor+=Vc;EV=normalize(Ep-Vp).xyz;if(ENa){gl_FragColor+=(Md * texture2D(Sd, Vu))*Ac;gl_FragColor+=(Ma*texture2D(Sa,Vu));gl_FragColor+=(Me*texture2D(Se,Vu));R=reflect(EV,Vn);R=normalize(R);Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;} if(ENd){LV=normalize(Lp-Vp).xyz;Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf),0.0,1.0);Dw=max(dot(Vn,LV),0.0)*Li*Fw;gl_FragColor+=(Md*texture2D(Sd,Vu))*((Lc*Li)*Dw);R=-reflect(LV,Vn);R=normalize(R);Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc*Li)*Sw);}gl_FragColor.a=Mo;}';
-
-
-/** Default GLSL fragment shader string for Standard shading pipeline.
- * @constant
- * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_SNLIGHT_FS ='#define MAX_LIGHT_COUNT '+Ovoid.MAX_LIGHT_BY_DRAW+'\nprecision highp float;uniform bool ENa;uniform bool ENd;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp[MAX_LIGHT_COUNT];uniform vec3 Ld[MAX_LIGHT_COUNT];uniform vec4 Lc[MAX_LIGHT_COUNT];uniform float Li[MAX_LIGHT_COUNT];uniform float Lr[MAX_LIGHT_COUNT];uniform float Lf[MAX_LIGHT_COUNT];uniform float La[MAX_LIGHT_COUNT];uniform bool Le[MAX_LIGHT_COUNT];uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sa;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;uniform sampler2D Sn;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;varying vec4 Vc;float Fw,Dw,Sw;vec3 EV,R,LV;vec2 Ru;void main(void){gl_FragColor+=Vc;EV=normalize(Ep-Vp).xyz;if(ENa){gl_FragColor+=(Md*texture2D(Sd,Vu))*Ac;gl_FragColor+=(Ma*texture2D(Sa,Vu));gl_FragColor+=(Me*texture2D(Se,Vu));R=reflect(EV,Vn);R=normalize(R);Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}if(ENd){for(int i=0;i<MAX_LIGHT_COUNT;i++){if(!Le[i])continue;LV=normalize(Lp[i]-Vp).xyz;Fw=clamp((-dot(LV,Ld[i])-(cos(La[i])))/(Lf[i]),0.0,1.0);Dw=max(dot(Vn,LV),0.0)*Li[i]*Fw;gl_FragColor+=(Md*texture2D(Sd,Vu))*((Lc[i]*Li[i])*Dw);R=-reflect(LV,Vn);R=normalize(R);Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc[i]*Li[i])*Sw);}}gl_FragColor.a=Mo;}';
-
-
-Ovoid.DEFAULT_GLSL_BASIC_Nl_FS = '#define LC '+Ovoid.MAX_LIGHT_BY_DRAW+'\nprecision highp float;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp[LC];uniform vec3 Ld[LC];uniform vec4 Lc[LC];uniform float Li[LC];uniform float Lr[LC];uniform float Lf[LC];uniform float La[LC];uniform bool Le[LC];uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sd;uniform sampler2D Sr;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;float Fw,Dw,Sw;vec3 EV,R,LV;vec2 Ru;void main(void){EV=normalize(Ep-Vp).xyz;gl_FragColor=Md*Ac;gl_FragColor+=Me;for(int i=0;i<LC;i++){LV=normalize(Lp[i]-Vp).xyz;Fw=clamp((-dot(LV,Ld[i])-(cos(La[i])))/(Lf[i]),0.0,1.0);Dw=max(dot(Vn,LV),0.0)*Li[i]*Fw;gl_FragColor+=(Md*texture2D(Sd,Vu))*((Lc[i]*Li[i])*Dw);R=normalize(reflect(-LV,Vn));Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=Ms*Sw;}gl_FragColor.a=Mo;}';
-
-
 /** Default GLSL Wrap map Json string for drawer basic init.
  * @constant
  * @memberOf _global_ */
-Ovoid.DEFAULT_GLSL_WRAPMAP = '{"OJSON":1,"type":"glslmap","wrapmap": {"attribute":[{"id":1,"name":"p"},{"id":2,"name":"n"},{"id":4,"name":"u"},{"id":8,"name":"t"},{"id":16,"name":"b"},{"id":32,"name":"c"},{"id":64,"name":"i"},{"id":128,"name":"w"}],"uniform":[{"id":0,"name":"ENd"},{"id":1,"name":"ENa"},{"id":2,"name":"ENs"},{"id":3,"name":"ENr"},{"id":4,"name":"ENp"},{"id":5,"name":"ENm"},{"id":6,"name":"ENw"},{"id":7,"name":"ENt"},{"id":8,"name":"Z"},{"id":9,"name":"C"},{"id":10,"name":"Ma"},{"id":11,"name":"Md"},{"id":12,"name":"Ms"},{"id":13,"name":"Me"},{"id":14,"name":"Mr"},{"id":15,"name":"Mi"},{"id":16,"name":"Mo"},{"id":17,"name":"My"},{"id":18,"name":"Mb"},{"id":19,"name":"Lw"},{"id":20,"name":"Lp"},{"id":21,"name":"Ld"},{"id":22,"name":"Lc"},{"id":23,"name":"Li"},{"id":23,"name":"Lac"},{"id":24,"name":"Lr"},{"id":25,"name":"Lf"},{"id":26,"name":"La"},{"id":27,"name":"Lal"},{"id":28,"name":"Le"},{"id":29,"name":"Laq"},{"id":30,"name":"Ep"},{"id":31,"name":"Ed"},{"id":32,"name":"Es"},{"id":40,"name":"Ac"},{"id":42,"name":"Ls"}],"uniformMatrix":[{"id":0,"name":"MXF"},{"id":1,"name":"MNR"},{"id":2,"name":"MMV"},{"id":3,"name":"MEV"},{"id":4,"name":"MPJ"},{"id":5,"name":"MLA"},{"id":6,"name":"MJT"}],"uniformSampler":[{"id":1,"name":"Sd"},{"id":0,"name":"Sa"},{"id":1,"name":"Sd"},{"id":2,"name":"Ss"},{"id":3,"name":"Se"},{"id":4,"name":"Sr"},{"id":5,"name":"Sn"}]}}';
+Ovoid.GLSL_WRAPMAP = '{"OJSON":1,"type":"glslmap","wrapmap": {"attribute":[{"id":1,"name":"p"},{"id":2,"name":"n"},{"id":4,"name":"u"},{"id":8,"name":"t"},{"id":16,"name":"b"},{"id":32,"name":"c"},{"id":64,"name":"i"},{"id":128,"name":"w"}],"uniform":[{"id":0,"name":"ENd"},{"id":1,"name":"ENa"},{"id":2,"name":"ENs"},{"id":3,"name":"ENr"},{"id":4,"name":"ENp"},{"id":5,"name":"ENm"},{"id":6,"name":"ENw"},{"id":7,"name":"ENt"},{"id":8,"name":"Z"},{"id":9,"name":"C"},{"id":10,"name":"Ma"},{"id":11,"name":"Md"},{"id":12,"name":"Ms"},{"id":13,"name":"Me"},{"id":14,"name":"Mr"},{"id":15,"name":"Mi"},{"id":16,"name":"Mo"},{"id":17,"name":"My"},{"id":18,"name":"Mb"},{"id":19,"name":"Lw"},{"id":20,"name":"Lp"},{"id":21,"name":"Ld"},{"id":22,"name":"Lc"},{"id":23,"name":"Li"},{"id":23,"name":"Lac"},{"id":24,"name":"Lr"},{"id":25,"name":"Lf"},{"id":26,"name":"La"},{"id":27,"name":"Lal"},{"id":28,"name":"Le"},{"id":29,"name":"Laq"},{"id":30,"name":"Ep"},{"id":31,"name":"Ed"},{"id":32,"name":"Es"},{"id":40,"name":"Ac"},{"id":42,"name":"Ls"}],"uniformMatrix":[{"id":0,"name":"MXF"},{"id":1,"name":"MNR"},{"id":2,"name":"MMV"},{"id":3,"name":"MEV"},{"id":4,"name":"MPJ"},{"id":5,"name":"MLA"},{"id":6,"name":"MJT"}],"uniformSampler":[{"id":1,"name":"Sd"},{"id":0,"name":"Sa"},{"id":1,"name":"Sd"},{"id":2,"name":"Ss"},{"id":3,"name":"Se"},{"id":4,"name":"Sr"},{"id":5,"name":"Sn"}]}}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_P_VS='attribute vec4 p;uniform mat4 MXF;uniform mat4 MEV;void main(void){gl_Position=MEV*MXF*p;}';
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_PU_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MXF;uniform mat4 MEV;varying vec2 Vu;void main(void){Vu=u.xy;gl_Position=MEV*MXF*p;}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_PC_VS='attribute vec4 p;attribute vec4 c;uniform mat4 MEV;uniform mat4 MXF;varying vec4 Vc;void main(void){Vc=c;gl_Position=MEV*(MXF*p);}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_P_ZSRING_VS='attribute vec4 p;uniform mat4 MXF;uniform mat4 MEV;uniform vec4 Ep;void main(void){gl_PointSize=p.z;gl_Position=MEV*MXF*vec4(p.xy,0.0,1.0);}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_P_ZWSRING_VS='attribute vec4 p;uniform mat4 MXF;uniform mat4 MEV;varying float a;void main(void){a=p.w;gl_PointSize=p.z;gl_Position=MEV*MXF*vec4(p.xy,0.0,1.0);}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_C_TEX_STRING_FS='precision highp float;uniform vec4 C;uniform sampler2D Sd;varying float a;vec2 Gu;void main(void){Gu.s=(gl_PointCoord.s*0.0625)+(floor(mod(a,16.0))*0.0625);Gu.t=(1.0-(gl_PointCoord.t*0.0625))-(floor(a/16.0)*0.0625);gl_FragColor=texture2D(Sd, Gu)*C;}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_PU_PARTICLE_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MEV;uniform vec4 Ep;void main(void){gl_PointSize=((u.z*10.0)/distance(p,Ep));gl_Position=MEV*p;}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_PUC_PARTICLE_VS='attribute vec4 p;attribute vec3 u;attribute vec4 c;uniform mat4 MEV;uniform vec4 Ep;varying vec4 Vc;void main(void){Vc=c;gl_PointSize=((u.z*10.0)/distance(p,Ep));gl_Position=MEV*p;}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_PIW_HYBRID_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute vec4 p;attribute vec4 i;attribute vec4 w;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];vec4 Vp;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;}else{Vp=MXF[0]*p;}gl_Position=MEV*Vp;}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_PNUIW_HYBRID_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec4 i;attribute vec4 w;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];uniform mat3 MNR[MA];varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;}else{Vp=MXF[0]*p;Vn=MNR[0]*n;}Vu=u.xy;gl_Position=MEV*Vp;}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_VL_PNUIW_HYBRID_1L_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec4 i;attribute vec4 w;uniform bool ENd;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];uniform mat3 MNR[MA];uniform vec4 Ep;uniform vec4 Lp; uniform vec3 Ld;uniform vec4 Lc;uniform float Li;uniform float Lr;uniform float Lf;uniform float La;uniform float My;uniform float Mi;vec4 Vp;vec3 Vn;varying vec2 Vu;varying vec4 Cd;varying vec4 Cs;varying vec2 Ru;vec3 LV,R,EV;float LT,Fw;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;}else{Vp=MXF[0]*p;Vn=MNR[0]*n;}Vu=u.xy;gl_Position=MEV*Vp;Cd=vec4(0.0,0.0,0.0,0.0);Cs=vec4(0.0,0.0,0.0,0.0);if(ENd){EV=normalize(Ep-Vp).xyz;if(My!=0.0){R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;}LV=normalize(Lp-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf),0.0,1.0);Cd+=(Lc*Li*LT)*Fw;R=normalize(reflect(-LV,Vn));Cs+=Lc*Li*(pow(max(dot(R,EV),0.0),Mi))*Fw;}}'
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_VL_PNUIW_HYBRID_NL_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\n#define ML '+Ovoid.MAX_LIGHT_BY_DRAW+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec4 i;attribute vec4 w;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];uniform mat3 MNR[MA];uniform vec4 Ep;uniform vec4 Lp[ML]; uniform vec3 Ld[ML];uniform vec4 Lc[ML];uniform float Li[ML];uniform float Lr[ML];uniform float Lf[ML];uniform float La[ML];uniform bool Le[ML];uniform float My;uniform float Mi;vec4 Vp;vec3 Vn;varying vec2 Vu;varying vec4 Cd;varying vec4 Cs;varying vec2 Ru;vec3 LV,R,EV;float LT,Fw;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;}else{Vp=MXF[0]*p;Vn=MNR[0]*n;}Vu=u.xy;gl_Position=MEV*Vp;Cd=vec4(0.0,0.0,0.0,0.0);Cs=vec4(0.0,0.0,0.0,0.0);EV=normalize(Ep-Vp).xyz;if(My!=0.0){R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;}for(int i=0;i<ML;i++){if(Le[i]){LV=normalize(Lp[i]-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld[i])-(cos(La[i])))/(Lf[i]), 0.0, 1.0);Cd+=(Lc[i]*Li[i]*LT)*Fw;R=normalize(reflect(-LV,Vn));Cs+=Lc[i]*Li[i]*(pow(max(dot(R,EV),0.0),Mi))*Fw;}}}'
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_C_FS='precision highp float;uniform vec4 C;void main(void){gl_FragColor=C;}';
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_BLACK_FS='precision highp float;void main(void){gl_FragColor=vec4(0.0,0.0,0.0,1.0);}';
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_VCC_FS='precision highp float;uniform vec4 C;varying vec4 Vc;void main(void){gl_FragColor=Vc*C;}';
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_C_TEX_FS='precision highp float;uniform vec4 C;uniform sampler2D Sd;varying vec2 Vu;void main(void){gl_FragColor=texture2D(Sd,Vu)*C;}';
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_VC_TEX_PARTICLE_FS='precision highp float;uniform sampler2D Sd;varying vec4 Vc;void main(void){gl_FragColor.rgb=texture2D(Sd,gl_PointCoord).rgb*Vc.rgb;gl_FragColor.a=Vc.a;}';
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_VL_AERDS_FULLTEX_FS='precision highp float;uniform vec4 Ac;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;uniform bool ENa;uniform bool ENd;uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float My;uniform float Mo;varying vec2 Vu;varying vec4 Cd;varying vec4 Cs;varying vec2 Ru;void main(void){if(ENa){gl_FragColor=(Md*Ma*texture2D(Sd,Vu))*Ac;gl_FragColor+=texture2D(Se,Vu)*Me;if(My!=0.0){gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}}if(ENd){gl_FragColor+=(Md*texture2D(Sd,Vu))*Cd;gl_FragColor+=(Ms*texture2D(Ss,Vu))*Cs;}gl_FragColor.a=Mo;}';
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_AERDS_FULLTEX_1L_FS='precision highp float;uniform bool ENd;uniform bool ENa;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp;uniform vec3 Ld;uniform vec4 Lc;uniform float Li;uniform float Lr;uniform float Lf;uniform float La;uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sa;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;float LT,Fw,Dw,Sw;vec3 EV,R,LV;vec2 Ru;void main(void){if(ENa){gl_FragColor=(Ma*Md*texture2D(Sd,Vu))*Ac;gl_FragColor+=(Me*texture2D(Se,Vu));if(My!=0.0){EV=normalize(Ep-Vp).xyz;R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}}if(ENd){LV=normalize(Lp-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf),0.0,1.0);Dw=LT*Li*Fw;R=normalize(reflect(-LV,Vn));Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Md*texture2D(Sd,Vu))*((Lc*Li)*Dw);gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc*Li)*Sw);}gl_FragColor.a=Mo;}';
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_AERDS_FULLTEX_NL_FS='#define ML '+Ovoid.MAX_LIGHT_BY_DRAW+'\nprecision highp float;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp[ML]; uniform vec3 Ld[ML];uniform vec4 Lc[ML];uniform float Li[ML];uniform float Lr[ML];uniform float Lf[ML];uniform float La[ML];uniform bool Le[ML];uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sa;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;float LT,Fw,Dw,Sw;vec3 EV,R,LV;vec2 Ru;void main(void){gl_FragColor=(Ma*Md*texture2D(Sd,Vu))*Ac;gl_FragColor+=(Me*texture2D(Se,Vu));if(My!=0.0){EV=normalize(Ep-Vp).xyz;R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}for(int i=0;i<ML;i++){if(Le[i]){LV=normalize(Lp[i]-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld[i])-(cos(La[i])))/(Lf[i]),0.0,1.0);Dw=LT*Li[i]*Fw;R=normalize(reflect(-LV,Vn));Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Md*texture2D(Sd,Vu))*((Lc[i]*Li[i])*Dw);gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc[i]*Li[i])*Sw);}}gl_FragColor.a=Mo;}';
 
 
 /** 

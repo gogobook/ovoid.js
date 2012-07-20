@@ -94,6 +94,10 @@ Ovoid.Queuer._qlight = new Ovoid.Stack(Ovoid.MAX_LIGHT_BY_DRAW);
 Ovoid.Queuer._qlayer = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
 
 
+/** Text queue list. */
+Ovoid.Queuer._qtext = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
+
+
 /** Physic queue list. */
 Ovoid.Queuer._qphycs = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
 
@@ -286,6 +290,7 @@ Ovoid.Queuer.reset = function() {
 
   Ovoid.Queuer._qbody.empty();
   Ovoid.Queuer._qlayer.empty();
+  Ovoid.Queuer._qtext.empty();
   Ovoid.Queuer._qlight.empty();
   Ovoid.Queuer._qtform.empty();
   Ovoid.Queuer._qphycs.empty();
@@ -436,12 +441,12 @@ Ovoid.Queuer.queueScene = function(sc) {
     o = Ovoid.Queuer._wgit.current;
     Ovoid.Queuer._cachDependencies(o);
     if (o.visible) {
-      if (o.type & Ovoid.TRANSFORM) {
-        o.cachTransform();
-        if (o.type & Ovoid.LAYER) {
-          o.cachLayer();
-          Ovoid.Queuer._qlayer.add(o);
-        }
+      o.cachTransform();
+      o.cachLayer();
+      if (o.type & Ovoid.TEXT) {
+        Ovoid.Queuer._qtext.add(o);
+      } else {
+        Ovoid.Queuer._qlayer.add(o);
       }
     }
   }

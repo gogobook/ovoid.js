@@ -685,14 +685,19 @@ Ovoid.Debug.Input = function() {
  * @return {string} Drawer debuging infos.
  */
 Ovoid.Debug.Drawer = function() {
-  
+    
   var d = 'Ovoid.Drawer status\n{\n';
-  d += '   readPixels picking : ';
-  Ovoid.opt_enablePicking?d += 'yes\n':d += 'no\n';
+  d += '   rp:';
+  Ovoid.opt_enablePicking?d += 'yes':d += 'no';
+  d += ' lp:';
+  Ovoid.Drawer.opt_perLightPass?d += 'yes':d += 'no';
+  d += ' zf:';
+  Ovoid.Drawer.opt_shadowCasting?d += 'yes\n':d += 'no\n';
   d += '   renderpasses:  ' + Ovoid.Drawer._renderpasses + '\n';
-  d += '   drawnlayer:    ' + Ovoid.Drawer._drawnlayer + '\n';
-  d += '   drawnhelper:   ' + Ovoid.Drawer._drawnhelper + '\n';
-  d += '   drawnmesh:     ' + Ovoid.Drawer._drawnmesh + '\n';
+  d += '   drawndynamic:  ' + Ovoid.Drawer._drawndynamic + '\n';
+  d += '   drawnsprite:   ' + Ovoid.Drawer._drawnsprite + '\n';
+  d += '   drawnchar:     ' + Ovoid.Drawer._drawnchar + '\n';
+  d += '   drawnsymbolic: ' + Ovoid.Drawer._drawnsymbolic + '\n';
   d += '   drawnpolyset:  ' + Ovoid.Drawer._drawnpolyset + '\n';
   d += '   drawnparticle: ' + Ovoid.Drawer._drawnparticle + '\n';
   d += '   drawnshadow:   ' + Ovoid.Drawer._drawnshadow + '\n';
@@ -863,10 +868,10 @@ Ovoid.Debug.Sumary = function() {
   var d = '';
   d = 'Fps:[' + Ovoid.Timer.framerate + ']';
   d += ' Drawn:[';
-  d += 'mesh:' + Ovoid.Drawer._drawnmesh;
-  d += ' polyset:' + Ovoid.Drawer._drawnpolyset;
-  d += ' layer:' + Ovoid.Drawer._drawnlayer;
-  d += ' helper:' + Ovoid.Drawer._drawnhelper;
+  d += 'polyset:' + Ovoid.Drawer._drawnpolyset;
+  d += ' dynamic:' + Ovoid.Drawer._drawndynamic;
+  d += ' sprite:' + Ovoid.Drawer._drawnsprite;
+  d += ' symbolic:' + Ovoid.Drawer._drawnsymbolic;
   d += ' particle:' + Ovoid.Drawer._drawnparticle;
   d += ' shadow:' + Ovoid.Drawer._drawnshadow;
   d += ']';

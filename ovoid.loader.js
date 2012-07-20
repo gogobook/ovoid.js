@@ -422,7 +422,7 @@ Ovoid.Loader._drawStep = function() {
 
   Ovoid.gl.clear(Ovoid.gl.COLOR_BUFFER_BIT|Ovoid.gl.DEPTH_BUFFER_BIT);
   
-  Ovoid.Drawer.switchSp(7); /* SP_LAYER */
+  Ovoid.Drawer.switchPipe(3); /* SP_LAYER */
   /* background */
   Ovoid.Drawer.model(Ovoid.Loader._bg.layerMatrix);
   Ovoid.Drawer.layer(Ovoid.Loader._bg);
@@ -464,7 +464,7 @@ Ovoid.Loader._drawStep = function() {
     Ovoid.Drawer.layer(Ovoid.Loader._lcirclei);
   }
   
-  Ovoid.Drawer.switchSp(6); /* SP_TEXT */
+  Ovoid.Drawer.switchPipe(4); /* SP_TEXT */
   
   if (Ovoid.Loader.opt_showPercentage) {
     Ovoid.Loader._percent.string = Math.floor(Ovoid.Loader._nratio).toString() + '%';
@@ -714,9 +714,9 @@ Ovoid.Loader._launch = function() {
     
     /* Initialize pour dessiner le wait screen */
     Ovoid.gl.viewport(0,0,Ovoid.Frame.size.v[0],Ovoid.Frame.size.v[1]);
-    Ovoid.Drawer.switchSp(6); /* SP_TEXT */
+    Ovoid.Drawer.switchPipe(4); /* SP_TEXT */
     Ovoid.Drawer.screen(Ovoid.Frame.matrix);
-    Ovoid.Drawer.switchSp(7); /* SP_LAYER */
+    Ovoid.Drawer.switchPipe(3); /* SP_LAYER */
     Ovoid.Drawer.screen(Ovoid.Frame.matrix);
     Ovoid.Drawer.switchDepth(0);
     Ovoid.Drawer.switchBlend(3);
