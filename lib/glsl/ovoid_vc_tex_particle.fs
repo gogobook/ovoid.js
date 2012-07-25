@@ -9,5 +9,6 @@ varying vec4 Vc;
 void main(void) {
   gl_FragColor.rgb = texture2D(Sd, gl_PointCoord).rgb * Vc.rgb;
   gl_FragColor.a = Vc.a;
+  gl_FragColor=vec4(1.0,1.0,1.0,1.0);
 }
 

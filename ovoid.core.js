@@ -603,11 +603,11 @@ Ovoid._mainloop = function() {
       Ovoid._hudbg.cachTransform();
       Ovoid._hudbg.cachLayer();
 
-      Ovoid.Drawer.model(Ovoid._hudbg.layerMatrix);
+      Ovoid.Drawer.model(Ovoid._hudbg.layerMatrix.m);
       Ovoid.Drawer.layer(Ovoid._hudbg);
   
       Ovoid.Drawer.switchPipe(4); /* SP_TEXT */
-      Ovoid.Drawer.model(Ovoid._dbg[7].layerMatrix);
+      Ovoid.Drawer.model(Ovoid._dbg[7].layerMatrix.m);
       Ovoid.Drawer.text(Ovoid._dbg[7]);
 
       if (Ovoid.opt_showDebug) {
@@ -649,12 +649,12 @@ Ovoid._mainloop = function() {
         Ovoid._dbg[4].string = Ovoid.Debug.WorldGraph(Ovoid.rscene);
         
         Ovoid.Drawer.switchPipe(3); /* SP_LAYER */
-        Ovoid.Drawer.model(Ovoid._dbgbg.layerMatrix);
+        Ovoid.Drawer.model(Ovoid._dbgbg.layerMatrix.m);
         Ovoid.Drawer.layer(Ovoid._dbgbg);
         
         Ovoid.Drawer.switchPipe(4); /* SP_TEXT */
         for ( var i = 0; i < 7; i++) {
-          Ovoid.Drawer.model(Ovoid._dbg[i].layerMatrix);
+          Ovoid.Drawer.model(Ovoid._dbg[i].layerMatrix.m);
           Ovoid.Drawer.text(Ovoid._dbg[i]);
         }
       }

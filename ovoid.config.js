@@ -75,15 +75,18 @@ Ovoid.Queuer.opt_defaultCameraRot = [0.0, 0.0, 0.0];
 Ovoid.Drawer.opt_clearColor = [1.0, 1.0, 1.0, 1.0];
 /* Global ambient lighting color */
 Ovoid.Drawer.opt_ambientColor = [0.2, 0.2, 0.2, 1.0];
-/* Enable or disable per-vertex lighting */
-Ovoid.Drawer.opt_vertexLight = false;
+/* Level of performance */
+Ovoid.Drawer.opt_lop = 2;
+/* Enable or disable adaptative level of performance */
+Ovoid.Drawer.opt_adaptativeLop = true;
+/* Adaptative level of performance threshold */
+Ovoid.Drawer.opt_adaptiveLopThreshold = 45;
 /* Enable or disable per-light pass render */
-Ovoid.Drawer.opt_perLightPass = false;
+Ovoid.Drawer.opt_perLightPass = true;
 /* Enable or disable Z-fail shadow casting */
-Ovoid.Drawer.opt_shadowCasting = false; 
+Ovoid.Drawer.opt_shadowCasting = true; 
 /* Z-fail shadow casting object exclusion tolerence (object minimum size) */
 Ovoid.Drawer.opt_shadowCastingExclusion = 0.8; 
-
 /* Enable or disable layers draws */
 Ovoid.Drawer.opt_drawLayers = true;
 /* Enable or disable helpers draws */

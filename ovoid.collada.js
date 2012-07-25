@@ -2157,7 +2157,9 @@ Ovoid.Collada.prototype._procNod = function(dae) {
   Ovoid.log(3, 'Ovoid.Collada ' + this.name,
         "Transform '" + node.name + "' scale:" 
         + s[0] + ', ' + s[1] + ', ' + s[2]);
-        
+  
+  /* cach les transformations avant le parentage */
+  node.cachTransform();
   /* retourne la node transformée */
   return node;
 };

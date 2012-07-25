@@ -78,31 +78,31 @@ Ovoid.Queuer.opt_defaultCameraRot = [0.0, 0.0, 0.0];
 Ovoid.Queuer._wgit = new Ovoid.WgIterator();
 
 
-/** Renderable queue stack. */
-Ovoid.Queuer._qbody = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
+/** Body stack. */
+ Ovoid.Queuer.qbody = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
 
 
-/** Transform queue list. */
-Ovoid.Queuer._qtform = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
+/** Transform stack. */
+Ovoid.Queuer.qtform = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
 
 
-/** Light queue list. */
-Ovoid.Queuer._qlight = new Ovoid.Stack(Ovoid.MAX_LIGHT_BY_DRAW);
+/** Light stack. */
+Ovoid.Queuer.qlight = new Ovoid.Stack(Ovoid.MAX_LIGHT_BY_DRAW);
 
 
-/** Layer queue list. */
-Ovoid.Queuer._qlayer = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
+/** Layer stack. */
+Ovoid.Queuer.qlayer = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
 
 
-/** Text queue list. */
-Ovoid.Queuer._qtext = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
+/** Text stack. */
+Ovoid.Queuer.qtext = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
 
 
-/** Physic queue list. */
-Ovoid.Queuer._qphycs = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
+/** Physic stack. */
+Ovoid.Queuer.qphycs = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
 
 
-/** Camera queue list. */
+/** Current render camera. */
 Ovoid.Queuer._rcamera = null;
 
 
@@ -207,9 +207,9 @@ Ovoid.Queuer._lightcull = function(o, l) {
     i = l.length;
     while (i--) {
       if (l[i].isLightening(o)) {
-        if(!Ovoid.Queuer._qlight.has(l[i])) {
+        if(!Ovoid.Queuer.qlight.has(l[i])) {
           l[i].rendered = true;
-          Ovoid.Queuer._qlight.add(l[i]);
+          Ovoid.Queuer.qlight.add(l[i]);
         }
       }
     }
@@ -233,12 +233,12 @@ Ovoid.Queuer._viewcull = function(o) {
           o.boundingSphere.radius;
           
       o.rendered = true;
-      Ovoid.Queuer._qbody.add(o);
+       Ovoid.Queuer.qbody.add(o);
       return true;
     }
   } else {
     o.rendered = true;
-    Ovoid.Queuer._qbody.add(o);
+     Ovoid.Queuer.qbody.add(o);
     return true;
   }
   return false;
@@ -257,7 +257,7 @@ Ovoid.Queuer._viewcull = function(o) {
 Ovoid.Queuer._physicscull = function(o) {
 
   if(!(o.cach & Ovoid.CACH_PHYSICS) || o.target.rendered) {
-    Ovoid.Queuer._qphycs.add(o);
+    Ovoid.Queuer.qphycs.add(o);
   } 
 };
 
@@ -288,12 +288,12 @@ Ovoid.Queuer._bodyZSortFunc = function(a, b) {
  */
 Ovoid.Queuer.reset = function() {
 
-  Ovoid.Queuer._qbody.empty();
-  Ovoid.Queuer._qlayer.empty();
-  Ovoid.Queuer._qtext.empty();
-  Ovoid.Queuer._qlight.empty();
-  Ovoid.Queuer._qtform.empty();
-  Ovoid.Queuer._qphycs.empty();
+  Ovoid.Queuer.qbody.empty();
+  Ovoid.Queuer.qlayer.empty();
+  Ovoid.Queuer.qtext.empty();
+  Ovoid.Queuer.qlight.empty();
+  Ovoid.Queuer.qtform.empty();
+  Ovoid.Queuer.qphycs.empty();
 };
 
 
@@ -364,7 +364,7 @@ Ovoid.Queuer.queueScene = function(sc) {
         /* Ajoute en queue transform si le dessins des helpers 
          * est activé */
         if (Ovoid.Drawer.opt_drawHelpers)
-          Ovoid.Queuer._qtform.add(o);
+          Ovoid.Queuer.qtform.add(o);
           
         /* Si c'est un body */
         if (o.type & Ovoid.BODY) {
@@ -422,15 +422,15 @@ Ovoid.Queuer.queueScene = function(sc) {
   while (i--) sc.track[i].cachTrack();
 
   /* Ordonne les bodys selon la distance à la camera */
-  Ovoid.Queuer._qbody.sort(Ovoid.Queuer._bodyZSortFunc);
+   Ovoid.Queuer.qbody.sort(Ovoid.Queuer._bodyZSortFunc);
 
   /* Si le light-linking est desactivé on ajoute toutes les lumieres */
   if (!Ovoid.Queuer.opt_lightcull) {
     i = sc.light.length;
     while (i--) {
-      if(!Ovoid.Queuer._qlight.has(sc.light[i])) {
+      if(!Ovoid.Queuer.qlight.has(sc.light[i])) {
         sc.light[i].rendered = true;
-        Ovoid.Queuer._qlight.add(sc.light[i]);
+        Ovoid.Queuer.qlight.add(sc.light[i]);
       }
     }
   }
@@ -444,9 +444,9 @@ Ovoid.Queuer.queueScene = function(sc) {
       o.cachTransform();
       o.cachLayer();
       if (o.type & Ovoid.TEXT) {
-        Ovoid.Queuer._qtext.add(o);
+        Ovoid.Queuer.qtext.add(o);
       } else {
-        Ovoid.Queuer._qlayer.add(o);
+        Ovoid.Queuer.qlayer.add(o);
       }
     }
   }

@@ -313,8 +313,8 @@ Ovoid.Loader.init = function() {
     Ovoid.Loader._fontmap = new Ovoid.Texture();
     Ovoid.Loader._fontmap.loadSource(dp+Ovoid.Loader.opt_fontmapSrc, 0, true);
 
-    Ovoid.Loader._percent.fontmapTexture = Ovoid.Loader._fontmap;
-    Ovoid.Loader._title.fontmapTexture = Ovoid.Loader._fontmap;
+    Ovoid.Loader._percent.fontmap = Ovoid.Loader._fontmap;
+    Ovoid.Loader._title.fontmap = Ovoid.Loader._fontmap;
   }
   
   if (Ovoid.Loader.opt_loadcircleSrc.length > 1) {
@@ -424,35 +424,35 @@ Ovoid.Loader._drawStep = function() {
   
   Ovoid.Drawer.switchPipe(3); /* SP_LAYER */
   /* background */
-  Ovoid.Drawer.model(Ovoid.Loader._bg.layerMatrix);
+  Ovoid.Drawer.model(Ovoid.Loader._bg.layerMatrix.m);
   Ovoid.Drawer.layer(Ovoid.Loader._bg);
   
   Ovoid.Loader._iconscn.bgColor.setv(Ovoid.Loader.opt_iconsColor);
   if (!Ovoid.Loader._loadstage[0])
     Ovoid.Loader._iconscn.bgColor.v[3] = 0.1;
   
-  Ovoid.Drawer.model(Ovoid.Loader._iconscn.layerMatrix);
+  Ovoid.Drawer.model(Ovoid.Loader._iconscn.layerMatrix.m);
   Ovoid.Drawer.layer(Ovoid.Loader._iconscn);
 
   Ovoid.Loader._icontex.bgColor.setv(Ovoid.Loader.opt_iconsColor);
   if (!Ovoid.Loader._loadstage[1])
     Ovoid.Loader._icontex.bgColor.v[3] = 0.1;
   
-  Ovoid.Drawer.model(Ovoid.Loader._icontex.layerMatrix);
+  Ovoid.Drawer.model(Ovoid.Loader._icontex.layerMatrix.m);
   Ovoid.Drawer.layer(Ovoid.Loader._icontex);
 
   Ovoid.Loader._iconaud.bgColor.setv(Ovoid.Loader.opt_iconsColor);
   if (!Ovoid.Loader._loadstage[2])
     Ovoid.Loader._iconaud.bgColor.v[3] = 0.1;
   
-  Ovoid.Drawer.model(Ovoid.Loader._iconaud.layerMatrix);
+  Ovoid.Drawer.model(Ovoid.Loader._iconaud.layerMatrix.m);
   Ovoid.Drawer.layer(Ovoid.Loader._iconaud);
   
   Ovoid.Loader._iconcgf.bgColor.setv(Ovoid.Loader.opt_iconsColor);
   if (!Ovoid.Loader._loadstage[3])
     Ovoid.Loader._iconcgf.bgColor.v[3] = 0.1;
   
-  Ovoid.Drawer.model(Ovoid.Loader._iconcgf.layerMatrix);
+  Ovoid.Drawer.model(Ovoid.Loader._iconcgf.layerMatrix.m);
   Ovoid.Drawer.layer(Ovoid.Loader._iconcgf);
 
   if(Ovoid.Loader._lcirclei.bgTexture) {
@@ -460,7 +460,7 @@ Ovoid.Loader._drawStep = function() {
     Ovoid.Loader._lcirclea.cachTransform();
     Ovoid.Loader._lcirclei.cachTransform();
     Ovoid.Loader._lcirclei.cachLayer();
-    Ovoid.Drawer.model(Ovoid.Loader._lcirclei.layerMatrix);
+    Ovoid.Drawer.model(Ovoid.Loader._lcirclei.layerMatrix.m);
     Ovoid.Drawer.layer(Ovoid.Loader._lcirclei);
   }
   
@@ -470,13 +470,13 @@ Ovoid.Loader._drawStep = function() {
     Ovoid.Loader._percent.string = Math.floor(Ovoid.Loader._nratio).toString() + '%';
     Ovoid.Loader._percent.moveXyz(Ovoid.Loader.opt_percentageXys[0]-(Ovoid.Loader._percent.getWidth()*0.5),Ovoid.Loader.opt_percentageXys[1],0.0,0,1);
     Ovoid.Loader._percent.cachTransform();
-    Ovoid.Drawer.model(Ovoid.Loader._percent.layerMatrix);
+    Ovoid.Drawer.model(Ovoid.Loader._percent.layerMatrix.m);
     Ovoid.Drawer.text(Ovoid.Loader._percent);
   }
 
   if (Ovoid.Loader.opt_showTitle) {
     Ovoid.Drawer.drawText(Ovoid.Loader._title);
-    Ovoid.Drawer.model(Ovoid.Loader._title.layerMatrix);
+    Ovoid.Drawer.model(Ovoid.Loader._title.layerMatrix.m);
     Ovoid.Drawer.text(Ovoid.Loader._title);
   }
 
@@ -484,7 +484,7 @@ Ovoid.Loader._drawStep = function() {
     Ovoid.Loader._details.string = Ovoid.Loader._detailsStr;
     Ovoid.Loader._details.moveXyz(Ovoid.Loader.opt_detailsXys[0]-(Ovoid.Loader._details.getWidth()*0.5),Ovoid.Loader.opt_detailsXys[1],0.0,0,1);
     Ovoid.Loader._details.cachTransform();
-    Ovoid.Drawer.model(Ovoid.Loader._details.layerMatrix);
+    Ovoid.Drawer.model(Ovoid.Loader._details.layerMatrix.m);
     Ovoid.Drawer.text(Ovoid.Loader._details);
   }
   

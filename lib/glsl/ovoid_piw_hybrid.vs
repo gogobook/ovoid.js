@@ -3,7 +3,7 @@
  * Main vertex shader for per-pixel lighting with Mesh or Skin deform mode 
  * choosed through boolean uniform value.
  */
-#define MA 32
+#define MA 24
 attribute vec4 p;
 attribute vec4 i;
 attribute vec4 w;

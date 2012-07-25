@@ -531,7 +531,7 @@ Ovoid.Debug.WorldGraph = function(o) {
     n = itdag.current;
     d += t;
     for (var i = 0; i < itdag.depth; i++) d += '  ';
-    d += ' « ' + n.name + '\n';
+    d += ' > ' + n.name + '\n';
   }
   d += '\n' + t + ' ¤ Overlay\n';
   itdag.init(o.overlay);
@@ -539,7 +539,7 @@ Ovoid.Debug.WorldGraph = function(o) {
     n = itdag.current;
     d += t;
     for (var i = 0; i < itdag.depth; i++) d += '  ';
-    d += ' « ' + n.name + '\n';
+    d += ' > ' + n.name + '\n';
   }
   d += '}';
   return d;
@@ -573,7 +573,7 @@ Ovoid.Debug.DependGraph = function(o) {
       n = itdg.current;
       d += t;
       for (var j = 0; j < itdg.depth; j++) d += '  ';
-      d += ' « ' + n.name + '\n';
+      d += ' > ' + n.name + '\n';
       if(n.type & Ovoid.TRANSFORM) itdg.jumpDepend();
     }
   }
@@ -629,15 +629,15 @@ Ovoid.Debug.Queuer = function() {
   Ovoid.Queuer.opt_viewcull?d += 'on\n':d += 'off\n';
   d += '  lightcull: ';
   Ovoid.Queuer.opt_lightcull?d += 'on\n':d += 'off\n';
-  c = Ovoid.Queuer._qlight.count;
+  c = Ovoid.Queuer.qlight.count;
   d += '  qlight: ' + c + '\n';
-  c = Ovoid.Queuer._qbody.count;
+  c =  Ovoid.Queuer.qbody.count;
   d += '  qbody:  ' + c + '\n';
-  c = Ovoid.Queuer._qphycs.count;
+  c = Ovoid.Queuer.qphycs.count;
   d += '  qphycs: ' + c + '\n';
-  c = Ovoid.Queuer._qlayer.count;
+  c = Ovoid.Queuer.qlayer.count;
   d += '  qlayer: ' + c + '\n';
-  c = Ovoid.Queuer._qtform.count;
+  c = Ovoid.Queuer.qtform.count;
   d += '  qtform: ' + c + '\n';
   d += '}';
   return d;

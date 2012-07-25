@@ -60,7 +60,7 @@ Ovoid.Text = function(name) {
   this.name = name;
   /** Fontmap texture.
    * @type Texture */
-  this.fontmapTexture = null;
+  this.fontmap = null;
   /** Text string.
    * @type string */
   this.string = '';
@@ -99,7 +99,7 @@ Ovoid.Text.prototype.setFormat = function(s, c, l) {
  */
 Ovoid.Text.prototype.setFontmap = function(texture) {
 
-  this.fontmapTexture = texture;
+  this.fontmap = texture;
 };
 
 
@@ -158,12 +158,13 @@ Ovoid.Layer.prototype.toJSON = function() {
   o['bgTexture'] = this.bgTexture;
   o['action'] = this.action?this.action.uid:'null';
   /* Ovoid.Text */
-  if (this.fontmapTexture) {
-    o['fontmapTexture'] = this.fontmapTexture.uid;
+  if (this.fontmap) {
+    o['fontmap'] = this.fontmap.uid;
   } else {
-    o['fontmapTexture'] = 'null';
+    o['fontmap'] = 'null';
   }
   o['string'] = this.string;
+  o['param'] = this.param;
   
   return o;
 };

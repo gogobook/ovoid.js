@@ -85,6 +85,18 @@
  * Pipeline for one-pass per-vertex lighting shading geometry draw. 
  * </li><br><br>
  * 
+ * <li><b>Per-vertex 1-light shading geometry</b><br><br>
+ * Symbolic constant:  Ovoid.PIPE_LE_GEOMETRY_1L<br>
+ * Number Id: 13<br>
+ * Pipeline for per-light passes low-end per-vertex lighting shading geometry draw. 
+ * </li><br><br>
+ * 
+ * <li><b>Per-vertex n-lights shading geometry</b><br><br>
+ * Symbolic constant:  Ovoid.PIPE_LE_GEOMETRY_NL<br>
+ * Number Id: 14<br>
+ * Pipeline for one-pass low-end per-vertex lighting shading geometry draw. 
+ * </li><br><br>
+ * 
  * <li><b>Particles</b><br><br>
  * Symbolic constant:  Ovoid.PIPE_PARTICLE<br>
  * Number Id: 2<br>
@@ -152,16 +164,24 @@ Ovoid.Drawer.opt_clearColor = [1.0, 1.0, 1.0, 1.0];
 Ovoid.Drawer.opt_ambientColor = [0.2, 0.2, 0.2, 1.0];
 
 
-/** Enable per-vertex lighting */
-Ovoid.Drawer.opt_vertexLight = false;
+/** Level of performance */
+Ovoid.Drawer.opt_lop = 2;
+
+
+/** Enable adaptative level of performance */
+Ovoid.Drawer.opt_adaptativeLop = true;
+
+
+/** Adaptative level of performance threshold */
+Ovoid.Drawer.opt_adaptiveLopThreshold = 45;
 
 
 /** Enable per-light pass rendering (required for shadow casting) */
-Ovoid.Drawer.opt_perLightPass = false;
+Ovoid.Drawer.opt_perLightPass = true;
 
 
 /** Enable Z-fail shadow casting rendering */
-Ovoid.Drawer.opt_shadowCasting = false;
+Ovoid.Drawer.opt_shadowCasting = true;
 
 
 /** Minimum average size to build shadow volum for */
@@ -329,6 +349,10 @@ Ovoid.Drawer._abcolor = new Float32Array(4);
 
 /** Picking readed pixel buffer. */
 Ovoid.Drawer._rpcolor = new Uint8Array(256);
+
+
+/** Level of performance for geometry drawing. */
+Ovoid.Drawer._lop = 2;
 
 
 /**
@@ -558,6 +582,8 @@ Ovoid.Drawer.init = function() {
    * - pixel-light one pass geometrie (...)              // Ovoid.PIPE_GEOMETRY_NL = 1;
    * - vertex-light per-light geometrie (...)            // Ovoid.PIPE_VL_GEOMETRY_1L = 10;
    * - vertex-light one pass geometrie (...)             // Ovoid.PIPE_VL_GEOMETRY_NL = 11;
+   * - Low-end vertex-light per-light geometrie (...)    // Ovoid.PIPE_LE_GEOMETRY_1L = 13;
+   * - Low-end vertex-light one pass geometrie (...)     // Ovoid.PIPE_LE_GEOMETRY_NL = 14;
    * - particles (puc_particle, vc_tex_particle);        // Ovoid.PIPE_PARTICLE = 2;
    * - layer (pu, c_tex);                                // Ovoid.PIPE_LAYER = 3;
    * - string (p_zwstring, c_tex_string)                 // Ovoid.PIPE_STRING = 4;
@@ -596,6 +622,22 @@ Ovoid.Drawer.init = function() {
     return false;
   }
   Ovoid.Drawer.plugShader(11,Ovoid.Drawer.addShader(sp));
+  
+  sp = new Ovoid.Shader("PIPE_LE_GEOMETRY_1L");
+  sp.setSources(Ovoid.GLSL_LE_PNUIW_HYBRID_1L_VS, Ovoid.GLSL_LE_ADS_1TEX_FS, Ovoid.GLSL_WRAPMAP);
+  if(!sp.linkWrap()) {
+    Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_LE_GEOMETRY_1L pipeline shader program.");
+    return false;
+  }
+  Ovoid.Drawer.plugShader(13,Ovoid.Drawer.addShader(sp));
+  
+  sp = new Ovoid.Shader("PIPE_LE_GEOMETRY_NL");
+  sp.setSources(Ovoid.GLSL_LE_PNUIW_HYBRID_NL_VS, Ovoid.GLSL_LE_ADS_1TEX_FS, Ovoid.GLSL_WRAPMAP);
+  if(!sp.linkWrap()) {
+    Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_LE_GEOMETRY_NL pipeline shader program.");
+    return false;
+  }
+  Ovoid.Drawer.plugShader(14,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_PARTICLE");
   sp.setSources(Ovoid.GLSL_PUC_PARTICLE_VS, Ovoid.GLSL_VC_TEX_PARTICLE_FS, Ovoid.GLSL_WRAPMAP);
@@ -951,6 +993,9 @@ Ovoid.Drawer.setCull = function(id) {
  */
 Ovoid.Drawer.beginDraw = function() {
   
+  /* performance counter */
+  Ovoid.Drawer._pc = (new Date().getTime());
+  
   if (Ovoid.Frame.changed) {
     Ovoid.gl.viewport(0,0,Ovoid.Frame.size.v[0],Ovoid.Frame.size.v[1]);
   }
@@ -978,11 +1023,22 @@ Ovoid.Drawer.beginDraw = function() {
   Ovoid.Drawer._drawnchar = 0;
   Ovoid.Drawer._drawnshadow = 0;
   
-  // initialize la projection pour les shader text et layer
-  Ovoid.Drawer.switchPipe(3);
-  Ovoid.Drawer.screen(Ovoid.Frame.matrix);
-  Ovoid.Drawer.switchPipe(4);
-  Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+  // setup le level of performance
+  var maxlop = Ovoid.Drawer.lop;
+  if (Ovoid.Drawer.opt_adaptativeLop) {
+    if (Ovoid.Timer._lopfps < Ovoid.Drawer.opt_adaptiveLopThreshold) {
+      Ovoid.Drawer._lop--;
+      Ovoid.Timer._lopfps = Ovoid.Drawer.opt_adaptiveLopThreshold;
+    }
+    if (Ovoid.Timer._lopfps >= 59)
+      Ovoid.Drawer._lop++;
+    if (Ovoid.Drawer._lop > Ovoid.Drawer.opt_lop) 
+      Ovoid.Drawer._lop = Ovoid.Drawer.opt_lop;
+    if (Ovoid.Drawer._lop < 0) 
+      Ovoid.Drawer._lop = 0;
+  } else {
+    Ovoid.Drawer._lop = Ovoid.Drawer.opt_lop;
+  }
 };
 
 
@@ -1038,7 +1094,6 @@ Ovoid.Drawer.endRpDraw = function() {
 }
   
 /* ********************** DRAWING SHADER SETUP METHODS ********************** */
-
 /**
  * Set light.<br><br>
  * 
@@ -1159,20 +1214,14 @@ Ovoid.Drawer.screen = function(matrix) {
  * Setup transform and normal matrices matrices for the current 
  * used shader.
  * 
- * @param {Matrix4} tmatrix Transformation matrix.
- * @param {Matrix3} [nmatrix] Normal matrix.
+ * @param {Float32Array[16]} tmatrix Transformation matrix.
+ * @param {Float32Array[9]} [nmatrix] Normal matrix.
  */
 Ovoid.Drawer.model = function(tmatrix, nmatrix) {
 
-    if (tmatrix.m) {
-      Ovoid.Drawer.sp.setUniformMatrix4fv(0,tmatrix.m);
-      if (nmatrix)
-        Ovoid.Drawer.sp.setUniformMatrix3fv(1,nmatrix.m);
-    } else {
-      Ovoid.Drawer.sp.setUniformMatrix4fv(0,tmatrix);
-      if (nmatrix)
-        Ovoid.Drawer.sp.setUniformMatrix3fv(1,nmatrix);
-    }
+  Ovoid.Drawer.sp.setUniformMatrix4fv(0,tmatrix);
+  if (nmatrix)
+    Ovoid.Drawer.sp.setUniformMatrix3fv(1,nmatrix);
 };
 
 
@@ -1448,7 +1497,7 @@ Ovoid.Drawer.text = function(text, color) {
   } else {
     Ovoid.Drawer.sp.setUniform4fv(9, text.fgColor.v); /* set color */
     /* change texture */
-    (text.fontmapTexture)?text.fontmapTexture.bind():Ovoid.Drawer._tfontm.bind();
+    (text.fontmap)?text.fontmap.bind():Ovoid.Drawer._tfontm.bind();
   }
   Ovoid.Drawer.sp.setUniformSampler(1,1);
   /* Draw a string */
@@ -1471,16 +1520,17 @@ Ovoid.Drawer.mesh = function(mesh, color) {
   Ovoid.gl.bindBuffer(0x8892, mesh._vbuffer[l]);
   Ovoid.gl.bindBuffer(0x8893, mesh._ibuffer[l]);
   Ovoid.Drawer.sp.setVertexAttribPointers(mesh._vformat, mesh._vfbytes);
+  j = mesh.polyset[l].length;
   if (color) {
-    Ovoid.Drawer.sp.setUniform4fv(9, color.v); /* set color */
+    Ovoid.Drawer.sp.setUniform4fv(9, color.v); /* set color */   
     while (j--) {
       s = mesh.polyset[l][j];
       /* TRIANGLES, count, UNSIGNED_SHORT, offset */
       Ovoid.gl.drawElements(4,s.icount,0x1403,s.ioffset); 
+      Ovoid.Drawer._drawnpolyset++;
     }
   } else {
-    /* parcour des polysets */
-    j = mesh.polyset[l].length;
+    /* parcour des polysets */  
     while (j--) {
       s = mesh.polyset[l][j];
       /* set material  */
@@ -1557,7 +1607,6 @@ Ovoid.Drawer.emitter = function(emitter, color) {
 
 
 /* ************************ DRAWING SPECIAL METHODS ************************* */
-
 /**
  * Draw shadow volume.<br><br>
  * 
@@ -1571,7 +1620,7 @@ Ovoid.Drawer.shadow = function(light, body) {
   
   var shape;
   if (body.shape.type & Ovoid.MESH) {
-    Ovoid.Drawer.model(body.worldMatrix);
+    Ovoid.Drawer.model(body.worldMatrix.m);
     shape = body.shape;
   }
   if (body.shape.type & Ovoid.SKIN) {
@@ -1579,7 +1628,7 @@ Ovoid.Drawer.shadow = function(light, body) {
       /* tentative d'implémentation des shadow volume pour les skin */
       if (!Ovoid.opt_localSkinData)
         return;
-      Ovoid.Drawer.model(body.worldMatrix);
+      Ovoid.Drawer.model(body.worldMatrix.m);
       shape = body.shape.mesh;
     }
   }
@@ -1690,39 +1739,47 @@ Ovoid.Drawer.shadow = function(light, body) {
 };
 
 
-/* ************************ DRAWING STACK METHODS *************************** */
-
 /**
- * Draw Body shape.<br><br>
+ * Draw faces normals.<br><br>
  * 
- * Draws Body's shape using the current used shader.
+ * Draws shape's faces normals of the given Body node.
  * 
  * @param {Body} body Body node.
- * @param {Color} [color] Optionnal flat color.
+ * @param {float} scale Normal scale.
  */
-Ovoid.Drawer.body = function(body, color) {
+Ovoid.Drawer.normals = function(body, scale) {
   
-  if (body.shape.type & Ovoid.MESH) {
-    Ovoid.Drawer.model(body.worldMatrix, body.normalMatrix);
-    Ovoid.Drawer.mesh(body.shape, color);
-    body.addCach(Ovoid.CACH_WORLD);
-    return;
+  var l = 0; /* Lod */
+  
+  Ovoid.Drawer.model(body.worldMatrix.m);
+  triangles = body.shape.triangles[l];
+
+  var V = new Float32Array(triangles.length*2*8);
+  var C, N;
+  var n = 0;
+  for (var t = 0; t < triangles.length; t++) {
+    C = triangles[t].center;
+    N = triangles[t].normal;
+    V[n] = C.v[0]; n++;
+    V[n] = C.v[1]; n++;
+    V[n] = C.v[2]; n++;
+    V[n] = 1.0; n++;
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++;
+    V[n] = C.v[0] + N.v[0] * scale; n++;
+    V[n] = C.v[1] + N.v[1] * scale; n++;
+    V[n] = C.v[2] + N.v[2] * scale; n++;
+    V[n] = 1.0; n++;
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++; 
+    V[n] = 1.0; n++;
   }
-  if (body.shape.type & Ovoid.SKIN) {
-    if (body.shape.mesh) {
-      Ovoid.Drawer.model(body.shape.infMxfArray, body.shape.infMnrArray);
-      Ovoid.Drawer.enable(6);
-      Ovoid.Drawer.mesh(body.shape.mesh, color);
-      Ovoid.Drawer.disable(6);
-    }
-    body.addCach(Ovoid.CACH_WORLD);
-    return;
-  }
-  if (body.shape.type & Ovoid.EMITTER) {
-    Ovoid.Drawer.model(body.worldMatrix, body.normalMatrix);
-    Ovoid.Drawer.emitter(body.shape, color);
-    body.addCach(Ovoid.CACH_WORLD);
-  }
+  
+  Ovoid.Drawer.sp.setUniform4fv(9, Ovoid.Drawer._tcolor[10].v);
+  Ovoid.Drawer.raw(33, 32, 1, n/8, V);
 };
 
 
@@ -1735,7 +1792,7 @@ Ovoid.Drawer.body = function(body, color) {
  */
 Ovoid.Drawer.helpers = function(tform) {
   
-  Ovoid.Drawer.model(tform.worldMatrix);
+  Ovoid.Drawer.model(tform.worldMatrix.m);
   if (Ovoid.Drawer.opt_drawAxis) {
     Ovoid.Drawer.symAxis(Ovoid.Drawer._tcolor[0]);
   }
@@ -1809,50 +1866,41 @@ Ovoid.Drawer.helpers = function(tform) {
 };
 
 
+/* ************************ DRAWING STACK METHODS *************************** */
 /**
- * Draw faces normals.<br><br>
+ * Draw Body shape.<br><br>
  * 
- * Draws shape's faces normals of the given Body node.
+ * Draws Body's shape using the current used shader.
  * 
  * @param {Body} body Body node.
- * @param {float} scale Normal scale.
+ * @param {Color} [color] Optionnal flat color.
  */
-Ovoid.Drawer.normals = function(body, scale) {
+Ovoid.Drawer.body = function(body, color) {
   
-  var l = 0; /* Lod */
-  
-  Ovoid.Drawer.model(body.worldMatrix);
-  triangles = body.shape.triangles[l];
-
-  var V = new Float32Array(triangles.length*2*8);
-  var C, N;
-  var n = 0;
-  for (var t = 0; t < triangles.length; t++) {
-    C = triangles[t].center;
-    N = triangles[t].normal;
-    V[n] = C.v[0]; n++;
-    V[n] = C.v[1]; n++;
-    V[n] = C.v[2]; n++;
-    V[n] = 1.0; n++;
-    V[n] = 1.0; n++; 
-    V[n] = 1.0; n++; 
-    V[n] = 1.0; n++; 
-    V[n] = 1.0; n++;
-    V[n] = C.v[0] + N.v[0] * scale; n++;
-    V[n] = C.v[1] + N.v[1] * scale; n++;
-    V[n] = C.v[2] + N.v[2] * scale; n++;
-    V[n] = 1.0; n++;
-    V[n] = 1.0; n++; 
-    V[n] = 1.0; n++; 
-    V[n] = 1.0; n++; 
-    V[n] = 1.0; n++;
+  if (body.shape.type & Ovoid.MESH) {
+    Ovoid.Drawer.model(body.worldMatrix.m, body.normalMatrix.m);
+    Ovoid.Drawer.mesh(body.shape, color);
+    body.addCach(Ovoid.CACH_WORLD);
+    return;
   }
-  
-  Ovoid.Drawer.sp.setUniform4fv(9, Ovoid.Drawer._tcolor[10].v);
-  Ovoid.Drawer.raw(33, 32, 1, n/8, V);
+  if (body.shape.type & Ovoid.SKIN) {
+    if (body.shape.mesh) {
+      Ovoid.Drawer.model(body.shape.infMxfArray, body.shape.infMnrArray);
+      Ovoid.Drawer.enable(6);
+      Ovoid.Drawer.mesh(body.shape.mesh, color);
+      Ovoid.Drawer.disable(6);
+    }
+    body.addCach(Ovoid.CACH_WORLD);
+    return;
+  }
+  if (body.shape.type & Ovoid.EMITTER) {
+    Ovoid.Drawer.model(body.worldMatrix.m);
+    Ovoid.Drawer.emitter(body.shape, color);
+    body.addCach(Ovoid.CACH_WORLD);
+  }
 };
 
-/* *************************** GLOBAL METHODS ******************************* */
+
 /**
  * Draw Body stack.<br><br>
  * 
@@ -1868,7 +1916,7 @@ Ovoid.Drawer.bodyStack = function(stack, rp) {
   if (rp) {
     var color = new Ovoid.Color();
     while(i--) {
-      if(stack[i].pickable && Ovoid.opt_debugMode) {
+      if(stack[i].pickable || Ovoid.opt_debugMode) {
         color.fromInt(stack[i].uid);
         Ovoid.Drawer.body(stack[i], color);
       }
@@ -1896,17 +1944,17 @@ Ovoid.Drawer.layerStack = function(stack, rp) {
   var c = stack.count;
   if (rp) {
     var color = new Ovoid.Color();
-    for (i = 0; i < c; i++) {
-      if(stack[i].pickable && Ovoid.opt_debugMode) {
+    for (var i = 0; i < c; i++) {
+      if(stack[i].pickable || Ovoid.opt_debugMode) {
         color.fromInt(stack[i].uid);
-        Ovoid.Drawer.model(stack[i].layerMatrix);
+        Ovoid.Drawer.model(stack[i].layerMatrix.m);
         Ovoid.Drawer.layer(stack[i], color);
         stack[i].addCach(Ovoid.CACH_WORLD);
       }
     }
   } else {
-    for (i = 0; i < c; i++) {
-      Ovoid.Drawer.model(stack[i].layerMatrix);
+    for (var i = 0; i < c; i++) {
+      Ovoid.Drawer.model(stack[i].layerMatrix.m);
       Ovoid.Drawer.layer(stack[i], color);
       stack[i].addCach(Ovoid.CACH_WORLD);
     }
@@ -1929,16 +1977,16 @@ Ovoid.Drawer.textStack = function(stack, rp) {
   if (rp) {
     var color = new Ovoid.Color();
     for (i = 0; i < c; i++) {
-      if(stack[i].pickable && Ovoid.opt_debugMode) {
+      if(stack[i].pickable || Ovoid.opt_debugMode) {
         color.fromInt(stack[i].uid);
-        Ovoid.Drawer.model(stack[i].layerMatrix);
+        Ovoid.Drawer.model(stack[i].layerMatrix.m);
         Ovoid.Drawer.text(stack[i], color);
         stack[i].addCach(Ovoid.CACH_WORLD);
       }
     }
   } else {
     for (i = 0; i < c; i++) {
-      Ovoid.Drawer.model(stack[i].layerMatrix);
+      Ovoid.Drawer.model(stack[i].layerMatrix.m);
       Ovoid.Drawer.text(stack[i], color);
       stack[i].addCach(Ovoid.CACH_WORLD);
     }
@@ -2005,6 +2053,7 @@ Ovoid.Drawer.zfailStack = function(light, stack) {
 };
 
 
+/* *************************** GLOBAL METHODS ******************************* */
 /**
  * Draw current queue.<br><br>
  * 
@@ -2015,6 +2064,25 @@ Ovoid.Drawer.zfailStack = function(light, stack) {
 Ovoid.Drawer.drawQueue = function() {
   
   Ovoid.Drawer.beginDraw();
+  
+  // pipeline geometrie selon level of performance
+  var G_1L, G_NL;
+  switch(Ovoid.Drawer._lop)
+  {
+	case 0:
+	  G_1L = 13;
+	  G_NL = 14;
+	break;
+	case 1:
+	  G_1L = 10;
+	  G_NL = 11;
+	break;
+	default:
+	  G_1L = 0;
+	  G_NL = 1;
+	break;
+  }
+  
   Ovoid.Drawer.setCull(1);
   var i;
   // Picking frame
@@ -2025,66 +2093,63 @@ Ovoid.Drawer.drawQueue = function() {
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.beginRpDraw();
     Ovoid.Drawer.switchDepth(1);
-    Ovoid.Drawer.bodyStack(Ovoid.Queuer._qbody, true);
+    Ovoid.Drawer.bodyStack(Ovoid.Queuer.qbody, true);
     if (Ovoid.Drawer.opt_drawLayers) {
       Ovoid.Drawer.switchDepth(0);
       Ovoid.Drawer.switchPipe(23); //PIPE_RP_LAYER
-      Ovoid.Drawer.layerStack(Ovoid.Queuer._qlayer, true);
+      Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+      Ovoid.Drawer.layerStack(Ovoid.Queuer.qlayer, true);
       Ovoid.Drawer.switchPipe(24); //PIPE_RP_STRING
-      Ovoid.Drawer.textStack(Ovoid.Queuer._qtext, true);
+      Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+      Ovoid.Drawer.textStack(Ovoid.Queuer.qtext, true);
     }
     Ovoid.Drawer.endRpDraw();
   }
   
   Ovoid.Drawer.switchBlend(3);
   Ovoid.Drawer.switchDepth(1);
+  // initialize projection pour particles
+  Ovoid.Drawer.switchPipe(2); // PIPE_PARTICLE
+  Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
   if (Ovoid.Drawer.opt_perLightPass) {
     Ovoid.Drawer.switchPipe(6); // PIPE_SHADOW_VOLUME
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    if(Ovoid.Drawer.opt_vertexLight) {
-      Ovoid.Drawer.switchPipe(10); // PIPE_GEOMETRY_1L
-    } else {
-      Ovoid.Drawer.switchPipe(0); // PIPE_GEOMETRY_1L
-    }
+    Ovoid.Drawer.switchPipe(G_1L); // [VL_,LE_]PIPE_GEOMETRY_1L
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.ambient();
     Ovoid.Drawer.disable(0); // disable diffuse; ENd 
     Ovoid.Drawer.enable(1);  // enable ambient; ENa 
-    Ovoid.Drawer.bodyStack(Ovoid.Queuer._qbody, false);
+    Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody, false);
     Ovoid.Drawer.switchBlend(2); // one, one 
     Ovoid.Drawer.switchDepth(3); // mask off, test less equal 
-    var l = Ovoid.Queuer._qlight.count
+    var l = Ovoid.Queuer.qlight.count
     Ovoid.Drawer.enable(0); // enable diffuse
     Ovoid.Drawer.disable(1); // disable ambient
     while (l--) {
-      if (Ovoid.Queuer._qlight[l].shadowCasting && Ovoid.Drawer.opt_shadowCasting) {
+      if (Ovoid.Queuer.qlight[l].shadowCasting && Ovoid.Drawer.opt_shadowCasting) {
         
         Ovoid.Drawer.switchPipe(6); // PIPE_SHADOW_VOLUME
         Ovoid.Drawer.switchBlend(0);
         Ovoid.Drawer.switchDepth(2); // mask off, test less
-        Ovoid.Drawer.zfailStack(Ovoid.Queuer._qlight[l], Ovoid.Queuer._qbody);
+        Ovoid.Drawer.zfailStack(Ovoid.Queuer.qlight[l],  Ovoid.Queuer.qbody);
         Ovoid.Drawer.restorePipe(); // PIPE_GEOMETRY_1L
         Ovoid.Drawer.restoreDepth(); // mask off, test less equal
         Ovoid.Drawer.restoreBlend(); // one, one
       }
-      Ovoid.Drawer.light(Ovoid.Queuer._qlight[l]);
-      Ovoid.Drawer.bodyStack(Ovoid.Queuer._qbody, false);
+      Ovoid.Drawer.light(Ovoid.Queuer.qlight[l]);
+      Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody, false);
     }
-    Ovoid.gl.disable(0x0B90); /* STENCIL_TEST */
+    Ovoid.gl.disable(0x0B90); // STENCIL_TEST 
     Ovoid.Drawer.switchBlend(3);
   } else {
-    if(Ovoid.Drawer.opt_vertexLight) {
-      Ovoid.Drawer.switchPipe(11); // PIPE_GEOMETRY_1L
-    } else {
-      Ovoid.Drawer.switchPipe(1); // PIPE_GEOMETRY_1L
-    }
+    Ovoid.Drawer.switchPipe(G_NL); // [VL_,LE_]PIPE_GEOMETRY_1L
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.ambient();
-    Ovoid.Drawer.light(Ovoid.Queuer._qlight);
-    Ovoid.Drawer.switchDepth(1); /* mask on, test less */
-    Ovoid.Drawer.enable(0);   /* enable diffuse; ENd */
-    Ovoid.Drawer.enable(1);    /* enable ambient; ENa */
-    Ovoid.Drawer.bodyStack(Ovoid.Queuer._qbody, false);
+    Ovoid.Drawer.light(Ovoid.Queuer.qlight);
+    Ovoid.Drawer.switchDepth(1); // mask on, test less
+    Ovoid.Drawer.enable(0);   // enable diffuse; ENd
+    Ovoid.Drawer.enable(1);    // enable ambient; ENa
+    Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody, false);
   }
   // Desactive de depth
   Ovoid.Drawer.switchDepth(0);
@@ -2093,17 +2158,18 @@ Ovoid.Drawer.drawQueue = function() {
     Ovoid.Drawer.switchPipe(5); // PIPE_HELPER
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     if (Ovoid.Drawer.opt_drawNormals) {
-      Ovoid.Drawer.normalsStack(Ovoid.Queuer._qbody);
+      Ovoid.Drawer.normalsStack( Ovoid.Queuer.qbody);
     }
-    Ovoid.Drawer.helpersStack(Ovoid.Queuer._qtform);
+    Ovoid.Drawer.helpersStack(Ovoid.Queuer.qtform);
   }
   // Layers & text
   if (Ovoid.Drawer.opt_drawLayers) {
     Ovoid.Drawer.switchPipe(3); //PIPE_LAYER
-    Ovoid.Drawer.layerStack(Ovoid.Queuer._qlayer, false);
+    Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+    Ovoid.Drawer.layerStack(Ovoid.Queuer.qlayer, false);
     Ovoid.Drawer.switchPipe(4); //PIPE_STRING
-    Ovoid.Drawer.textStack(Ovoid.Queuer._qtext, false);
+    Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+    Ovoid.Drawer.textStack(Ovoid.Queuer.qtext, false);
   }
-  
   Ovoid.Drawer.endDraw();
 };

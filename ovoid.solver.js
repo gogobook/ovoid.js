@@ -826,15 +826,15 @@ Ovoid.Solver._detectContacts = function() {
 
   var a, b;
   
-  var i = Ovoid.Queuer._qphycs.count;
+  var i = Ovoid.Queuer.qphycs.count;
   while(i--) {
-    j = Ovoid.Queuer._qphycs.count;
+    j = Ovoid.Queuer.qphycs.count;
     while(j--) {
       
       if(j != i && !Ovoid.Solver._contactq.isFull()) {
         
-        a = Ovoid.Queuer._qphycs[i];
-        b = Ovoid.Queuer._qphycs[j];
+        a = Ovoid.Queuer.qphycs[i];
+        b = Ovoid.Queuer.qphycs[j];
         
         /* Si les deux body sont trop éloignés pour rentrer en contact
          * on peut laisser tomber */

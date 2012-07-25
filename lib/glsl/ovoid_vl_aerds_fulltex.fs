@@ -27,6 +27,7 @@ varying vec2 Ru;
 
 void main(void)
 {	
+  gl_FragColor=vec4(0.0,0.0,0.0,0.0);
   if(ENa) {
     gl_FragColor=(Md*Ma*texture2D(Sd,Vu))*Ac;
     gl_FragColor+=texture2D(Se,Vu)*Me;

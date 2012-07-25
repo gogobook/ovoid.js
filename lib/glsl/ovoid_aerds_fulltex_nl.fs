@@ -38,10 +38,10 @@ vec2 Ru;
 	
 void main(void)
 {	
+  EV=normalize(Ep-Vp).xyz;
   gl_FragColor=(Ma*Md*texture2D(Sd,Vu))*Ac;
   gl_FragColor+=(Me*texture2D(Se,Vu));
   if(My!=0.0) {
-    EV=normalize(Ep-Vp).xyz;
     R=normalize(reflect(EV,Vn));
     Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;
     gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;

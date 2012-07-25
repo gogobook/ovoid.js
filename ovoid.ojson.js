@@ -382,7 +382,7 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
     n.bgTexture = this._dstsc.search(n.bgTexture);
 
   if(n.type & Ovoid.TEXT)
-    n.fontmapTexture = this._dstsc.search(n.fontmapTexture);
+    n.fontmap = this._dstsc.search(n.fontmap);
     
   if(n.type & Ovoid.MATERIAL) {
     for(var i = 0; i < n.texture.length; i++)
@@ -976,13 +976,15 @@ Ovoid.Ojson.prototype._procText = function(n, j) {
   /* Importation hérité de "Ovoid.Layer" */
   this._procLayer(n, j);
   /* - OJSON.Text structure -
-   * .fontmapTexture*
+   * .fontmap*
    * .string
+   * .param[u,v,w]
    */
-  (j.fontmapTexture == 'null')?
-    n.fontmapTexture=null:
-    n.fontmapTexture=j.fontmapTexture;
+  (j.fontmap == 'null')?
+    n.fontmap=null:
+    n.fontmap=j.fontmap;
   n.string = j.string;
+  n.param.setv(j.param);
 };
 
 

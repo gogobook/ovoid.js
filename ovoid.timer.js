@@ -42,12 +42,17 @@ Ovoid.Timer = {};
 /** Current time. */
 Ovoid.Timer.clock = 0;
 
+
 /** Time delta since the last update. */
 Ovoid.Timer.quantum = 0;
 
 
 /** Average pre-seconds timer's update. */
 Ovoid.Timer.framerate = 0;
+
+
+/** Average pre-seconds timer's update. */
+Ovoid.Timer.avgframerate = 100;
 
 
 /** Current time. */
@@ -64,6 +69,10 @@ Ovoid.Timer._fcount = 0;
 
 /** Time cumulator for framerate. */
 Ovoid.Timer._fcumul = 0.0;
+
+
+/** Level of performance fps counter. */
+Ovoid.Timer._lopfps = 0;
 
 
 /**
@@ -104,8 +113,9 @@ Ovoid.Timer.update = function() {
   Ovoid.Timer._fcount++;
   Ovoid.Timer._fcumul+=Ovoid.Timer.quantum;
   
-  if(Ovoid.Timer._fcumul > 0.1) {
+  if(Ovoid.Timer._fcumul > 0.5) {
     Ovoid.Timer.framerate = Math.floor(Ovoid.Timer._fcount / Ovoid.Timer._fcumul);
+    Ovoid.Timer._lopfps = Ovoid.Timer.framerate;
     Ovoid.Timer._fcount = 0;
     Ovoid.Timer._fcumul = 0.0;
   }
