@@ -622,6 +622,7 @@ Ovoid._mainloop = function() {
           if (n) {
             Ovoid._dbg[5].string = Ovoid.Debug.Node(n) + '\n';
             Ovoid._dbg[5].string += Ovoid.Debug.Transform(n, true) + '\n';
+            Ovoid._dbg[5].string += Ovoid.Debug.Body(n) + '\n';
             if(n.shape) {
               if (n.shape.type & Ovoid.MESH) {
                 Ovoid._dbg[5].string += Ovoid.Debug.Mesh(n.shape, true);
@@ -1411,7 +1412,10 @@ Ovoid.inputTrigger = function(m, k, s, f) {
  * Ovoid.MOUSE_OVER_RIGHT_UP, <br>
  * Ovoid.MOUSE_OVER_RIGHT_HELD, <br>
  * Ovoid.ON_GRABBED,<br>
- * Ovoid.ON_UNGRABBED<br>
+ * Ovoid.ON_UNGRABBED,<br>
+ * Ovoid.ON_INTERSECT,<br>
+ * Ovoid.ON_INTERSECT_ENTER,<br>
+ * Ovoid.ON_INTERSECT_LEAVE
  * 
  * @param {string|Node} target Node object, or a string to retrieve one or 
  * several nodes whose name matches with.
@@ -1420,13 +1424,40 @@ Ovoid.inputTrigger = function(m, k, s, f) {
  * 
  * @return {Action} The created Action node reference.
  */
-Ovoid.setAction = function(e, target, f) {
+Ovoid.setAction = function(e, target, f, item) {
   
-  if (e > 13) 
+  if (e > 16) {
+    Ovoid.log(2, 'Ovoid.setAction', "Unknown event (" + e + ").");
     return;
+  }
   
-  if (!(f instanceof Function))
+  if (!(f instanceof Function)) {
+    Ovoid.log(2, 'Ovoid.setAction', "Not valid Function ("+ f +").");
     return;
+  }
+  
+  /* verifie la validité de l'item, si on peu retrouver quelque chose */
+  var items = null;
+  if (item) {
+    if (typeof(item) == "string") {
+      var nodes = Ovoid.rscene.searchMatches(item);
+      if (nodes.length == 0) {
+        Ovoid.log(2, 'Ovoid.setAction', "no node found with matching name '"
+          +item+"' in the current active scene '" + Ovoid.rscene.name + "'.");
+        return;
+      }
+      items = nodes;
+    } else {
+      if(item.type & Ovoid.BODY) {
+        items = new Array();
+        items.push(item);
+      } else {
+        Ovoid.log(2, 'Ovoid.setAction', 'node ' 
+          +item.name+' is not a Body instance.');
+        return;
+      }
+    }
+  }
   
   var newaction;
   
@@ -1449,6 +1480,7 @@ Ovoid.setAction = function(e, target, f) {
     } else {
       Ovoid.log(2, 'Ovoid.setAction', 'node ' 
           +target.name+' is not a Body or Layer instance.');
+      return;
     }
   }
   
@@ -1504,65 +1536,11 @@ Ovoid.setAction = function(e, target, f) {
         once = true;
         Ovoid.log(3, 'Ovoid.setAction', 'updating action ' + action.name);
     }
-    /* parcour le type d'event */
-    switch (e)
-    {
-      /* Ovoid.MOUSE_ENTER */
-      case 0:
-        action.onEnter = f;
-        break;
-      /* Ovoid.MOUSE_LEAVE */
-      case 1:
-        action.onLeave = f;
-        break;
-      /* Ovoid.MOUSE_OVER */
-      case 2:
-        action.onOver = f;
-        break;
-      /* Ovoid.MOUSE_LEFT_DOWN */
-      case 3: 
-        action.onLmbDn = f;
-        break;
-      /* Ovoid.MOUSE_LEFT_UP */
-      case 4: 
-        action.onLmbUp = f;
-        break;
-      /* Ovoid.MOUSE_LEFT_HELD */
-      case 5:
-        action.onLmbHl = f;
-        break;
-      /* Ovoid.MOUSE_MIDDLE_DOWN */
-      case 6:
-        action.onMmbDn = f;
-        break;
-      /* Ovoid.MOUSE_MIDDLE_UP */
-      case 7:
-        action.onMmbUp = f;
-        break;
-      /* Ovoid.MOUSE_MIDDLE_HELD */
-      case 8:
-        action.onMmbHl = f;
-        break;
-      /* Ovoid.MOUSE_RIGHT_DOWN */
-      case 9:
-        action.onRmbDn = f;
-        break;
-      /* Ovoid.MOUSE_RIGHT_UP */
-      case 10:
-        action.onRmbUp = f;
-        break;
-      /* Ovoid.MOUSE_RIGHT_HELD */
-      case 11:
-        action.onRmbHl = f;
-        break;
-      /* Ovoid.ON_GRABBED */
-      case 12:
-        action.onGrabd = f;
-        break;
-      /* Ovoid.ON_UNGRABBED */
-      case 13: 
-        action.onUgrabd = f;
-        break;
+    if(items) {
+      j = items.length;
+      while (j--) action.setTrigger(e, f, items[j]);
+    } else {
+      action.setTrigger(e, f);
     }
     if (once) return action;
   }

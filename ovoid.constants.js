@@ -122,6 +122,13 @@ Ovoid.PICKING_OFFSCREEN_FRAME_Y = 1080;
 Ovoid.PHYSICS_MOTION_EPSILON = 0.1;
 
 
+/** Maximum body intersection count.
+ * @constant 
+ * @memberOf _global_
+ * @see Ovoid.Body */
+Ovoid.MAX_BODY_INTERSECT = 64;
+
+
 /** Bitmask constant 00000000000000000000000000000000 
  * @constant 
  * @memberOf _global_
@@ -1157,6 +1164,15 @@ Ovoid.DAE_MERGE_DEPENDENCIES = Ovoid.BIT16;
 Ovoid.DAE_CREATE_TRACK = Ovoid.BIT17;
 
 
+/** Symbolic constant bitmask for collada importation options. Create a track 
+ * node that compile all scene's animation nodes.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Collada
+ */
+Ovoid.DAE_CONVERT_UPAXIS = Ovoid.BIT18;
+
+
 /** Symbolic constant for frame mode.
  * @constant
  * @memberOf _global_
@@ -2080,6 +2096,24 @@ Ovoid.ON_GRABBED = 12;
  * @constant
  * @memberOf _global_ */
 Ovoid.ON_UNGRABBED = 13;
+
+
+/** Symbolic constant for node trigger
+ * @constant
+ * @memberOf _global_ */
+Ovoid.ON_INTERSECT = 14;
+
+
+/** Symbolic constant for node trigger
+ * @constant
+ * @memberOf _global_ */
+Ovoid.ON_INTERSECT_ENTER = 15;
+
+
+/** Symbolic constant for node trigger
+ * @constant
+ * @memberOf _global_ */
+Ovoid.ON_INTERSECT_LEAVE = 16;
 
 
 /** Symbolic constant for key or button state

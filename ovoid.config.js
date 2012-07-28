@@ -65,6 +65,8 @@ Ovoid.Frame.opt_frameMode = Ovoid.FRAME_FULL_CLIENT;
 Ovoid.Queuer.opt_viewcull = true; 
 /* Enable or disable light culling */
 Ovoid.Queuer.opt_lightcull = true;
+/* Enable or disable intersection detection */
+Ovoid.Queuer.opt_intersect = true;
 /* Default camera position */
 Ovoid.Queuer.opt_defaultCameraPos = [0.0, 0.0, 5.0];
 /* Default camera rotation */

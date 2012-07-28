@@ -67,7 +67,18 @@ Ovoid.Body = function(name) {
   /** Distance from the current render camera.
    * @type float */
   this.distFromEye = 0.0;
-  
+  /** Intersectable flag.
+   * @type bool */
+  this.intersectable = false;
+  /** Intersect nodes.
+   * @type Node[] */
+  this.intersect = new Ovoid.Stack(Ovoid.MAX_BODY_INTERSECT);
+  /** Enter nodes.
+   * @type Node[] */
+  this.enter = new Ovoid.Stack(Ovoid.MAX_BODY_INTERSECT);
+  /** Leave nodes.
+   * @type Node[] */
+  this.leave = new Ovoid.Stack(Ovoid.MAX_BODY_INTERSECT);
 };
 Ovoid.Body.prototype = new Ovoid.Transform;
 Ovoid.Body.prototype.constructor = Ovoid.Body;

@@ -150,15 +150,15 @@ Ovoid.Debug.Node = function(o, s) {
   d += '\n';
   d += '  child: ';
   for ( var i = 0; i < o.child.length; i++) 
-    d += '\n   « ' + o.child[i].name; 
+    d += '\n   > ' + o.child[i].name; 
   d += '\n'
   d += '  link: ';
   for ( var i = 0; i < o.link.length; i++) 
-    d += '\n   « ' + o.link[i].name; 
+    d += '\n   > ' + o.link[i].name; 
   d += '\n'
   d += '  depend: ';
   for ( var i = 0; i < o.depend.length; i++) 
-    d += '\n   « ' + o.depend[i].name; 
+    d += '\n   > ' + o.depend[i].name; 
   d += '\n'
   d += '}';
   return d;
@@ -291,6 +291,39 @@ Ovoid.Debug.Transform = function(o, s) {
   }
   d += '  worldDirection: '+Ovoid.Debug.Float3v(o.worldDirection.v, '')+'\n';
   d += '  worldPosition:  '+Ovoid.Debug.Float3v(o.worldPosition.v, '')+'\n';
+  d += '}';
+  return d;
+};
+
+
+/**
+ * Body debug.
+ * <br>
+ * <br>
+ * Returns node debuging informations in text format.
+ * 
+ * @param {Body} o Body node.
+ * @param {bool} s Sumarize.
+ * @return {string} Node debuging infos.
+ */
+Ovoid.Debug.Body = function(o, s) {
+  
+  var d = 'Ovoid.Body "' + o.name + '" infos\n{\n';
+  d += '  shape: ';
+    o.shape?d+=o.shape.name:d+='null';
+  d += '\n';
+  d += '  intersect: ';
+  for ( var i = 0; i < o.intersect.count; i++) 
+    d += '\n   > ' + o.intersect[i].name; 
+  d += '\n'
+  d += '  enter: ';
+  for ( var i = 0; i < o.enter.count; i++) 
+    d += '\n   > ' + o.enter[i].name; 
+  d += '\n'
+  d += '  leave: ';
+  for ( var i = 0; i < o.leave.count; i++) 
+    d += '\n   > ' + o.leave[i].name; 
+  d += '\n'
   d += '}';
   return d;
 };
@@ -605,7 +638,7 @@ Ovoid.Debug.DependTree = function(o) {
     n = itdg.current;
     d += t;
     for (var j = 0; j < itdg.depth; j++) d += '  ';
-    d += ' « ' + n.name + '\n';
+    d += ' > ' + n.name + '\n';
   }
   d += '}';
   return d;

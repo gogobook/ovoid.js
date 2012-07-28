@@ -66,6 +66,10 @@ Ovoid.Queuer.opt_viewcull = true;
 Ovoid.Queuer.opt_lightcull = true;
 
 
+/** Enable or disable intersection detection. */
+Ovoid.Queuer.opt_intersect = true;
+
+
 /** Default camera position. */
 Ovoid.Queuer.opt_defaultCameraPos = [0.0, 0.0, 10.0];
 
@@ -160,33 +164,23 @@ Ovoid.Queuer._cachDependencies = function(o) {
 
   var i = o.depend.length;
   while (i--) {
-    if (o.depend[i].type & Ovoid.ACTION) {
+    if (o.depend[i].type & Ovoid.ACTION)
       o.depend[i].cachAction();
-    }
     
-    if (o.depend[i].type & Ovoid.PHYSICS) {
-      /* Aplique la gravité */
-      o.depend[i].newtonXyz(Ovoid.opt_gravity[0], 
-          Ovoid.opt_gravity[1], 
-          Ovoid.opt_gravity[2])
+    if (o.depend[i].type & Ovoid.PHYSICS)
       o.depend[i].cachPhysics();
-    }
     
-    if (o.depend[i].type & Ovoid.ANIMATION) {
+    if (o.depend[i].type & Ovoid.ANIMATION)
       o.depend[i].cachAnimation();
-    }
     
-    if (o.depend[i].type & Ovoid.MESH) {
+    if (o.depend[i].type & Ovoid.MESH)
       o.depend[i].cachMesh();
-    }
 
-    if (o.depend[i].type & Ovoid.SKIN) {
+    if (o.depend[i].type & Ovoid.SKIN)
       o.depend[i].cachSkin();
-    }
       
-    if (o.depend[i].type & Ovoid.EMITTER) {
+    if (o.depend[i].type & Ovoid.EMITTER)
       o.depend[i].cachEmitter();
-    }
       
     o.depend[i].addCach(Ovoid.CACH_WORLD);
   }
@@ -316,7 +310,7 @@ Ovoid.Queuer.reset = function() {
 Ovoid.Queuer.queueScene = function(sc) {
 
   /* quelques variables reutilisables */
-  var o, i, c, x;
+  var o, i, j;
 
   /* creation de la queue de rendu */
   /* selection de la camera */
@@ -335,6 +329,8 @@ Ovoid.Queuer.queueScene = function(sc) {
     Ovoid.Queuer._rcamera.cachCamera();
   }
 
+  Ovoid.Queuer._cachDependencies(Ovoid.Queuer._rcamera);
+ 
   /* Update de l'audioListener */
   if(Ovoid.al.type == 3) { /* Ovoid.WEBKIT_AUDIO_API */
     var matrix = Ovoid.Queuer._rcamera.worldMatrix;
@@ -342,8 +338,6 @@ Ovoid.Queuer.queueScene = function(sc) {
     Ovoid.al.listener.setOrientation(-matrix.m[8], -matrix.m[9], -matrix.m[10],
         matrix.m[4], matrix.m[5], matrix.m[6]);
   }
-  
-  Ovoid.Queuer._cachDependencies(Ovoid.Queuer._rcamera);
 
   /* Uncach tous les actions */
   i = sc.action.length;
@@ -411,6 +405,51 @@ Ovoid.Queuer.queueScene = function(sc) {
     }
   }
   
+  /* Verifie les intersections des bodys intersectables */
+  if (Ovoid.Queuer.opt_intersect) {
+    var a, b;
+    /* On stock les intersections, dans un stack */
+    var intersect = new Ovoid.Stack(Ovoid.MAX_BODY_INTERSECT);
+    i = sc.transform.length;
+    while (i--) {
+      a = sc.transform[i];
+      if(a.intersectable) {
+        j = sc.transform.length;
+        /* On vide le stack */
+        intersect.empty();
+        while (j--) {
+          b = sc.transform[j];
+          if(j != i && b.intersectable) {
+            if(a.boundingSphere.worldCenter.dist2(b.boundingSphere.worldCenter) 
+              <= (a.boundingSphere.radius2+b.boundingSphere.radius2)) {
+              intersect.add(b);
+            }
+          }
+        }
+        /* Verifie les différences pour enter et leave*/
+        a.enter.empty();
+        a.leave.empty();
+        j = intersect.count;
+        while (j--) {
+          if(!a.intersect.has(intersect[j])) {
+            a.enter.add(intersect[j])
+          }
+        }
+        j = a.intersect.count;
+        while (j--) {
+          if(!intersect.has(a.intersect[j])) {
+            a.leave.add(a.intersect[j])
+          }
+        }
+        a.intersect.empty();
+        j = intersect.count;
+        while (j--) {
+          a.intersect.add(intersect[j]);
+        }
+      }
+    }
+  }
+  
   /* A optimiser, on ajoute les physics au collider stack 
    * Note à moi-même: A optimiser comment ? Avec un octree ? Bwahaha !! */
   i = sc.physics.length;
@@ -422,7 +461,7 @@ Ovoid.Queuer.queueScene = function(sc) {
   while (i--) sc.track[i].cachTrack();
 
   /* Ordonne les bodys selon la distance à la camera */
-   Ovoid.Queuer.qbody.sort(Ovoid.Queuer._bodyZSortFunc);
+  Ovoid.Queuer.qbody.sort(Ovoid.Queuer._bodyZSortFunc);
 
   /* Si le light-linking est desactivé on ajoute toutes les lumieres */
   if (!Ovoid.Queuer.opt_lightcull) {

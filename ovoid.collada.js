@@ -525,7 +525,7 @@ Ovoid.Collada.prototype._retrieveNode = function(name) {
 /**
  * Convert and correct vertex according to the up axis.
  * 
- * @param {Matrix4} m Matrix4 to convert.
+ * @param {Vector} v Vector to convert.
  * @param {bool} i inverse.
  */
 Ovoid.Collada.prototype._procVect = function(v, i) {
@@ -537,6 +537,43 @@ Ovoid.Collada.prototype._procVect = function(v, i) {
       tmp = v.v[1];
       v.v[1] = -v.v[2];
       v.v[2] = tmp;
+    break;
+    case 0: /* X up */
+    break;
+  }
+};
+
+
+/**
+ * Convert and correct matrix according to the up axis.
+ * 
+ * @param {Matrix4} m Matrix4 to convert.
+ * @param {bool} i inverse.
+ */
+Ovoid.Collada.prototype._procMat4 = function(m, i) {
+  
+  switch (this._upaxis)
+  {
+    case 2: /* Z up */
+      /* Z-up to Y-up world 
+       * 
+       * |  1  0  0  0  |
+       * |  0  0  1  0  |
+       * |  0 -1  0  0  |
+       * |  0  0  0  1  | 
+       */
+      var m2y = new Ovoid.Matrix4();
+      m2y.m[5] = 0.0;
+      m2y.m[6] = -1.0;
+      m2y.m[9] = 1.0;
+      m2y.m[10] = 0.0;
+      m.multBy(m2y);
+      /*
+      var tmp;
+      tmp = m.m[13];
+      m.m[13] = -m.m[14];
+      m.m[14] = tmp;
+      */
     break;
     case 0: /* X up */
     break;
@@ -2160,6 +2197,9 @@ Ovoid.Collada.prototype._procNod = function(dae) {
   
   /* cach les transformations avant le parentage */
   node.cachTransform();
+  /* Convertis en Y-up si besoin */
+  this._procMat4(node.matrix);
+  this._procMat4(node.worldMatrix);
   /* retourne la node transformée */
   return node;
 };
@@ -2656,6 +2696,8 @@ Ovoid.Collada.prototype._procAni = function(dae) {
           mat.setv(ACD['ydata'][i].subarray((k * 16), (k * 16) + 16));
           /* Column-major vers Row-major */
           mat.toTranspose();
+          /* convertis en Y-up si nécéssaire */
+          //this._procMat4(mat);
 
           /* recuperation des translations */
           tx[k] = mat.m[12]; ty[k] = mat.m[13]; tz[k] = mat.m[14];
@@ -2799,15 +2841,27 @@ Ovoid.Collada.prototype._procAni = function(dae) {
              * du axis-angle décrit pour l'animation :
              * 1,0,0 = X; 0,1,0 = Y, 0,0,1 = Z */
             var v = this._gTxtDataSplit(this._dae.getElementsByTagName('visual_scene')[0].getElementsByTagName('rotate')[k].childNodes);
-            if (parseFloat(v[0]) == 1.0) {
-              channel = Ovoid.ANIMATION_CHANNEL_ROTATE_X;
+            if (parseFloat(v[0]) == 1.0) channel = Ovoid.ANIMATION_CHANNEL_ROTATE_X;
+            if (parseFloat(v[1]) == 1.0) channel = Ovoid.ANIMATION_CHANNEL_ROTATE_Y;
+            if (parseFloat(v[2]) == 1.0) channel = Ovoid.ANIMATION_CHANNEL_ROTATE_Z;
+            
+            /* conversion des data selon up-axis */
+            switch (this._upaxis)
+            {
+              case 2: /* Z up */
+                if (parseFloat(v[0]) == 1.0) channel = Ovoid.ANIMATION_CHANNEL_ROTATE_X;
+                if (parseFloat(v[1]) == 1.0) channel = Ovoid.ANIMATION_CHANNEL_ROTATE_Z;
+                if (parseFloat(v[2]) == 1.0) channel = Ovoid.ANIMATION_CHANNEL_ROTATE_Y;
+              break;
+              case 0: /* X up */
+              break;
+              default:
+                if (parseFloat(v[0]) == 1.0) channel = Ovoid.ANIMATION_CHANNEL_ROTATE_X;
+                if (parseFloat(v[1]) == 1.0) channel = Ovoid.ANIMATION_CHANNEL_ROTATE_Y;
+                if (parseFloat(v[2]) == 1.0) channel = Ovoid.ANIMATION_CHANNEL_ROTATE_Z;
+              break;
             }
-            if (parseFloat(v[1]) == 1.0) {
-              channel = Ovoid.ANIMATION_CHANNEL_ROTATE_Y;
-            }
-            if (parseFloat(v[2]) == 1.0) {
-              channel = Ovoid.ANIMATION_CHANNEL_ROTATE_Z;
-            }
+        
             break;
           }
         }
@@ -2818,16 +2872,47 @@ Ovoid.Collada.prototype._procAni = function(dae) {
 
       /* S'agit-il d'une translation ? on retrouve l'axe */
       if (channel == Ovoid.ANIMATION_CHANNEL_TRANSLATE) {
-        if (ACD['ttaxis'][i] == 'X') channel = Ovoid.ANIMATION_CHANNEL_TRANSLATE_X;
-        if (ACD['ttaxis'][i] == 'Y') channel = Ovoid.ANIMATION_CHANNEL_TRANSLATE_Y;
-        if (ACD['ttaxis'][i] == 'Z') channel = Ovoid.ANIMATION_CHANNEL_TRANSLATE_Z;
+        /* conversion des data selon up-axis */
+        switch (this._upaxis)
+        {
+          case 2: /* Z up */
+            if (ACD['ttaxis'][i] == 'X') channel = Ovoid.ANIMATION_CHANNEL_TRANSLATE_X;
+            if (ACD['ttaxis'][i] == 'Y') { 
+              channel = Ovoid.ANIMATION_CHANNEL_TRANSLATE_Z;
+              /* inversion des valeurs Z */
+              var k = ACD['ydata'][i].length;
+              while (k--)
+                ACD['ydata'][i][k] = -ACD['ydata'][i][k];
+            }
+            if (ACD['ttaxis'][i] == 'Z') channel = Ovoid.ANIMATION_CHANNEL_TRANSLATE_Y;
+          break;
+          case 0: /* X up */
+          break;
+          default:
+            if (ACD['ttaxis'][i] == 'X') channel = Ovoid.ANIMATION_CHANNEL_TRANSLATE_X;
+            if (ACD['ttaxis'][i] == 'Y') channel = Ovoid.ANIMATION_CHANNEL_TRANSLATE_Y;
+            if (ACD['ttaxis'][i] == 'Z') channel = Ovoid.ANIMATION_CHANNEL_TRANSLATE_Z;
+          break;
+        }
       }
       /* Si il s'agit de rotation il faut convertir les valeurs
        * d'entrée degrés en radians */
       if (channel == Ovoid.ANIMATION_CHANNEL_ROTATE_X) {
         var k = ACD['ydata'][i].length;
-        while (k--)
-          ACD['ydata'][i][k] = Ovoid.deg2Rad(ACD['ydata'][i][k]);
+        /* conversion des data selon up-axis */
+        switch (this._upaxis)
+        {
+          case 2: /* Z up */
+            while (k--)
+              ACD['ydata'][i][k] = Ovoid.deg2Rad(ACD['ydata'][i][k]-90);
+          break;
+          case 0: /* X up */
+          break;
+          default:
+            while (k--)
+              ACD['ydata'][i][k] = Ovoid.deg2Rad(ACD['ydata'][i][k]);
+          break;
+        }
         if (ACD['xerp'][i] == Ovoid.INTERPOLATION_BSPLINE) {
           k = byarray.length;
           while (k--) {
@@ -2838,8 +2923,21 @@ Ovoid.Collada.prototype._procAni = function(dae) {
       if (channel == Ovoid.ANIMATION_CHANNEL_ROTATE_Y) {
         /* conversion deg to rad */
         var k = ACD['ydata'][i].length;
-        while (k--)
-          ACD['ydata'][i][k] = Ovoid.deg2Rad(ACD['ydata'][i][k]);
+        /* conversion des data selon up-axis */
+        switch (this._upaxis)
+        {
+          case 2: /* Z up */
+            while (k--)
+              ACD['ydata'][i][k] = Ovoid.deg2Rad(ACD['ydata'][i][k]);
+          break;
+          case 0: /* X up */
+          break;
+          default:
+            while (k--)
+              ACD['ydata'][i][k] = Ovoid.deg2Rad(ACD['ydata'][i][k]);
+          break;
+        }
+        
         if (ACD['xerp'][i] == Ovoid.INTERPOLATION_BSPLINE) {
           k = byarray.length;
           while (k--) {
@@ -2850,8 +2948,20 @@ Ovoid.Collada.prototype._procAni = function(dae) {
       if (channel == Ovoid.ANIMATION_CHANNEL_ROTATE_Z) {
         /* conversion deg to rad */
         var k = ACD['ydata'][i].length;
-        while (k--)
-          ACD['ydata'][i][k] = Ovoid.deg2Rad(ACD['ydata'][i][k]);
+        /* conversion des data selon up-axis */
+        switch (this._upaxis)
+        {
+          case 2: /* Z up */
+            while (k--)
+              ACD['ydata'][i][k] = Ovoid.deg2Rad(-ACD['ydata'][i][k]);
+          break;
+          case 0: /* X up */
+          break;
+          default:
+            while (k--)
+              ACD['ydata'][i][k] = Ovoid.deg2Rad(ACD['ydata'][i][k]);
+          break;
+        }
         if (ACD['xerp'][i] == Ovoid.INTERPOLATION_BSPLINE) {
           k = byarray.length;
           while (k--) {
@@ -3039,18 +3149,38 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
 
   /* Recupération de l'up-axis */
   var up_axis = this._dae.getElementsByTagName('up_axis')[0].childNodes[0].data;
-  if (up_axis == 'Z_UP') {
-      this._upaxis = 2;
+  if (up_axis == 'Z_UP') this._upaxis = 2;
+  if (up_axis == 'Y_UP') this._upaxis = 1;
+  if (up_axis == 'X_UP') this._upaxis = 0;
+
+  if(this._mask & Ovoid.DAE_CONVERT_UPAXIS) {
+    switch(this._upaxis)
+    {
+      case 0:
+        Ovoid.log(2, 'Ovoid.Collada ' + this.name, 
+          "Conversion from X-Up axis not supported, data will be imported" 
+          + "without modification.");
+        this._upaxis = 1;
+      break;
+      case 2:
+        Ovoid.log(2, 'Ovoid.Collada ' + this.name, 
+          "Conversion from Z-Up axis to Y-Up axis");
+      break;
+    }
+  } else {
+    switch(this._upaxis)
+    {
+      case 0:
       Ovoid.log(2, 'Ovoid.Collada ' + this.name, 
-          "Z-Up axis, OvoiD.JS usually work in Right-Handed Y-Up.");
-  }
-  if (up_axis == 'Y_UP') {
-     this._upaxis = 1;
-  }
-  if (up_axis == 'X_UP') {
-    this._upaxis = 0;
-    Ovoid.log(2, 'Ovoid.Collada ' + this.name, 
-        "X-Up axis, OvoiD.JS usually work in Right-Handed Y-Up.");
+        "is X-Up axis, OvoiD.JS usually work in Right-Handed Y-Up.");
+      break;
+      case 2:
+      Ovoid.log(2, 'Ovoid.Collada ' + this.name, 
+          "is Z-Up axis, OvoiD.JS usually work in Right-Handed Y-Up." 
+          + "Use option Ovoid.DAE_CONVERT_UPAXIS to convert Z-up to Y-up.");
+      break;
+    }
+    this._upaxis = 1;
   }
 
   /* Crée un track si demandé */

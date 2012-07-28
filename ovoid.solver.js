@@ -824,9 +824,9 @@ Ovoid.Solver._detectContacts = function() {
   /* Reset le contact stack */
   Ovoid.Solver._contactq.empty();
 
-  var a, b;
+  var a, b, i, j;
   
-  var i = Ovoid.Queuer.qphycs.count;
+  i = Ovoid.Queuer.qphycs.count;
   while(i--) {
     j = Ovoid.Queuer.qphycs.count;
     while(j--) {

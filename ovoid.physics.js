@@ -393,6 +393,13 @@ Ovoid.Physics.prototype.cachPhysics = function() {
       this.itensor.m[8] = RI[6] * this.target.worldMatrix.m[8] + 
           RI[7] * this.target.worldMatrix.m[9] + 
           RI[8] * this.target.worldMatrix.m[10];
+      
+      /* applique la gravité */
+      var mass = 1.0/this.imass;
+      this.linearInfluence.v[0] += mass * Ovoid.opt_gravity[0];
+      this.linearInfluence.v[1] += mass * Ovoid.opt_gravity[1];
+      this.linearInfluence.v[2] += mass * Ovoid.opt_gravity[2];
+      this.unCach(Ovoid.CACH_INFLUENCES);
 
     }
     
