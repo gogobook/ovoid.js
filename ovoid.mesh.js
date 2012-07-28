@@ -1135,17 +1135,11 @@ Ovoid.Mesh.prototype.cachMesh = function() {
         Ovoid.FLOAT_MIN,
         1.0);
 
-    var rad = 0.0;
-
     var P;
-    var S;
     var c = this.vertices[0].length;
     for (var i = 0; i < c; i++) {
       
       P = this.vertices[0][i].p;
-      S = P.size2();
-      
-      if (S > rad) rad = S;
 
       if (P.v[0] > max.v[0]) max.v[0] = P.v[0];
       if (P.v[1] > max.v[1]) max.v[1] = P.v[1];
@@ -1157,7 +1151,7 @@ Ovoid.Mesh.prototype.cachMesh = function() {
     }
 
     this.boundingBox.setBound(min, max);
-    this.boundingSphere.setBound(min, max, rad);
+    this.boundingSphere.setBound(min, max);
 
     /* propage l'uncach du shape */
     for (var i = 0; i < this.link.length; i++)

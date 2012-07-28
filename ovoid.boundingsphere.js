@@ -33,9 +33,6 @@ Ovoid.Boundingsphere = function() {
   /** Bounding sphere's radius.
    * @type float */
   this.radius = 0.0;
-  /** Bounding sphere's squared radius.
-   * @type float */
-  this.radius2 = 0.0;
   /** Bounding sphere's center relative to its shape node.
    * @type Point*/
   this.center = new Ovoid.Point(0.0, 0.0, 0.0, 1.0);
@@ -56,7 +53,6 @@ Ovoid.Boundingsphere = function() {
 Ovoid.Boundingsphere.prototype.copy = function(bsphere) {
 
   this.radius = bsphere.radius;
-  this.radius2 = bsphere.radius2;
   this.center.copy(bsphere.center);
 };
 
@@ -69,11 +65,10 @@ Ovoid.Boundingsphere.prototype.copy = function(bsphere) {
  *
  * @param {Point} min Min point relative to center.
  * @param {Point} max Max point relative to center.
- * @param {float} rad2 Squared radius.
  * 
  * @see Ovoid.Point
  */
-Ovoid.Boundingsphere.prototype.setBound = function(min, max, rad2) {
+Ovoid.Boundingsphere.prototype.setBound = function(min, max) {
 
   /* half size */
   var hsx = (max.v[0] - min.v[0]) * 0.5;
@@ -84,9 +79,14 @@ Ovoid.Boundingsphere.prototype.setBound = function(min, max, rad2) {
       hsy + min.v[1],
       hsz + min.v[2], 
       1.0);
-      
-  this.radius2 = rad2;
-  this.radius = Math.sqrt(this.radius2);
+
+  this.radius = 0.0;
+
+  var S;
+  S = max.dist(this.center);
+  if (S > this.radius) this.radius = S;
+  S = min.dist(this.center);
+  if (S > this.radius) this.radius = S;
 };
 
 
@@ -100,10 +100,7 @@ Ovoid.Boundingsphere.prototype.setBound = function(min, max, rad2) {
  */
 Ovoid.Boundingsphere.prototype.setRadius = function(rad) {
 
-  /* half size */
-  this.radius2 = rad * rad;
   this.radius = rad;
-
 };
 
 

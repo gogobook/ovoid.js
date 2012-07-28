@@ -122,10 +122,10 @@ Ovoid.Solver._hasContact = function (a, b) {
  */
 Ovoid.Solver._canContact = function (a, b, m) {
   /* a.dist2(b) <= a.r2 + b.r2 + t */
-  return a.target.boundingSphere.worldCenter.dist2(
+  return a.target.boundingSphere.worldCenter.dist(
       b.target.boundingSphere.worldCenter) <= 
-      (a.target.boundingSphere.radius2 + 
-      b.target.boundingSphere.radius2 + m);
+      (a.target.boundingSphere.radius + 
+      b.target.boundingSphere.radius + m);
 };
 
 

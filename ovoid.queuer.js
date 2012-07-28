@@ -420,8 +420,8 @@ Ovoid.Queuer.queueScene = function(sc) {
         while (j--) {
           b = sc.transform[j];
           if(j != i && b.intersectable) {
-            if(a.boundingSphere.worldCenter.dist2(b.boundingSphere.worldCenter) 
-              <= (a.boundingSphere.radius2+b.boundingSphere.radius2)) {
+            if(a.boundingSphere.worldCenter.dist(b.boundingSphere.worldCenter) 
+                <= (a.boundingSphere.radius+b.boundingSphere.radius)) {
               intersect.add(b);
             }
           }

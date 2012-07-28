@@ -299,8 +299,6 @@ Ovoid.Skin.prototype.cachSkin = function() {
           Ovoid.FLOAT_MIN,
           1.0);
           
-      var rad2 = 0.0;
-      var S;
       var mv, sv, p0, p1, p2;
       
       var l = 0; /* Lod */
@@ -325,8 +323,6 @@ Ovoid.Skin.prototype.cachSkin = function() {
         sv.p.normalizeWeight();
         
         // calcul min et max pour le bounding volum
-        S = sv.p.size2();
-        if (S > rad2) rad2 = S;
         if (sv.p.v[0] > max.v[0]) max.v[0] = sv.p.v[0];
         if (sv.p.v[1] > max.v[1]) max.v[1] = sv.p.v[1];
         if (sv.p.v[2] > max.v[2]) max.v[2] = sv.p.v[2];
@@ -362,7 +358,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
       }
 
       this.boundingBox.setBound(min, max);
-      this.boundingSphere.setBound(min, max, rad2*0.5);
+      this.boundingSphere.setBound(min, max);
 
       // propage l'uncach du shape
       for (var i = 0; i < this.link.length; i++)

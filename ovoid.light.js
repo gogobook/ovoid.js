@@ -208,8 +208,8 @@ Ovoid.Light.prototype.isLightening = function(tform) {
   /* simple test d'intersection des bounding sphere */
 
   /* size2 <= somme des radius2 */
-  return this.boundingSphere.worldCenter.dist2(tform.boundingSphere.worldCenter) <= 
-      (this.boundingSphere.radius2 + tform.boundingSphere.radius2);
+  return this.boundingSphere.worldCenter.dist(tform.boundingSphere.worldCenter) <= 
+      (this.boundingSphere.radius + tform.boundingSphere.radius);
 };
 
 

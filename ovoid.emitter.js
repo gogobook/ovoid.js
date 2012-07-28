@@ -265,11 +265,9 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         Ovoid.FLOAT_MIN,
         1.0);
 
-    var rad2 = 0.0;
     var P;
     var V;
     var C;
-    var S;
     var U;
     var L;
     
@@ -309,9 +307,6 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         if(i % 50 == 0) {
           WP.copy(P);
           WP.transform4Inverse(body.worldMatrix);
-          S = WP.size2();
-          
-          if (S > rad2) rad2 = S;
 
           if (WP.v[0] > max.v[0]) max.v[0] = WP.v[0];
           if (WP.v[1] > max.v[1]) max.v[1] = WP.v[1];
@@ -360,9 +355,6 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
             if(NB == 1) {
               WP.copy(P);
               WP.transform4Inverse(body.worldMatrix);
-              S = WP.size2();
-              
-              if (S > rad2) rad2 = S;
 
               if (WP.v[0] > max.v[0]) max.v[0] = WP.v[0];
               if (WP.v[1] > max.v[1]) max.v[1] = WP.v[1];
@@ -429,7 +421,7 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
   /* update bounding box et bounding sphere */
   if (!(this.cach & Ovoid.CACH_GEOMETRY)) {
     this.boundingBox.setBound(min, max);
-    this.boundingSphere.setBound(min, max, rad2);
+    this.boundingSphere.setBound(min, max);
     /* propage l'uncach du shape */
     for (var i = 0; i < this.link.length; i++) {
         this.link[i].unCach(Ovoid.CACH_BOUNDING_SHAPE);
