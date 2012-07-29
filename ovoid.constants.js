@@ -2870,6 +2870,12 @@ Ovoid.GLSL_C_FS='precision highp float;uniform vec4 C;void main(void){gl_FragCol
 /** Default built-in Glsl fragment shader string.
  * @constant
  * @memberOf _global_ */
+Ovoid.GLSL_C_ADEPTH_FS='precision highp float;uniform vec4 C;void main(void){gl_FragColor=C;gl_FragColor.a=gl_FragCoord.z;}';
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
 Ovoid.GLSL_BLACK_FS='precision highp float;void main(void){gl_FragColor=vec4(0.0,0.0,0.0,1.0);}';
 
 

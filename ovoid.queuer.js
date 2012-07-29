@@ -330,7 +330,7 @@ Ovoid.Queuer.queueScene = function(sc) {
   }
 
   Ovoid.Queuer._cachDependencies(Ovoid.Queuer._rcamera);
- 
+  
   /* Update de l'audioListener */
   if(Ovoid.al.type == 3) { /* Ovoid.WEBKIT_AUDIO_API */
     var matrix = Ovoid.Queuer._rcamera.worldMatrix;

@@ -704,6 +704,11 @@ Ovoid.Debug.Input = function() {
   d += '   mouseOverUid:  ' + Ovoid.Input.mouseOverUid + '\n';
   d += '   mouseEnterUid: ' + Ovoid.Input.mouseEnterUid + '\n';
   d += '   mouseLeaveUid: ' + Ovoid.Input.mouseLeaveUid + '\n';
+  d += '   mouseCursor: ' 
+  d += Ovoid.frnd(Ovoid.Input.mouseCursor.m[12]) + ', ';
+  d += Ovoid.frnd(Ovoid.Input.mouseCursor.m[13]) + ', ';
+  d += Ovoid.frnd(Ovoid.Input.mouseCursor.m[14]);
+  d += '\n';
   d += '}';
   return d;
 };

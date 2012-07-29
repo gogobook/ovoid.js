@@ -351,6 +351,10 @@ Ovoid.Drawer._abcolor = new Float32Array(4);
 Ovoid.Drawer._rpcolor = new Uint8Array(256);
 
 
+/** Picking readed pixel depth. */
+Ovoid.Drawer._rpdepth = new Float32Array(1);
+
+
 /** Level of performance for geometry drawing. */
 Ovoid.Drawer._lop = 2;
 
@@ -680,7 +684,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer.plugShader(6,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_RP_GEOMETRY");
-  sp.setSources(Ovoid.GLSL_PIW_HYBRID_VS, Ovoid.GLSL_C_FS, Ovoid.GLSL_WRAPMAP);
+  sp.setSources(Ovoid.GLSL_PIW_HYBRID_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_RP_GEOMETRY pipeline shader program.");
     return false;
@@ -688,7 +692,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer.plugShader(20,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_RP_PARTICLE");
-  sp.setSources(Ovoid.GLSL_PU_PARTICLE_VS, Ovoid.GLSL_C_FS, Ovoid.GLSL_WRAPMAP);
+  sp.setSources(Ovoid.GLSL_PU_PARTICLE_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_RP_PARTICLE pipeline shader program.");
     return false;
@@ -696,7 +700,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer.plugShader(22,Ovoid.Drawer.addShader(sp));
  
   sp = new Ovoid.Shader("PIPE_RP_LAYER");
-  sp.setSources(Ovoid.GLSL_P_VS, Ovoid.GLSL_C_FS, Ovoid.GLSL_WRAPMAP);
+  sp.setSources(Ovoid.GLSL_P_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_RP_LAYER pipeline shader program.");
     return false;
@@ -704,7 +708,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer.plugShader(23,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_RP_STRING");
-  sp.setSources(Ovoid.GLSL_P_ZSRING_VS, Ovoid.GLSL_C_FS, Ovoid.GLSL_WRAPMAP);
+  sp.setSources(Ovoid.GLSL_P_ZSRING_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_RP_STRING pipeline shader program.");
     return false;
@@ -1048,6 +1052,7 @@ Ovoid.Drawer.beginDraw = function() {
  * Conclude the current drawing session.
  */
 Ovoid.Drawer.endDraw = function() {
+
   /* Sais pas si c'est très utile... */
   Ovoid.gl.flush();
 };
@@ -1074,8 +1079,11 @@ Ovoid.Drawer.beginRpDraw = function() {
 Ovoid.Drawer.endRpDraw = function() {
   
   /* Read pixel a la position du pointeur actuel */
-  Ovoid.gl.readPixels(Ovoid.Input.mousePosition.v[0],(Ovoid.Frame.size.v[1] - Ovoid.Input.mousePosition.v[1]),1,1,0x1908,0x1401,/* RGBA, UNSIGNED_BYTE */Ovoid.Drawer._rpcolor);
-  
+  Ovoid.gl.readPixels(Ovoid.Input.mousePosition.v[0],
+      (Ovoid.Frame.size.v[1] - Ovoid.Input.mousePosition.v[1]),
+      1,1,0x1908,0x1401,/* RGBA, UNSIGNED_BYTE */
+      Ovoid.Drawer._rpcolor);
+      
   Ovoid.gl.bindFramebuffer(0x8D40, null); /* FRAMEBUFFER */
   
   Ovoid.Input.mouseLeaveUid = Ovoid.Input.mouseOverUid;
@@ -1086,6 +1094,14 @@ Ovoid.Drawer.endRpDraw = function() {
       ((Ovoid.Drawer._rpcolor[1]) << 8) |
       ((Ovoid.Drawer._rpcolor[2]));
   
+  Ovoid.Drawer._rpdepth[0] = (Ovoid.Drawer._rpcolor[3] / 255);
+  
+  /* calcule l'unproject */
+  Ovoid.Queuer._rcamera.unproject(Ovoid.Input.mousePosition.v[0],
+      (Ovoid.Frame.size.v[1] - Ovoid.Input.mousePosition.v[1]),
+      Ovoid.Drawer._rpdepth[0],
+      Ovoid.Input.mouseCursor);
+      
   if(Ovoid.Input.mouseLeaveUid != Ovoid.Input.mouseOverUid) {
     Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseOverUid;
   } else {
@@ -2161,6 +2177,11 @@ Ovoid.Drawer.drawQueue = function() {
       Ovoid.Drawer.normalsStack( Ovoid.Queuer.qbody);
     }
     Ovoid.Drawer.helpersStack(Ovoid.Queuer.qtform);
+    
+    // Dessin du curseur
+    Ovoid.Drawer.model(Ovoid.Input.mouseCursor.m);
+    Ovoid.Drawer.symSphere(Ovoid.Drawer._tcolor[1]);
+    
   }
   // Layers & text
   if (Ovoid.Drawer.opt_drawLayers) {

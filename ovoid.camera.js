@@ -169,6 +169,69 @@ Ovoid.Camera.prototype.isWatching = function(transform) {
 
 
 /**
+ * Unproject from view.<br><br>
+ *
+ * Unprojects screen coordinates to world coordinates.
+ * 
+ * @param {float} x X screen coordinate.
+ * @param {float} y Y screen coordinate.
+ * @param {float} z Depth coordinate from eye position.
+ * @param {Matrix4} out Matrix to be set as result of the unproject.
+ * 
+ * @return {bool} True if unproject succeed, false otherwise.
+ * 
+ */
+Ovoid.Camera.prototype.unproject = function(x, y, z, out) {
+
+  var ieyeview = new Ovoid.Matrix4();
+  // On inverse la matrice eyeview (lookat * projection).
+  ieyeview.copy(this.eyeview);
+  ieyeview.toInverse();
+  
+  var px, py, pz, xx, yy, zz, ww, dx;
+  
+  px = (x / this.viewX) * 2 - 1; // Ratio screen X range entre 1 et -1
+  py = (y / this.viewY) * 2 - 1; // Ratio screen Y range entre 1 et -1
+  pz = z * 2 - 1;   // Ratio depth range entre 1 et -1
+  
+  // Transforme le point par la matrice inverse de projection
+  var p = new Ovoid.Point();
+  p.v[0] = px*ieyeview.m[0]+py*ieyeview.m[4]+pz*ieyeview.m[8]+ieyeview.m[12];
+  p.v[1] = px*ieyeview.m[1]+py*ieyeview.m[5]+pz*ieyeview.m[9]+ieyeview.m[13];
+  p.v[2] = px*ieyeview.m[2]+py*ieyeview.m[6]+pz*ieyeview.m[10]+ieyeview.m[14];
+  p.v[3] = px*ieyeview.m[3]+py*ieyeview.m[7]+pz*ieyeview.m[11]+ieyeview.m[15];
+  
+  if(ww != 0.0) {
+    // Positions en coordonnees monde
+    p.v[0] /= p.v[3];
+    p.v[1] /= p.v[3];
+    p.v[2] /= p.v[3];
+    p.v[3] = 1.0;
+    // Calcule de la direction du rayon
+    var au = new Ovoid.Vector(0.0,1.0,0.0); // up vector
+    var az = new Ovoid.Vector(); // axe z
+    var ay = new Ovoid.Vector(); // axe y
+    var ax = new Ovoid.Vector(); // axe x
+    // calcule de l'axe z selon position de la camera
+    az.subOf(p, this.worldPosition);
+    az.normalize();
+    ax.crossOf(au, az); // reconstitue l'axe x
+    ay.crossOf(az, ax); // reconstitue l'axe y
+    // Construction de la matrice finale
+    out.m[0] = ax.v[0]; out.m[1] = ax.v[1]; out.m[2] = ax.v[2];
+    out.m[4] = ay.v[0]; out.m[5] = ay.v[1]; out.m[6] = ay.v[2];
+    out.m[8] = az.v[0]; out.m[9] = az.v[1]; out.m[10] = az.v[2];
+    out.m[12] = p.v[0]; out.m[13] = p.v[1]; out.m[14] = p.v[2];
+    out.m[15] = 1.0;
+    return true;
+  } else {
+    return false;
+  }
+};
+
+
+
+/**
  * Node's caching function.
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 

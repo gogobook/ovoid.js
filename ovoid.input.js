@@ -67,6 +67,10 @@ Ovoid.Input.mousePosition = new Ovoid.Coord(0.0, 0.0, 0.0);
 Ovoid.Input.mouseVelocity = new Ovoid.Vector(0.0, 0.0, 0.0);
 
 
+/** Current mouse unprojected cursor world matrix */
+Ovoid.Input.mouseCursor = new Ovoid.Matrix4();
+
+
 /** Current grabbed node */
 Ovoid.Input.grabbedNode = null;
 
