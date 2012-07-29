@@ -295,6 +295,10 @@ Ovoid.Drawer._tcolor[10].set(0.5,0.0,1.0,1.0);
 Ovoid.Drawer._tcolor[11].set(0.1,0.0,1.0,1.0);
 
 
+/** Default blank material **/
+Ovoid.Drawer._mblank = null;
+
+
 /** Default blank texture **/
 Ovoid.Drawer._tblank = null;
 
@@ -421,6 +425,9 @@ Ovoid.Drawer.init = function() {
   if (Ovoid._logGlerror('Ovoid.Drawer.init:: Font map creation'))
     return false;
   
+  /* material blank */
+  Ovoid.Drawer._mblank = new Ovoid.Material();
+
   /* Cree les buffers de primitives */
   var buffdata;
   Ovoid.Drawer._bprimitive = new Array(6);
@@ -1531,7 +1538,7 @@ Ovoid.Drawer.text = function(text, color) {
  */
 Ovoid.Drawer.mesh = function(mesh, color) {
 
-  var l, j, k, s;
+  var l, j, k, s, m;
   l = 0; /* TODO: implementation du Lod si besoin */
   Ovoid.gl.bindBuffer(0x8892, mesh._vbuffer[l]);
   Ovoid.gl.bindBuffer(0x8893, mesh._ibuffer[l]);
@@ -1549,20 +1556,21 @@ Ovoid.Drawer.mesh = function(mesh, color) {
     /* parcour des polysets */  
     while (j--) {
       s = mesh.polyset[l][j];
+      s.material?m=s.material:m=Ovoid.Drawer._mblank;
       /* set material  */
-      Ovoid.Drawer.sp.setUniform4fv(10,s.material.color[0].v);
-      Ovoid.Drawer.sp.setUniform4fv(11,s.material.color[1].v);
-      Ovoid.Drawer.sp.setUniform4fv(12,s.material.color[2].v);
-      Ovoid.Drawer.sp.setUniform4fv(13,s.material.color[3].v);
-      Ovoid.Drawer.sp.setUniform4fv(14,s.material.color[4].v);
-      Ovoid.Drawer.sp.setUniform1f(15,s.material.shininess);
-      Ovoid.Drawer.sp.setUniform1f(16,s.material.opacity);
-      Ovoid.Drawer.sp.setUniform1f(17,s.material.reflectivity);
+      Ovoid.Drawer.sp.setUniform4fv(10,m.color[0].v);
+      Ovoid.Drawer.sp.setUniform4fv(11,m.color[1].v);
+      Ovoid.Drawer.sp.setUniform4fv(12,m.color[2].v);
+      Ovoid.Drawer.sp.setUniform4fv(13,m.color[3].v);
+      Ovoid.Drawer.sp.setUniform4fv(14,m.color[4].v);
+      Ovoid.Drawer.sp.setUniform1f(15,m.shininess);
+      Ovoid.Drawer.sp.setUniform1f(16,m.opacity);
+      Ovoid.Drawer.sp.setUniform1f(17,m.reflectivity);
       /* bind texture */
       for (k = 0; k < 6; k++) {
         if(Ovoid.Drawer.sp.uniformSampler[k] != -1) {
           Ovoid.gl.activeTexture(0x84C0+k); /* TEXTURE0+k */
-          (s.material.texture[k])?s.material.texture[k].bind():Ovoid.Drawer._tblank.bind();
+          (m.texture[k])?m.texture[k].bind():Ovoid.Drawer._tblank.bind();
           Ovoid.gl.uniform1i(Ovoid.Drawer.sp.uniformSampler[k], k);
         }
       }

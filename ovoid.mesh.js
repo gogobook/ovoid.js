@@ -746,10 +746,6 @@ Ovoid.Mesh.prototype.genDebugBox = function(l, size, div, material) {
       v++;
     }
   }
-  
-  if (!material) {
-    material = new Ovoid.Material("blank_material");
-  }
 
   this.addPolyset(l, vt, material);
 };
@@ -843,10 +839,6 @@ Ovoid.Mesh.prototype.genDebugGrid = function(l, size, div, material) {
       vt[v].c.setv(C);
       v++;
     }
-  }
-  
-  if (!material) {
-    material = new Ovoid.Material("blank_material");
   }
 
   this.addPolyset(l, vt, material);
@@ -1191,6 +1183,9 @@ Ovoid.Mesh.prototype.toJSON = function() {
   o['link'] = new Array();
   for(var i = 0; i < this.link.length; i++)
     o['link'][i] = this.link[i].uid;
+  o['bvolumemin'] = this.boundingBox.min;
+  o['bvolumemax'] = this.boundingBox.max;
+  o['bvolumerad'] = this.boundingSphere.radius;
   /* Ovoid.Mesh */
   o['polyset'] = this.polyset;
   o['vertices'] = this.vertices;

@@ -379,35 +379,36 @@ Ovoid.Animation.prototype.cachAnimation = function() {
     }
 
     /* Application des valeurs output à la node Transform */
-    if (this._format & Ovoid.ANIMATION_CHANNEL_TRANSLATE)
-    {
-      this.target.translation.setv(this._output.subarray(0, 3));
-      this.target.unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
+    if(this.target[0]) {
+      if (this._format & Ovoid.ANIMATION_CHANNEL_TRANSLATE)
+      {
+        this.target[0].translation.setv(this._output.subarray(0, 3));
+        this.target[0].unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
+      }
+
+      if (this._format & Ovoid.ANIMATION_CHANNEL_ROTATE)
+      {
+        this.target[0].rotation.fromEulerXyz(this._output[3],
+                                          this._output[4],
+                                          this._output[5]);
+
+        this.target[0].unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
+      }
+
+      if (this._format & Ovoid.ANIMATION_CHANNEL_ORIENTE) {
+
+        this.body.orientation.fromEulerXyz(this._output[6],
+            this._output[7],
+            this._output[8]);
+
+        this.target[0].unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
+      }
+
+      if (this._format & Ovoid.ANIMATION_CHANNEL_SCALE) {
+        this.target[0].scaling.setv(this._output.subarray(9, 12));
+        this.target[0].unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
+      }
     }
-
-    if (this._format & Ovoid.ANIMATION_CHANNEL_ROTATE)
-    {
-      this.target.rotation.fromEulerXyz(this._output[3],
-                                        this._output[4],
-                                        this._output[5]);
-
-      this.target.unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
-    }
-
-    if (this._format & Ovoid.ANIMATION_CHANNEL_ORIENTE) {
-
-      this.body.orientation.fromEulerXyz(this._output[6],
-          this._output[7],
-          this._output[8]);
-
-      this.target.unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
-    }
-
-    if (this._format & Ovoid.ANIMATION_CHANNEL_SCALE) {
-      this.target.scaling.setv(this._output.subarray(9, 12));
-      this.target.unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
-    }
-
   }
 };
 
@@ -441,8 +442,13 @@ Ovoid.Animation.prototype.toJSON = function() {
   o['link'] = new Array();
   for(var i = 0; i < this.link.length; i++)
     o['link'][i] = this.link[i].uid;
+  o['bvolumemin'] = this.boundingBox.min;
+  o['bvolumemax'] = this.boundingBox.max;
+  o['bvolumerad'] = this.boundingSphere.radius;
   /* Ovoid.Constraint */
-  o['target'] = this.target?this.target.uid:'null';
+  o['target'] = new Array();
+  for(var i = 0; i < this.target.length; i++)
+    o['target'][i] = this.target[i].uid;
   /* Ovoid.Animation */
   o['format'] = this._format;
   o['playing'] = this.playing;

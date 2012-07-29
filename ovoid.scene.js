@@ -121,6 +121,9 @@ Ovoid.Scene = function(name) {
   /** Animation list.
    * @type Animation[] */
   this.animation = new Array();
+  /** Expression list.
+   * @type Animation[] */
+  this.expression = new Array();
   /** Track list.
    * @type Track[] */
   this.track = new Array();
@@ -165,6 +168,7 @@ Ovoid.Scene = function(name) {
  * Ovoid.MESH, <br>
  * Ovoid.SKIN, <br>
  * Ovoid.ANIMATION, <br>
+ * Ovoid.EXPRESSION, <br>
  * Ovoid.ACTION, <br>
  * Ovoid.PHYSICS, <br>
  * Ovoid.EMITTER, <br>
@@ -253,6 +257,10 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
     case Ovoid.ANIMATION:
       node = new Ovoid.Animation(name);
       this.animation.push(node);
+      break;
+    case Ovoid.EXPRESSION:
+      node = new Ovoid.Expression(name);
+      this.expression.push(node);
       break;
     case Ovoid.TRACK:
       node = new Ovoid.Track(name);
@@ -413,7 +421,10 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
 
   if (node.type & Ovoid.ANIMATION)
     rmgroup = this.animation;
-
+    
+  if (node.type & Ovoid.EXPRESSION)
+    rmgroup = this.expression;
+    
   if (node.type & Ovoid.TRACK)
     rmgroup = this.track;
     
@@ -523,6 +534,9 @@ Ovoid.Scene.prototype.insert = function(node, parent, preserveParent, preserveUi
 
   if (node.type & Ovoid.ANIMATION)
     this.animation.push(node);
+    
+  if (node.type & Ovoid.EXPRESSION)
+    this.expression.push(node);
     
   if (node.type & Ovoid.TRACK)
     this.track.push(node);

@@ -164,9 +164,9 @@ Ovoid.Contact.prototype.set = function(b0, b1, c, n, p, q) {
   }
   
   /* Les contact position relatifs à chaque object */
-  this._rc[0].subOf(this._c, this._b[0].target.worldPosition);
+  this._rc[0].subOf(this._c, this._b[0].target[0].worldPosition);
   if(this._b[1]) {
-    this._rc[1].subOf(this._c, this._b[1].target.worldPosition);
+    this._rc[1].subOf(this._c, this._b[1].target[0].worldPosition);
   }
   
   /* velocité locale au contact */
@@ -293,12 +293,12 @@ Ovoid.Contact.prototype._adjustPositions = function(p) {
       /* Application du retrait linéaire */
       ladjust.copy(this._n);
       ladjust.scaleBy(ldelta[i]);
-      this._b[i].target.translation.addBy(ladjust);
+      this._b[i].target[0].translation.addBy(ladjust);
       
       radjust.copy(this._ar[i]);
       radjust.scaleBy(this._as[i] * 0.5);
-      this._b[i].target.rotation.vectorRotateBy(radjust);
-      this._b[i].target.rotation.normalize();
+      this._b[i].target[0].rotation.vectorRotateBy(radjust);
+      this._b[i].target[0].rotation.normalize();
       /* On garde les informations pour modifier les autres
        * contacts */
       this._ap[i].copy(this._n);

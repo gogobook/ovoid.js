@@ -122,10 +122,10 @@ Ovoid.Solver._hasContact = function (a, b) {
  */
 Ovoid.Solver._canContact = function (a, b, m) {
   /* a.dist2(b) <= a.r2 + b.r2 + t */
-  return a.target.boundingSphere.worldCenter.dist(
-      b.target.boundingSphere.worldCenter) <= 
-      (a.target.boundingSphere.radius + 
-      b.target.boundingSphere.radius + m);
+  return a.target[0].boundingSphere.worldCenter.dist(
+      b.target[0].boundingSphere.worldCenter) <= 
+      (a.target[0].boundingSphere.radius + 
+      b.target[0].boundingSphere.radius + m);
 };
 
 
@@ -165,9 +165,9 @@ Ovoid.Solver._getContactB2L = function (a, b) {
   
   /* On retrouve le mesh du landscape pour tester les collisions */
   var mesh = null;
-  if(b.target.shape) {
-    if(b.target.shape.type & Ovoid.MESH) {
-        mesh = b.target.shape;
+  if(b.target[0].shape) {
+    if(b.target[0].shape.type & Ovoid.MESH) {
+        mesh = b.target[0].shape;
     }
   }
   
@@ -175,12 +175,12 @@ Ovoid.Solver._getContactB2L = function (a, b) {
     return;
   
   /* La boundingSphere du body */
-  var Ba = a.target.boundingBox;
-  var Bb = b.target.boundingBox;
+  var Ba = a.target[0].boundingBox;
+  var Bb = b.target[0].boundingBox;
   
   /* La matrices de transformation du landscape */
-  var Tb = b.target.worldMatrix;
-  var Ta = a.target.worldMatrix;
+  var Tb = b.target[0].worldMatrix;
+  var Ta = a.target[0].worldMatrix;
   
   /* Transforme le centre de la box dans le repère du landscape */
   var Lc = Ovoid.Solver._tmpPoint[8];
@@ -326,9 +326,9 @@ Ovoid.Solver._getContactS2L = function (a, b) {
  
   /* On retrouve le mesh du landscape pour tester les collisions */
   var mesh = null;
-  if(b.target.shape) {
-    if(b.target.shape.type & Ovoid.MESH) {
-        mesh = b.target.shape;
+  if(b.target[0].shape) {
+    if(b.target[0].shape.type & Ovoid.MESH) {
+        mesh = b.target[0].shape;
     }
   }
   
@@ -336,11 +336,11 @@ Ovoid.Solver._getContactS2L = function (a, b) {
     return;
 
   /* La boundingSphere du body */
-  var Sa = a.target.boundingSphere;
+  var Sa = a.target[0].boundingSphere;
   
   /* La matrices de transformation du landscape */
-  var Tb = b.target.worldMatrix;
-  var Ta = a.target.worldMatrix;
+  var Tb = b.target[0].worldMatrix;
+  var Ta = a.target[0].worldMatrix;
   
   /* Transforme la sphere dans le repère du landscape */
   var Lc = Ovoid.Solver._tmpPoint[0];
@@ -423,8 +423,8 @@ Ovoid.Solver._getContactS2L = function (a, b) {
 Ovoid.Solver._getContactS2S = function (a, b) {
   
   /* Les boundingBox et boundingSphere des deux bodys */
-  var Sa = a.target.boundingSphere;
-  var Sb = b.target.boundingSphere;
+  var Sa = a.target[0].boundingSphere;
+  var Sb = b.target[0].boundingSphere;
   
   /* vecteur entre les deux body */
   var atob = Ovoid.Solver._tmpVect[16];
@@ -466,10 +466,10 @@ Ovoid.Solver._getContactS2S = function (a, b) {
 Ovoid.Solver._getContactB2S = function (a, b) {
   
   /* Les boundingBox et boundingSphere des deux bodys */
-  var Ba = a.target.boundingBox;
-  var Sb = b.target.boundingSphere;
+  var Ba = a.target[0].boundingBox;
+  var Sb = b.target[0].boundingSphere;
   /* Les matrices de transformation de la box */
-  var Ta = a.target.worldMatrix;
+  var Ta = a.target[0].worldMatrix;
   
   /* Transforme la sphere dans le repère de la box */
   var Lc = Ovoid.Solver._tmpPoint[0];
@@ -524,11 +524,11 @@ Ovoid.Solver._getContactB2S = function (a, b) {
 Ovoid.Solver._getContactB2B = function (a, b) {
 
   /* Les boundingBox des deux bodys */
-  var Ba = a.target.boundingBox;
-  var Bb = b.target.boundingBox;
+  var Ba = a.target[0].boundingBox;
+  var Bb = b.target[0].boundingBox;
   /* Les matrices de transformation des deux bodys */
-  var Ta = a.target.worldMatrix;
-  var Tb = b.target.worldMatrix;
+  var Ta = a.target[0].worldMatrix;
+  var Tb = b.target[0].worldMatrix;
 
   /* vecteur entre les deux body */
   var btoa = Ovoid.Solver._tmpVect[16];

@@ -182,7 +182,7 @@ Ovoid.Ojson.prototype.exportScene = function(scene) {
   
   /* Entête d'objet */
   this._json = new Object();
-  this._json['OJSON'] = Ovoid.OVOI3D_VERSION;
+  this._json['OJSON'] = Ovoid.OVOIDJS_VERSION;
   this._json['type'] = "scene";
   /* Export de la scene */
   this._json['scene'] = scene;
@@ -274,6 +274,10 @@ Ovoid.Ojson.prototype._importNode = function(j) {
       n = new Ovoid.Animation(j.name);
       this._procAnimation(n, j);
       break;
+    case Ovoid.EXPRESSION:
+      n = new Ovoid.Expression(j.name);
+      this._procExpression(n, j);
+      break;
     case Ovoid.TRACK:
       n = new Ovoid.Track(j.name);
       this._procTrack(n, j);
@@ -334,16 +338,19 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
     }
   }
   
-  for(var i = 0; i < n.child.length; i++) {
+  for(var i = 0; i < n.child.length; i++)
     n.child[i] = this._dstsc.search(n.child[i]);
-  }
+    
   for(var i = 0; i < n.depend.length; i++)
     n.depend[i] = this._dstsc.search(n.depend[i]);
+    
   for(var i = 0; i < n.link.length; i++)
     n.link[i] = this._dstsc.search(n.link[i]);
     
-  if(n.type & Ovoid.CONSTRAINT)
-    n.target = this._dstsc.search(n.target);
+  if(n.type & Ovoid.CONSTRAINT) {
+    for(var i = 0; i < n.target.length; i++)
+      n.target[i] = this._dstsc.search(n.target[i]);
+  }
     
   if(n.type & Ovoid.LIGHT || n.type & Ovoid.CAMERA) 
     n.action = this._dstsc.search(n.action);
@@ -401,6 +408,16 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
       }
     }
   }
+  
+  if(n.type & Ovoid.ACTION) {
+    for (var i = 0; i < n.onIntersect[0].length; i++)
+      n.onIntersect[0][i] = this._dstsc.search(n.onIntersect[0][i]);
+    for (var i = 0; i < n.onIntersectEnter[0].length; i++)
+      n.onIntersectEnter[0][i] = this._dstsc.search(n.onIntersectEnter[0][i]);
+    for (var i = 0; i < n.onIntersectLeave[0].length; i++)
+      n.onIntersectLeave[0][i] = this._dstsc.search(n.onIntersectLeave[0][i]);
+  }
+  
 };
 
 
@@ -432,6 +449,13 @@ Ovoid.Ojson.prototype._procNode = function(n, j) {
     n.depend.push(j.depend[i]);
   for (var i = 0; i < j.link.length; i++)
     n.link.push(j.link[i]);
+  var min = new Ovoid.Point();
+  var max = new Ovoid.Point();
+  min.setv(j.bvolumemin);
+  max.setv(j.bvolumemax);
+  n.boundingBox.setBound(min, max);
+  n.boundingSphere.setBound(min, max);
+  n.boundingSphere.setRadius(j.bvolumerad);
 };
 
 
@@ -614,9 +638,10 @@ Ovoid.Ojson.prototype._procConstraint = function(n, j) {
   /* Importation hérité de "Ovoid.Node" */
   this._procNode(n, j);
   /* - OJSON.Constraint structure -
-   * .target*
+   * .target[]
    */
-  (j.target == 'null')?n.target=null:n.target=j.target;
+  for (var i = 0; i < j.target.length; i++)
+    n.target.push(j.target[i]);
 };
 
 
@@ -813,7 +838,6 @@ Ovoid.Ojson.prototype._procCamera = function(n, j) {
    * .aspect
    * .clipNear
    * .clipFar
-   * .action*
    */
   n.viewX = j.viewX;
   n.viewY = j.viewY;
@@ -821,7 +845,6 @@ Ovoid.Ojson.prototype._procCamera = function(n, j) {
   n.aspect = j.aspect;
   n.clipNear = j.clipNear;
   n.clipFar = j.clipFar;
-  (j.action == 'null')?n.action=null:n.action=j.action;
 };
 
 
@@ -846,7 +869,6 @@ Ovoid.Ojson.prototype._procLight = function(n, j) {
    * .falloff
    * .spotAngle
    * .shadowCasting
-   * .action*
    */
   n.model = j.model;
   n.color.setv(j.color);
@@ -858,7 +880,6 @@ Ovoid.Ojson.prototype._procLight = function(n, j) {
   n.falloff = j.falloff;
   n.spotAngle = j.spotAngle;
   n.shadowCasting = j.shadowCasting;
-  (j.action == 'null')?n.action=null:n.action=j.action;
   
 };
 
@@ -875,10 +896,10 @@ Ovoid.Ojson.prototype._procBody = function(n, j) {
   this._procTransform(n, j);
   /* - OJSON.Body structure -
    * .shape*
-   * .action*
+   * .intersectable
    */
   (j.shape == 'null')?n.shape=null:n.shape=j.shape;
-  (j.action == 'null')?n.action=null:n.action=j.action;
+  n.intersectable = j.intersectable;
 };
 
 
@@ -953,7 +974,6 @@ Ovoid.Ojson.prototype._procLayer = function(n, j) {
    * .fgColor[r,g,b,a]
    * .bgTexture[r,g,b,a]
    * .bgTexture*
-   * .action*
    */
   n.size.setv(j.size);
   n.size.setv(j.fgColor);
@@ -961,7 +981,6 @@ Ovoid.Ojson.prototype._procLayer = function(n, j) {
   (j.bgTexture == 'null')?
     n.bgTexture=null:
     n.bgTexture=j.bgTexture;
-  (j.action == 'null')?n.action=null:n.action=j.action;
 };
 
 
@@ -989,6 +1008,29 @@ Ovoid.Ojson.prototype._procText = function(n, j) {
 
 
 /**
+ * Proceed to importation of the Expression part from a OJSON sub-object.
+ * 
+ * @param {Object} n Ovoid typed Node object to structure from JSON.
+ * @param {Object} j OJSON object.
+ */
+Ovoid.Ojson.prototype._procExpression = function(n, j) {
+  
+  /* Importation hérité de "Ovoid.Constraint" */
+  this._procConstraint(n, j);
+  /* - OJSON.Expression structure -
+   * .playing
+   * .factor
+   * .exprfunc[]
+   */
+  n.playing = j.playing;
+  n.factor = j.factor;
+  for (var i = 0; i < j.exprfunc.length; i++)
+    n.exprfunc.push(this._parseFunc(j.exprfunc[i]));
+};
+
+
+
+/**
  * Proceed to importation of the Action part from a OJSON sub-object.
  * 
  * @param {Object} n Ovoid typed Node object to structure from JSON.
@@ -1013,6 +1055,9 @@ Ovoid.Ojson.prototype._procAction = function(n, j) {
    * .onMmbHl()
    * .onGrabd()
    * .onUgrabd()
+   * .onIntersect[[][]]
+   * .onIntersectEnter[[][]]
+   * .onIntersectLeave[[][]]
    */
   n.onEnter = this._parseFunc(j.onEnter);
   n.onLeave = this._parseFunc(j.onLeave);
@@ -1028,6 +1073,18 @@ Ovoid.Ojson.prototype._procAction = function(n, j) {
   n.onRmbHl = this._parseFunc(j.onRmbHl);
   n.onGrabd = this._parseFunc(j.onGrabd);
   n.onUgrabd = this._parseFunc(j.onUgrabd);
+  for (var i = 0; i < j.onIntersect[0].length; i++) {
+    n.onIntersect[0][i] = j.onIntersect[0][i];
+    n.onIntersect[1][i] = this._parseFunc(j.onIntersect[1][i]);
+  }
+  for (var i = 0; i < j.onIntersectEnter[0].length; i++) {
+    n.onIntersectEnter[0][i] = j.onIntersectEnter[0][i];
+    n.onIntersectEnter[1][i] = this._parseFunc(j.onIntersectEnter[1][i]);
+  }
+  for (var i = 0; i < j.onIntersectLeave[0].length; i++) {
+    n.onIntersectLeave[0][i] = j.onIntersectLeave[0][i];
+    n.onIntersectLeave[1][i] = this._parseFunc(j.onIntersectLeave[1][i]);
+  }
 };
 
 

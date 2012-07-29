@@ -173,6 +173,9 @@ Ovoid.Queuer._cachDependencies = function(o) {
     if (o.depend[i].type & Ovoid.ANIMATION)
       o.depend[i].cachAnimation();
     
+    if (o.depend[i].type & Ovoid.EXPRESSION)
+      o.depend[i].cachExpression();
+      
     if (o.depend[i].type & Ovoid.MESH)
       o.depend[i].cachMesh();
 

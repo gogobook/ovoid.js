@@ -158,6 +158,9 @@ Ovoid.Body.prototype.toJSON = function() {
   o['link'] = new Array();
   for(var i = 0; i < this.link.length; i++)
     o['link'][i] = this.link[i].uid;
+  o['bvolumemin'] = this.boundingBox.min;
+  o['bvolumemax'] = this.boundingBox.max;
+  o['bvolumerad'] = this.boundingSphere.radius;
   /* Ovoid.Transform */
   o['pivot'] = this.pivot;
   o['scaling'] = this.scaling;
@@ -166,7 +169,7 @@ Ovoid.Body.prototype.toJSON = function() {
   o['rotation'] = this.rotation;
   /* Ovoid.Body */
   o['shape'] = this.shape?this.shape.uid:'null';
-  o['action'] = this.action?this.action.uid:'null';
+  o['intersectable'] = this.intersectable;
   
   return o;
 };

@@ -521,6 +521,13 @@ Ovoid.TRACK = Ovoid.BIT17;
  * @constant
  * @memberOf _global_
  * @see Ovoid.Node */
+Ovoid.EXPRESSION = Ovoid.BIT18;
+
+
+/** Symbolic constant bitmask for node type.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Node */
 Ovoid.TEXT = Ovoid.BIT20;
 
 
@@ -641,6 +648,13 @@ Ovoid.CACH_PHYSICS = Ovoid.BIT12;
  * @memberOf _global_
  * @see Ovoid.Node */
 Ovoid.CACH_SOUND = Ovoid.BIT13;
+
+
+/** Symbolic constant bitmask for node cach.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Node */
+Ovoid.CACH_EXPRESSION = Ovoid.BIT14;
 
 
 /** Symbolic constant for transform space coordinates.
@@ -2926,17 +2940,17 @@ Ovoid.GLSL_AERDS_FULLTEX_NL_FS='#define ML '+Ovoid.MAX_LIGHT_BY_DRAW+'\nprecisio
  * @constant
  * @memberOf _global_
  */
-Ovoid.OVOI3D_VERSION = '1.1';
+Ovoid.OVOIDJS_VERSION = '1.1';
 
 
 /** OvoiD.JS Library first-build date.
  * @constant
  * @memberOf _global_
  */
-Ovoid.OVOI3D_FIRSTBUILD_DATE = '16-07-2012';
+Ovoid.OVOIDJS_FIRSTBUILD_DATE = '16-07-2012';
 
 /** OvoiD.JS Library release date.
  * @constant
  * @memberOf _global_
  */
-Ovoid.OVOI3D_RELEASE_DATE = 'XX-XX-2012';
+Ovoid.OVOIDJS_RELEASE_DATE = 'XX-XX-2012';

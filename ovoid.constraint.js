@@ -49,7 +49,7 @@ Ovoid.Constraint = function(name) {
   this.name = name;
   /** Constraint's target node 
    * @type Node */
-  this.target = null;
+  this.target = new Array();
 
 };
 Ovoid.Constraint.prototype = new Ovoid.Node;
@@ -68,11 +68,8 @@ Ovoid.Constraint.prototype.constructor = Ovoid.Constraint;
  */
 Ovoid.Constraint.prototype.setTarget = function(node) {
 
-    if (this.target != null) {
-        this.target.breakDepend(this);
-    }
-    this.target = node;
-    this.target.makeDepend(this);
+    this.target.push(node);
+    node.makeDepend(this);
 };
 
 
@@ -105,12 +102,14 @@ Ovoid.Constraint.prototype.toJSON = function() {
   o['link'] = new Array();
   for(var i = 0; i < this.link.length; i++)
     o['link'][i] = this.link[i].uid;
+  o['bvolumemin'] = this.boundingBox.min;
+  o['bvolumemax'] = this.boundingBox.max;
+  o['bvolumerad'] = this.boundingSphere.radius;
   /* Ovoid.Constraint */
-  if (this.target) {
-    o['target'] = this.target.uid;
-  } else {
-    o['target'] = 'null';
-  }
+  o['target'] = new Array();
+  for(var i = 0; i < this.target.length; i++)
+    o['target'][i] = this.target[i].uid;
+    
   return o;
 
 };

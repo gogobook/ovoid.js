@@ -236,9 +236,9 @@ Ovoid.Physics.prototype.impulse = function(force, point) {
   this.linearInfluence.addBy(force);
 
   /* vecteur radius = point -> centre de gravité */
-  var rx = point.v[0] - this.target.worldPosition.v[0];
-  var ry = point.v[1] - this.target.worldPosition.v[1];
-  var rz = point.v[2] - this.target.worldPosition.v[2];
+  var rx = point.v[0] - this.target[0].worldPosition.v[0];
+  var ry = point.v[1] - this.target[0].worldPosition.v[1];
+  var rz = point.v[2] - this.target[0].worldPosition.v[2];
   
   /* torque += rvect.cross(force) */
   this.torqueInfluence.v[0] += ry * force.v[2] - rz * force.v[1];
@@ -316,8 +316,8 @@ Ovoid.Physics.prototype.cachPhysics = function() {
   if(!(this.cach & Ovoid.CACH_PHYSICS)) {
     
     /* Update l'inertia tensor */
-    if( (this.target.boundingBox.hsize.v[0] + this.target.boundingBox.hsize.v[1] +
-        this.target.boundingBox.hsize.v[2]) > 0.0) {
+    if( (this.target[0].boundingBox.hsize.v[0] + this.target[0].boundingBox.hsize.v[1] +
+        this.target[0].boundingBox.hsize.v[2]) > 0.0) {
 
       var mass = 1.0/this.imass;
       var Ix, Iy, Iz;
@@ -327,7 +327,7 @@ Ovoid.Physics.prototype.cachPhysics = function() {
       {
         case 2: /* Ovoid.RIGID_MASSIVE_SPHERE */
 
-          var r2 = (this.target.boundingSphere.radius * 2.0);
+          var r2 = (this.target[0].boundingSphere.radius * 2.0);
           r2 *= r2;
           
           Ix = 1.0 / (0.3 * mass * r2 );
@@ -337,9 +337,9 @@ Ovoid.Physics.prototype.cachPhysics = function() {
           break;
         default: /* Ovoid.RIGID_MASSIVE_BOX */
 
-          var sx = (this.target.boundingBox.hsize.v[0] * 2.0);
-          var sy = (this.target.boundingBox.hsize.v[1] * 2.0);
-          var sz = (this.target.boundingBox.hsize.v[2] * 2.0);
+          var sx = (this.target[0].boundingBox.hsize.v[0] * 2.0);
+          var sy = (this.target[0].boundingBox.hsize.v[1] * 2.0);
+          var sz = (this.target[0].boundingBox.hsize.v[2] * 2.0);
           sx *= sx;
           sy *= sy;
           sz *= sz;
@@ -355,44 +355,44 @@ Ovoid.Physics.prototype.cachPhysics = function() {
       
       /* Premiere etape: [RI] = [R] * [I] */
       var RI = new Float32Array(9);
-      RI[0] = this.target.worldMatrix.m[0] * Ix;
-      RI[1] = this.target.worldMatrix.m[1] * Iy;
-      RI[2] = this.target.worldMatrix.m[2] * Iz;
-      RI[3] = this.target.worldMatrix.m[4] * Ix;
-      RI[4] = this.target.worldMatrix.m[5] * Iy;
-      RI[5] = this.target.worldMatrix.m[6] * Iz;
-      RI[6] = this.target.worldMatrix.m[8] * Ix;
-      RI[7] = this.target.worldMatrix.m[9] * Iy;
-      RI[8] = this.target.worldMatrix.m[10] * Iz;
+      RI[0] = this.target[0].worldMatrix.m[0] * Ix;
+      RI[1] = this.target[0].worldMatrix.m[1] * Iy;
+      RI[2] = this.target[0].worldMatrix.m[2] * Iz;
+      RI[3] = this.target[0].worldMatrix.m[4] * Ix;
+      RI[4] = this.target[0].worldMatrix.m[5] * Iy;
+      RI[5] = this.target[0].worldMatrix.m[6] * Iz;
+      RI[6] = this.target[0].worldMatrix.m[8] * Ix;
+      RI[7] = this.target[0].worldMatrix.m[9] * Iy;
+      RI[8] = this.target[0].worldMatrix.m[10] * Iz;
       
       /* Seconde etape: [Iw] = [RI] * [R'] */
-      this.itensor.m[0] = RI[0] * this.target.worldMatrix.m[0] + 
-          RI[1] * this.target.worldMatrix.m[1] + 
-          RI[2] * this.target.worldMatrix.m[2];
-      this.itensor.m[1] = RI[0] * this.target.worldMatrix.m[4] + 
-          RI[1] * this.target.worldMatrix.m[5] + 
-          RI[2] * this.target.worldMatrix.m[6];
-      this.itensor.m[2] = RI[0] * this.target.worldMatrix.m[8] + 
-          RI[1] * this.target.worldMatrix.m[9] + 
-          RI[2] * this.target.worldMatrix.m[10];
-      this.itensor.m[3] = RI[3] * this.target.worldMatrix.m[0] + 
-          RI[4] * this.target.worldMatrix.m[1] + 
-          RI[5] * this.target.worldMatrix.m[2];
-      this.itensor.m[4] = RI[3] * this.target.worldMatrix.m[4] + 
-          RI[4] * this.target.worldMatrix.m[5] + 
-          RI[5] * this.target.worldMatrix.m[6];
-      this.itensor.m[5] = RI[3] * this.target.worldMatrix.m[8] + 
-          RI[4] * this.target.worldMatrix.m[9] + 
-          RI[5] * this.target.worldMatrix.m[10];
-      this.itensor.m[6] = RI[6] * this.target.worldMatrix.m[0] + 
-          RI[7] * this.target.worldMatrix.m[1] + 
-          RI[8] * this.target.worldMatrix.m[2];
-      this.itensor.m[7] = RI[6] * this.target.worldMatrix.m[4] + 
-          RI[7] * this.target.worldMatrix.m[5] + 
-          RI[8] * this.target.worldMatrix.m[6];
-      this.itensor.m[8] = RI[6] * this.target.worldMatrix.m[8] + 
-          RI[7] * this.target.worldMatrix.m[9] + 
-          RI[8] * this.target.worldMatrix.m[10];
+      this.itensor.m[0] = RI[0] * this.target[0].worldMatrix.m[0] + 
+          RI[1] * this.target[0].worldMatrix.m[1] + 
+          RI[2] * this.target[0].worldMatrix.m[2];
+      this.itensor.m[1] = RI[0] * this.target[0].worldMatrix.m[4] + 
+          RI[1] * this.target[0].worldMatrix.m[5] + 
+          RI[2] * this.target[0].worldMatrix.m[6];
+      this.itensor.m[2] = RI[0] * this.target[0].worldMatrix.m[8] + 
+          RI[1] * this.target[0].worldMatrix.m[9] + 
+          RI[2] * this.target[0].worldMatrix.m[10];
+      this.itensor.m[3] = RI[3] * this.target[0].worldMatrix.m[0] + 
+          RI[4] * this.target[0].worldMatrix.m[1] + 
+          RI[5] * this.target[0].worldMatrix.m[2];
+      this.itensor.m[4] = RI[3] * this.target[0].worldMatrix.m[4] + 
+          RI[4] * this.target[0].worldMatrix.m[5] + 
+          RI[5] * this.target[0].worldMatrix.m[6];
+      this.itensor.m[5] = RI[3] * this.target[0].worldMatrix.m[8] + 
+          RI[4] * this.target[0].worldMatrix.m[9] + 
+          RI[5] * this.target[0].worldMatrix.m[10];
+      this.itensor.m[6] = RI[6] * this.target[0].worldMatrix.m[0] + 
+          RI[7] * this.target[0].worldMatrix.m[1] + 
+          RI[8] * this.target[0].worldMatrix.m[2];
+      this.itensor.m[7] = RI[6] * this.target[0].worldMatrix.m[4] + 
+          RI[7] * this.target[0].worldMatrix.m[5] + 
+          RI[8] * this.target[0].worldMatrix.m[6];
+      this.itensor.m[8] = RI[6] * this.target[0].worldMatrix.m[8] + 
+          RI[7] * this.target[0].worldMatrix.m[9] + 
+          RI[8] * this.target[0].worldMatrix.m[10];
       
       /* applique la gravité */
       var mass = 1.0/this.imass;
@@ -432,11 +432,11 @@ Ovoid.Physics.prototype.cachPhysics = function() {
     this.angularVelocity.scaleBy(d);
     
     /* ajoute a la transformation */
-    this.target.translation.addBy(this.linearVelocity);
+    this.target[0].translation.addBy(this.linearVelocity);
 
     /* ajoute la rotation */
-    this.target.rotation.vectorRotateBy(this.angularVelocity);
-    this.target.rotation.normalize();
+    this.target[0].rotation.vectorRotateBy(this.angularVelocity);
+    this.target[0].rotation.normalize();
     
     /* Mise en someil du node physique si ses mouvements sont 
      * stables depuis un certain temps */;
@@ -451,7 +451,7 @@ Ovoid.Physics.prototype.cachPhysics = function() {
       this.addCach(Ovoid.CACH_PHYSICS);
     }
 
-    this.target.unCach(Ovoid.CACH_WORLD|Ovoid.CACH_TRANSFORM);
+    this.target[0].unCach(Ovoid.CACH_WORLD|Ovoid.CACH_TRANSFORM);
   }
 };
 
@@ -485,8 +485,13 @@ Ovoid.Physics.prototype.toJSON = function() {
   o['link'] = new Array();
   for(var i = 0; i < this.link.length; i++)
     o['link'][i] = this.link[i].uid;
+  o['bvolumemin'] = this.boundingBox.min;
+  o['bvolumemax'] = this.boundingBox.max;
+  o['bvolumerad'] = this.boundingSphere.radius;
   /* Ovoid.Constraint */
-  o['target'] = this.target?this.target.uid:'null';
+  o['target'] = new Array();
+  for(var i = 0; i < this.target.length; i++)
+    o['target'][i] = this.target[i].uid;
   /* Ovoid.Physics */
   o['imass'] = this.imass;
   o['itensor'] = this.itensor;

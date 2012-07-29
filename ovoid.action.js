@@ -724,6 +724,9 @@ Ovoid.Action.prototype.toJSON = function() {
   o['link'] = new Array();
   for(var i = 0; i < this.link.length; i++)
     o['link'][i] = this.link[i].uid;
+  o['bvolumemin'] = this.boundingBox.min;
+  o['bvolumemax'] = this.boundingBox.max;
+  o['bvolumerad'] = this.boundingSphere.radius;
   /* Ovoid.Action */
   o['onEnter'] = String(this.onEnter);
   o['onLeave'] = String(this.onLeave);
@@ -739,5 +742,20 @@ Ovoid.Action.prototype.toJSON = function() {
   o['onRmbHl'] = String(this.onRmbHl);
   o['onGrabd'] = String(this.onGrabd);
   o['onUgrabd'] = String(this.onUgrabd);
+  o['onIntersect'] = [new Array(), new Array()];
+  for(var i = 0; i < this.onIntersect[0].length; i++) {
+    o['onIntersect'][0][i] = this.onIntersect[0][i].uid;
+    o['onIntersect'][1][i] = String(this.onIntersect[1][i]);
+  }
+  o['onIntersectEnter'] = [new Array(), new Array()];
+  for(var i = 0; i < this.onIntersectEnter[0].length; i++) {
+    o['onIntersectEnter'][0][i] = this.onIntersectEnter[0][i].uid;
+    o['onIntersectEnter'][1][i] = String(this.onIntersectEnter[1][i]);
+  }
+  o['onIntersectLeave'] = [new Array(), new Array()];
+  for(var i = 0; i < this.onIntersectLeave[0].length; i++) {
+    o['onIntersectLeave'][0][i] = this.onIntersectLeave[0][i].uid;
+    o['onIntersectLeave'][1][i] = String(this.onIntersectLeave[1][i]);
+  }
   return o;
 };
