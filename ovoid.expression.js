@@ -92,9 +92,9 @@ Ovoid.Expression.prototype.addExpression = function(expr) {
 
 
 /**
- * Stop animation.<br><br>
+ * Stop expression.<br><br>
  * 
- * Stop or pause the animation at the current time.
+ * Stop or pause the expression process.
  */
 Ovoid.Expression.prototype.stop = function() {
   
@@ -103,14 +103,14 @@ Ovoid.Expression.prototype.stop = function() {
 
 
 /**
- * Play animation.<br><br>
+ * Play expression.<br><br>
  * 
- * Play the animation from the current time with the specified pitch.
+ * Play the expression process with the specified time factor pitch.
  *
  * @param {float} factor Pitch time factor.
- * The factor can be positive to increase the animation pitch or negative to 
- * play the animation backward. For example a value of -2.0 will play the 
- * animation backward twice the normal speed.
+ * Define the time factor to increment local time. The factor 
+ * can be negative to decrement the local time. For example a value of -2.0
+ * will decrement the time backward twice the normal speed.
  */
 Ovoid.Expression.prototype.play = function(factor) {
 
