@@ -79,14 +79,8 @@ Ovoid.isPowerOfTwo = function(val) {
  * @return {bool} Perlin noise value.
  */
 Ovoid.noise = function(f) {
-  f = (f << 13) ^ f;
-  var u = (f << 13) ^ f;
-  var f0 = (f * f * 15731 + 789221);
-  var f1 = (f * f0 + 1376312589);
-  var f2 = f1 & 0x7fffffff;
-  var f3 = f2 / 1073741824.0;
-  Ovoid.log(2, 'Ovoid.noise', 'f=' + f + ' f0=' + f0 + " f1=" + f1 + " f2=" + f2 + " f3=" + f3);
-  return ( 1.0 - ( (f * (f * f * 15731.0 + 789221.0) + 1376312589.0) & 0x7fffffff) / 1073741824.0);
+  //f = (f << 13) ^ f;
+  return ( 1.0 - ( (f * (f * f * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
 };
 
 
@@ -248,6 +242,42 @@ Ovoid.getBinary = function(url) {
     Ovoid.log(1, 'Ovoid', "failled to open '" + url + "'");
     return null;
   }
+};
+
+
+/**
+ * Convert Array to Float32Array.<br><br>
+ * 
+ * Returns Float32Array filled with to the given Array values.
+ *
+ * @param {Array} array Array to convert to Float32Array.
+ *
+ * @return {Float32Array} new Float32Array filled.
+ */
+Ovoid.array2Float32 = function(array) {
+  
+  var i = array.length;
+  var buffer = new Float32Array(i);
+  while(i--) buffer[i] = array[i];
+  return buffer;
+};
+
+
+/**
+ * Convert Float32Array to Array.<br><br>
+ * 
+ * Returns Array filled with to the given Float32Array values.
+ *
+ * @param {Float32Array} buffer Float32Array to convert to Array.
+ *
+ * @return {Array} new Array filled.
+ */
+Ovoid.float322Array = function(buffer) {
+  
+  var i = buffer.length;
+  var array = new Array(i);
+  while(i--) array[i] = buffer[i];
+  return array;
 };
 
 

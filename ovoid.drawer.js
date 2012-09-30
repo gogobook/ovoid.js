@@ -499,7 +499,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer._bprimitive[2] = Ovoid.gl.createBuffer();
   Ovoid.gl.bindBuffer(0x8892, Ovoid.Drawer._bprimitive[2]);
   Ovoid.gl.bufferData(0x8892,
-      Ovoid.Vertex.arrayAsVbo(Ovoid.VERTEX_VEC4_P|Ovoid.VERTEX_VEC4_C,buffdata),
+      Ovoid.Vertex.bufferize(Ovoid.VERTEX_VEC4_P|Ovoid.VERTEX_VEC4_C,buffdata),
       0x88E4);
   
   /* Tricolor axis */
@@ -1164,7 +1164,7 @@ Ovoid.Drawer.light = function(light) {
     Ovoid.Drawer.sp.setUniform1iv(28, le); /*enabled*/
     
   } else {
-    
+
     Ovoid.Drawer.sp.setUniform4fv(20, light.worldPosition.v);
     Ovoid.Drawer.sp.setUniform3fv(21, light.worldDirection.v);
     Ovoid.Drawer.sp.setUniform4fv(22, light.color.v);
@@ -1603,6 +1603,8 @@ Ovoid.Drawer.emitter = function(emitter, color) {
     Ovoid.Drawer.switchBlend(3); /* substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA */
   } else {
     Ovoid.Drawer.switchPipe(2); // PIPE_PARTICLE
+    /* Force la mise à jour de la perspective */
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     /* model de rendu pour les particules */
     switch(emitter.model) 
     {
@@ -1619,9 +1621,11 @@ Ovoid.Drawer.emitter = function(emitter, color) {
     Ovoid.Drawer.sp.setUniformSampler(1,1);
   }
   /* disable depth */
-  Ovoid.Drawer.switchDepth(0);
+  Ovoid.Drawer.switchDepth(2);
   /* Ovoid.VERTEX_PARTICLE, stride, gl.POINTS, */
-  Ovoid.Drawer.raw(37, 44, 0, emitter._alives, emitter._fbuffer);
+  //Ovoid.Drawer.raw(37, 44, 0, emitter._alives, emitter._fbuffer);
+  
+  Ovoid.Drawer.raw(Ovoid.VERTEX_PARTICLE, 44, 0, emitter._alives, emitter._fbuffer);
   Ovoid.Drawer._drawnparticle+=emitter._alives;
   /* restore depth, blend et pipe */
   Ovoid.Drawer.restoreBlend();
@@ -1657,6 +1661,8 @@ Ovoid.Drawer.shadow = function(light, body) {
     }
   }
   
+  if(!shape) return;
+  
   var l = 0; /* TODO: implementation du Lod si besoin */
   var c = shape.triangles[l].length;
   
@@ -1670,14 +1676,23 @@ Ovoid.Drawer.shadow = function(light, body) {
   var V = new Float32Array(c*24);
 
   // position de la lumiere en coordonnée locale à l'objet 
-  LP.copy(light.worldPosition);
-  LP.transform4Inverse(body.worldMatrix);
+  if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
+    LD.copy(light.worldDirection);
+    LD.transform4Inverse(body.worldMatrix);
+    LP.copy(LD);
+    LP.scaleBy(-1.0);
+  } else {
+    LP.copy(light.worldPosition);
+    LP.transform4Inverse(body.worldMatrix);
+  }
   
   // on parcour la liste de triangles pour creer le vertex buffer du shadow volum
   var n = 0;
   for (var i = 0; i < c; i++)
   {
-    LD.subOf(LP, body.shape.triangles[l][i].center);
+    if(light.kind != Ovoid.LIGHT_DIRECTIONAL)
+      LD.subOf(LP, body.shape.triangles[l][i].center);
+      
     if (LD.dot(body.shape.triangles[l][i].normal) > 0.0)
     {
       /* triangles face lumiere */
@@ -1685,9 +1700,16 @@ Ovoid.Drawer.shadow = function(light, body) {
       P[1] = body.shape.vertices[l][body.shape.triangles[l][i].index[1]].p;
       P[2] = body.shape.vertices[l][body.shape.triangles[l][i].index[2]].p;
       /* triangle extrudé à l'infini lumiere */
-      P[3].subOf(P[0], LP);
-      P[4].subOf(P[1], LP);
-      P[5].subOf(P[2], LP);
+      
+      if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
+        P[3].copy(LP);
+        P[4].copy(LP);
+        P[5].copy(LP);
+      } else {
+        P[3].subOf(P[0], LP);
+        P[4].subOf(P[1], LP);
+        P[5].subOf(P[2], LP);
+      }
       // ( La methode d'assignation est bête et brute, mais c'est la plus rapide )
       V[n] = P[0].v[0]; n++; V[n] = P[0].v[1]; n++; V[n] = P[0].v[2]; n++; V[n] = 1.0; n++;
       V[n] = P[1].v[0]; n++; V[n] = P[1].v[1]; n++; V[n] = P[1].v[2]; n++; V[n] = 1.0; n++;
@@ -1704,7 +1726,9 @@ Ovoid.Drawer.shadow = function(light, body) {
         a = body.shape.triangles[l][i].adjacent[j];
         if (a != -1.0)
         {
-          LD.subOf(LP, body.shape.triangles[l][a].center);
+          if(light.kind != Ovoid.LIGHT_DIRECTIONAL)
+            LD.subOf(LP, body.shape.triangles[l][a].center);
+            
           if (LD.dot(body.shape.triangles[l][a].normal) <= 0.0)
           {
             /* le premier triangle du "ring", l'index des vertices
@@ -1712,9 +1736,14 @@ Ovoid.Drawer.shadow = function(light, body) {
              * peut donc être trouvé grace à un modulo :
              * (0+1)%3 = 1, (1+1)%3 = 2, (1+2)%3 = 0*/
             k = (j + 1) % 3;
-            P[3].subOf(P[j], LP);
-            P[4].subOf(P[k], LP);
-
+            if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
+              P[3].copy(LP);
+              P[4].copy(LP);
+            } else {
+              P[3].subOf(P[j], LP);
+              P[4].subOf(P[k], LP);
+            }
+      
             V[n] = P[j].v[0]; n++;V[n] = P[j].v[1]; n++;V[n] = P[j].v[2]; n++;V[n] = 1.0; n++;
             V[n] = P[4].v[0]; n++;V[n] = P[4].v[1]; n++;V[n] = P[4].v[2]; n++;V[n] = 0.0; n++;
             V[n] = P[k].v[0]; n++;V[n] = P[k].v[1]; n++;V[n] = P[k].v[2]; n++;V[n] = 1.0; n++;
@@ -1727,8 +1756,14 @@ Ovoid.Drawer.shadow = function(light, body) {
           /* si pas de face adjacente c'est un face de bordure
              on extrude les bords */
           k = (j + 1) % 3;
-          P[3].subOf(P[j], LP);
-          P[4].subOf(P[k], LP);
+          
+          if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
+            P[3].copy(LP);
+            P[4].copy(LP);
+          } else {
+            P[3].subOf(P[j], LP);
+            P[4].subOf(P[k], LP);
+          }
 
           V[n] = P[j].v[0]; n++;V[n] = P[j].v[1]; n++;V[n] = P[j].v[2]; n++;V[n] = 1.0; n++;
           V[n] = P[4].v[0]; n++; V[n] = P[4].v[1]; n++;V[n] = P[4].v[2]; n++;V[n] = 0.0; n++;
@@ -1774,6 +1809,9 @@ Ovoid.Drawer.shadow = function(light, body) {
 Ovoid.Drawer.normals = function(body, scale) {
   
   var l = 0; /* Lod */
+  
+  if(!body.shape.triangles)
+    return;
   
   Ovoid.Drawer.model(body.worldMatrix.m);
   triangles = body.shape.triangles[l];
@@ -2062,14 +2100,14 @@ Ovoid.Drawer.normalsStack = function(stack) {
  */
 Ovoid.Drawer.zfailStack = function(light, stack) {
 
-
   Ovoid.gl.enable(0x0B90); // STENCIL_TEST
   Ovoid.gl.clear(0x00000400); // STENCIL_BUFFER_BIT
   Ovoid.gl.colorMask(0,0,0,0); 
   Ovoid.gl.stencilFunc(0x0207,0,0); // ALWAYS,0,0
   i = stack.count;
   while(i--) {
-    Ovoid.Drawer.shadow(light, stack[i]);
+    if(stack[i].shadowCasting)
+      Ovoid.Drawer.shadow(light, stack[i]);
   }
   Ovoid.gl.stencilFunc(0x0202,0,-1); // EQUAL
   Ovoid.gl.stencilOp(0x1E00,0x1E00,0x1E00); // KEEP,KEEP,KEEP

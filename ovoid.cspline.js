@@ -246,7 +246,7 @@ Ovoid.Cspline.prototype.getOutput = function(xerp) {
 Ovoid.Cspline.prototype.toJSON = function() {
   
   var o = new Object();
-  o['type'] = 'Cspline';
+  o['t'] = 'Cspline';
   o['x'] = new Array();
   for (var i = 0; i < this._x.length; i++)
     o['x'][i] = this._x[i];

@@ -384,31 +384,31 @@ Ovoid.Skin.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['type'] = Ovoid.SKIN;
+  o['t'] = Ovoid.SKIN;
   /* Ovoid.Node */
-  o['name'] = this.name;
-  o['visible'] = this.visible;
-  o['uid'] = this.uid;
-  o['parent'] = this.parent?this.parent.uid:'null';
-  o['child'] = new Array();
+  o['n'] = this.name;
+  o['v'] = this.visible;
+  o['u'] = this.uid;
+  o['p'] = this.parent?this.parent.uid:'null';
+  o['c'] = new Array();
   for(var i = 0; i < this.child.length; i++)
-    o['child'][i] = this.child[i].uid;
-  o['depend'] = new Array();
+    o['c'][i] = this.child[i].uid;
+  o['dp'] = new Array();
   for(var i = 0; i < this.depend.length; i++)
-    o['depend'][i] = this.depend[i].uid;
-  o['link'] = new Array();
+    o['dp'][i] = this.depend[i].uid;
+  o['lk'] = new Array();
   for(var i = 0; i < this.link.length; i++)
-    o['link'][i] = this.link[i].uid;
-  o['bvolumemin'] = this.boundingBox.min;
-  o['bvolumemax'] = this.boundingBox.max;
-  o['bvolumerad'] = this.boundingSphere.radius;
+    o['lk'][i] = this.link[i].uid;
+  o['bmn'] = this.boundingBox.min;
+  o['bmx'] = this.boundingBox.max;
+  o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Skin */
-  o['mesh'] = this.mesh?this.mesh.uid:'null';
-  o['joint'] = new Array();
+  o['mh'] = this.mesh?this.mesh.uid:'null';
+  o['jt'] = new Array();
   for(var i = 0; i < this.joint.length; i++)
-    o['joint'][i] = this.joint[i].uid;
-  o['bindJointMatrix'] = this.bindJointMatrix;
-  o['bindShapeMatrix'] = this.bindShapeMatrix;
+    o['jt'][i] = this.joint[i].uid;
+  o['bjm'] = this.bindJointMatrix;
+  o['bsm'] = this.bindShapeMatrix;
   
   return o;
 

@@ -178,41 +178,36 @@ Ovoid.Layer.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['type'] = Ovoid.LAYER;
+  o['t'] = Ovoid.LAYER;
   /* Ovoid.Node */
-  o['name'] = this.name;
-  o['visible'] = this.visible;
-  o['uid'] = this.uid;
-  o['parent'] = this.parent?this.parent.uid:'null';
-  o['child'] = new Array();
+  o['n'] = this.name;
+  o['v'] = this.visible;
+  o['u'] = this.uid;
+  o['p'] = this.parent?this.parent.uid:'null';
+  o['c'] = new Array();
   for(var i = 0; i < this.child.length; i++)
-    o['child'][i] = this.child[i].uid;
-  o['depend'] = new Array();
+    o['c'][i] = this.child[i].uid;
+  o['dp'] = new Array();
   for(var i = 0; i < this.depend.length; i++)
-    o['depend'][i] = this.depend[i].uid;
-  o['link'] = new Array();
+    o['dp'][i] = this.depend[i].uid;
+  o['lk'] = new Array();
   for(var i = 0; i < this.link.length; i++)
-    o['link'][i] = this.link[i].uid;
-  o['bvolumemin'] = this.boundingBox.min;
-  o['bvolumemax'] = this.boundingBox.max;
-  o['bvolumerad'] = this.boundingSphere.radius;
+    o['lk'][i] = this.link[i].uid;
+  o['bmn'] = this.boundingBox.min;
+  o['bmx'] = this.boundingBox.max;
+  o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Transform */
   o['pivot'] = this.pivot;
-  o['scaling'] = this.scaling;
-  o['translation'] = this.translation;
-  o['orientation'] = this.orientation;
-  o['rotation'] = this.rotation;
+  o['ts'] = this.scaling;
+  o['tt'] = this.translation;
+  o['to'] = this.orientation;
+  o['tr'] = this.rotation;
   /* Ovoid.Layer */
-  o['size'] = this.size;
-  o['fgColor'] = this.fgColor;
-  o['bgColor'] = this.bgColor;
-  o['bgTexture'] = this.bgTexture;
-  o['bgTexture'] = this.bgTexture?
-    this.bgTexture.uid:
-    'null';
-  o['action'] = this.action?
-    this.action.uid:
-    'null';
+  o['sz'] = this.size;
+  o['fc'] = this.fgColor;
+  o['bc'] = this.bgColor;
+  o['bt'] = this.bgTexture?this.bgTexture.uid:'null';
+
   return o;
 };
 

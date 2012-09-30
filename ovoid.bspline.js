@@ -356,7 +356,7 @@ Ovoid.Bspline.prototype.getOutput = function(xerp) {
 Ovoid.Bspline.prototype.toJSON = function() {
   
   var o = new Object();
-  o['type'] = 'Bspline';
+  o['t'] = 'Bspline';
   o['x'] = new Array();
   for (var i = 0; i < this._x.length; i++)
     o['x'][i] = this._x[i];

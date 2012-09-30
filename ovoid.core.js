@@ -551,6 +551,9 @@ Ovoid._logGlerror = function(scope) {
  */
 Ovoid._mainload = function() {
   
+  /* performance counter */
+  var t = (new Date().getTime());
+  
   try {
     /* USER CUSTOM ONLOAD FUNC */
     Ovoid.onload();
@@ -560,6 +563,10 @@ Ovoid._mainload = function() {
     Ovoid.error(8, 'Main onload Exception thrown');
     return false;
   }
+  
+  Ovoid.log(3, 'Ovoid.onload', 'executed in: ' + 
+      ((new Date().getTime() - t) * 0.001) + 's');
+
   return true;
 };
 
@@ -622,8 +629,8 @@ Ovoid._mainloop = function() {
           if (n) {
             Ovoid._dbg[5].string = Ovoid.Debug.Node(n) + '\n';
             Ovoid._dbg[5].string += Ovoid.Debug.Transform(n, true) + '\n';
-            Ovoid._dbg[5].string += Ovoid.Debug.Body(n) + '\n';
             if(n.shape) {
+              Ovoid._dbg[5].string += Ovoid.Debug.Body(n) + '\n';
               if (n.shape.type & Ovoid.MESH) {
                 Ovoid._dbg[5].string += Ovoid.Debug.Mesh(n.shape, true);
               }

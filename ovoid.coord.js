@@ -136,6 +136,22 @@ Ovoid.Coord.prototype.addOf = function(l, r) {
 
 
 /**
+ * In place scalar multiplication.<br><br>
+ * 
+ * Sets this instance to the result of the multiplication of this instance by a
+ * scalar.
+ *
+ * @param {float} scale Scalar value.
+ */
+Ovoid.Coord.prototype.scaleBy = function(scale) {
+
+  this.v[0] *= scale;
+  this.v[1] *= scale;
+  this.v[2] *= scale;
+};
+
+
+/**
  * In place transformation.<br><br>
  * 
  * Transform this instance by the specified 4x4 transformation matrix.

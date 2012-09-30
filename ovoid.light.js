@@ -224,6 +224,9 @@ Ovoid.Light.prototype.isLightening = function(tform) {
  */
 Ovoid.Light.prototype.cachLight = function() {
 
+  if(this.kind == Ovoid.LIGHT_DIRECTIONAL)
+    this.worldPosition.v[3] = 0.0;
+      
   if (!(this.cach & Ovoid.CACH_LIGHT))
   {
     this.boundingSphere.setRadius(this.range);
@@ -246,42 +249,41 @@ Ovoid.Light.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['type'] = Ovoid.LIGHT;
+  o['t'] = Ovoid.LIGHT;
   /* Ovoid.Node */
-  o['name'] = this.name;
-  o['visible'] = this.visible;
-  o['uid'] = this.uid;
-  o['parent'] = this.parent?this.parent.uid:'null';
-  o['child'] = new Array();
+  o['n'] = this.name;
+  o['v'] = this.visible;
+  o['u'] = this.uid;
+  o['p'] = this.parent?this.parent.uid:'null';
+  o['c'] = new Array();
   for(var i = 0; i < this.child.length; i++)
-    o['child'][i] = this.child[i].uid;
-  o['depend'] = new Array();
+    o['c'][i] = this.child[i].uid;
+  o['dp'] = new Array();
   for(var i = 0; i < this.depend.length; i++)
-    o['depend'][i] = this.depend[i].uid;
-  o['link'] = new Array();
+    o['dp'][i] = this.depend[i].uid;
+  o['lk'] = new Array();
   for(var i = 0; i < this.link.length; i++)
-    o['link'][i] = this.link[i].uid;
-  o['bvolumemin'] = this.boundingBox.min;
-  o['bvolumemax'] = this.boundingBox.max;
-  o['bvolumerad'] = this.boundingSphere.radius;
+    o['lk'][i] = this.link[i].uid;
+  o['bmn'] = this.boundingBox.min;
+  o['bmx'] = this.boundingBox.max;
+  o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Transform */
   o['pivot'] = this.pivot;
-  o['scaling'] = this.scaling;
-  o['translation'] = this.translation;
-  o['orientation'] = this.orientation;
-  o['rotation'] = this.rotation;
+  o['ts'] = this.scaling;
+  o['tt'] = this.translation;
+  o['to'] = this.orientation;
+  o['tr'] = this.rotation;
   /* Ovoid.Light */
-  o['model'] = this.model = Ovoid.LIGHT_POINT;
-  o['color'] = this.color;
-  o['intensity'] = this.intensity;
-  o['attenuationC'] = this.attenuationC;
-  o['attenuationL'] = this.attenuationL;
-  o['attenuationQ'] = this.attenuationQ;
-  o['range'] = this.range
-  o['falloff'] = this.falloff;
-  o['spotAngle'] = this.spotAngle;
-  o['shadowCasting'] = this.shadowCasting;
-  o['action'] = this.action?this.action.uid:'null';
+  o['md'] = this.model = Ovoid.LIGHT_POINT;
+  o['cl'] = this.color;
+  o['in'] = this.intensity;
+  o['ac'] = this.attenuationC;
+  o['al'] = this.attenuationL;
+  o['aq'] = this.attenuationQ;
+  o['rn'] = this.range
+  o['ff'] = this.falloff;
+  o['sa'] = this.spotAngle;
+  o['sc'] = this.shadowCasting;
 
   return o;
 };

@@ -109,7 +109,10 @@ Ovoid.Timer.update = function() {
   Ovoid.Timer._timelast = Ovoid.Timer.clock;
 
   /* prévient les eventuels bugs en cas de blocage de frame ou de timer incorrecte */
-  if (Ovoid.Timer.quantum > 0.25) Ovoid.Timer.quantum = 0.01;
+  if (Ovoid.Timer.quantum > 0.1 || Ovoid.Timer.quantum < 0.0) {
+    Ovoid.log(2, "Ovoid.Timer", "Invalid time laps detected.");
+    Ovoid.Timer.quantum = 0.01;
+  }
   Ovoid.Timer._fcount++;
   Ovoid.Timer._fcumul+=Ovoid.Timer.quantum;
   

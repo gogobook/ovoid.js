@@ -248,31 +248,31 @@ Ovoid.Track.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['type'] = Ovoid.TRACK;
+  o['t'] = Ovoid.TRACK;
   /* Ovoid.Node */
-  o['name'] = this.name;
-  o['visible'] = this.visible;
-  o['uid'] = this.uid;
-  o['parent'] = this.parent?this.parent.uid:'null';
-  o['child'] = new Array();
+  o['n'] = this.name;
+  o['v'] = this.visible;
+  o['u'] = this.uid;
+  o['p'] = this.parent?this.parent.uid:'null';
+  o['c'] = new Array();
   for(var i = 0; i < this.child.length; i++)
-    o['child'][i] = this.child[i].uid;
-  o['depend'] = new Array();
+    o['c'][i] = this.child[i].uid;
+  o['dp'] = new Array();
   for(var i = 0; i < this.depend.length; i++)
-    o['depend'][i] = this.depend[i].uid;
-  o['link'] = new Array();
+    o['dp'][i] = this.depend[i].uid;
+  o['lk'] = new Array();
   for(var i = 0; i < this.link.length; i++)
-    o['link'][i] = this.link[i].uid;
-  o['bvolumemin'] = this.boundingBox.min;
-  o['bvolumemax'] = this.boundingBox.max;
-  o['bvolumerad'] = this.boundingSphere.radius;
+    o['lk'][i] = this.link[i].uid;
+  o['bmn'] = this.boundingBox.min;
+  o['bmx'] = this.boundingBox.max;
+  o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Track */
-  o['playing'] = this.playing;
-  o['loop'] = this.loop;
-  o['ended'] = this.ended;
-  o['animation'] = new Array();
+  o['pl'] = this.playing;
+  o['lo'] = this.loop;
+  o['en'] = this.ended;
+  o['an'] = new Array();
   for (var i = 0; i < this.animation.length; i++)
-    o['animation'][i] = this.animation[i].uid;
-  o['onended'] = String(this.onended);
+    o['an'][i] = this.animation[i].uid;
+  o['oe'] = String(this.onended);
   return o;
 };

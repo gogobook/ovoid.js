@@ -279,6 +279,167 @@ Ovoid.Vertex.getFormatSize = function(format) {
 
 
 /**
+ * Pack vertices data in Array.<br><br>
+ * 
+ * Translates the given Vertices Array in number Array according to the 
+ * specified vertex format. 
+ *
+ * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
+ * following symbolic constants:<br>
+ * Ovoid.VERTEX_VEC4_P,<br>
+ * Ovoid.VERTEX_VEC3_N,<br>
+ * Ovoid.VERTEX_VEC3_U,<br>
+ * Ovoid.VERTEX_VEC3_T,<br>
+ * Ovoid.VERTEX_VEC3_B,<br>
+ * Ovoid.VERTEX_VEC4_C,<br>
+ * Ovoid.VERTEX_VEC4_I,<br>
+ * Ovoid.VERTEX_VEC4_W.<br><br>
+ * 
+ * @param {Vertex[]} vertices Array of Vertex objects to translate.
+ *
+ * @return {float[]} Vertices data as Array of float.
+ */
+Ovoid.Vertex.pack = function(format, vertices) {
+  
+  var c = vertices.length;
+  
+  var s = Ovoid.Vertex.getFormatStride(format);
+  
+  var array = new Array(c * s);
+  
+  var p = 0;
+  for(var i = 0; i < c; i++) {
+    if (format & Ovoid.VERTEX_VEC4_P) {
+      array[p] = vertices[i].p.v[0]; p++;
+      array[p] = vertices[i].p.v[1]; p++;
+      array[p] = vertices[i].p.v[2]; p++;
+      array[p] = vertices[i].p.v[3]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC3_N) {
+      array[p] = vertices[i].n.v[0]; p++;
+      array[p] = vertices[i].n.v[1]; p++;
+      array[p] = vertices[i].n.v[2]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC3_U) {
+      array[p] = vertices[i].u.v[0]; p++;
+      array[p] = vertices[i].u.v[1]; p++;
+      array[p] = vertices[i].u.v[2]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC3_T) {
+      array[p] = vertices[i].t.v[0]; p++;
+      array[p] = vertices[i].t.v[1]; p++;
+      array[p] = vertices[i].t.v[2]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC3_B) {
+      array[p] = vertices[i].b.v[0]; p++;
+      array[p] = vertices[i].b.v[1]; p++;
+      array[p] = vertices[i].b.v[2]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC4_C) {
+      array[p] = vertices[i].c.v[0]; p++;
+      array[p] = vertices[i].c.v[1]; p++;
+      array[p] = vertices[i].c.v[2]; p++;
+      array[p] = vertices[i].c.v[3]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC4_I) {
+      array[p] = vertices[i].i.v[0]; p++;
+      array[p] = vertices[i].i.v[1]; p++;
+      array[p] = vertices[i].i.v[2]; p++;
+      array[p] = vertices[i].i.v[3]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC4_W) {
+      array[p] = vertices[i].w.v[0]; p++;
+      array[p] = vertices[i].w.v[1]; p++;
+      array[p] = vertices[i].w.v[2]; p++;
+      array[p] = vertices[i].w.v[3]; p++;
+    }
+  }
+  
+  return array;
+};
+
+
+/**
+ * Unpack vertices data from Array.<br><br>
+ * 
+ * Translates the given Array of float in Vertex object Array according to the 
+ * specified vertex format. 
+ *
+ * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
+ * following symbolic constants:<br>
+ * Ovoid.VERTEX_VEC4_P,<br>
+ * Ovoid.VERTEX_VEC3_N,<br>
+ * Ovoid.VERTEX_VEC3_U,<br>
+ * Ovoid.VERTEX_VEC3_T,<br>
+ * Ovoid.VERTEX_VEC3_B,<br>
+ * Ovoid.VERTEX_VEC4_C,<br>
+ * Ovoid.VERTEX_VEC4_I,<br>
+ * Ovoid.VERTEX_VEC4_W.<br><br>
+ * 
+ * @param {float[]} array Array of float data to translate.
+ *
+ * @return {Vertex[]} Vertex object Array.
+ */
+Ovoid.Vertex.upack = function(format, array) {
+  
+  var s = Ovoid.Vertex.getFormatStride(format);
+  var c = array.length / s;
+          
+  var vertices = Ovoid.Vertex.newArray(c);
+
+  var p = 0;
+  for(var i = 0; i < c; i++) {
+    if (format & Ovoid.VERTEX_VEC4_P) {
+      vertices[i].p.v[0] = array[p]; p++;
+      vertices[i].p.v[1] = array[p]; p++;
+      vertices[i].p.v[2] = array[p]; p++;
+      vertices[i].p.v[3] = array[p]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC3_N) {
+      vertices[i].n.v[0] = array[p]; p++;
+      vertices[i].n.v[1] = array[p]; p++;
+      vertices[i].n.v[2] = array[p]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC3_U) {
+      vertices[i].u.v[0] = array[p]; p++;
+      vertices[i].u.v[1] = array[p]; p++;
+      vertices[i].u.v[2] = array[p]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC3_T) {
+      vertices[i].t.v[0] = array[p]; p++;
+      vertices[i].t.v[1] = array[p]; p++;
+      vertices[i].t.v[2] = array[p]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC3_B) {
+      vertices[i].b.v[0] = array[p]; p++;
+      vertices[i].b.v[1] = array[p]; p++;
+      vertices[i].b.v[2] = array[p]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC4_C) {
+      vertices[i].c.v[0] = array[p]; p++;
+      vertices[i].c.v[1] = array[p]; p++;
+      vertices[i].c.v[2] = array[p]; p++;
+      vertices[i].c.v[3] = array[p]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC4_I) {
+      vertices[i].i.v[0] = array[p]; p++;
+      vertices[i].i.v[1] = array[p]; p++;
+      vertices[i].i.v[2] = array[p]; p++;
+      vertices[i].i.v[3] = array[p]; p++;
+    }
+    if (format & Ovoid.VERTEX_VEC4_W) {
+      vertices[i].w.v[0] = array[p]; p++;
+      vertices[i].w.v[1] = array[p]; p++;
+      vertices[i].w.v[2] = array[p]; p++;
+      vertices[i].w.v[3] = array[p]; p++;
+    }
+  }
+
+  return vertices;
+};
+
+
+/**
  * Translate Vertices array in Float32Array.<br><br>
  * 
  * Translates the given Vertices Array in Float32Array according to the 
@@ -299,7 +460,7 @@ Ovoid.Vertex.getFormatSize = function(format) {
  *
  * @return {Float32Array} Vertices data as Float32Array.
  */
-Ovoid.Vertex.arrayAsVbo = function(format, vertices) {
+Ovoid.Vertex.bufferize = function(format, vertices) {
 
   var c = vertices.length;
   var ofp, ofn, ofu, oft, ofb, ofc, ofi, ofw;

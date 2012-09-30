@@ -115,7 +115,15 @@ Ovoid.Triangle.arrayAsIbo = function(triangles) {
  */
 Ovoid.Triangle.prototype.toJSON = function() {
   
-  //var o = new Object();
+  var o = new Array(6);
+  o[0] = this.index[0];
+  o[1] = this.index[1];
+  o[2] = this.index[2];
+  o[3] = this.adjacent[0];
+  o[4] = this.adjacent[1];
+  o[5] = this.adjacent[2];
+  
+  /*
   o = new Object();
   o['i'] = new Array(3);
   for(var i = 0; i < 3; i++)
@@ -128,5 +136,6 @@ Ovoid.Triangle.prototype.toJSON = function() {
     o['a'][i] = this.adjacent[i];
     
   o['e'] = this.equation;
+  */
   return o;
 };

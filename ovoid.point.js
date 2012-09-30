@@ -137,6 +137,23 @@ Ovoid.Point.prototype.addBy = function(point) {
 
 
 /**
+ * In place scalar multiplication.<br><br>
+ * 
+ * Sets this instance to the result of the multiplication of this instance by a
+ * scalar.
+ *
+ * @param {float} scale Scalar value.
+ */
+Ovoid.Point.prototype.scaleBy = function(scale) {
+
+  this.v[0] *= scale;
+  this.v[1] *= scale;
+  this.v[2] *= scale;
+  this.v[3] *= scale;
+};
+
+
+/**
  * Subtraction result assignment.<br><br>
  * 
  * Sets this instance to the result of the subtraction of two others.

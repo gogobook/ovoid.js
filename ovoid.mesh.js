@@ -304,6 +304,146 @@ Ovoid.Mesh.prototype.addPolyset = function(l, vertices, material) {
 
 
 /**
+ * Assign material to polysed.<br><br>
+ * 
+ * Assigns the specified Material to the specified polyset at the given LOD.
+ * 
+ * @param {int} l LOD level (not yet fully implemented).
+ * @param {int} p Polyset index.
+ * @param {Material} material Material to assign.
+ *
+ * @see Ovoid.Polyset
+ * @see Ovoid.Triangle
+ * @see Ovoid.Vertex
+ * @see Ovoid.Material
+ */
+Ovoid.Mesh.prototype.setMaterial = function(l, p, material) {
+  
+  if (this.polyset[l][p].material != null) {
+    this.breakDepend(this.polyset[l][p].material);
+  }
+  this.polyset[l][p].material = material;
+  this.makeDepend(material);
+}
+
+
+/**
+ * Recalculate triangles data.<br><br>
+ * 
+ * Recalculate triangles's normal, center and plane equation of the specified
+ * LOD.
+ * 
+ * @param {int} l LOD level (not yet fully implemented).
+ *
+ * @see Ovoid.Polyset
+ * @see Ovoid.Triangle
+ * @see Ovoid.Vertex
+ * @see Ovoid.Material
+ */
+Ovoid.Mesh.prototype.recalcTriangles = function(l) {
+  
+  if(!this.triangles[l].length)
+    return;
+  
+  // pour la maj des triangles
+  var triangle;
+  var p0, p1, p2, n0, n1, n2;
+  var v0 = new Ovoid.Vector();
+  var v1 = new Ovoid.Vector();
+  for (var t = 0; t < this.triangles[l].length; t++) {
+    triangle = this.triangles[l][t];
+    // les 3 vertices du triangle
+    p0 = this.vertices[l][triangle.index[0]].p;
+    p1 = this.vertices[l][triangle.index[1]].p;
+    p2 = this.vertices[l][triangle.index[2]].p;
+
+    // calcul de la normale
+    v0.subOf(p0, p1);
+    v1.subOf(p0, p2);
+
+    triangle.normal.crossOf(v0, v1);
+    triangle.normal.normalize();
+    
+    // calcule du centre
+    triangle.center.set(
+        (p0.v[0] + p1.v[0] + p2.v[0]) / 3,
+        (p0.v[1] + p1.v[1] + p2.v[1]) / 3,
+        (p0.v[2] + p1.v[2] + p2.v[2]) / 3,
+        1.0);
+        
+    triangle.equation = -(triangle.normal.v[0] * triangle.center.v[0] + 
+        triangle.normal.v[1] * triangle.center.v[1] +
+        triangle.normal.v[2] * triangle.center.v[2]);
+  }
+  
+  this.unCach(Ovoid.CACH_GEOMETRY);
+  
+};
+
+
+/**
+ * Recalculate mesh geometry.<br><br>
+ * 
+ * Recalculate triangles's normal, center, plane equation and vertices's normal
+ * according to vertices's position for the specified LOD.
+ * 
+ * @param {int} l LOD level (not yet fully implemented).
+ *
+ * @see Ovoid.Polyset
+ * @see Ovoid.Triangle
+ * @see Ovoid.Vertex
+ * @see Ovoid.Material
+ */
+Ovoid.Mesh.prototype.recalcGeometry = function(l) {
+  
+  if(!this.vertices[l].length)
+    return;
+  // pour la maj des triangles
+  var triangle;
+  var p0, p1, p2, n0, n1, n2;
+  var v0 = new Ovoid.Vector();
+  var v1 = new Ovoid.Vector();
+  for (var t = 0; t < this.triangles[l].length; t++) {
+    triangle = this.triangles[l][t];
+    // les 3 vertices du triangle
+    p0 = this.vertices[l][triangle.index[0]].p;
+    p1 = this.vertices[l][triangle.index[1]].p;
+    p2 = this.vertices[l][triangle.index[2]].p;
+    
+    n0 = this.vertices[l][triangle.index[0]].n;
+    n1 = this.vertices[l][triangle.index[1]].n;
+    n2 = this.vertices[l][triangle.index[2]].n;
+    // calcul de la normale
+    v0.subOf(p0, p1);
+    v1.subOf(p0, p2);
+
+    triangle.normal.crossOf(v0, v1);
+    triangle.normal.normalize();
+    
+    // On ajoute les normales
+    n0.addBy(triangle.normal);
+    n1.addBy(triangle.normal);
+    n2.addBy(triangle.normal);
+    
+    // calcule du centre
+    triangle.center.set(
+        (p0.v[0] + p1.v[0] + p2.v[0]) / 3,
+        (p0.v[1] + p1.v[1] + p2.v[1]) / 3,
+        (p0.v[2] + p1.v[2] + p2.v[2]) / 3,
+        1.0);
+        
+    triangle.equation = -(triangle.normal.v[0] * triangle.center.v[0] + 
+        triangle.normal.v[1] * triangle.center.v[1] +
+        triangle.normal.v[2] * triangle.center.v[2]);
+  }
+  for(var i = 0; i < this.vertices[l].length; i++) {
+      this.vertices[l][i].n.normalize();
+  }
+      
+  this.unCach(Ovoid.CACH_GEOMETRY);
+};
+
+/**
  * Generates Gl buffers.<br><br>
  * 
  * Generate and fill the GL Vertex Buffer Objects (VBOs) for this instance. 
@@ -341,13 +481,15 @@ Ovoid.Mesh.prototype.addPolyset = function(l, vertices, material) {
  */
 Ovoid.Mesh.prototype.createBuffers = function(format, type) {
 
+  Ovoid._clearGlerror();
+
   this._vformat = format;
   this._vfbytes = Ovoid.Vertex.getFormatSize(this._vformat);
 
   var ibo, vbo;
   for (var l = 0; l < Ovoid.MAX_MESH_LOD; l++)
   {
-    if (this.triangles[l].count == 0)
+    if (this.triangles[l].length == 0)
       continue;
 
     ibo = Ovoid.gl.createBuffer();
@@ -355,17 +497,27 @@ Ovoid.Mesh.prototype.createBuffers = function(format, type) {
 
     Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, vbo);
     Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
-        Ovoid.Vertex.arrayAsVbo(this._vformat,
+        Ovoid.Vertex.bufferize(this._vformat,
 			this.vertices[l]),
 			type);
 
+    Ovoid.log(3, "Ovoid.Mesh", "'" + this.name + "' lod#"+l+" Adding VBO " + (this.vertices[l].length * this._vfbytes) + " bytes");
+      
     Ovoid.gl.bindBuffer(Ovoid.gl.ELEMENT_ARRAY_BUFFER, ibo);
     Ovoid.gl.bufferData(Ovoid.gl.ELEMENT_ARRAY_BUFFER,
         Ovoid.Triangle.arrayAsIbo(this.triangles[l]),
 		Ovoid.gl.STATIC_DRAW);
+    
+    Ovoid.log(3, "Ovoid.Mesh", "'" + this.name + "' lod#"+l+" Adding IBO " + (this.triangles[l].length * 3 * 4) + " bytes");
 
     this._ibuffer[l] = ibo;
     this._vbuffer[l] = vbo;
+    
+    if (Ovoid._logGlerror('Ovoid.Mesh.createBuffers :: ' +
+      this.name))
+    {
+      return false;
+    }
   }
 };
 
@@ -1168,34 +1320,37 @@ Ovoid.Mesh.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['type'] = Ovoid.MESH;
+  o['t'] = Ovoid.MESH;
   /* Ovoid.Node */
-  o['name'] = this.name;
-  o['visible'] = this.visible;
-  o['uid'] = this.uid;
-  o['parent'] = this.parent?this.parent.uid:'null';
-  o['child'] = new Array();
+  o['n'] = this.name;
+  o['v'] = this.visible;
+  o['u'] = this.uid;
+  o['p'] = this.parent?this.parent.uid:'null';
+  o['c'] = new Array();
   for(var i = 0; i < this.child.length; i++)
-    o['child'][i] = this.child[i].uid;
-  o['depend'] = new Array();
+    o['c'][i] = this.child[i].uid;
+  o['dp'] = new Array();
   for(var i = 0; i < this.depend.length; i++)
-    o['depend'][i] = this.depend[i].uid;
-  o['link'] = new Array();
+    o['dp'][i] = this.depend[i].uid;
+  o['lk'] = new Array();
   for(var i = 0; i < this.link.length; i++)
-    o['link'][i] = this.link[i].uid;
-  o['bvolumemin'] = this.boundingBox.min;
-  o['bvolumemax'] = this.boundingBox.max;
-  o['bvolumerad'] = this.boundingSphere.radius;
+    o['lk'][i] = this.link[i].uid;
+  o['bmn'] = this.boundingBox.min;
+  o['bmx'] = this.boundingBox.max;
+  o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Mesh */
-  o['polyset'] = this.polyset;
-  o['vertices'] = this.vertices;
-  o['triangles'] = this.triangles;
-  o['vformat'] = this._vformat;
-  o['vfbytes'] = this._vfbytes;
+  o['mp'] = this.polyset;
+  o['mv'] = new Array(Ovoid.MAX_MESH_LOD);
+  for(var i = 0; i < Ovoid.MAX_MESH_LOD; i++) {
+    o['mv'][i] = Ovoid.Vertex.pack(this._vformat, this.vertices[i]);
+  }
+  o['mt'] = this.triangles;
+  o['mf'] = this._vformat;
+  o['mb'] = this._vfbytes;
   if(this.modifier) {
-    o['modifier'] = this.modifier.uid;
+    o['mm'] = this.modifier.uid;
   } else {
-    o['modifier'] = 'null';
+    o['mm'] = 'null';
   }
 
   return o;

@@ -48,7 +48,9 @@
       {"symbol":"UNIFORM_EYE_DIRECTION_VEC4","id":31,"name":"Ed"},
       {"symbol":"UNIFORM_EYE_VIEWSIZE_VEC3","id":32,"name":"Es"},
       {"symbol":"UNIFORM_AMBIENT_COLOR_VEC4","id":40,"name":"Ac"},
-      {"symbol":"UNIFORM_LAYER_SIZE_VEC3","id":42,"name":"Ls"}
+      {"symbol":"UNIFORM_LAYER_SIZE_VEC3","id":42,"name":"Ls"},
+      {"symbol":"UNIFORM_FOG_COLOR_VEC4","id":44,"name":"Fc"},
+      {"symbol":"UNIFORM_FOG_DENSITY_FLOAT","id":45,"name":"Fd"}
     ],
 		"uniformMatrix":[
       {"symbol":"UNIFORM_MATRIX_XFORM_MAT4","id":0,"name":"MXF"},

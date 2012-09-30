@@ -489,7 +489,10 @@ Ovoid.Loader._drawStep = function() {
   }
   
   /* vide le cach error */
-  Ovoid._logGlerror('Ovoid.Loader._drawStep');
+  //Ovoid._logGlerror('Ovoid.Loader._drawStep');
+  /* "Bug" etrange de firefox qui anonce une erreur GL_OUT_OF_MEMORY ici, pour une raison que j'ignore
+  ça n'empêche pas tout le reste de fonctionner sans problème. */
+  Ovoid.gl.getError();
 };
 
 
@@ -573,7 +576,7 @@ Ovoid.Loader._loadStep = function() {
         if (Ovoid.Loader._stacktex.length > 0) {
           var poped = Ovoid.Loader._stacktex.pop();
           Ovoid.Loader._obj = poped[0];
-          Ovoid.Loader._obj.loadSource(Ovoid.Loader._obj.url, poped[1]);
+          Ovoid.Loader._obj.loadSource(Ovoid.Loader._obj.url, poped[2]);
           Ovoid.Loader._detailsStr = 'Texture..('+Ovoid.Loader._obj.url+')';
         }
       }
@@ -797,6 +800,12 @@ Ovoid.Loader._launch = function() {
  */
 Ovoid.Loader.includeOjson = function(url, scene) {
 
+  for(var i = 0; i < Ovoid.Loader._stackscn.length; i++) {
+    if(Ovoid.Loader._stackscn[i][1] == url && 
+        Ovoid.Loader._stackscn[i][3] == scene)
+      return;
+  }
+  
   if (Ovoid.Ojson != undefined) {
     Ovoid.Loader._stackscn.unshift(new Array(6))
     Ovoid.Loader._stackscn[0][0] = Ovoid.OJSON;
@@ -838,6 +847,15 @@ Ovoid.Loader.includeOjson = function(url, scene) {
  */
 Ovoid.Loader.includeCollada = function(url, mask, scene, namespace, extension) {
 
+  for(var i = 0; i < Ovoid.Loader._stackscn.length; i++) {
+    if(Ovoid.Loader._stackscn[i][1] == url && 
+        Ovoid.Loader._stackscn[i][2] == mask && 
+        Ovoid.Loader._stackscn[i][4] == namespace &&
+        Ovoid.Loader._stackscn[i][5] == extension &&
+        Ovoid.Loader._stackscn[i][3] == scene)
+      return;
+  }
+  
   if (Ovoid.Collada != undefined) {
     Ovoid.Loader._stackscn.unshift(new Array(6))
     Ovoid.Loader._stackscn[0][0] = Ovoid.COLLADA;
@@ -874,6 +892,11 @@ Ovoid.Loader.includeCollada = function(url, mask, scene, namespace, extension) {
  */
 Ovoid.Loader.includeTexture = function(texture, filter) {
 
+  for(var i = 0; i < Ovoid.Loader._stacktex.length; i++) {
+    if(Ovoid.Loader._stacktex[i][0] == texture)
+      return;
+  }
+  
   var i = Ovoid.Loader._stacktex.length;
   Ovoid.Loader._stacktex.push(new Array(2));
   Ovoid.Loader._stacktex[i][0] = texture;
@@ -896,6 +919,11 @@ Ovoid.Loader.includeTexture = function(texture, filter) {
  */
 Ovoid.Loader.includeAudio = function(audio) {
 
+  for(var i = 0; i < Ovoid.Loader._stackaud.length; i++) {
+    if(Ovoid.Loader._stackaud[i][0] == audio)
+      return;
+  }
+  
   var i = Ovoid.Loader._stackaud.length;
   Ovoid.Loader._stackaud.push(new Array(2));
   Ovoid.Loader._stackaud[i][0] = audio;
@@ -937,6 +965,14 @@ Ovoid.Loader.includeAudio = function(audio) {
  */
 Ovoid.Loader.includeShader = function(slot, vs, fs, wm, name) {
 
+  for(var i = 0; i < Ovoid.Loader._stackgls.length; i++) {
+    if(Ovoid.Loader._stackscn[i][0] == slot && 
+        Ovoid.Loader._stackgls[i][1] == vs && 
+        Ovoid.Loader._stackgls[i][2] == fs &&
+        Ovoid.Loader._stackgls[i][3] == wm)
+      return;
+  }
+  
   var i = Ovoid.Loader._stackgls.length;
   Ovoid.Loader._stackgls.push(new Array(4));
   Ovoid.Loader._stackgls[i][0] = slot;

@@ -240,7 +240,7 @@ Ovoid.Solver._getContactB2L = function (a, b) {
   var f, u, v;
   /* distance */
   var d;
-  
+ 
   /* parcourre la liste des triangles */
   var i = mesh.triangles[0].length;
   while(i--) {
@@ -838,7 +838,7 @@ Ovoid.Solver._detectContacts = function() {
         
         /* Si les deux body sont trop éloignés pour rentrer en contact
          * on peut laisser tomber */
-        if(!Ovoid.Solver._canContact(a, b, 5.0))
+        if(!Ovoid.Solver._canContact(a, b, 0.0))
           continue;
 
         if(Ovoid.Solver._hasContact(a, b))

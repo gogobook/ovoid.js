@@ -10,6 +10,7 @@ uniform sampler2D Sd;
 uniform sampler2D Ss;
 uniform sampler2D Se;
 uniform sampler2D Sr;
+uniform vec4 Ep;
 uniform bool ENa; /* enable ambient/env shading */
 uniform bool ENd; /* enable ambient/env shading */
 uniform vec4 Md;
@@ -23,7 +24,11 @@ uniform float Mo;
 varying vec2 Vu;
 varying vec4 Cd;
 varying vec4 Cs;
-varying vec2 Ru;
+varying vec3 Vn;
+varying vec4 Vp;
+
+vec3 R, EV;
+vec2 Ru;
 
 void main(void)
 {	
@@ -32,6 +37,9 @@ void main(void)
     gl_FragColor=(Md*Ma*texture2D(Sd,Vu))*Ac;
     gl_FragColor+=texture2D(Se,Vu)*Me;
     if(My!=0.0) {
+      EV=normalize(Ep-Vp).xyz;
+      R=normalize(reflect(EV,Vn));
+      Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;
       gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;
     }
   }

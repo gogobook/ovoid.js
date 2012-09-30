@@ -55,13 +55,13 @@ Ovoid.Polyset = function() {
  */
 Ovoid.Polyset.prototype.toJSON = function() {
   
-  var o = new Object();
-  o['ioffset'] = this.ioffset;
-  o['icount'] = this.icount;
+  var o = new Array(3);
+  o[0] = this.ioffset;
+  o[1] = this.icount;
   if(this.material) {
-    o['material'] = this.material.uid;
+    o[2] = this.material.uid;
   } else {
-    o['material'] = 'null';
+    o[2] = 'null';
   }
   return o;
 };

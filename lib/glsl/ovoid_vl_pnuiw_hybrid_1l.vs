@@ -26,12 +26,11 @@ uniform float La;
 uniform float My;
 uniform float Mi;
 
-vec4 Vp;
-vec3 Vn;
+varying vec4 Vp;
+varying vec3 Vn;
 varying vec2 Vu;
 varying vec4 Cd;
 varying vec4 Cs;
-varying vec2 Ru;
 
 vec3 LV, R, EV;
 float LT, Fw;
@@ -60,15 +59,17 @@ void main(void){
   
   if(ENd) {
     EV=normalize(Ep-Vp).xyz;
-    if(My!=0.0) {
-      R=normalize(reflect(EV,Vn));
-      Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;
+    if(Lp.w==1.0){
+      LV=normalize(Lp-Vp).xyz;
+      LT=max(dot(Vn,LV),0.0);
+      Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf), 0.0, 1.0);
+    }else{
+      LV=Ld;
+      LT=max(dot(Vn,LV),0.0);
+      Fw=1.0;
     }
-    LV=normalize(Lp-Vp).xyz;
-    LT=max(dot(Vn,LV),0.0);
-    Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf), 0.0, 1.0);
     Cd+=(Lc*Li*LT)*Fw;
-    R = normalize(reflect(-LV,Vn));
+    R=normalize(reflect(-LV,Vn));
     Cs+=Lc*Li*(pow(max(dot(R,EV),0.0),Mi))*Fw;
   }
 }

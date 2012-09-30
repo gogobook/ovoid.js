@@ -87,6 +87,8 @@ Ovoid.Ojson = function() {
   this._json = null;
   /** Destination scene */
   this._dstsc = null;
+  /** Relinking stack */
+  this._rlnkstack = new Array();
   /** Loading status code.
    * @type int */
   this.loadStatus = 0;
@@ -117,6 +119,8 @@ Ovoid.Ojson.prototype.loadSource = function(url, async, nopath) {
 
   this.url = url;
 
+  Ovoid.log(3, 'Ovoid.Ojson', "loading source file '" + this.url + "'");
+          
   this.loadStatus = 0;
   var htreq = new XMLHttpRequest();
 
@@ -128,7 +132,12 @@ Ovoid.Ojson.prototype.loadSource = function(url, async, nopath) {
     {
       if (this.readyState == 4) {
         if (this.status == 200 || this.status == 304) {
-          this.owner._json = JSON.parse(this.responseText);
+          Ovoid.log(3, 'Ovoid.Ojson', "parsing source file '" + this.owner.url + "'");
+          try{
+            this.owner._json = JSON.parse(this.responseText);
+          } catch(e) {
+            Ovoid.log(2, 'Ovoid.Ojson', "parse error '" + e.stack + "'");
+          }
           this.owner.loadStatus = 1;
         } else {
           this.owner.loadStatus = -1;
@@ -183,10 +192,23 @@ Ovoid.Ojson.prototype.exportScene = function(scene) {
   /* Entête d'objet */
   this._json = new Object();
   this._json['OJSON'] = Ovoid.OVOIDJS_VERSION;
-  this._json['type'] = "scene";
+  this._json['TYPE'] = "SCN";
   /* Export de la scene */
-  this._json['scene'] = scene;
+  this._json['SCENE'] = scene;
   var Ojson = JSON.stringify(this._json);
+
+  /* reformate le json pour inclure quelques espaces pour permetre le retour
+   * a la ligne automatique, sans ca l'outup peut bugger */
+  var c = Ojson.length;
+  var p = 0;
+  for(var i = 0; i < c; i++, p++) {
+    if(p > 2048) {
+      if(Ojson[i] == ',') {
+        Ojson = [Ojson.slice(0, i+1), '<br>', Ojson.slice(i+1)].join('');
+        p = 0;
+      }
+    }
+  }
   /* Affiche le popup avec le contenu JSON */
   var pop = window.open("scene.ojsn","Ojson export","width=600,height=300,scrollbars=yes,resizable=yes", true);
   var doc = pop.document.open();
@@ -221,6 +243,26 @@ Ovoid.Ojson.prototype._parseFunc = function(s) {
   }
 };
 
+
+/**
+ * Create log output for relinking report.
+ * 
+ * @param {Object} n Relinked node.
+ * @param {Object} l Link found.
+ * @param {Object} s Link string.
+ */
+Ovoid.Ojson.prototype._linkReport = function(n, l, s) {
+  
+  var lname;
+  if(l) {
+    lname = l.name;
+  } else {
+    lname = "null";
+  }
+  
+  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "relink '" + n.name + "' has "+ s +" '" + lname + "'");
+}
+
 /**
  * Proceed to importation of the typed Node from a OJSON sub-object.
  * 
@@ -228,90 +270,137 @@ Ovoid.Ojson.prototype._parseFunc = function(s) {
  */
 Ovoid.Ojson.prototype._importNode = function(j) {
   
-  switch (j.type)
+  switch (j.t)
   {
     case Ovoid.TRANSFORM:
-      n = new Ovoid.Transform(j.name);
+      n = new Ovoid.Transform(j.n);
       this._procTransform(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Transform node '" + j.n + "'");
       break;
     case Ovoid.CAMERA:
-      n = new Ovoid.Camera(j.name);
+      n = new Ovoid.Camera(j.n);
       this._procCamera(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Camera node '" + j.n + "'");
       break;
     case Ovoid.LIGHT:
-      n = new Ovoid.Light(j.name);
+      n = new Ovoid.Light(j.n);
       this._procLight(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Light node '" + j.n + "'");
       break;
     case Ovoid.BODY:
-      n = new Ovoid.Body(j.name);
+      n = new Ovoid.Body(j.n);
       this._procBody(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Body node '" + j.n + "'");
       break;
     case Ovoid.JOINT:
-      n = new Ovoid.Joint(j.name);
+      n = new Ovoid.Joint(j.n);
       this._procJoint(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Joint node '" + j.n + "'");
       break;
     case Ovoid.MESH:
-      n = new Ovoid.Mesh(j.name);
+      n = new Ovoid.Mesh(j.n);
       this._procMesh(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Mesh node '" + j.n + "'");
       break;
     case Ovoid.MATERIAL:
-      n = new Ovoid.Material(j.name);
+      n = new Ovoid.Material(j.n);
       this._procMaterial(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Material node '" + j.n + "'");
       break;
     case Ovoid.TEXTURE:
-      n = new Ovoid.Texture(j.name);
+      n = new Ovoid.Texture(j.n);
       this._procTexture(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Texture node '" + j.n + "'");
       break;
     case Ovoid.ACTION:
-      n = new Ovoid.Action(j.name);
+      n = new Ovoid.Action(j.n);
       this._procAction(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Action node '" + j.n + "'");
       break;
     case Ovoid.PHYSICS:
-      n = new Ovoid.Physics(j.name);
+      n = new Ovoid.Physics(j.n);
       this._procPhysic(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Physics node '" + j.n + "'");
       break;
     case Ovoid.ANIMATION:
-      n = new Ovoid.Animation(j.name);
+      n = new Ovoid.Animation(j.n);
       this._procAnimation(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Animation node '" + j.n + "'");
       break;
     case Ovoid.EXPRESSION:
-      n = new Ovoid.Expression(j.name);
+      n = new Ovoid.Expression(j.n);
       this._procExpression(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Expression node '" + j.n + "'");
+      break;
+    case Ovoid.AIM:
+      n = new Ovoid.Aim(j.n);
+      this._procAim(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Aim node '" + j.n + "'");
       break;
     case Ovoid.TRACK:
-      n = new Ovoid.Track(j.name);
+      n = new Ovoid.Track(j.n);
       this._procTrack(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Track node '" + j.n + "'");
       break;
     case Ovoid.SKIN:
-      n = new Ovoid.Skin(j.name);
+      n = new Ovoid.Skin(j.n);
       this._procSkin(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Skin node '" + j.n + "'");
       break;
     case Ovoid.EMITTER:
-      n = new Ovoid.Emitter(j.name);
+      n = new Ovoid.Emitter(j.n);
       this._procEmitter(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Emitter node '" + j.n + "'");
       break;
     case Ovoid.AUDIO:
-      n = new Ovoid.Audio(j.name);
+      n = new Ovoid.Audio(j.n);
       this._procAudio(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Audio node '" + j.n + "'");
       break;
     case Ovoid.TEXT:
-      n = new Ovoid.Text(j.name);
+      n = new Ovoid.Text(j.n);
       this._procText(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Text node '" + j.n + "'");
       break;
     case Ovoid.LAYER:
-      n = new Ovoid.Layer(j.name);
+      n = new Ovoid.Layer(j.n);
       this._procLayer(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Layer node '" + j.n + "'");
       break;
     case Ovoid.SOUND:
-      n = new Ovoid.Sound(j.name);
+      n = new Ovoid.Sound(j.n);
       this._procSound(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Sound node '" + j.n + "'");
       break;
     default:
-      n = new Ovoid.Node(j.name);
+      n = new Ovoid.Node(j.n);
       this._procNode(n, j);
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "import Null node '" + j.n + "'");
       break;
   }
   this._dstsc.insert(n, null, true, true);
+  this._rlnkstack.push(n);
 };
 
 
@@ -338,7 +427,7 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
     }
   }
   
-  for(var i = 0; i < n.child.length; i++)
+  for(var i = 0; i < n.child.length; i++) 
     n.child[i] = this._dstsc.search(n.child[i]);
     
   for(var i = 0; i < n.depend.length; i++)
@@ -347,18 +436,15 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
   for(var i = 0; i < n.link.length; i++)
     n.link[i] = this._dstsc.search(n.link[i]);
     
-  if(n.type & Ovoid.CONSTRAINT) {
+  if(n.type & Ovoid.CONSTRAINT)
     for(var i = 0; i < n.target.length; i++)
       n.target[i] = this._dstsc.search(n.target[i]);
-  }
-    
-  if(n.type & Ovoid.LIGHT || n.type & Ovoid.CAMERA) 
-    n.action = this._dstsc.search(n.action);
+  
+  if(n.type & Ovoid.AIM)
+    n.aimat[i] = this._dstsc.search(n.aimat[i]);
 
-  if(n.type & Ovoid.BODY) {
+  if(n.type & Ovoid.BODY)
     n.shape = this._dstsc.search(n.shape);
-    n.action = this._dstsc.search(n.action);
-  }
 
   if(n.type & Ovoid.SKIN) {
     n.mesh = this._dstsc.search(n.mesh);
@@ -366,6 +452,7 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
     var joints = new Array();
     for(var i = 0; i < n.joint.length; i++) {
       n.joint[i] = this._dstsc.search(n.joint[i]);
+      this._linkReport(n, n.joint[i], "joint");
       /* Il faut aussi recréer les tableaux de matrices */
       n.bindJointMatrix.push(new Ovoid.Matrix4());
       n.infWorldMatrix.push(new Ovoid.Matrix4());
@@ -379,45 +466,45 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
   }
 
   if(n.type & Ovoid.JOINT)
-    n.skin = this._dstsc.search(n.skin);
+      n.skin = this._dstsc.search(n.skin);
   
   if(n.type & Ovoid.SOUND)
-    n.audio = this._dstsc.search(n.audio);
+      n.audio = this._dstsc.search(n.audio);
 
   if(n.type & Ovoid.LAYER)
-    n.action = this._dstsc.search(n.action);
-    n.bgTexture = this._dstsc.search(n.bgTexture);
+      n.bgTexture = this._dstsc.search(n.bgTexture);
 
   if(n.type & Ovoid.TEXT)
-    n.fontmap = this._dstsc.search(n.fontmap);
+      n.fontmap = this._dstsc.search(n.fontmap);
     
-  if(n.type & Ovoid.MATERIAL) {
+  if(n.type & Ovoid.MATERIAL)
     for(var i = 0; i < n.texture.length; i++)
-      n.texture[i] = this._dstsc.search(n.texture[i]);
-  }
+        n.texture[i] = this._dstsc.search(n.texture[i]);
   
-  if(n.type & Ovoid.TRACK) {
+  if(n.type & Ovoid.TRACK)
     for(var i = 0; i < n.animation.length; i++)
-      n.animation[i] = this._dstsc.search(n.animation[i]);
-  }
+        n.animation[i] = this._dstsc.search(n.animation[i]);
   
   if(n.type & Ovoid.MESH) {
     for (var l = 0; l < Ovoid.MAX_MESH_LOD; l++) {
       for (var s = 0; s < n.polyset[l].length; s++) {
         n.polyset[l][s].material = this._dstsc.search(n.polyset[l][s].material);
+        if(!n.polyset[l][s].material) {
+          Ovoid.log(2, 'Ovoid.Ojson ' + this.name, 
+              "polyset #" + l + " of '" + n.name + "' has null material.");
+        }
       }
     }
   }
   
   if(n.type & Ovoid.ACTION) {
     for (var i = 0; i < n.onIntersect[0].length; i++)
-      n.onIntersect[0][i] = this._dstsc.search(n.onIntersect[0][i]);
+        n.onIntersect[0][i] = this._dstsc.search(n.onIntersect[0][i]);
     for (var i = 0; i < n.onIntersectEnter[0].length; i++)
-      n.onIntersectEnter[0][i] = this._dstsc.search(n.onIntersectEnter[0][i]);
-    for (var i = 0; i < n.onIntersectLeave[0].length; i++)
+        n.onIntersectEnter[0][i] = this._dstsc.search(n.onIntersectEnter[0][i]);
+    for (var i = 0; i < n.onIntersectLeave[0].length; i++) 
       n.onIntersectLeave[0][i] = this._dstsc.search(n.onIntersectLeave[0][i]);
   }
-  
 };
 
 
@@ -431,31 +518,34 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
 Ovoid.Ojson.prototype._procNode = function(n, j) {
   
   /* - OJSON.Node structure -
-   * .type
-   * .name
-   * .visible
-   * .uid
-   * .parent*
-   * .child[*]
-   * .depend[*]
-   * .link[*]
+   * .t
+   * .n
+   * .v
+   * .u
+   * .p*
+   * .c[*]
+   * .dp[*]
+   * .lk[*]
+   * .bmn
+   * .bmx
+   * .brd
    */
-  n.visible = j.visible;
-  n.uid = j.uid;
-  (j.parent == 'null')?n.parent=null:n.parent=j.parent;
-  for (var i = 0; i < j.child.length; i++)
-    n.child.push(j.child[i]);
-  for (var i = 0; i < j.depend.length; i++)
-    n.depend.push(j.depend[i]);
-  for (var i = 0; i < j.link.length; i++)
-    n.link.push(j.link[i]);
+  n.visible = j.v;
+  n.uid = j.u;
+  (j.p == 'null')?n.parent=null:n.parent=j.p;
+  for (var i = 0; i < j.c.length; i++)
+    n.child.push(j.c[i]);
+  for (var i = 0; i < j.dp.length; i++)
+    n.depend.push(j.dp[i]);
+  for (var i = 0; i < j.lk.length; i++)
+    n.link.push(j.lk[i]);
   var min = new Ovoid.Point();
   var max = new Ovoid.Point();
-  min.setv(j.bvolumemin);
-  max.setv(j.bvolumemax);
+  min.setv(j.bmn);
+  max.setv(j.bmx);
   n.boundingBox.setBound(min, max);
   n.boundingSphere.setBound(min, max);
-  n.boundingSphere.setRadius(j.bvolumerad);
+  n.boundingSphere.setRadius(j.brd);
 };
 
 
@@ -477,19 +567,19 @@ Ovoid.Ojson.prototype._procMaterial = function(n, j) {
    * .opacity
    */
    
-  for(var i = 0; i < j.color.length; i++) {
-    n.color[i].setv(j.color[i]);
+  for(var i = 0; i < j.cl.length; i++) {
+    n.color[i].setv(j.cl[i]);
   }
   
-  for(var i = 0; i < j.texture.length; i++) {
+  for(var i = 0; i < j.tx.length; i++) {
     if(n.texture[i] != 'null') {
-      n.texture[i] = j.texture[i];
+      n.texture[i] = j.tx[i];
     }
   }
   
-  n.shininess = j.shininess;
-  n.reflectivity = j.reflectivity;
-  n.opacity = j.opacity;
+  n.shininess = j.sh;
+  n.reflectivity = j.re;
+  n.opacity = j.op;
   
 };
 
@@ -509,7 +599,7 @@ Ovoid.Ojson.prototype._procTexture = function(n, j) {
    * .filter
    */
   n.url = j.url;
-  n.filter = j.filter;
+  n.filter = j.fl;
 };
 
 
@@ -547,12 +637,12 @@ Ovoid.Ojson.prototype._procTrack = function(n, j) {
    * .animation[]
    * .onended()
    */
-  n.playing = j.playing;
-  n.loop = j.loop;
-  n.ended = j.ended;
-  for (var i = 0; i < j.animation.length; i++)
-    n.animation.push(j.animation[i]);
-  n.onended = this._parseFunc(j.onended);
+  n.playing = j.pl;
+  n.loop = j.lo;
+  n.ended = j.en;
+  for (var i = 0; i < j.an.length; i++)
+    n.animation.push(j.an[i]);
+  n.onended = this._parseFunc(j.oe);
 };
 
 
@@ -575,53 +665,41 @@ Ovoid.Ojson.prototype._procMesh = function(n, j) {
    * .modifier*
    */
   for (var l = 0; l < Ovoid.MAX_MESH_LOD; l++) {
-    if(j.polyset[l].length > 0) {
-      for (var s = 0; s < j.polyset[l].length; s++) {
+    if(j.mp[l].length > 0) {
+      for (var s = 0; s < j.mp[l].length; s++) {
         var polyset = new Ovoid.Polyset();
-        polyset.ioffset = j.polyset[l][s].ioffset;
-        polyset.icount = j.polyset[l][s].icount;
-        polyset.material = j.polyset[l][s].material;
+        polyset.ioffset = j.mp[l][s][0];
+        polyset.icount = j.mp[l][s][1];
+        polyset.material = j.mp[l][s][2];
         n.polyset[l].push(polyset);
       }
     }
     
-    if(j.vertices[l].length > 0) {
-      for (var v = 0; v < j.vertices[l].length; v++) {
-        var vertex = new Ovoid.Vertex();
-        vertex.p.setv(j.vertices[l][v][0]);
-        vertex.n.setv(j.vertices[l][v][1]);
-        vertex.u.setv(j.vertices[l][v][2]);
-        vertex.t.setv(j.vertices[l][v][3]);
-        vertex.b.setv(j.vertices[l][v][4]);
-        vertex.c.setv(j.vertices[l][v][5]);
-        vertex.i.setv(j.vertices[l][v][6]);
-        vertex.w.setv(j.vertices[l][v][7]);
-        n.vertices[l].push(vertex);
-      }
+    if(j.mv[l].length > 0) {
+      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+        "unpack vertices buffer:" + j.mv[l].length + " floats");
+      n.vertices[l] = Ovoid.Vertex.upack(j.mf, j.mv[l]);
     }
     
-    //alert("LOD:"+ l + " = " + n.vertices[l].length);
-    
-    if(j.triangles[l].length > 0) {
-      for (var t = 0; t < j.triangles[l].length; t++) {
+    if(j.mt[l].length > 0) {
+      for (var t = 0; t < j.mt[l].length; t++) {
         var triangle = new Ovoid.Triangle();
-        triangle.index[0] = j.triangles[l][t].i[0];
-        triangle.index[1] = j.triangles[l][t].i[1];
-        triangle.index[2] = j.triangles[l][t].i[2];
-        triangle.normal.setv(j.triangles[l][t].n);
-        triangle.center.setv(j.triangles[l][t].c);
-        triangle.adjacent[0] = j.triangles[l][t].a[0];
-        triangle.adjacent[1] = j.triangles[l][t].a[1];
-        triangle.adjacent[2] = j.triangles[l][t].a[2];
-        triangle.equation = j.triangles[l][t].e;
+        triangle.index[0] = j.mt[l][t][0];
+        triangle.index[1] = j.mt[l][t][1];
+        triangle.index[2] = j.mt[l][t][2];
+        triangle.adjacent[0] = j.mt[l][t][3];
+        triangle.adjacent[1] = j.mt[l][t][4];
+        triangle.adjacent[2] = j.mt[l][t][5];
         n.triangles[l].push(triangle);
       }
     }
+    
+    n.recalcTriangles(l);
   }
   
-  n._vfbytes = j.vfbytes;
-  n._vformat = j.vformat;
-  (j.modifier == 'null')?n.modifier=null:n.modifier=j.modifier;
+  n._vfbytes = j.mb;
+  n._vformat = j.mf;
+  (j.mm == 'null')?n.modifier=null:n.modifier=j.mm;
   
   n.createBuffers(n._vformat, Ovoid.BUFFER_STATIC);
 };
@@ -640,8 +718,8 @@ Ovoid.Ojson.prototype._procConstraint = function(n, j) {
   /* - OJSON.Constraint structure -
    * .target[]
    */
-  for (var i = 0; i < j.target.length; i++)
-    n.target.push(j.target[i]);
+  for (var i = 0; i < j.ct.length; i++)
+    n.target.push(j.ct[i]);
 };
 
 
@@ -665,43 +743,43 @@ Ovoid.Ojson.prototype._procAnimation = function(n, j) {
    * .channel[#]
    * .onended()
    */
-  n._format = j.format;
-  n.playing = j.playing;
-  n.loop = j.loop;
-  n.ended = j.ended;
-  n.smooth = j.smooth;
-  n.factor = j.factor;
+  n._format = j.ft;
+  n.playing = j.pl;
+  n.loop = j.lo;
+  n.ended = j.en;
+  n.smooth = j.sm;
+  n.factor = j.fc;
   
   for (var i = 0; i < 21; i++) {
-    if (j.channel[i] == 'null') {
+    if (j.cn[i] == 'null') {
       n._channel[i] = null;
     } else {
       var curve;
-      switch (j.channel[i].type)
+      switch (j.cn[i].type)
       {
         case "Bspline":
           curve = new Ovoid.Bspline(
-            new Float32Array(j.channel[i].x),
-            new Float32Array(j.channel[i].y),
-            new Float32Array(j.channel[i].cx),
-            new Float32Array(j.channel[i].cy));
+            new Float32Array(j.cn[i].x),
+            new Float32Array(j.cn[i].y),
+            new Float32Array(j.cn[i].cx),
+            new Float32Array(j.cn[i].cy));
           break;
         case "Hspline":
           curve = new Ovoid.Hspline(
-            new Float32Array(j.channel[i].x),
-            new Float32Array(j.channel[i].y),
-            new Float32Array(j.channel[i].v));
+            new Float32Array(j.cn[i].x),
+            new Float32Array(j.cn[i].y),
+            new Float32Array(j.cn[i].v));
           break;
         default:
           curve = new Ovoid.Cspline(
-            new Float32Array(j.channel[i].x),
-            new Float32Array(j.channel[i].y));
+            new Float32Array(j.cn[i].x),
+            new Float32Array(j.cn[i].y));
           break;
       }
       n._channel[i] = curve;
     }
   }
-  n.onended = this._parseFunc(j.onended);
+  n.onended = this._parseFunc(j.oe);
 };
 
 
@@ -721,10 +799,10 @@ Ovoid.Ojson.prototype._procPhysic = function(n, j) {
    * .kind
    * .damping
    */
-  n.imass = j.imass;
-  n.itensor.setv(j.itensor);
-  n.model = j.model;
-  n.damping = j.damping;
+  n.imass = j.im;
+  n.itensor.setv(j.it);
+  n.model = j.md;
+  n.damping = j.dm;
 };
 
 
@@ -744,15 +822,15 @@ Ovoid.Ojson.prototype._procSkin = function(n, j) {
    * .bindJointMatrix[]
    * .bindShapeMatrix
    */
-  (j.mesh == 'null')?n.mesh=null:n.mesh=j.mesh;
-  for (var i = 0; i < j.joint.length; i++)
-    n.joint.push(j.joint[i]);
-  n.bindJointMatrix = new Array(j.bindJointMatrix.length);
+  (j.mh == 'null')?n.mesh=null:n.mesh=j.mh;
+  for (var i = 0; i < j.jt.length; i++)
+    n.joint.push(j.jt[i]);
+  n.bindJointMatrix = new Array(j.bjm.length);
   for (var i = 0; i < n.bindJointMatrix.length; i++) {
     n.bindJointMatrix[i] = new Ovoid.Matrix4();
-    n.bindJointMatrix[i].setv(j.bindJointMatrix[i]);
+    n.bindJointMatrix[i].setv(j.bjm[i]);
   }
-  n.bindShapeMatrix.setv(j.bindShapeMatrix);
+  n.bindShapeMatrix.setv(j.bsm);
 };
 
 
@@ -779,21 +857,21 @@ Ovoid.Ojson.prototype._procEmitter = function(n, j) {
    * .emits
    * .texture*
    */
-  n.model = j.model;
-  n.mass = j.mass;
-  n.life = j.life;
-  n.rate = j.rate;
-  n.velocity = j.velocity;
-  n.damping = j.damping;
-  n.delta = j.delta;
-  n.scattering = j.scattering;
-  for(var i = 0; i < j.color.length; i++) {
-    n.color[i].setv(j.color[i]);
+  n.model = j.md;
+  n.mass = j.ms;
+  n.life = j.lf;
+  n.rate = j.rt;
+  n.velocity = j.vl;
+  n.damping = j.dm;
+  n.delta = j.dt;
+  n.scattering = j.sc;
+  for(var i = 0; i < j.cl.length; i++) {
+    n.color[i].setv(j.cl[i]);
   }
-  n.size[0] = j.size[0];
-  n.size[1] = j.size[1];
-  n.emits = j.emits;
-  (j.texture == 'null')?n.texture=null:n.texture=j.texture;
+  n.size[0] = j.sz[0];
+  n.size[1] = j.sz[1];
+  n.emits = j.em;
+  (j.tx == 'null')?n.texture=null:n.texture=j.tx;
   
 };
 
@@ -809,15 +887,15 @@ Ovoid.Ojson.prototype._procTransform = function(n, j) {
   /* Importation hérité de "Ovoid.Node" */
   this._procNode(n, j);
   /* - OJSON.Transform structure -
-   * .scaling[x,y,z]
-   * .translation[x,y,z]
-   * .orientation[x,y,z,w]
-   * .rotation[x,y,z,w]
+   * .ts[x,y,z]
+   * .tt[x,y,z]
+   * .to[x,y,z,w]
+   * .tr[x,y,z,w]
    */
-  n.scaling.setv(j.scaling);
-  n.translation.setv(j.translation);
-  n.orientation.setv(j.orientation);
-  n.rotation.setv(j.rotation);
+  n.scaling.setv(j.ts);
+  n.translation.setv(j.tt);
+  n.orientation.setv(j.to);
+  n.rotation.setv(j.tr);
 };
 
 
@@ -839,12 +917,12 @@ Ovoid.Ojson.prototype._procCamera = function(n, j) {
    * .clipNear
    * .clipFar
    */
-  n.viewX = j.viewX;
-  n.viewY = j.viewY;
-  n.fov = j.fov;
-  n.aspect = j.aspect;
-  n.clipNear = j.clipNear;
-  n.clipFar = j.clipFar;
+  n.viewX = j.vx;
+  n.viewY = j.vy;
+  n.fov = j.fv;
+  n.aspect = j.ar;
+  n.clipNear = j.cn;
+  n.clipFar = j.cf;
 };
 
 
@@ -870,16 +948,16 @@ Ovoid.Ojson.prototype._procLight = function(n, j) {
    * .spotAngle
    * .shadowCasting
    */
-  n.model = j.model;
-  n.color.setv(j.color);
-  n.intensity = j.intensity;
-  n.attenuationC = j.attenuationC;
-  n.attenuationL = j.attenuationL;
-  n.attenuationQ = j.attenuationQ;
-  n.range = j.range;
-  n.falloff = j.falloff;
-  n.spotAngle = j.spotAngle;
-  n.shadowCasting = j.shadowCasting;
+  n.model = j.md;
+  n.color.setv(j.cl);
+  n.intensity = j.in;
+  n.attenuationC = j.ac;
+  n.attenuationL = j.al;
+  n.attenuationQ = j.aq;
+  n.range = j.rn;
+  n.falloff = j.ff;
+  n.spotAngle = j.sa;
+  n.shadowCasting = j.sc;
   
 };
 
@@ -898,8 +976,8 @@ Ovoid.Ojson.prototype._procBody = function(n, j) {
    * .shape*
    * .intersectable
    */
-  (j.shape == 'null')?n.shape=null:n.shape=j.shape;
-  n.intersectable = j.intersectable;
+  (j.shape == 'null')?n.shape=null:n.shape=j.bs;
+  n.intersectable = j.bi;
 };
 
 
@@ -917,8 +995,8 @@ Ovoid.Ojson.prototype._procJoint = function(n, j) {
    * .size
    * .skin*
    */
-  n.size = j.size;
-  (j.skin == 'null')?n.skin=null:n.skin=j.skin;
+  n.sz = j.size;
+  (j.sk == 'null')?n.skin=null:n.skin=j.sk;
 };
 
 
@@ -945,17 +1023,17 @@ Ovoid.Ojson.prototype._procSound = function(n, j) {
    * }
    * .loop
    */
-  (j.audio == 'null')?n.audio=null:n.audio=j.audio;
-  n.spatialize(!j.flat);
-  if(n.alpanner && j.coneInnerAngle) {
-    n.alpanner.coneInnerAngle = j.coneInnerAngle;
-    n.alpanner.coneOuterAngle = j.coneOuterAngle;
-    n.alpanner.coneOuterGain = j.coneOuterGain;
-    n.alpanner.refDistance = j.refDistance;
-    n.alpanner.maxDistance = j.maxDistance;
-    n.alpanner.rolloffFactor = j.rolloffFactor;
+  (j.au == 'null')?n.audio=null:n.audio=j.au;
+  n.spatialize(!j.fl);
+  if(n.alpanner && j.ia) {
+    n.alpanner.coneInnerAngle = j.ia;
+    n.alpanner.coneOuterAngle = j.oa;
+    n.alpanner.coneOuterGain = j.og;
+    n.alpanner.refDistance = j.rd;
+    n.alpanner.maxDistance = j.md;
+    n.alpanner.rolloffFactor = j.rf;
   }
-  n.setLoop(j.loop);
+  n.setLoop(j.lo);
 };
 
 
@@ -975,12 +1053,12 @@ Ovoid.Ojson.prototype._procLayer = function(n, j) {
    * .bgTexture[r,g,b,a]
    * .bgTexture*
    */
-  n.size.setv(j.size);
-  n.size.setv(j.fgColor);
-  n.size.setv(j.bgColor);
-  (j.bgTexture == 'null')?
+  n.size.setv(j.sz);
+  n.size.setv(j.fc);
+  n.size.setv(j.bc);
+  (j.bt == 'null')?
     n.bgTexture=null:
-    n.bgTexture=j.bgTexture;
+    n.bgTexture=j.bt;
 };
 
 
@@ -999,11 +1077,11 @@ Ovoid.Ojson.prototype._procText = function(n, j) {
    * .string
    * .param[u,v,w]
    */
-  (j.fontmap == 'null')?
+  (j.fm == 'null')?
     n.fontmap=null:
-    n.fontmap=j.fontmap;
-  n.string = j.string;
-  n.param.setv(j.param);
+    n.fontmap=j.fm;
+  n.string = j.st;
+  n.param.setv(j.pr);
 };
 
 
@@ -1022,12 +1100,30 @@ Ovoid.Ojson.prototype._procExpression = function(n, j) {
    * .factor
    * .exprfunc[]
    */
-  n.playing = j.playing;
-  n.factor = j.factor;
-  for (var i = 0; i < j.exprfunc.length; i++)
-    n.exprfunc.push(this._parseFunc(j.exprfunc[i]));
+  n.playing = j.pl;
+  n.factor = j.fc;
+  for (var i = 0; i < j.ex.length; i++)
+    n.exprfunc.push(this._parseFunc(j.ex[i]));
 };
 
+
+/**
+ * Proceed to importation of the Aim part from a OJSON sub-object.
+ * 
+ * @param {Object} n Ovoid typed Node object to structure from JSON.
+ * @param {Object} j OJSON object.
+ */
+Ovoid.Ojson.prototype._procAim = function(n, j) {
+  
+  /* Importation hérité de "Ovoid.Constraint" */
+  this._procConstraint(n, j);
+  /* - OJSON.Expression structure -
+   * .upvector[x,y,z]
+   * .aimat*
+   */
+  n.upvector.set(j.up);
+  (j.at == 'null')?n.aimat=null:n.aimat=j.at;
+};
 
 
 /**
@@ -1073,16 +1169,26 @@ Ovoid.Ojson.prototype._procAction = function(n, j) {
   n.onRmbHl = this._parseFunc(j.onRmbHl);
   n.onGrabd = this._parseFunc(j.onGrabd);
   n.onUgrabd = this._parseFunc(j.onUgrabd);
+  
   for (var i = 0; i < j.onIntersect[0].length; i++) {
-    n.onIntersect[0][i] = j.onIntersect[0][i];
+    (j.onIntersect[0][i] == 'null')?
+    n.onIntersect[0][i]=null:
+    n.onIntersect[0][i]=j.onIntersect[0][i];
+    
     n.onIntersect[1][i] = this._parseFunc(j.onIntersect[1][i]);
   }
   for (var i = 0; i < j.onIntersectEnter[0].length; i++) {
-    n.onIntersectEnter[0][i] = j.onIntersectEnter[0][i];
+    (j.onIntersectEnter[0][i] == 'null')?
+    n.onIntersectEnter[0][i]=null:
+    n.onIntersectEnter[0][i]=j.onIntersectEnter[0][i];
+    
     n.onIntersectEnter[1][i] = this._parseFunc(j.onIntersectEnter[1][i]);
   }
   for (var i = 0; i < j.onIntersectLeave[0].length; i++) {
-    n.onIntersectLeave[0][i] = j.onIntersectLeave[0][i];
+    (j.onIntersectLeave[0][i] == 'null')?
+    n.onIntersectLeave[0][i]=null:
+    n.onIntersectLeave[0][i]=j.onIntersectLeave[0][i];
+    
     n.onIntersectLeave[1][i] = this._parseFunc(j.onIntersectLeave[1][i]);
   }
 };
@@ -1099,18 +1205,21 @@ Ovoid.Ojson.prototype._procAction = function(n, j) {
  * @return {bool} True if import suceeds, false otherwise.
  */
 Ovoid.Ojson.prototype.importScene = function(scene) {
-                              
-  /* Si le JSON object n'existe on ne peut rien faire */
-  if (!this._json) {
-    return false;
-  }
-  
+
   /* détermine le nom du ojson d'apres l'url */
   var tmp = this.url;
   tmp = tmp.split('/');
   tmp = tmp[tmp.length - 1];
   tmp = tmp.split('.');
   this.name = tmp[0];
+  
+  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "importScene START");
+  
+  /* Si le JSON object n'existe on ne peut rien faire */
+  if (!this._json) {
+    Ovoid.log(1, 'Ovoid.Ojson ' + this.name, "no data to import.");
+    return false;
+  }
 
   /* Verifie le format JSON */
   if(!this._json.OJSON) {
@@ -1119,24 +1228,28 @@ Ovoid.Ojson.prototype.importScene = function(scene) {
     return false;
   }
   
-  if(this._json.type != "scene") {
+  if(this._json.TYPE != "SCN") {
     Ovoid.log(1, 'Ovoid.Ojson ' + this.name,
           "is not a valid Ovoid JSON Scene");
     return false;
   }
   
-  if(!this._json.scene) {
+  if(!this._json.SCENE) {
     Ovoid.log(1, 'Ovoid.Ojson ' + this.name,
           "no scene object found in Ovoid JSON");
     return false;
   }
   
+  /* reset le relink stack */
+  this._rlnkstack = new Array();
+  
   /* Scene de destination */
   this._dstsc = scene;
   
   //var debug = '';
-  var jsonnode = this._json.scene.node;
+  var jsonnode = this._json.SCENE.nl;
   /* importation de toutes les nodes */
+  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "importing nodes...");
   for (var i = 0; i < jsonnode.length; i++) {
     //debug += jsonnode[i].name + "\n";
     try {
@@ -1149,12 +1262,15 @@ Ovoid.Ojson.prototype.importScene = function(scene) {
     }
   }
   /* relink / reparente toutes les nodes */
-  for (var i = 0; i < this._dstsc.node.length; i++) {
-    this._relinkNode(this._dstsc.node[i]);
+  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "relinking nodes...");
+  for (var i = 0; i < this._rlnkstack.length; i++) {
+    this._relinkNode(this._rlnkstack[i]);
   }
   
-  this._dstsc.name = this._json.scene.name;
-  this._dstsc._uidn = this._json.scene.uidn;
+  this._dstsc.name = this._json.SCENE.n;
+  this._dstsc._uidn = this._json.SCENE.u;
+  
+  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "importScene END");
   
   return true;
 };

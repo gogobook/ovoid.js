@@ -258,6 +258,9 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
       node = new Ovoid.Animation(name);
       this.animation.push(node);
       break;
+    case Ovoid.AIM:
+      node = new Ovoid.Aim(name);
+      break;
     case Ovoid.EXPRESSION:
       node = new Ovoid.Expression(name);
       this.expression.push(node);
@@ -459,6 +462,8 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
   }
 
   node.setParent(null); /* bye bye ! */
+  
+  Ovoid.log(2, "Ovoid.Scene.remove", "Removing node " + node.name);
 };
 
 
@@ -818,7 +823,7 @@ Ovoid.Scene.prototype.removeMatches = function(item, rdep) {
   if(typeof(item) == 'string') {
     
     while (i--) {
-      if (this.node[i].name.indexOf(name, 0) != -1) {
+      if (this.node[i].name.indexOf(item, 0) != -1) {
         this.remove(this.node[i]);
         f = true;
       }
@@ -850,9 +855,9 @@ Ovoid.Scene.prototype.removeMatches = function(item, rdep) {
 Ovoid.Scene.prototype.toJSON = function() {
   
   var o = new Object();
-  o['name'] = this.name;
-  o['uidn'] = this._uidn;
-  o['activeCamera'] = this.activeCamera?this.activeCamera.uid:'null';
-  o['node'] = this.node;
+  o['n'] = this.name;
+  o['u'] = this._uidn;
+  o['ac'] = this.activeCamera?this.activeCamera.uid:'null';
+  o['nl'] = this.node;
   return o;
 };

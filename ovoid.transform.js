@@ -208,7 +208,7 @@ Ovoid.Transform.prototype.scale = function(vect, m) {
 
   switch (m)
   {
-    case Ovoid.ABSOLUTE:
+    case 1: // Ovoid.ABSOLUTE
       this.scaling.v[0] = vect.v[0];
       this.scaling.v[1] = vect.v[1];
       this.scaling.v[2] = vect.v[2];
@@ -238,7 +238,7 @@ Ovoid.Transform.prototype.scaleXyz = function(x, y, z, m) {
 
   switch (m)
   {
-    case Ovoid.ABSOLUTE:
+    case 1: // Ovoid.ABSOLUTE
       this.scaling.v[0] = x;
       this.scaling.v[1] = y;
       this.scaling.v[2] = z;
@@ -269,10 +269,10 @@ Ovoid.Transform.prototype.move = function(vect, c, m) {
 
   switch (m)
   {
-    case Ovoid.ABSOLUTE:
+    case 1: // Ovoid.ABSOLUTE
       switch (c)
       {
-        case Ovoid.LOCAL:
+        case 1: // Ovoid.LOCAL
           this.translation.v[0] = vect.v[0] * this.matrix.m[0] +
               vect.v[1] * this.matrix.m[4] +
               vect.v[2] * this.matrix.m[8];
@@ -295,7 +295,7 @@ Ovoid.Transform.prototype.move = function(vect, c, m) {
     default:
       switch (c)
       {
-        case Ovoid.LOCAL:
+        case 1: // Ovoid.LOCAL
           this.translation.v[0] += vect.v[0] * this.matrix.m[0] +
               vect.v[1] * this.matrix.m[4] +
               vect.v[2] * this.matrix.m[8];
@@ -336,10 +336,10 @@ Ovoid.Transform.prototype.moveXyz = function(x, y, z, c, m) {
 
   switch (m)
   {
-    case Ovoid.ABSOLUTE:
+    case 1: // Ovoid.ABSOLUTE
       switch (c)
       {
-        case Ovoid.LOCAL:
+        case 1: // Ovoid.LOCAL
           this.translation.v[0] = x * this.matrix.m[0] +
               y * this.matrix.m[4] +
               z * this.matrix.m[8];
@@ -362,7 +362,7 @@ Ovoid.Transform.prototype.moveXyz = function(x, y, z, c, m) {
     default:
       switch (c)
       {
-        case Ovoid.LOCAL:
+        case 1: // Ovoid.LOCAL
           this.translation.v[0] += x * this.matrix.m[0] +
               y * this.matrix.m[4] +
               z * this.matrix.m[8];
@@ -403,13 +403,13 @@ Ovoid.Transform.prototype.orient = function(euler, c, m) {
 
   switch (m)
   {
-    case Ovoid.ABSOLUTE:
+    case 1: // Ovoid.ABSOLUTE
       this.orientation.fromEuler(euler);
       break;
     default:
       switch (c)
       {
-        case Ovoid.LOCAL:
+        case 1: // Ovoid.LOCAL
           this.orientation.rotateSwapBy(euler);
           break;
         default:
@@ -439,13 +439,13 @@ Ovoid.Transform.prototype.orientXyz = function(x, y, z, c, m) {
 
   switch (m)
   {
-    case Ovoid.ABSOLUTE:
+    case 1: // Ovoid.ABSOLUTE
       this.orientation.fromEulerXyz(x, y, z);
       break;
     default:
       switch (c)
       {
-        case Ovoid.LOCAL:
+        case 1: // Ovoid.LOCAL
           this.orientation.rotateSwapByXyz(x, y, z);
           break;
         default:
@@ -475,18 +475,13 @@ Ovoid.Transform.prototype.rotate = function(euler, c, m) {
 
   switch (m)
   {
-    case Ovoid.ABSOLUTE:
-      switch (c)
-      {
-        default:
-          this.rotation.fromEuler(euler);
-          break;
-      }
+    case 1: // Ovoid.ABSOLUTE
+        this.rotation.fromEuler(euler);
       break;
     default:
       switch (c)
       {
-        case Ovoid.LOCAL:
+        case 1: // Ovoid.LOCAL
           this.rotation.rotateSwapBy(euler);
           break;
         default:
@@ -516,18 +511,12 @@ Ovoid.Transform.prototype.rotateXyz = function(x, y, z, c, m) {
 
   switch (m)
   {
-    case Ovoid.ABSOLUTE:
-      switch (c)
-      {
-        default:
-          this.rotation.fromEulerXyz(x, y, z);
-          break;
-      }
-      break;
+    case 1: // Ovoid.ABSOLUTE
+        this.rotation.fromEulerXyz(x, y, z);
     default:
       switch (c)
       {
-        case Ovoid.LOCAL:
+        case 1: // Ovoid.LOCAL
           this.rotation.rotateSwapByXyz(x, y, z);
           break;
         default:
@@ -678,29 +667,29 @@ Ovoid.Transform.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['type'] = Ovoid.TRANSFORM;
+  o['t'] = Ovoid.TRANSFORM;
   /* Ovoid.Node */
-  o['name'] = this.name;
-  o['visible'] = this.visible;
-  o['uid'] = this.uid;
-  o['parent'] = this.parent?this.parent.uid:'null';
-  o['child'] = new Array();
+  o['n'] = this.name;
+  o['v'] = this.visible;
+  o['u'] = this.uid;
+  o['p'] = this.parent?this.parent.uid:'null';
+  o['c'] = new Array();
   for(var i = 0; i < this.child.length; i++)
-    o['child'][i] = this.child[i].uid;
-  o['depend'] = new Array();
+    o['c'][i] = this.child[i].uid;
+  o['dp'] = new Array();
   for(var i = 0; i < this.depend.length; i++)
-    o['depend'][i] = this.depend[i].uid;
-  o['link'] = new Array();
+    o['dp'][i] = this.depend[i].uid;
+  o['lk'] = new Array();
   for(var i = 0; i < this.link.length; i++)
-    o['link'][i] = this.link[i].uid;
-  o['bvolumemin'] = this.boundingBox.min;
-  o['bvolumemax'] = this.boundingBox.max;
-  o['bvolumerad'] = this.boundingSphere.radius;
+    o['lk'][i] = this.link[i].uid;
+  o['bmn'] = this.boundingBox.min;
+  o['bmx'] = this.boundingBox.max;
+  o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Transform */
-  o['scaling'] = this.scaling;
-  o['translation'] = this.translation;
-  o['orientation'] = this.orientation;
-  o['rotation'] = this.rotation;
+  o['ts'] = this.scaling;
+  o['tt'] = this.translation;
+  o['to'] = this.orientation;
+  o['tr'] = this.rotation;
 
   return o;
 };

@@ -445,37 +445,37 @@ Ovoid.Emitter.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['type'] = Ovoid.EMITTER;
+  o['t'] = Ovoid.EMITTER;
   /* Ovoid.Node */
-  o['name'] = this.name;
-  o['visible'] = this.visible;
-  o['uid'] = this.uid;
-  o['parent'] = this.parent?this.parent.uid:'null';
-  o['child'] = new Array();
+  o['n'] = this.name;
+  o['v'] = this.visible;
+  o['u'] = this.uid;
+  o['p'] = this.parent?this.parent.uid:'null';
+  o['c'] = new Array();
   for(var i = 0; i < this.child.length; i++)
-    o['child'][i] = this.child[i].uid;
-  o['depend'] = new Array();
+    o['c'][i] = this.child[i].uid;
+  o['dp'] = new Array();
   for(var i = 0; i < this.depend.length; i++)
-    o['depend'][i] = this.depend[i].uid;
-  o['link'] = new Array();
+    o['dp'][i] = this.depend[i].uid;
+  o['lk'] = new Array();
   for(var i = 0; i < this.link.length; i++)
-    o['link'][i] = this.link[i].uid;
-  o['bvolumemin'] = this.boundingBox.min;
-  o['bvolumemax'] = this.boundingBox.max;
-  o['bvolumerad'] = this.boundingSphere.radius;
+    o['lk'][i] = this.link[i].uid;
+  o['bmn'] = this.boundingBox.min;
+  o['bmx'] = this.boundingBox.max;
+  o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Emitter */
-  o['model'] = this.model;
-  o['mass'] = this.mass;
-  o['life'] = this.life;
-  o['rate'] = this.rate;
-  o['velocity'] = this.velocity;
-  o['damping'] = this.damping;
-  o['delta'] = this.delta;
-  o['scattering'] = this.scattering;
-  o['color'] = this.color;
-  o['size'] = this.size;
-  o['emits'] = this.emits;
-  o['texture'] = this.texture;
+  o['md'] = this.model;
+  o['ms'] = this.mass;
+  o['lf'] = this.life;
+  o['rt'] = this.rate;
+  o['vl'] = this.velocity;
+  o['dm'] = this.damping;
+  o['dt'] = this.delta;
+  o['sc'] = this.scattering;
+  o['cl'] = this.color;
+  o['sz'] = this.size;
+  o['em'] = this.emits;
+  o['tx'] = this.texture;
   return o;
 
 };

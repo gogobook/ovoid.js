@@ -528,7 +528,7 @@ Ovoid.Collada.prototype._retrieveNode = function(name) {
  * @param {Vector} v Vector to convert.
  * @param {bool} i inverse.
  */
-Ovoid.Collada.prototype._procVect = function(v, i) {
+Ovoid.Collada.prototype._switch2YVect = function(v, i) {
   
   switch (this._upaxis)
   {
@@ -550,7 +550,7 @@ Ovoid.Collada.prototype._procVect = function(v, i) {
  * @param {Matrix4} m Matrix4 to convert.
  * @param {bool} i inverse.
  */
-Ovoid.Collada.prototype._procMat4 = function(m, i) {
+Ovoid.Collada.prototype._switch2YMat4 = function(m, i) {
   
   switch (this._upaxis)
   {
@@ -568,18 +568,55 @@ Ovoid.Collada.prototype._procMat4 = function(m, i) {
       m2y.m[9] = 1.0;
       m2y.m[10] = 0.0;
       m.multBy(m2y);
-      /*
-      var tmp;
-      tmp = m.m[13];
-      m.m[13] = -m.m[14];
-      m.m[14] = tmp;
-      */
     break;
     case 0: /* X up */
     break;
   }
 };
 
+/**
+ * Convert and correct Transform node according to the up axis.
+ * 
+ * @param {Transform} tform Transform node to convert.
+ */
+Ovoid.Collada.prototype._switch2YNode = function(tform) {
+  
+  /* Convertis l'up-axis */
+  switch (this._upaxis)
+  {
+    case 2: /* Z up */
+    var t = new Float32Array([0.0, 0.0, 0.0]);
+    var r = new Float32Array([0.0, 0.0, 0.0]);
+    /* transforme la matrice */
+    tform.cachTransform();
+    var mat = tform.matrix;
+    this._switch2YMat4(mat);
+    /* Recuperation des composants de translation */
+    t[0] = mat.m[12]; t[1] = mat.m[13]; t[2] = mat.m[14];
+    /* Recuperation des composants de rotation */
+    var cy = Math.sqrt(mat.m[0] * mat.m[0] + mat.m[1] * mat.m[1]);
+    if (cy > 0.001) {
+      r[0] = Math.atan2(mat.m[6], mat.m[10]);
+      r[1] = Math.atan2(-mat.m[2], cy);
+      r[2] = Math.atan2(mat.m[1], mat.m[0]);
+    } else {
+      r[0] = Math.atan2(-mat.m[9], mat.m[5]);
+      r[1] = Math.atan2(-mat.m[2], cy);
+      r[2] = 0.0;
+    }
+    /* Reset les transformations du node */
+    tform.moveXyz(0.0, 0.0, 0.0, Ovoid.WORLD, Ovoid.ABSOLUTE);
+    tform.rotateXyz(0.0, 0.0, 0.0, Ovoid.WORLD, Ovoid.ABSOLUTE);
+    /* Applique les nouvelles transformations */
+    tform.moveXyz(t[0], t[1], t[2], Ovoid.WORLD, Ovoid.ABSOLUTE);
+    tform.rotateXyz(r[0], r[1], r[2], Ovoid.LOCAL, Ovoid.RELATIVE);
+    break;
+    case 0: /* X up */
+    break;
+    default:
+    break;
+  }
+};
 
 /**
  * Proceed to creation and setting of a new camera node from a
@@ -1340,7 +1377,7 @@ Ovoid.Collada.prototype._procGeo = function(dae) {
             "Geometry '" + node.name + '/' + sms +
             "' : material not found");
 
-        material = new Ovoid.Material('null_material#' +
+        material = new Ovoid.Material('newmaterial#' +
                                       this._dstsc.material.length);
                                       
         Ovoid.log(2, 'Ovoid.Collada ' + this.name,
@@ -1351,7 +1388,7 @@ Ovoid.Collada.prototype._procGeo = function(dae) {
       }
     } else {
       /* pas de 'symbol' ? on crée un material par défaut */
-      material = new Ovoid.Material('null_material#' +
+      material = new Ovoid.Material('newmaterial#' +
                                     this._dstsc.material.length);
                                     
       Ovoid.log(2, 'Ovoid.Collada ' + this.name,
@@ -2101,6 +2138,9 @@ Ovoid.Collada.prototype._procNod = function(dae) {
   var o = new Float32Array([0.0, 0.0, 0.0]);
 
   /* a-t-on trouvé un élements <matrix> dans le <node> ? */
+  /* NOTE: Il se peut que ce soit la parent inverse, c'est pourquoi 
+   * les transformations subsequentes sont ajoutés. Ceci permet de
+   * retrouver la matrice locale de l'objet (Typique blender) */
   if (dm.length) {
     /* on décompose la matrice pour extraire les translations
      * et rotations du node */
@@ -2111,30 +2151,30 @@ Ovoid.Collada.prototype._procNod = function(dae) {
     var mat = new Ovoid.Matrix4(d);
     /* Column-major vers Row-major */
     mat.toTranspose();
-
+    
     /* Recuperation des composants de translation */
-    t[0] = mat.m[12]; t[1] = mat.m[13]; t[2] = mat.m[14];
+    t[0] += mat.m[12]; t[1] += mat.m[13]; t[2] += mat.m[14];
 
     /* Recuperation des composants de rotation */
     var cy = Math.sqrt(mat.m[0] * mat.m[0] + mat.m[1] * mat.m[1]);
     if (cy > 0.001) {
-      r[0] = Math.atan2(mat.m[6], mat.m[10]);
-      r[1] = Math.atan2(-mat.m[2], cy);
-      r[2] = Math.atan2(mat.m[1], mat.m[0]);
+      r[0] += Math.atan2(mat.m[6], mat.m[10]);
+      r[1] += Math.atan2(-mat.m[2], cy);
+      r[2] += Math.atan2(mat.m[1], mat.m[0]);
     } else {
-      r[0] = Math.atan2(-mat.m[9], mat.m[5]);
-      r[1] = Math.atan2(-mat.m[2], cy);
+      r[0] += Math.atan2(-mat.m[9], mat.m[5]);
+      r[1] += Math.atan2(-mat.m[2], cy);
       r[2] = 0;
     }
   }
-
+  
   /* a-t-on trouvé un élements <translate> dans le <node> ? */
   if (dt.length) {
     /* une liste de float */
     var data = this._gTxtDataSplit(dt[0].childNodes);
-    t[0] = parseFloat(data[0]);
-    t[1] = parseFloat(data[1]);
-    t[2] = parseFloat(data[2]);
+    t[0] += parseFloat(data[0]);
+    t[1] += parseFloat(data[1]);
+    t[2] += parseFloat(data[2]);
   }
 
   /* a-t-on trouvé des élements <rotate> dans le <node> ? */
@@ -2174,11 +2214,11 @@ Ovoid.Collada.prototype._procNod = function(dae) {
 
   /* On applique les transformation au node d'après les éléments
    * extrait précédemment */
-  node.moveXyz(t[0], t[1], t[2], Ovoid.WORLD, Ovoid.ABSOLUTE);
+  node.moveXyz(t[0], t[1], t[2], Ovoid.LOCAL, Ovoid.RELATIVE);
   node.rotateXyz(r[0], r[1], r[2], Ovoid.LOCAL, Ovoid.RELATIVE);
   node.orientXyz(o[0], o[1], o[2], Ovoid.LOCAL, Ovoid.RELATIVE);
   node.scaleXyz(s[0], s[1], s[2], Ovoid.ABSOLUTE);
-
+  
   Ovoid.log(3, 'Ovoid.Collada ' + this.name,
         "Transform '" + node.name + "' move:" 
         + t[0] + ', ' + t[1] + ', ' + t[2]);
@@ -2195,11 +2235,6 @@ Ovoid.Collada.prototype._procNod = function(dae) {
         "Transform '" + node.name + "' scale:" 
         + s[0] + ', ' + s[1] + ', ' + s[2]);
   
-  /* cach les transformations avant le parentage */
-  node.cachTransform();
-  /* Convertis en Y-up si besoin */
-  this._procMat4(node.matrix);
-  this._procMat4(node.worldMatrix);
   /* retourne la node transformée */
   return node;
 };
@@ -2697,7 +2732,7 @@ Ovoid.Collada.prototype._procAni = function(dae) {
           /* Column-major vers Row-major */
           mat.toTranspose();
           /* convertis en Y-up si nécéssaire */
-          //this._procMat4(mat);
+          //this._switch2YMat4(mat);
 
           /* recuperation des translations */
           tx[k] = mat.m[12]; ty[k] = mat.m[13]; tz[k] = mat.m[14];
@@ -3368,7 +3403,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
           /* Si on trouve un parent on parente, si non, on parent au
            * root */
           if (!parent) {
-            //node.setParent(this._nroot);
+            /* Convertis en Y-up si nécéssaire */
+            this._switch2YNode(node);
             Ovoid.log(3, 'Ovoid.Collada ' + this.name,
                 "'" + node.name +
                 "' in scene root");
@@ -3378,6 +3414,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
                 "'" + node.name + "' child of '" +
                 parent.name + "'");
           }
+          /* cach les transformations */
+          node.cachTransform();
         }
       }
     }

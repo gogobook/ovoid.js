@@ -46,6 +46,8 @@
 		<s symbol="UNIFORM_EYE_VIEWSIZE_VEC3" 				id="32">Es</s>
     <s symbol="UNIFORM_AMBIENT_COLOR_VEC4" 				id="40">Ac</s>
 		<s symbol="UNIFORM_LAYER_SIZE_VEC3" 					id="42">Ls</s>
+    <s symbol="UNIFORM_FOG_COLOR_VEC4" 					  id="44">Fc</s>
+    <s symbol="UNIFORM_FOG_DENSITY_FLOAT" 				id="45">Fd</s>
 	</uniform>
 	<uniformMatrix>
 		<s symbol="UNIFORM_MATRIX_TRANSFORM_MAT4" 				id="0">MXF</s>

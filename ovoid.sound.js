@@ -400,45 +400,45 @@ Ovoid.Sound.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['type'] = Ovoid.SOUND;
+  o['t'] = Ovoid.SOUND;
   /* Ovoid.Node */
-  o['name'] = this.name;
-  o['visible'] = this.visible;
-  o['uid'] = this.uid;
-  o['parent'] = this.parent?this.parent.uid:'null';
-  o['child'] = new Array();
+  o['n'] = this.name;
+  o['v'] = this.visible;
+  o['u'] = this.uid;
+  o['p'] = this.parent?this.parent.uid:'null';
+  o['c'] = new Array();
   for(var i = 0; i < this.child.length; i++)
-    o['child'][i] = this.child[i].uid;
-  o['depend'] = new Array();
+    o['c'][i] = this.child[i].uid;
+  o['dp'] = new Array();
   for(var i = 0; i < this.depend.length; i++)
-    o['depend'][i] = this.depend[i].uid;
-  o['link'] = new Array();
+    o['dp'][i] = this.depend[i].uid;
+  o['lk'] = new Array();
   for(var i = 0; i < this.link.length; i++)
-    o['link'][i] = this.link[i].uid;
-  o['bvolumemin'] = this.boundingBox.min;
-  o['bvolumemax'] = this.boundingBox.max;
-  o['bvolumerad'] = this.boundingSphere.radius;
+    o['lk'][i] = this.link[i].uid;
+  o['bmn'] = this.boundingBox.min;
+  o['bmx'] = this.boundingBox.max;
+  o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Transform */
   o['pivot'] = this.pivot;
-  o['scaling'] = this.scaling;
-  o['translation'] = this.translation;
-  o['orientation'] = this.orientation;
-  o['rotation'] = this.rotation;
+  o['ts'] = this.scaling;
+  o['tt'] = this.translation;
+  o['to'] = this.orientation;
+  o['tr'] = this.rotation;
   /* Ovoid.Sound */
-  o['audio'] = this.audio?this.audio.uid:'null';
-  o['flat'] =  this.flat;
+  o['au'] = this.audio?this.audio.uid:'null';
+  o['fl'] =  this.flat;
   if(this._alpanner) {
-    o['coneInnerAngle'] = this._alpanner.coneInnerAngle;
-    o['coneOuterAngle'] = this._alpanner.coneOuterAngle;
-    o['coneOuterGain'] = this._alpanner.coneOuterGain;
-    o['refDistance'] = this._alpanner.refDistance;
-    o['maxDistance'] = this._alpanner.maxDistance;
-    o['rolloffFactor'] = this._alpanner.rolloffFactor;
+    o['ia'] = this._alpanner.coneInnerAngle;
+    o['oa'] = this._alpanner.coneOuterAngle;
+    o['og'] = this._alpanner.coneOuterGain;
+    o['rd'] = this._alpanner.refDistance;
+    o['md'] = this._alpanner.maxDistance;
+    o['rf'] = this._alpanner.rolloffFactor;
   }
   if(this._alsource) {
-    o['loop'] = this._alsource.loop
+    o['lo'] = this._alsource.loop
   } else {
-    o['loop'] = false;
+    o['lo'] = false;
   }
   
   return o;

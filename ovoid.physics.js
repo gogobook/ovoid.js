@@ -123,7 +123,7 @@ Ovoid.Physics.prototype.constructor = Ovoid.Physics;
 
 
 /**
- * Define mass.
+ * Set mass.
  * 
  * <br><br>Sets the mass of this instance according to the specified value.
  *
@@ -131,7 +131,21 @@ Ovoid.Physics.prototype.constructor = Ovoid.Physics;
  */
 Ovoid.Physics.prototype.setMass = function(mass) {
   
-  this.imass = 1.0/mass;
+  (mass>0.0)?this.imass = 1.0/mass:this.imass = 0.0;
+};
+
+
+/**
+ * Set damping.
+ * 
+ * <br><br>Sets the damping factor of this instance according to the specified 
+ * value.
+ *
+ * @param {float} damp Damping factor.
+ */
+Ovoid.Physics.prototype.setDamping = function(damp) {
+  
+  this.damping = damp;
 };
 
 
@@ -148,7 +162,8 @@ Ovoid.Physics.prototype.setMass = function(mass) {
 Ovoid.Physics.prototype.newton = function(g) {
   
   if(!(this.cach & Ovoid.CACH_PHYSICS)) {
-    var mass = 1.0/this.imass;
+    var mass;
+    (this.imass>0.0)?mass = 1.0/this.imass:mass = 0.0;
     this.linearInfluence.v[0] += mass * g.v[0];
     this.linearInfluence.v[1] += mass * g.v[1];
     this.linearInfluence.v[2] += mass * g.v[2];
@@ -170,7 +185,8 @@ Ovoid.Physics.prototype.newton = function(g) {
 Ovoid.Physics.prototype.newtonXyz = function(x, y, z) {
   
   if(!(this.cach & Ovoid.CACH_PHYSICS)) {
-    var mass = 1.0/this.imass;
+    var mass;
+    (this.imass>0.0)?mass = 1.0/this.imass:mass = 0.0;
     this.linearInfluence.v[0] += mass * x;
     this.linearInfluence.v[1] += mass * y;
     this.linearInfluence.v[2] += mass * z;
@@ -227,19 +243,41 @@ Ovoid.Physics.prototype.windXyz = function(x, y, z) {
  *
  * @param {Vector} force Impulsion vector.
  * @param {Point} point Impulsion point.
+ * @param {int} c Space coordinate for impulsion point. Can be Ovoid.WORLD or 
+ * Ovoid.LOCAL.
  * 
  * @see Ovoid.Vector
  * @see Ovoid.Point
  */
-Ovoid.Physics.prototype.impulse = function(force, point) {
+Ovoid.Physics.prototype.impulse = function(force, point, c) {
   
   this.linearInfluence.addBy(force);
 
   /* vecteur radius = point -> centre de gravité */
-  var rx = point.v[0] - this.target[0].worldPosition.v[0];
-  var ry = point.v[1] - this.target[0].worldPosition.v[1];
-  var rz = point.v[2] - this.target[0].worldPosition.v[2];
-  
+  var rx, ry, rz;
+  switch (c)
+  {
+    case 1: // Ovoid.LOCAL
+      // Transforme en coordonnées local à l'objet
+      rx = point.v[0] * this.target[0].worldMatrix.m[0] +
+              point.v[1] * this.target[0].worldMatrix.m[4] +
+              point.v[2] * this.target[0].worldMatrix.m[8];
+
+      ry = point.v[0] * this.target[0].worldMatrix.m[1] +
+              point.v[1] * this.target[0].worldMatrix.m[5] +
+              point.v[2] * this.target[0].worldMatrix.m[9];
+
+      rz = point.v[0] * this.target[0].worldMatrix.m[2] +
+              point.v[1] * this.target[0].worldMatrix.m[6] +
+              point.v[2] * this.target[0].worldMatrix.m[10];
+      break;
+    default:
+      rx = point.v[0] - this.target[0].worldPosition.v[0];
+      ry = point.v[1] - this.target[0].worldPosition.v[1];
+      rz = point.v[2] - this.target[0].worldPosition.v[2];
+      break;
+  }
+        
   /* torque += rvect.cross(force) */
   this.torqueInfluence.v[0] += ry * force.v[2] - rz * force.v[1];
   this.torqueInfluence.v[1] += rz * force.v[0] - rx * force.v[2];
@@ -260,6 +298,36 @@ Ovoid.Physics.prototype.impulse = function(force, point) {
    * Le resultat est un axe de rotation dont la taille 
    * représente la force.
    */
+  
+  this.unCach(Ovoid.CACH_INFLUENCES|Ovoid.CACH_PHYSICS);
+};
+
+
+/**
+ * Spring impultion.
+ * 
+ * <br><br>Applies a ponctual spring influence to this instance according to the
+ * given spring parameters.
+ *
+ * @param {Point} point Spring anchor point.
+ * @param {Point} target Spring other extremity position.
+ * @param {float} strength Spring strength.
+ * @param {float} limit Spring distance limit.
+ * @param {int} c Space coordinate for anchor point. Can be Ovoid.WORLD or 
+ * Ovoid.LOCAL.
+ * 
+ * @see Ovoid.Point
+ */
+Ovoid.Physics.prototype.spring = function(point, target, strength, limit, c) {
+  
+  var force = new Ovoid.Vector();
+  force.subOf(this.target[0].worldPosition, target);
+  var mag = Math.abs(force.size() - limit) * strength;
+  
+  force.normalize();
+  force.scaleBy(-mag);
+  
+  this.impulse(force, point, c);
   
   this.unCach(Ovoid.CACH_INFLUENCES|Ovoid.CACH_PHYSICS);
 };
@@ -319,7 +387,8 @@ Ovoid.Physics.prototype.cachPhysics = function() {
     if( (this.target[0].boundingBox.hsize.v[0] + this.target[0].boundingBox.hsize.v[1] +
         this.target[0].boundingBox.hsize.v[2]) > 0.0) {
 
-      var mass = 1.0/this.imass;
+      var mass;
+      (this.imass>0.0)?mass = 1.0/this.imass:mass = 0.0;
       var Ix, Iy, Iz;
       
       /* il s'agit d'un inverse, comme la masse */
@@ -395,7 +464,6 @@ Ovoid.Physics.prototype.cachPhysics = function() {
           RI[8] * this.target[0].worldMatrix.m[10];
       
       /* applique la gravité */
-      var mass = 1.0/this.imass;
       this.linearInfluence.v[0] += mass * Ovoid.opt_gravity[0];
       this.linearInfluence.v[1] += mass * Ovoid.opt_gravity[1];
       this.linearInfluence.v[2] += mass * Ovoid.opt_gravity[2];
@@ -470,33 +538,33 @@ Ovoid.Physics.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['type'] = Ovoid.PHYSICS;
+  o['t'] = Ovoid.PHYSICS;
   /* Ovoid.Node */
-  o['name'] = this.name;
-  o['visible'] = this.visible;
-  o['uid'] = this.uid;
-  o['parent'] = this.parent?this.parent.uid:'null';
-  o['child'] = new Array();
+  o['n'] = this.name;
+  o['v'] = this.visible;
+  o['u'] = this.uid;
+  o['p'] = this.parent?this.parent.uid:'null';
+  o['c'] = new Array();
   for(var i = 0; i < this.child.length; i++)
-    o['child'][i] = this.child[i].uid;
-  o['depend'] = new Array();
+    o['c'][i] = this.child[i].uid;
+  o['dp'] = new Array();
   for(var i = 0; i < this.depend.length; i++)
-    o['depend'][i] = this.depend[i].uid;
-  o['link'] = new Array();
+    o['dp'][i] = this.depend[i].uid;
+  o['lk'] = new Array();
   for(var i = 0; i < this.link.length; i++)
-    o['link'][i] = this.link[i].uid;
-  o['bvolumemin'] = this.boundingBox.min;
-  o['bvolumemax'] = this.boundingBox.max;
-  o['bvolumerad'] = this.boundingSphere.radius;
+    o['lk'][i] = this.link[i].uid;
+  o['bmn'] = this.boundingBox.min;
+  o['bmx'] = this.boundingBox.max;
+  o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Constraint */
-  o['target'] = new Array();
+  o['ct'] = new Array();
   for(var i = 0; i < this.target.length; i++)
-    o['target'][i] = this.target[i].uid;
+    o['ct'][i] = this.target[i].uid;
   /* Ovoid.Physics */
-  o['imass'] = this.imass;
-  o['itensor'] = this.itensor;
-  o['model'] = this.model;
-  o['damping'] = this.damping;
+  o['im'] = this.imass;
+  o['it'] = this.itensor;
+  o['md'] = this.model;
+  o['dm'] = this.damping;
   
   return o;
 };
