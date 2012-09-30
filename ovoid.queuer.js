@@ -233,12 +233,12 @@ Ovoid.Queuer._viewcull = function(o) {
           o.boundingSphere.radius;
           
       o.rendered = true;
-       Ovoid.Queuer.qbody.add(o);
+      Ovoid.Queuer.qbody.add(o);
       return true;
     }
   } else {
     o.rendered = true;
-     Ovoid.Queuer.qbody.add(o);
+    Ovoid.Queuer.qbody.add(o);
     return true;
   }
   return false;
@@ -256,9 +256,9 @@ Ovoid.Queuer._viewcull = function(o) {
  */
 Ovoid.Queuer._physicscull = function(o) {
 
-  if(!(o.cach & Ovoid.CACH_PHYSICS) || o.target.rendered) {
+  //if(!(o.cach & Ovoid.CACH_PHYSICS) || o.target.rendered) {
     Ovoid.Queuer.qphycs.add(o);
-  } 
+  //} 
 };
 
 
@@ -368,7 +368,7 @@ Ovoid.Queuer.queueScene = function(sc) {
           
         /* Si c'est un body */
         if (o.type & Ovoid.BODY) {
-          if (o.shape) {
+          if(o.shape) {
             /* cache le body pour actualiser la bounding volum */
             o.cachBody();
             /* Ajoute au render stack si passe le view culling

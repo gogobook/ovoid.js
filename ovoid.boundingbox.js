@@ -32,13 +32,13 @@ Ovoid.Boundingbox = function() {
 
   /** Bounding box's min point 
    * @type Point*/
-  this.min = new Ovoid.Point(0.0, 0.0, 0.0, 1.0);
+  this.min = new Ovoid.Point(-0.05, -0.05, -0.05, 1.0);
   /** Bounding box's max point 
    * @type Point*/
-  this.max = new Ovoid.Point(0.0, 0.0, 0.0, 1.0);
+  this.max = new Ovoid.Point(0.05, 0.05, 0.05, 1.0);
   /** Bounding box's half size in X, Y and Z axis
    * @type Vector*/
-  this.hsize = new Ovoid.Vector(0.0, 0.0, 0.0);
+  this.hsize = new Ovoid.Vector(0.1, 0.1, 0.1);
   /** Bounding box's center relative to its shape node.
    * @type Point*/
   this.center = new Ovoid.Point(0.0, 0.0, 0.0, 1.0);

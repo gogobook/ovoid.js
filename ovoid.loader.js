@@ -966,7 +966,7 @@ Ovoid.Loader.includeAudio = function(audio) {
 Ovoid.Loader.includeShader = function(slot, vs, fs, wm, name) {
 
   for(var i = 0; i < Ovoid.Loader._stackgls.length; i++) {
-    if(Ovoid.Loader._stackscn[i][0] == slot && 
+    if(Ovoid.Loader._stackgls[i][0] == slot && 
         Ovoid.Loader._stackgls[i][1] == vs && 
         Ovoid.Loader._stackgls[i][2] == fs &&
         Ovoid.Loader._stackgls[i][3] == wm)

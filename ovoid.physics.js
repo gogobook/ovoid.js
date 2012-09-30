@@ -322,14 +322,12 @@ Ovoid.Physics.prototype.spring = function(point, target, strength, limit, c) {
   
   var force = new Ovoid.Vector();
   force.subOf(this.target[0].worldPosition, target);
-  var mag = Math.abs(force.size() - limit) * strength;
-  
-  force.normalize();
-  force.scaleBy(-mag);
-  
-  this.impulse(force, point, c);
-  
-  this.unCach(Ovoid.CACH_INFLUENCES|Ovoid.CACH_PHYSICS);
+  var mag = force.size();
+  if(mag) {
+    force.normalize();
+    force.scaleBy(-((mag - limit) * strength));
+    this.impulse(force, point, c);
+  }
 };
 
 
@@ -382,10 +380,11 @@ Ovoid.Physics.prototype.cachPhysics = function() {
     return;
 
   if(!(this.cach & Ovoid.CACH_PHYSICS)) {
-    
+      
     /* Update l'inertia tensor */
-    if( (this.target[0].boundingBox.hsize.v[0] + this.target[0].boundingBox.hsize.v[1] +
-        this.target[0].boundingBox.hsize.v[2]) > 0.0) {
+    if( ( this.target[0].boundingBox.hsize.v[0] + 
+          this.target[0].boundingBox.hsize.v[1] +
+          this.target[0].boundingBox.hsize.v[2]) > 0.0) {
 
       var mass;
       (this.imass>0.0)?mass = 1.0/this.imass:mass = 0.0;
@@ -462,13 +461,12 @@ Ovoid.Physics.prototype.cachPhysics = function() {
       this.itensor.m[8] = RI[6] * this.target[0].worldMatrix.m[8] + 
           RI[7] * this.target[0].worldMatrix.m[9] + 
           RI[8] * this.target[0].worldMatrix.m[10];
-      
+          
       /* applique la gravité */
       this.linearInfluence.v[0] += mass * Ovoid.opt_gravity[0];
       this.linearInfluence.v[1] += mass * Ovoid.opt_gravity[1];
       this.linearInfluence.v[2] += mass * Ovoid.opt_gravity[2];
       this.unCach(Ovoid.CACH_INFLUENCES);
-
     }
     
     if(!(this.cach & Ovoid.CACH_INFLUENCES)) {    

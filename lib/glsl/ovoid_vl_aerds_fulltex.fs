@@ -20,13 +20,15 @@ uniform vec4 Me;
 uniform vec4 Mr;
 uniform float My;
 uniform float Mo;
-
+uniform vec4 Fc; /* Fog color */
+uniform float Fd; /* Fog density */
 varying vec2 Vu;
 varying vec4 Cd;
 varying vec4 Cs;
 varying vec3 Vn;
 varying vec4 Vp;
 
+float Fz, Ff;
 vec3 R, EV;
 vec2 Ru;
 
@@ -46,6 +48,11 @@ void main(void)
   if(ENd) {
     gl_FragColor+=(Md*texture2D(Sd,Vu))*Cd;
     gl_FragColor+=(Ms*texture2D(Ss,Vu))*Cs;
+  }
+  if(Fd>0.0) {
+    Fz=gl_FragCoord.z/gl_FragCoord.w;
+    Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);
+    gl_FragColor=mix(Fc,gl_FragColor,Ff);
   }
 	gl_FragColor.a = Mo;
 }

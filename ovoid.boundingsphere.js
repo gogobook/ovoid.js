@@ -32,7 +32,7 @@ Ovoid.Boundingsphere = function() {
 
   /** Bounding sphere's radius.
    * @type float */
-  this.radius = 0.0;
+  this.radius = 0.1;
   /** Bounding sphere's center relative to its shape node.
    * @type Point*/
   this.center = new Ovoid.Point(0.0, 0.0, 0.0, 1.0);

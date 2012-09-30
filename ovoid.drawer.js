@@ -164,6 +164,14 @@ Ovoid.Drawer.opt_clearColor = [1.0, 1.0, 1.0, 1.0];
 Ovoid.Drawer.opt_ambientColor = [0.2, 0.2, 0.2, 1.0];
 
 
+/** Global fog/atmosphere color */
+Ovoid.Drawer.opt_fogColor = [1.0, 1.0, 1.0, 1.0];
+
+
+/** Global fog/atmosphere density */
+Ovoid.Drawer.opt_fogDensity = 0.0;
+
+
 /** Level of performance */
 Ovoid.Drawer.opt_lop = 2;
 
@@ -349,6 +357,10 @@ Ovoid.Drawer._swdepth = new Array(2);
 
 /** Internal ambiant color **/
 Ovoid.Drawer._abcolor = new Float32Array(4);
+
+
+/** Internal fog color **/
+Ovoid.Drawer._fogcolor = new Float32Array(4);
 
 
 /** Picking readed pixel buffer. */
@@ -1018,6 +1030,14 @@ Ovoid.Drawer.beginDraw = function() {
   Ovoid.Drawer._abcolor[1] = c[1];
   Ovoid.Drawer._abcolor[2] = c[2];
   Ovoid.Drawer._abcolor[3] = c[3];
+  /* fog color si necessaire */
+  if(Ovoid.Drawer.opt_fogDensity > 0.0) {
+    c = Ovoid.Drawer.opt_fogColor;
+    Ovoid.Drawer._fogcolor[0] = c[0];
+    Ovoid.Drawer._fogcolor[1] = c[1];
+    Ovoid.Drawer._fogcolor[2] = c[2];
+    Ovoid.Drawer._fogcolor[3] = c[3];
+  }
 
   c = Ovoid.Drawer.opt_clearColor;
   Ovoid.gl.clearColor(c[0],c[1],c[2],c[3]);
@@ -1184,6 +1204,10 @@ Ovoid.Drawer.light = function(light) {
 Ovoid.Drawer.ambient = function() {
   
   Ovoid.Drawer.sp.setUniform4fv(40, Ovoid.Drawer._abcolor);
+  if(Ovoid.Drawer.opt_fogDensity > 0.0) {
+    Ovoid.Drawer.sp.setUniform4fv(44, Ovoid.Drawer._fogcolor);
+    Ovoid.Drawer.sp.setUniform1f(45, Ovoid.Drawer.opt_fogDensity);
+  }
 }
 
 
@@ -2150,14 +2174,14 @@ Ovoid.Drawer.drawQueue = function() {
   // Picking frame
   if (Ovoid.opt_enablePicking) { 
     
-    Ovoid.Drawer.switchBlend(0);
+    Ovoid.Drawer.switchBlend(0); // blend off
     Ovoid.Drawer.switchPipe(20); //PIPE_RP_GEOMETRY
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.beginRpDraw();
-    Ovoid.Drawer.switchDepth(1);
+    Ovoid.Drawer.switchDepth(1); // depth mask on, test less
     Ovoid.Drawer.bodyStack(Ovoid.Queuer.qbody, true);
     if (Ovoid.Drawer.opt_drawLayers) {
-      Ovoid.Drawer.switchDepth(0);
+      Ovoid.Drawer.switchDepth(0); // depth all disable
       Ovoid.Drawer.switchPipe(23); //PIPE_RP_LAYER
       Ovoid.Drawer.screen(Ovoid.Frame.matrix);
       Ovoid.Drawer.layerStack(Ovoid.Queuer.qlayer, true);
@@ -2168,8 +2192,8 @@ Ovoid.Drawer.drawQueue = function() {
     Ovoid.Drawer.endRpDraw();
   }
   
-  Ovoid.Drawer.switchBlend(3);
-  Ovoid.Drawer.switchDepth(1);
+  Ovoid.Drawer.switchBlend(3); // blend substractive alpha
+  Ovoid.Drawer.switchDepth(1); // depth mask on, test less
   // initialize projection pour particles
   Ovoid.Drawer.switchPipe(2); // PIPE_PARTICLE
   Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
@@ -2178,12 +2202,12 @@ Ovoid.Drawer.drawQueue = function() {
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.switchPipe(G_1L); // [VL_,LE_]PIPE_GEOMETRY_1L
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    Ovoid.Drawer.ambient();
+    Ovoid.Drawer.ambient();  // set scene ambiant parameters
     Ovoid.Drawer.disable(0); // disable diffuse; ENd 
     Ovoid.Drawer.enable(1);  // enable ambient; ENa 
     Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody, false);
-    Ovoid.Drawer.switchBlend(2); // one, one 
-    Ovoid.Drawer.switchDepth(3); // mask off, test less equal 
+    Ovoid.Drawer.switchBlend(2); // blend additive color
+    Ovoid.Drawer.switchDepth(3); // depth mask off, test lessequal
     var l = Ovoid.Queuer.qlight.count
     Ovoid.Drawer.enable(0); // enable diffuse
     Ovoid.Drawer.disable(1); // disable ambient
@@ -2191,7 +2215,7 @@ Ovoid.Drawer.drawQueue = function() {
       if (Ovoid.Queuer.qlight[l].shadowCasting && Ovoid.Drawer.opt_shadowCasting) {
         
         Ovoid.Drawer.switchPipe(6); // PIPE_SHADOW_VOLUME
-        Ovoid.Drawer.switchBlend(0);
+        Ovoid.Drawer.switchBlend(0); // blend off
         Ovoid.Drawer.switchDepth(2); // mask off, test less
         Ovoid.Drawer.zfailStack(Ovoid.Queuer.qlight[l],  Ovoid.Queuer.qbody);
         Ovoid.Drawer.restorePipe(); // PIPE_GEOMETRY_1L
@@ -2202,19 +2226,19 @@ Ovoid.Drawer.drawQueue = function() {
       Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody, false);
     }
     Ovoid.gl.disable(0x0B90); // STENCIL_TEST 
-    Ovoid.Drawer.switchBlend(3);
+    Ovoid.Drawer.switchBlend(3); // blend substractive alpha
   } else {
     Ovoid.Drawer.switchPipe(G_NL); // [VL_,LE_]PIPE_GEOMETRY_1L
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    Ovoid.Drawer.ambient();
+    Ovoid.Drawer.ambient();   // set scene ambiant parameters
     Ovoid.Drawer.light(Ovoid.Queuer.qlight);
     Ovoid.Drawer.switchDepth(1); // mask on, test less
     Ovoid.Drawer.enable(0);   // enable diffuse; ENd
-    Ovoid.Drawer.enable(1);    // enable ambient; ENa
+    Ovoid.Drawer.enable(1);   // enable ambient; ENa
     Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody, false);
   }
-  // Desactive de depth
-  Ovoid.Drawer.switchDepth(0);
+
+  Ovoid.Drawer.switchDepth(0); // depth all disable
   // Helpers 
   if (Ovoid.Drawer.opt_drawHelpers) {
     Ovoid.Drawer.switchPipe(5); // PIPE_HELPER

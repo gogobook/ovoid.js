@@ -77,6 +77,10 @@ Ovoid.Queuer.opt_defaultCameraRot = [0.0, 0.0, 0.0];
 Ovoid.Drawer.opt_clearColor = [1.0, 1.0, 1.0, 1.0];
 /* Global ambient lighting color */
 Ovoid.Drawer.opt_ambientColor = [0.2, 0.2, 0.2, 1.0];
+/* Global fog/atmosphere color */
+Ovoid.Drawer.opt_fogColor = [1.0, 1.0, 1.0, 1.0];
+/* Global fog/atmosphere density */
+Ovoid.Drawer.opt_fogDensity = 0.0;
 /* Level of performance */
 Ovoid.Drawer.opt_lop = 2;
 /* Enable or disable adaptative level of performance */

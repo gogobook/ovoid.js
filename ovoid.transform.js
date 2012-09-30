@@ -643,8 +643,7 @@ Ovoid.Transform.prototype.cachTransform = function() {
     this.boundingSphere.transform(this.worldMatrix);
     
     /* Propage l'uncach matrix aux enfants */
-    for (var i = 0; i < this.child.length; i++)
-    {
+    for (var i = 0; i < this.child.length; i++) {
       this.child[i].unCach(Ovoid.CACH_MATRIX);
     }
 
