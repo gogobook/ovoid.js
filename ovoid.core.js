@@ -576,13 +576,13 @@ Ovoid._mainload = function() {
 Ovoid._mainloop = function() {
   
   try {
-    /* BEGIN FRAME */
+    /* BEGIN FRAME */    
+    /* USER CUSTOM LOOP FUNC */
+    Ovoid.onloop();
+    
     /* Reset render queue */
     Ovoid.Queuer.reset();
     
-    /* USER CUSTOM LOOP FUNC */
-    Ovoid.onloop();
-      
     /* QUEUE STACK */
     Ovoid.Queuer.queueScene(Ovoid.rscene);
     
@@ -596,9 +596,9 @@ Ovoid._mainloop = function() {
     /* DRAW HUD */
     if (Ovoid.opt_showHud) {
 
-      Ovoid.Drawer.switchPipe(4); /* SP_TEXT */
+      Ovoid.Drawer.switchPipe(4,0); /* SP_TEXT */
       Ovoid.Drawer.screen(Ovoid.Frame.matrix);
-      Ovoid.Drawer.switchPipe(3); /* SP_LAYER */
+      Ovoid.Drawer.switchPipe(3,0); /* SP_LAYER */
       Ovoid.Drawer.screen(Ovoid.Frame.matrix);
       Ovoid.Drawer.switchDepth(0);
       Ovoid.Drawer.switchBlend(3);
@@ -613,7 +613,7 @@ Ovoid._mainloop = function() {
       Ovoid.Drawer.model(Ovoid._hudbg.layerMatrix.m);
       Ovoid.Drawer.layer(Ovoid._hudbg);
   
-      Ovoid.Drawer.switchPipe(4); /* SP_TEXT */
+      Ovoid.Drawer.switchPipe(4,0); /* SP_TEXT */
       Ovoid.Drawer.model(Ovoid._dbg[7].layerMatrix.m);
       Ovoid.Drawer.text(Ovoid._dbg[7]);
 
@@ -656,11 +656,11 @@ Ovoid._mainloop = function() {
         Ovoid._dbg[3].string += Ovoid.Debug.Frame();
         Ovoid._dbg[4].string = Ovoid.Debug.WorldGraph(Ovoid.rscene);
         
-        Ovoid.Drawer.switchPipe(3); /* SP_LAYER */
+        Ovoid.Drawer.switchPipe(3,0); /* SP_LAYER */
         Ovoid.Drawer.model(Ovoid._dbgbg.layerMatrix.m);
         Ovoid.Drawer.layer(Ovoid._dbgbg);
         
-        Ovoid.Drawer.switchPipe(4); /* SP_TEXT */
+        Ovoid.Drawer.switchPipe(4,0); /* SP_TEXT */
         for ( var i = 0; i < 7; i++) {
           Ovoid.Drawer.model(Ovoid._dbg[i].layerMatrix.m);
           Ovoid.Drawer.text(Ovoid._dbg[i]);
@@ -728,7 +728,7 @@ Ovoid.includeOjsScene = function(url, scene) {
  * 
  * The default mask used to import the DAE scene is defined as follow:<br>
  * <code>Ovoid.DAE_ALLSNODES|Ovoid.DAE_CREATE_TRACK|Ovoid.DAE_FORCE_CSPLINE|
- * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_OPTIMIZE_ALL</code>
+ * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_OPTIMIZE_ALL|Ovoid.DAE_CONVERT_UPAXIS</code>
  * 
  * For more information about Collada/DAE importation see the
  * <code>Ovoid.Collada</code> class reference documentation.
@@ -754,7 +754,8 @@ Ovoid.includeDaeScene = function(url, mask, scene, prefix, suffix) {
             Ovoid.DAE_CREATE_TRACK|
             Ovoid.DAE_FORCE_CSPLINE|
             Ovoid.DAE_MERGE_DEPENDENCIES|
-            Ovoid.DAE_OPTIMIZE_ALL;
+            Ovoid.DAE_OPTIMIZE_ALL|
+            Ovoid.DAE_CONVERT_UPAXIS;
     Ovoid.log(3, 'Ovoid.includeDaeScene', 'null options, use default.');
   }
   Ovoid.Loader.includeCollada(url, mask, scene, prefix, suffix);
@@ -777,7 +778,7 @@ Ovoid.includeDaeScene = function(url, mask, scene, prefix, suffix) {
  * 
  * The preset mask used to import the DAE scene is defined as follow:<br>
  * <code>Ovoid.DAE_ANIMATIONS|Ovoid.DAE_CREATE_TRACK|
- * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_FORCE_CSPLINE</code><br><br>
+ * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_FORCE_CSPLINE|Ovoid.DAE_CONVERT_UPAXIS</code><br><br>
  * 
  * For more information about Collada/DAE importation see the
  * <code>Ovoid.Collada</code> class reference documentation.
@@ -800,7 +801,8 @@ Ovoid.includeDaeAnimation = function(url, scene, prefix, suffix) {
   var mask = Ovoid.DAE_ANIMATIONS |
             Ovoid.DAE_CREATE_TRACK |
             Ovoid.DAE_MERGE_DEPENDENCIES |
-            Ovoid.DAE_FORCE_CSPLINE;
+            Ovoid.DAE_FORCE_CSPLINE |
+            Ovoid.DAE_CONVERT_UPAXIS;
 
   Ovoid.Loader.includeCollada(url, mask, scene, prefix, suffix);
 };
@@ -823,7 +825,7 @@ Ovoid.includeDaeAnimation = function(url, scene, prefix, suffix) {
  * 
  * The preset mask used to import the DAE scene is defined as follow:<br>
  * <code>Ovoid.DAE_MESHS|Ovoid.DAE_MATERIALS|
- * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_OPTIMIZE_ALL</code><br><br>
+ * Ovoid.DAE_MERGE_DEPENDENCIES|Ovoid.DAE_OPTIMIZE_ALL|Ovoid.DAE_CONVERT_UPAXIS</code><br><br>
  * 
  * For more information about Collada/DAE importation see the
  * <code>Ovoid.Collada</code> class reference documentation.
@@ -846,7 +848,8 @@ Ovoid.includeDaeMesh = function(url, scene, prefix, suffix) {
   var mask = Ovoid.DAE_MESHS | 
             Ovoid.DAE_MATERIALS |
             Ovoid.DAE_MERGE_DEPENDENCIES |
-            Ovoid.DAE_OPTIMIZE_ALL;
+            Ovoid.DAE_OPTIMIZE_ALL |
+            Ovoid.DAE_CONVERT_UPAXIS;
 
   Ovoid.Loader.includeCollada(url, mask, scene, prefix, suffix);
 };
@@ -943,6 +946,10 @@ Ovoid.includeTexture = function(url, filter, scene) {
  * Ovoid.DRAWER_SP_LAYER,<br>
  * Ovoid.DRAWER_SP_PARTICLES<br><br>
  * 
+ * @param {int} layer Render/Drawing layer to assing the shader to. Can be an
+ * integer up to Ovoid.MAX_RENDER_LAYER or -1 to assing to all available 
+ * layers. 
+ * 
  * @param {string} vs Vertex program shader source file name. 
  * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
@@ -954,9 +961,9 @@ Ovoid.includeTexture = function(url, filter, scene) {
  * 
  * @param {string} name Optionnal shader name.
  */
-Ovoid.includeShader = function(slot, vs, fs, wm, name) {
+Ovoid.includeShader = function(slot, layer, vs, fs, wm, name) {
 
-  Ovoid.Loader.includeShader(slot, vs, fs, wm, name);
+  Ovoid.Loader.includeShader(slot, layer, vs, fs, wm, name);
 };
 
 

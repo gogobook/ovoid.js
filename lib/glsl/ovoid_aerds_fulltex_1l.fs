@@ -66,11 +66,13 @@ void main(void)
     Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;
     gl_FragColor+=(Md*texture2D(Sd,Vu))*((Lc*Li)*Dw);
     gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc*Li)*Sw);
+    
+    if(Fd>0.0) {
+      Fz=gl_FragCoord.z/gl_FragCoord.w;
+      Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);
+      gl_FragColor=mix(Fc,gl_FragColor,Ff);
+    }
   }
-  if(Fd>0.0) {
-    Fz=gl_FragCoord.z/gl_FragCoord.w;
-    Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);
-    gl_FragColor=mix(Fc,gl_FragColor,Ff);
-  }
+
 	gl_FragColor.a = Mo;
 }

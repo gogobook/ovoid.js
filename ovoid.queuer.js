@@ -83,7 +83,7 @@ Ovoid.Queuer._wgit = new Ovoid.WgIterator();
 
 
 /** Body stack. */
- Ovoid.Queuer.qbody = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
+Ovoid.Queuer.qbody = new Array(Ovoid.MAX_RENDER_LAYER);
 
 
 /** Transform stack. */
@@ -128,8 +128,12 @@ Ovoid.Queuer.init = function() {
 
   Ovoid.log(3, 'Ovoid.Queuer', 'initialization');
 
-  /* initialisation de la camera par defaut */
+  /* Initialise les stack de body pour les render layers */
+  for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+    Ovoid.Queuer.qbody[i] = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
+  }
   
+  /* initialisation de la camera par defaut */
   Ovoid.Queuer._dcamera.moveXyz(Ovoid.Queuer.opt_defaultCameraPos[0],
       Ovoid.Queuer.opt_defaultCameraPos[1],
       Ovoid.Queuer.opt_defaultCameraPos[2],
@@ -228,17 +232,17 @@ Ovoid.Queuer._viewcull = function(o) {
   
   if (Ovoid.Queuer.opt_viewcull) {
     if (Ovoid.Queuer._rcamera.isWatching(o)) {
-      o.distFromEye = 
-          o.worldPosition.dist(Ovoid.Queuer._rcamera.worldPosition) -
-          o.boundingSphere.radius;
-          
+      // Exception pour les particules, toujours dessinées en dernier.
+      if(o.shape.type & Ovoid.EMITTER)
+        o.distFromEye = Ovoid.FLOAT_MIN;
+        
       o.rendered = true;
-      Ovoid.Queuer.qbody.add(o);
+      Ovoid.Queuer.qbody[o.renderLayer].add(o);
       return true;
     }
   } else {
     o.rendered = true;
-    Ovoid.Queuer.qbody.add(o);
+    Ovoid.Queuer.qbody[o.renderLayer].add(o);
     return true;
   }
   return false;
@@ -276,7 +280,7 @@ Ovoid.Queuer._physicscull = function(o) {
  */
 Ovoid.Queuer._bodyZSortFunc = function(a, b) {
   
-  return a.distFromEye <= b.distFromEye;
+  return a.distFromEye - b.distFromEye;
   
 };
 
@@ -288,7 +292,9 @@ Ovoid.Queuer._bodyZSortFunc = function(a, b) {
  */
 Ovoid.Queuer.reset = function() {
 
-  Ovoid.Queuer.qbody.empty();
+  for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+    Ovoid.Queuer.qbody[i].empty();
+  }
   Ovoid.Queuer.qlayer.empty();
   Ovoid.Queuer.qtext.empty();
   Ovoid.Queuer.qlight.empty();
@@ -467,7 +473,10 @@ Ovoid.Queuer.queueScene = function(sc) {
   while (i--) sc.track[i].cachTrack();
 
   /* Ordonne les bodys selon la distance à la camera */
-  Ovoid.Queuer.qbody.sort(Ovoid.Queuer._bodyZSortFunc);
+  for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+    Ovoid.Queuer.qbody[i].sort(Ovoid.Queuer._bodyZSortFunc);
+  }
+  
 
   /* Si le light-linking est desactivé on ajoute toutes les lumieres */
   if (!Ovoid.Queuer.opt_lightcull) {

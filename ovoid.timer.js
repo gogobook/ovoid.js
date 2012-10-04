@@ -46,13 +46,8 @@ Ovoid.Timer.clock = 0;
 /** Time delta since the last update. */
 Ovoid.Timer.quantum = 0;
 
-
 /** Average pre-seconds timer's update. */
 Ovoid.Timer.framerate = 0;
-
-
-/** Average pre-seconds timer's update. */
-Ovoid.Timer.avgframerate = 100;
 
 
 /** Current time. */
@@ -61,6 +56,10 @@ Ovoid.Timer._timecurr = 0;
 
 /** Time of the last update. */
 Ovoid.Timer._timelast = 0;
+
+
+/** Time of the last update. */
+Ovoid.Timer._timeq = 0;
 
 
 /** Frame counter for framerate. */
@@ -105,19 +104,15 @@ Ovoid.Timer.update = function() {
   Ovoid.Timer.clock = new Date().getTime();
   
   Ovoid.Timer._timecurr = Ovoid.Timer.clock;
-  Ovoid.Timer.quantum = (Ovoid.Timer._timecurr - Ovoid.Timer._timelast) * 0.001;
+  Ovoid.Timer._timeq = (Ovoid.Timer._timecurr - Ovoid.Timer._timelast) * 0.001;
   Ovoid.Timer._timelast = Ovoid.Timer.clock;
 
-  /* prévient les eventuels bugs en cas de blocage de frame ou de timer incorrecte */
-  if (Ovoid.Timer.quantum > 0.1 || Ovoid.Timer.quantum < 0.0) {
-    Ovoid.log(2, "Ovoid.Timer", "Invalid time laps detected.");
-    Ovoid.Timer.quantum = 0.01;
-  }
   Ovoid.Timer._fcount++;
-  Ovoid.Timer._fcumul+=Ovoid.Timer.quantum;
+  Ovoid.Timer._fcumul+=Ovoid.Timer._timeq;
   
   if(Ovoid.Timer._fcumul > 0.5) {
     Ovoid.Timer.framerate = Math.floor(Ovoid.Timer._fcount / Ovoid.Timer._fcumul);
+    Ovoid.Timer.quantum = Ovoid.Timer._fcumul / Ovoid.Timer._fcount;
     Ovoid.Timer._lopfps = Ovoid.Timer.framerate;
     Ovoid.Timer._fcount = 0;
     Ovoid.Timer._fcumul = 0.0;

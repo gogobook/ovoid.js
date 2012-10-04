@@ -115,6 +115,14 @@ Ovoid.PICKING_OFFSCREEN_FRAME_X = 1920;
 Ovoid.PICKING_OFFSCREEN_FRAME_Y = 1080;
 
 
+/** Render layer stack size.
+ * @constant 
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ * @see Ovoid.Queuer */
+Ovoid.MAX_RENDER_LAYER = 8;
+
+
 /** Sleeping motion epsilon limit for rigid bodys 
  * @constant 
  * @memberOf _global_

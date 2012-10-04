@@ -422,7 +422,7 @@ Ovoid.Loader._drawStep = function() {
 
   Ovoid.gl.clear(Ovoid.gl.COLOR_BUFFER_BIT|Ovoid.gl.DEPTH_BUFFER_BIT);
   
-  Ovoid.Drawer.switchPipe(3); /* SP_LAYER */
+  Ovoid.Drawer.switchPipe(3,0); /* SP_LAYER */
   /* background */
   Ovoid.Drawer.model(Ovoid.Loader._bg.layerMatrix.m);
   Ovoid.Drawer.layer(Ovoid.Loader._bg);
@@ -464,7 +464,7 @@ Ovoid.Loader._drawStep = function() {
     Ovoid.Drawer.layer(Ovoid.Loader._lcirclei);
   }
   
-  Ovoid.Drawer.switchPipe(4); /* SP_TEXT */
+  Ovoid.Drawer.switchPipe(4,0); /* SP_TEXT */
   
   if (Ovoid.Loader.opt_showPercentage) {
     Ovoid.Loader._percent.string = Math.floor(Ovoid.Loader._nratio).toString() + '%';
@@ -510,7 +510,8 @@ Ovoid.Loader._loadStep = function() {
             if(Ovoid.Loader._obj.linkWrap()) {
               var spid = Ovoid.Drawer.addShader(Ovoid.Loader._obj);
               if(Ovoid.Loader._item[0] != -1) {
-                Ovoid.Drawer.plugShader(Ovoid.Loader._item[0], spid);
+                Ovoid.Drawer.plugShader(Ovoid.Loader._item[0], 
+                    Ovoid.Loader._item[5], spid);
               }
             }
           }
@@ -717,9 +718,9 @@ Ovoid.Loader._launch = function() {
     
     /* Initialize pour dessiner le wait screen */
     Ovoid.gl.viewport(0,0,Ovoid.Frame.size.v[0],Ovoid.Frame.size.v[1]);
-    Ovoid.Drawer.switchPipe(4); /* SP_TEXT */
+    Ovoid.Drawer.switchPipe(4,0); /* SP_TEXT */
     Ovoid.Drawer.screen(Ovoid.Frame.matrix);
-    Ovoid.Drawer.switchPipe(3); /* SP_LAYER */
+    Ovoid.Drawer.switchPipe(3,0); /* SP_LAYER */
     Ovoid.Drawer.screen(Ovoid.Frame.matrix);
     Ovoid.Drawer.switchDepth(0);
     Ovoid.Drawer.switchBlend(3);
@@ -950,6 +951,10 @@ Ovoid.Loader.includeAudio = function(audio) {
  * Ovoid.DRAWER_SP_LAYER,<br>
  * Ovoid.DRAWER_SP_PARTICLES<br><br>
  * 
+ * @param {int} layer Render/Drawing layer to assing the shader to. Can be an
+ * integer up to Ovoid.MAX_RENDER_LAYER or -1 to assing to all available 
+ * layers. 
+ * 
  * @param {string} vs Vertex program shader source file url. 
  * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
@@ -963,13 +968,14 @@ Ovoid.Loader.includeAudio = function(audio) {
  *
  * @see Ovoid.Shader
  */
-Ovoid.Loader.includeShader = function(slot, vs, fs, wm, name) {
+Ovoid.Loader.includeShader = function(slot, layer, vs, fs, wm, name) {
 
   for(var i = 0; i < Ovoid.Loader._stackgls.length; i++) {
     if(Ovoid.Loader._stackgls[i][0] == slot && 
         Ovoid.Loader._stackgls[i][1] == vs && 
         Ovoid.Loader._stackgls[i][2] == fs &&
-        Ovoid.Loader._stackgls[i][3] == wm)
+        Ovoid.Loader._stackgls[i][3] == wm &&
+        Ovoid.Loader._stackgls[i][5] == layer)
       return;
   }
   
@@ -984,6 +990,7 @@ Ovoid.Loader.includeShader = function(slot, vs, fs, wm, name) {
   } else {
     Ovoid.Loader._stackgls[i][4] = name;
   }
+  Ovoid.Loader._stackgls[i][5] = layer;
   Ovoid.Loader._ntotal++;
   Ovoid.Loader._remains[3]++;
 };

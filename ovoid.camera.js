@@ -154,6 +154,13 @@ Ovoid.Camera.prototype.setCliping = function(n, f) {
  */
 Ovoid.Camera.prototype.isWatching = function(transform) {
 
+  /* Calcul de la distance à la camera */
+  var S = transform.worldPosition.dist(this.worldPosition);
+  transform.distFromEye = S - transform.boundingSphere.radius;
+  
+  if(S < transform.boundingSphere.radius) 
+    return true;
+
   var i = 6;
   while (i--) {
     if ( (this._fstum[i].v[0] * transform.boundingSphere.worldCenter.v[0] + 

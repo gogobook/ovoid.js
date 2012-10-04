@@ -82,6 +82,9 @@ Ovoid.Body = function(name) {
   /** Leave nodes.
    * @type Node[] */
   this.leave = new Ovoid.Stack(Ovoid.MAX_BODY_INTERSECT);
+  /** Render layer index.
+   * @type int */
+  this.renderLayer = 0;
 };
 Ovoid.Body.prototype = new Ovoid.Transform;
 Ovoid.Body.prototype.constructor = Ovoid.Body;

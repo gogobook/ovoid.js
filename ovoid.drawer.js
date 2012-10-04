@@ -146,11 +146,55 @@
  * if( snow == -1) {<br>
  * &nbsp;&nbsp;<codecomment>// error</codecomment><br>
  * }<br>
- * Ovoid.Drawer.plugShader(Ovoid.DRAWER_SP_PARTICLES, snow);<br>
+ * <codecomment>// plug custum shader to all layers of the particle pipeline</codecomment><br>
+ * Ovoid.Drawer.plugShader(Ovoid.DRAWER_SP_PARTICLES, -1, snow);<br>
  * </blockcode><br><br>
  * 
  * For more informations about shaders link and wrapping see the 
- * <code>Ovoid.Shader</code> object documentation page.
+ * <code>Ovoid.Shader</code> object documentation page.<br><br>
+ * 
+ * <b>Render Layer</b><br><br>
+ * 
+ * In conjunction with Ovoid.Queuer, the Drawer class implements a Render Layer 
+ * mechanism who allow to draw sequentially (one after the other) several sets 
+ * of Body nodes of the same scene using different custom shaders. (This 
+ * mecanism is currently implemented only for geometry pipelines 
+ * Ovoid.PIPE_GEOMETRY_1L, Ovoid.PIPE_GEOMETRY_NL, Ovoid.PIPE_VL_GEOMETRY_1L, 
+ * Ovoid.PIPE_VL_GEOMETRY_NL, Ovoid.PIPE_LE_GEOMETRY_1L and 
+ * Ovoid.PIPE_LE_GEOMETRY_NL).<br><br>
+ * 
+ * Once you have defined the render layer of a Body 
+ * node by setting its <code>renderLayer</code> variable (default value is 0), 
+ * the Queuer will put each node in their defined render layer's queues which 
+ * will be drawed with the shader defined for each of them.<br><br>
+ * 
+ * <blockcode>
+ * <codecomment>// Define all landscape body at Render Layer 0</codecomment><br>
+ * for(var i = 0; i < landscapes.length; i++)<br>
+ * &nbsp;&nbsp;landscapes[i].renderLayer = 0;<br>
+ * <codecomment>// Define all trees body at Render Layer 1</codecomment><br>
+ * for(var i = 0; i < trees.length; i++)<br>
+ * &nbsp;&nbsp;trees[i].renderLayer = 1;<br>
+ * <br>
+ * <codecomment>// Load custom shader for landscape and assing it to layer 0</codecomment><br>
+ * var Slandscape = Ovoid.Drawer.addShader("land.vs", "land.fs", "custom.wm");<br>
+ * if( Slandscape == -1) {<br>
+ * &nbsp;&nbsp;<codecomment>// error</codecomment><br>
+ * }<br>
+ * Ovoid.Drawer.plugShader(Ovoid.PIPE_GEOMETRY_1L, 0, Slandscape);<br>
+ * Ovoid.Drawer.plugShader(Ovoid.PIPE_VL_GEOMETRY_1L, 0, Slandscape);<br>
+ * Ovoid.Drawer.plugShader(Ovoid.PIPE_LE_GEOMETRY_1L, 0, Slandscape);<br>
+ * <br>
+ * <codecomment>// Load custom shader for trees and assing it to layer 1</codecomment><br>
+ * var Strees = Ovoid.Drawer.addShader("tree.vs", "tree.fs", "custom.wm");<br>
+ * if( Strees == -1) {<br>
+ * &nbsp;&nbsp;<codecomment>// error</codecomment><br>
+ * }<br>
+ * Ovoid.Drawer.plugShader(Ovoid.PIPE_GEOMETRY_1L, 1, Strees);<br>
+ * Ovoid.Drawer.plugShader(Ovoid.PIPE_VL_GEOMETRY_1L, 1, Strees);<br>
+ * Ovoid.Drawer.plugShader(Ovoid.PIPE_LE_GEOMETRY_1L, 1, Strees);<br>
+ * 
+ * </blockcode><br><br>
  * 
  */
 Ovoid.Drawer = {};
@@ -332,7 +376,7 @@ Ovoid.Drawer._splib = new Array();
 
 
 /** Shader program pipes **/
-Ovoid.Drawer._sppipe = new Array();
+Ovoid.Drawer._sppipe = new Array(Ovoid.MAX_RENDER_LAYER);
 
 
 /** Current used shader program **/
@@ -341,6 +385,10 @@ Ovoid.Drawer.sp = null;
 
 /** Pipe swapper **/
 Ovoid.Drawer._swpipe = new Array(2);
+
+
+/** Layer swapper **/
+Ovoid.Drawer._swlayer = new Array(2);
 
 
 /** Shader swapper **/
@@ -592,7 +640,11 @@ Ovoid.Drawer.init = function() {
   if (Ovoid._logGlerror('Ovoid.Drawer.init:: RP Frame buffer creation'))
     return false;
 
- /* Ajout des shaders par défaut */
+  /* Construit le tableau de pipeline */
+  for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+    Ovoid.Drawer._sppipe[i] = new Array();
+  }
+  /* Ajout des shaders par défaut */
   var sp;
 
   /*   pipeline (vp, sp)                                // Symbolic constant = id;
@@ -620,7 +672,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_GEOMETRY_1L pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(0,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(0,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_GEOMETRY_NL");
   sp.setSources(Ovoid.GLSL_PNUIW_HYBRID_VS, Ovoid.GLSL_AERDS_FULLTEX_NL_FS, Ovoid.GLSL_WRAPMAP);
@@ -628,7 +680,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_GEOMETRY_NL pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(1,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(1,-1,Ovoid.Drawer.addShader(sp));
 
   sp = new Ovoid.Shader("PIPE_VL_GEOMETRY_1L");
   sp.setSources(Ovoid.GLSL_VL_PNUIW_HYBRID_1L_VS, Ovoid.GLSL_VL_AERDS_FULLTEX_FS, Ovoid.GLSL_WRAPMAP);
@@ -636,7 +688,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_VL_GEOMETRY_1L pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(10,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(10,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_VL_GEOMETRY_NL");
   sp.setSources(Ovoid.GLSL_VL_PNUIW_HYBRID_NL_VS, Ovoid.GLSL_VL_AERDS_FULLTEX_FS, Ovoid.GLSL_WRAPMAP);
@@ -644,7 +696,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_VL_GEOMETRY_NL pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(11,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(11,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_LE_GEOMETRY_1L");
   sp.setSources(Ovoid.GLSL_LE_PNUIW_HYBRID_1L_VS, Ovoid.GLSL_LE_ADS_1TEX_FS, Ovoid.GLSL_WRAPMAP);
@@ -652,7 +704,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_LE_GEOMETRY_1L pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(13,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(13,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_LE_GEOMETRY_NL");
   sp.setSources(Ovoid.GLSL_LE_PNUIW_HYBRID_NL_VS, Ovoid.GLSL_LE_ADS_1TEX_FS, Ovoid.GLSL_WRAPMAP);
@@ -660,7 +712,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_LE_GEOMETRY_NL pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(14,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(14,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_PARTICLE");
   sp.setSources(Ovoid.GLSL_PUC_PARTICLE_VS, Ovoid.GLSL_VC_TEX_PARTICLE_FS, Ovoid.GLSL_WRAPMAP);
@@ -668,7 +720,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_PARTICLE pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(2,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(2,-1,Ovoid.Drawer.addShader(sp));
 
   sp = new Ovoid.Shader("PIPE_LAYER");
   sp.setSources(Ovoid.GLSL_PU_VS, Ovoid.GLSL_C_TEX_FS, Ovoid.GLSL_WRAPMAP);
@@ -676,7 +728,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_LAYER pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(3,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(3,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_STRING");
   sp.setSources(Ovoid.GLSL_P_ZWSRING_VS, Ovoid.GLSL_C_TEX_STRING_FS, Ovoid.GLSL_WRAPMAP);
@@ -684,7 +736,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_STRING pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(4,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(4,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_HELPER");
   sp.setSources(Ovoid.GLSL_PC_VS, Ovoid.GLSL_VCC_FS, Ovoid.GLSL_WRAPMAP);
@@ -692,7 +744,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_HELPER pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(5,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(5,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_SHADOW_VOLUME");
   sp.setSources(Ovoid.GLSL_P_VS, Ovoid.GLSL_BLACK_FS, Ovoid.GLSL_WRAPMAP);
@@ -700,7 +752,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_SHADOW_VOLUME pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(6,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(6,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_RP_GEOMETRY");
   sp.setSources(Ovoid.GLSL_PIW_HYBRID_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP);
@@ -708,7 +760,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_RP_GEOMETRY pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(20,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(20,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_RP_PARTICLE");
   sp.setSources(Ovoid.GLSL_PU_PARTICLE_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP);
@@ -716,7 +768,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_RP_PARTICLE pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(22,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(22,-1,Ovoid.Drawer.addShader(sp));
  
   sp = new Ovoid.Shader("PIPE_RP_LAYER");
   sp.setSources(Ovoid.GLSL_P_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP);
@@ -724,7 +776,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_RP_LAYER pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(23,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(23,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_RP_STRING");
   sp.setSources(Ovoid.GLSL_P_ZSRING_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP);
@@ -732,7 +784,7 @@ Ovoid.Drawer.init = function() {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_RP_STRING pipeline shader program.");
     return false;
   }
-  Ovoid.Drawer.plugShader(24,Ovoid.Drawer.addShader(sp));
+  Ovoid.Drawer.plugShader(24,-1,Ovoid.Drawer.addShader(sp));
   
   
   if (Ovoid._logGlerror('Ovoid.Drawer.init:: Shader program creation.'))
@@ -809,16 +861,35 @@ Ovoid.Drawer.addShader = function(sp) {
  * Ovoid.DRAWER_SP_LAYER,<br>
  * Ovoid.DRAWER_SP_PARTICLES<br><br>
  * 
+ * @param {int} layer Render/Drawing layer to assing the shader to. Can be an
+ * integer up to Ovoid.MAX_RENDER_LAYER or -1 to assing to all available 
+ * layers. 
+ * 
  * @param {int} id Shader index.
  * 
  * @return {bool} True if plug succeeds, false if id is not a valid index.
  */
-Ovoid.Drawer.plugShader = function(slot, id) {
+Ovoid.Drawer.plugShader = function(slot, layer, id) {
   
-  if(!Ovoid.Drawer._splib[id])
+  if(!Ovoid.Drawer._splib[id]) {
+    Ovoid.log(2, "Ovoid.Drawer.plugShader", "No such shader with id " + id);
     return false;
-
-  Ovoid.Drawer._sppipe[slot] = id;
+  }
+  if(layer > Ovoid.MAX_RENDER_LAYER) {
+    Ovoid.log(2, "Ovoid.Drawer.plugShader", "Invalid layer index");
+    return false;
+  }
+  if(layer == -1) {
+    Ovoid.log(3, "Ovoid.Drawer.plugShader", 
+        "Plug shader "+id+" to slot "+slot+" for all layers");
+    for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+      Ovoid.Drawer._sppipe[i][slot] = id;
+    }
+  } else {
+    Ovoid.log(3, "Ovoid.Drawer.plugShader", 
+        "Plug shader "+id+" to slot "+slot+" for layer "+layer);
+    Ovoid.Drawer._sppipe[layer][slot] = id;
+  }
   return true;
 };
 
@@ -856,12 +927,16 @@ Ovoid.Drawer.restorSp = function() {
  * Switch the current drawing pipeline to the specified one.
  * 
  * @param {int} id Pipeline id to switch.
+ * @param {int} layer Render layer index to switch.
  */
-Ovoid.Drawer.switchPipe = function(id) {
+Ovoid.Drawer.switchPipe = function(id, layer) {
 
   Ovoid.Drawer._swpipe[0] = Ovoid.Drawer._swpipe[1];
   Ovoid.Drawer._swpipe[1] = id;
-  Ovoid.Drawer.sp = Ovoid.Drawer._splib[Ovoid.Drawer._sppipe[id]];
+  Ovoid.Drawer._swlayer[0] = Ovoid.Drawer._swlayer[1];
+  Ovoid.Drawer._swlayer[1] = layer;
+  
+  Ovoid.Drawer.sp = Ovoid.Drawer._splib[Ovoid.Drawer._sppipe[layer][id]];
   Ovoid.Drawer.sp.use();
 };
 
@@ -873,7 +948,7 @@ Ovoid.Drawer.switchPipe = function(id) {
  */
 Ovoid.Drawer.restorePipe = function() {
   
-  Ovoid.Drawer.switchPipe(Ovoid.Drawer._swpipe[0]);
+  Ovoid.Drawer.switchPipe(Ovoid.Drawer._swpipe[0], Ovoid.Drawer._swlayer[0]);
 };
 
 
@@ -937,6 +1012,7 @@ Ovoid.Drawer.restoreBlend = function() {
  * 1 : depthMask on, depth test less.<br><br>
  * 2 : depthMask off, depth test less.<br><br>
  * 3 : depthMask off, depth test less equal.<br><br>
+ * 4 : depthMask off, depth test equal.<br><br>
  */
 Ovoid.Drawer.switchDepth = function(id) {
 
@@ -957,6 +1033,11 @@ Ovoid.Drawer.switchDepth = function(id) {
       Ovoid.gl.depthMask(0);
       Ovoid.gl.enable(0x0B71);
       Ovoid.gl.depthFunc(0x0201);
+    return;
+    case 4:
+      Ovoid.gl.depthMask(0);
+      Ovoid.gl.enable(0x0B71);
+      Ovoid.gl.depthFunc(0x0202);
     return;
     default:
       Ovoid.gl.depthMask(0);
@@ -1997,7 +2078,7 @@ Ovoid.Drawer.body = function(body, color) {
  * color).
  */
 Ovoid.Drawer.bodyStack = function(stack, rp) {
-
+  
   var i = stack.count;
   if (rp) {
     var color = new Ovoid.Color();
@@ -2128,7 +2209,7 @@ Ovoid.Drawer.zfailStack = function(light, stack) {
   Ovoid.gl.clear(0x00000400); // STENCIL_BUFFER_BIT
   Ovoid.gl.colorMask(0,0,0,0); 
   Ovoid.gl.stencilFunc(0x0207,0,0); // ALWAYS,0,0
-  i = stack.count;
+  var i = stack.count;
   while(i--) {
     if(stack[i].shadowCasting)
       Ovoid.Drawer.shadow(light, stack[i]);
@@ -2140,6 +2221,163 @@ Ovoid.Drawer.zfailStack = function(light, stack) {
 
 
 /* *************************** GLOBAL METHODS ******************************* */
+
+/**
+ * Draw current queue subfunction for Read Pixels frame.<br><br>
+ * 
+ * Draws all the current queue available in <code>Ovoid.Queuer</code>. 
+ * This method does not takes argument because it get data directly from the 
+ * <code>Ovoid.Queuer</code> global class. 
+ */
+Ovoid.Drawer.drawQueueRP = function() {
+  
+  Ovoid.Drawer.setCull(1);
+  var i;
+  // Picking frame
+  if (Ovoid.opt_enablePicking) { 
+    for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+      if(!Ovoid.Queuer.qbody[i].count) continue;
+      Ovoid.Drawer.switchBlend(0); // blend off
+      Ovoid.Drawer.switchPipe(20,0); //PIPE_RP_GEOMETRY
+      Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+      Ovoid.Drawer.beginRpDraw();
+      Ovoid.Drawer.switchDepth(1); // depth mask on, test less
+      Ovoid.Drawer.bodyStack(Ovoid.Queuer.qbody[i], true);
+    }
+    if (Ovoid.Drawer.opt_drawLayers) {
+      Ovoid.Drawer.switchDepth(0); // depth all disable
+      Ovoid.Drawer.switchPipe(23,0); //PIPE_RP_LAYER
+      Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+      Ovoid.Drawer.layerStack(Ovoid.Queuer.qlayer, true);
+      Ovoid.Drawer.switchPipe(24,0); //PIPE_RP_STRING
+      Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+      Ovoid.Drawer.textStack(Ovoid.Queuer.qtext, true);
+    }
+    Ovoid.Drawer.endRpDraw();
+  }
+}
+
+/**
+ * Draw current queue subfunction for Helpers and layers.<br><br>
+ * 
+ * Draws all the current queue available in <code>Ovoid.Queuer</code>. 
+ * This method does not takes argument because it get data directly from the 
+ * <code>Ovoid.Queuer</code> global class. 
+ */
+Ovoid.Drawer.drawQueueHL = function() {
+ 
+  Ovoid.Drawer.switchDepth(0); // depth all disable
+  // Helpers 
+  if (Ovoid.Drawer.opt_drawHelpers) {
+    Ovoid.Drawer.switchPipe(5,0); // PIPE_HELPER
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+    if (Ovoid.Drawer.opt_drawNormals) {
+      for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+        Ovoid.Drawer.normalsStack(Ovoid.Queuer.qbody[i]);
+      }
+    }
+    Ovoid.Drawer.helpersStack(Ovoid.Queuer.qtform);
+    
+    // Dessin du curseur
+    Ovoid.Drawer.model(Ovoid.Input.mouseCursor.m);
+    Ovoid.Drawer.symSphere(Ovoid.Drawer._tcolor[1]);
+    
+  }
+  // Layers & text
+  if (Ovoid.Drawer.opt_drawLayers && Ovoid.Queuer.qlayer.count) {
+    Ovoid.Drawer.switchPipe(3,0); //PIPE_LAYER
+    Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+    Ovoid.Drawer.layerStack(Ovoid.Queuer.qlayer, false);
+    Ovoid.Drawer.switchPipe(4,0); //PIPE_STRING
+    Ovoid.Drawer.screen(Ovoid.Frame.matrix);
+    Ovoid.Drawer.textStack(Ovoid.Queuer.qtext, false);
+  }
+}
+
+/**
+ * Draw current queue subfunction for per-light Passes.<br><br>
+ * 
+ * Draws all the current queue available in <code>Ovoid.Queuer</code>. 
+ * This method does not takes argument because it get data directly from the 
+ * <code>Ovoid.Queuer</code> global class. 
+ */
+Ovoid.Drawer.drawQueueLP = function(pipe) {
+
+  Ovoid.Drawer.setCull(0); // disable face culling
+  Ovoid.Drawer.switchBlend(3); // blend substractive alpha
+  Ovoid.Drawer.switchDepth(1); // depth mask on, test less
+  // initialize projection pour les shadow volume
+  Ovoid.Drawer.switchPipe(6,0); // PIPE_SHADOW_VOLUME
+  Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+  for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+    if(!Ovoid.Queuer.qbody[i].count) continue;
+    // initialize projection pour particles
+    Ovoid.Drawer.switchPipe(2,i); // PIPE_PARTICLE
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+    Ovoid.Drawer.switchPipe(pipe,i); // [VL_,LE_]PIPE_GEOMETRY_1L
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+    Ovoid.Drawer.ambient();  // set scene ambiant parameters
+    Ovoid.Drawer.disable(0); // disable diffuse; ENd 
+    Ovoid.Drawer.enable(1);  // enable ambient; ENa 
+    Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody[i], false);
+  }
+  Ovoid.Drawer.switchBlend(2); // blend additive color
+  Ovoid.Drawer.switchDepth(3); // depth mask off, test lessequal
+  var l = Ovoid.Queuer.qlight.count
+  Ovoid.Drawer.enable(0); // enable diffuse
+  Ovoid.Drawer.disable(1); // disable ambient
+  while (l--) {
+    if (Ovoid.Queuer.qlight[l].shadowCasting && Ovoid.Drawer.opt_shadowCasting) {
+      
+      Ovoid.Drawer.switchPipe(6,0); // PIPE_SHADOW_VOLUME
+      Ovoid.Drawer.switchBlend(0); // blend off
+      Ovoid.Drawer.switchDepth(2); // mask off, test less
+      for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+        if(!Ovoid.Queuer.qbody[i].count) continue;
+        Ovoid.Drawer.zfailStack(Ovoid.Queuer.qlight[l],  Ovoid.Queuer.qbody[i]);
+      }
+      //Ovoid.Drawer.restoreDepth(); // mask off, test less equal
+      Ovoid.Drawer.switchDepth(4); //depthMask off, depth test equal
+      Ovoid.Drawer.restoreBlend(); // one, one
+    }
+    for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+      if(!Ovoid.Queuer.qbody[i].count) continue;
+      Ovoid.Drawer.switchPipe(pipe,i); // [VL_,LE_]PIPE_GEOMETRY_1L
+      Ovoid.Drawer.light(Ovoid.Queuer.qlight[l]);
+      Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody[i], false);
+    }
+  }
+  Ovoid.gl.disable(0x0B90); // STENCIL_TEST 
+  Ovoid.Drawer.switchBlend(3); // blend substractive alpha
+}
+
+/**
+ * Draw current queue subfunction for one Passe.<br><br>
+ * 
+ * Draws all the current queue available in <code>Ovoid.Queuer</code>. 
+ * This method does not takes argument because it get data directly from the 
+ * <code>Ovoid.Queuer</code> global class. 
+ */
+Ovoid.Drawer.drawQueue1P = function(pipe) {
+
+  Ovoid.Drawer.setCull(0); // disable face culling
+  Ovoid.Drawer.switchBlend(3); // blend substractive alpha
+  Ovoid.Drawer.switchDepth(1); // depth mask on, test less
+  for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+    if(!Ovoid.Queuer.qbody[i].count) continue;
+    // initialize projection pour particles
+    Ovoid.Drawer.switchPipe(2,i); // PIPE_PARTICLE
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+    Ovoid.Drawer.switchPipe(pipe,i); // [VL_,LE_]PIPE_GEOMETRY_1L
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+    Ovoid.Drawer.ambient();   // set scene ambiant parameters
+    Ovoid.Drawer.light(Ovoid.Queuer.qlight);
+    Ovoid.Drawer.enable(0);   // enable diffuse; ENd
+    Ovoid.Drawer.enable(1);   // enable ambient; ENa
+    Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody[i], false);
+  }
+}
+
 /**
  * Draw current queue.<br><br>
  * 
@@ -2169,98 +2407,14 @@ Ovoid.Drawer.drawQueue = function() {
 	break;
   }
   
-  Ovoid.Drawer.setCull(1);
   var i;
-  // Picking frame
-  if (Ovoid.opt_enablePicking) { 
-    
-    Ovoid.Drawer.switchBlend(0); // blend off
-    Ovoid.Drawer.switchPipe(20); //PIPE_RP_GEOMETRY
-    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    Ovoid.Drawer.beginRpDraw();
-    Ovoid.Drawer.switchDepth(1); // depth mask on, test less
-    Ovoid.Drawer.bodyStack(Ovoid.Queuer.qbody, true);
-    if (Ovoid.Drawer.opt_drawLayers) {
-      Ovoid.Drawer.switchDepth(0); // depth all disable
-      Ovoid.Drawer.switchPipe(23); //PIPE_RP_LAYER
-      Ovoid.Drawer.screen(Ovoid.Frame.matrix);
-      Ovoid.Drawer.layerStack(Ovoid.Queuer.qlayer, true);
-      Ovoid.Drawer.switchPipe(24); //PIPE_RP_STRING
-      Ovoid.Drawer.screen(Ovoid.Frame.matrix);
-      Ovoid.Drawer.textStack(Ovoid.Queuer.qtext, true);
-    }
-    Ovoid.Drawer.endRpDraw();
-  }
   
-  Ovoid.Drawer.switchBlend(3); // blend substractive alpha
-  Ovoid.Drawer.switchDepth(1); // depth mask on, test less
-  // initialize projection pour particles
-  Ovoid.Drawer.switchPipe(2); // PIPE_PARTICLE
-  Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+  Ovoid.Drawer.drawQueueRP();
   if (Ovoid.Drawer.opt_perLightPass) {
-    Ovoid.Drawer.switchPipe(6); // PIPE_SHADOW_VOLUME
-    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    Ovoid.Drawer.switchPipe(G_1L); // [VL_,LE_]PIPE_GEOMETRY_1L
-    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    Ovoid.Drawer.ambient();  // set scene ambiant parameters
-    Ovoid.Drawer.disable(0); // disable diffuse; ENd 
-    Ovoid.Drawer.enable(1);  // enable ambient; ENa 
-    Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody, false);
-    Ovoid.Drawer.switchBlend(2); // blend additive color
-    Ovoid.Drawer.switchDepth(3); // depth mask off, test lessequal
-    var l = Ovoid.Queuer.qlight.count
-    Ovoid.Drawer.enable(0); // enable diffuse
-    Ovoid.Drawer.disable(1); // disable ambient
-    while (l--) {
-      if (Ovoid.Queuer.qlight[l].shadowCasting && Ovoid.Drawer.opt_shadowCasting) {
-        
-        Ovoid.Drawer.switchPipe(6); // PIPE_SHADOW_VOLUME
-        Ovoid.Drawer.switchBlend(0); // blend off
-        Ovoid.Drawer.switchDepth(2); // mask off, test less
-        Ovoid.Drawer.zfailStack(Ovoid.Queuer.qlight[l],  Ovoid.Queuer.qbody);
-        Ovoid.Drawer.restorePipe(); // PIPE_GEOMETRY_1L
-        Ovoid.Drawer.restoreDepth(); // mask off, test less equal
-        Ovoid.Drawer.restoreBlend(); // one, one
-      }
-      Ovoid.Drawer.light(Ovoid.Queuer.qlight[l]);
-      Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody, false);
-    }
-    Ovoid.gl.disable(0x0B90); // STENCIL_TEST 
-    Ovoid.Drawer.switchBlend(3); // blend substractive alpha
+    Ovoid.Drawer.drawQueueLP(G_1L);
   } else {
-    Ovoid.Drawer.switchPipe(G_NL); // [VL_,LE_]PIPE_GEOMETRY_1L
-    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    Ovoid.Drawer.ambient();   // set scene ambiant parameters
-    Ovoid.Drawer.light(Ovoid.Queuer.qlight);
-    Ovoid.Drawer.switchDepth(1); // mask on, test less
-    Ovoid.Drawer.enable(0);   // enable diffuse; ENd
-    Ovoid.Drawer.enable(1);   // enable ambient; ENa
-    Ovoid.Drawer.bodyStack( Ovoid.Queuer.qbody, false);
+    Ovoid.Drawer.drawQueue1P(G_NL);
   }
-
-  Ovoid.Drawer.switchDepth(0); // depth all disable
-  // Helpers 
-  if (Ovoid.Drawer.opt_drawHelpers) {
-    Ovoid.Drawer.switchPipe(5); // PIPE_HELPER
-    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    if (Ovoid.Drawer.opt_drawNormals) {
-      Ovoid.Drawer.normalsStack( Ovoid.Queuer.qbody);
-    }
-    Ovoid.Drawer.helpersStack(Ovoid.Queuer.qtform);
-    
-    // Dessin du curseur
-    Ovoid.Drawer.model(Ovoid.Input.mouseCursor.m);
-    Ovoid.Drawer.symSphere(Ovoid.Drawer._tcolor[1]);
-    
-  }
-  // Layers & text
-  if (Ovoid.Drawer.opt_drawLayers) {
-    Ovoid.Drawer.switchPipe(3); //PIPE_LAYER
-    Ovoid.Drawer.screen(Ovoid.Frame.matrix);
-    Ovoid.Drawer.layerStack(Ovoid.Queuer.qlayer, false);
-    Ovoid.Drawer.switchPipe(4); //PIPE_STRING
-    Ovoid.Drawer.screen(Ovoid.Frame.matrix);
-    Ovoid.Drawer.textStack(Ovoid.Queuer.qtext, false);
-  }
+  Ovoid.Drawer.drawQueueHL();
   Ovoid.Drawer.endDraw();
 };

@@ -367,14 +367,20 @@ Ovoid.Input.update = function() {
  */
 Ovoid.Input.trigger = function(m, s, k, f) {
 
-  if (s > 2) 
+  if (s > 2) {
+    Ovoid.log(2, "Ovoid.Input.trigger", "Invalid key status code.");
     return;
+  }
   
-  if (k > 255)
+  if (k > 255) {
+    Ovoid.log(2, "Ovoid.Input.trigger", "Invalid key code.");
     return;
+  }
   
-  if (!(f instanceof Function))
+  if (!(f instanceof Function)) {
+    Ovoid.log(2, "Ovoid.Input.trigger", "Non-Function instance given as trigger function");
     return;
+  }
 
   var trigger = new Array(2);
   trigger[0] = k;
