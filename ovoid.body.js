@@ -178,7 +178,9 @@ Ovoid.Body.prototype.toJSON = function() {
   /* Ovoid.Body */
   o['bs'] = this.shape?this.shape.uid:'null';
   o['bi'] = this.intersectable;
-  
+  o['bc'] = this.shadowCasting;
+  o['bl'] = this.renderLayer;
+  o['ba'] = this.renderAlpha;
   return o;
 };
 

@@ -978,6 +978,9 @@ Ovoid.Ojson.prototype._procBody = function(n, j) {
    */
   (j.shape == 'null')?n.shape=null:n.shape=j.bs;
   n.intersectable = j.bi;
+  n.shadowCasting = j.bc;
+  n.renderLayer = j.bl;
+  n.renderAlpha = j.ba;
 };
 
 
