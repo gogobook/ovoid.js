@@ -107,6 +107,8 @@ Ovoid.Timer.update = function() {
   Ovoid.Timer._timeq = (Ovoid.Timer._timecurr - Ovoid.Timer._timelast) * 0.001;
   Ovoid.Timer._timelast = Ovoid.Timer.clock;
 
+  if(Ovoid.Timer._timeq > 0.1) Ovoid.Timer._timeq = 0.01;
+  
   Ovoid.Timer._fcount++;
   Ovoid.Timer._fcumul+=Ovoid.Timer._timeq;
   

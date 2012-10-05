@@ -32,6 +32,11 @@
  * assigned to several nodes to generate logical animation to multiple nodes at
  * once.<br><br>
  * 
+ * The expression function should take three arguments. The first one is the 
+ * targeted node, second one is the time quantum value (time elapsed since the
+ * last frame) and the third one is the linear time value (time elapsed since 
+ * the begining).<br><br>
+ * 
  * <blockcode>
  * var exprfunc1 = function(node, t, l) {<br>
  * &nbsp;&nbsp;node.rotateXyz(0.0, t*0.1, 0.0);<br>
@@ -138,20 +143,24 @@ Ovoid.Expression.prototype.play = function(factor) {
  */
 Ovoid.Expression.prototype.cachExpression = function() {
 
-  if (this.playing)
+  if(!(this.cach & Ovoid.CACH_EXPRESSION))
   {
-    this.timeq = this.factor * Ovoid.Timer.quantum;
-    this.timel += this.timeq;
-    
-    var i, j, c;
-    
-    i = this.target.length;
-    c = this.exprfunc.length;
-    while (i--) {
-      for ( j = 0; j < c; j++) {
-        this.exprfunc[j](this.target[i], this.timeq, this.timel);
+    if (this.playing)
+    {
+      this.timeq = this.factor * Ovoid.Timer.quantum;
+      this.timel += this.timeq;
+      
+      var i, j, c;
+      
+      i = this.target.length;
+      c = this.exprfunc.length;
+      while (i--) {
+        for ( j = 0; j < c; j++) {
+          this.exprfunc[j](this.target[i], this.timeq, this.timel);
+        }
       }
     }
+    this.addCach(Ovoid.CACH_EXPRESSION);
   }
 };
 

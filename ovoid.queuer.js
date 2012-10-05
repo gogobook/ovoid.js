@@ -368,7 +368,9 @@ Ovoid.Queuer.queueScene = function(sc) {
   /* Uncach tous les actions */
   i = sc.action.length;
   while (i--) sc.action[i].unCach(Ovoid.CACH_ACTION);
-
+  /* Uncach toutes les expressions */
+  i = sc.expression.length;
+  while (i--) sc.expression[i].unCach(Ovoid.CACH_EXPRESSION);
 
   /* Actualisation et mise en render queue des bodys */
   Ovoid.Queuer._wgit.init(sc.world);
