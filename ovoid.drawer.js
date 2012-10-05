@@ -760,7 +760,7 @@ Ovoid.Drawer.init = function() {
   Ovoid.Drawer.plugShader(11,-1,Ovoid.Drawer.addShader(sp));
   
   sp = new Ovoid.Shader("PIPE_L0_GEOMETRY_LP");
-  sp.setSources(Ovoid.GLSL_VL_PNUIW_HYBRID_LP_VS, Ovoid.GLSL_LE_ADS_1TEX_FS, Ovoid.GLSL_WRAPMAP);
+  sp.setSources(Ovoid.GLSL_VL_PNUIW_HYBRID_LP_VS, Ovoid.GLSL_VL_ADS_1TEX_FS, Ovoid.GLSL_WRAPMAP);
   if(!sp.linkWrap()) {
     Ovoid.log(1, 'Ovoid.Drawer', "error wrapping default PIPE_L0_GEOMETRY_LP pipeline shader program.");
     return false;
