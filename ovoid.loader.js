@@ -945,8 +945,8 @@ Ovoid.Loader.includeAudio = function(audio) {
  * following symbolic constants:
  * Ovoid.DRAWER_SP_COLOR,<br>
  * Ovoid.DRAWER_SP_VERTEX_COLOR,<br>
- * Ovoid.DRAWER_SP_1LIGHT,<br>
- * Ovoid.DRAWER_SP_NLIGHT,<br>
+ * Ovoid.DRAWER_SP_LPIGHT,<br>
+ * Ovoid.DRAWER_SP_1PIGHT,<br>
  * Ovoid.DRAWER_SP_TEXT,<br>
  * Ovoid.DRAWER_SP_LAYER,<br>
  * Ovoid.DRAWER_SP_PARTICLES<br><br>

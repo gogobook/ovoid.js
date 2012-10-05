@@ -82,7 +82,7 @@ Ovoid.Drawer.opt_fogColor = [1.0, 1.0, 1.0, 1.0];
 /* Global fog/atmosphere density */
 Ovoid.Drawer.opt_fogDensity = 0.0;
 /* Level of performance */
-Ovoid.Drawer.opt_lop = 2;
+Ovoid.Drawer.opt_lopLevel = 2;
 /* Enable or disable adaptative level of performance */
 Ovoid.Drawer.opt_adaptativeLop = true;
 /* Adaptative level of performance threshold */

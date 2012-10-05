@@ -110,7 +110,7 @@ Ovoid.Texture.prototype._handleLoad = function() {
 
   this.owner.loadStatus = 1;
   
-  Ovoid.log(2, 'Ovoid.Texture', "'" + this.owner.name +"' loaded");
+  Ovoid.log(3, 'Ovoid.Texture', "'" + this.owner.name +"' loaded");
       
   return true;
 };

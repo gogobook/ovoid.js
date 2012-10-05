@@ -174,8 +174,8 @@ Ovoid.error = function(code, message) {
   }
   
   /* compose le contenu html */
-  var content = '<div style="text-align:center;font-family:sans-serif;margin:20px;border-radius:16px;background-color:#343434;color:#fa0;padding:20px;">';
-  content += '<h1><b><big>OvoiD.JS Error X(</big></b></h1><span style="color:#ddd;">';
+  var content = '<div style="text-align:center;width:600px;font-family:sans-serif;font-size:8pt;margin:auto;background-color:#fff;color:#444;padding:20px;">';
+  content += '<h5>OVOID.JS ERROR</h5><span style="color:#444;">';
 
   var comment = "<p>Sorry, the page you requested uses the <i>OvoiD.JS's WebGL Wrapper</i> and the library's script has stopped ";
   var browser = '</p><p>This error is related to your web browser and/or your operating system. This may be caused by:<div style="text-align:left;"><ul><b><li>An outdated or incompatible browser</li><li>The browser Hardware Acceleration and/or WebGL support disabled</li> <li>Not properly installed graphic drivers</li></b></ul></div><p>If you already uses a compatible browser try to update it or enable the Hardware Acceleration and WebGL support in the browser parameters (<a style="color:#fa0;" href="http://www.ovoid.org/js/doc/index.php#faq">How to enable WebGL</a>). Else, it is recommanded to use the latest version of one of the followings:</p><table cellpadding=10px style="border:0;margin:auto;text-align:center;"><tr><td><a style="color:#fa0;" href="http://www.google.com/chrome/">Chrome<a></td><td><a style="color:#fa0;" href="http://www.mozilla.org/firefox/">Firefox<a></div></td></tr><tr><td><a style="color:#fa0;" href="http://www.opera.com/browser/">Opera</a></td><td><a style="color:#fa0;" href="http://www.apple.com/safari/">Safari<a></td></tr></table>';
@@ -185,38 +185,38 @@ Ovoid.error = function(code, message) {
   switch(code)
   {
     case 1:
-      dcode += "01 - Non-compatible Web Browser";
+      dcode += "Error 01 - Non-compatible Web Browser";
       comment += 'because your browser seems to be outdated or rudimentary and does not provide some essentials fonctionnalities.';
       comment += browser;
       break;
     case 2:
-      dcode += "02 - WebGL Context Exception";
+      dcode += "Error 02 - WebGL Context Exception";
       comment += 'because an exception occured during the <b><a style="color:#fa0;" href="http://www.khronos.org/webgl/">WebGL<a></b> context creation.';
       comment += browser;
       break;
     case 3:
-      dcode += "03 - WebGL Context Not Found";
+      dcode += "Error 03 - WebGL Context Not Found";
       comment += 'because no suitable <b><a style="color:#fa0;" href="http://www.khronos.org/webgl/">WebGL<a></b> implementation was found.';
       comment += browser;
       break;
     case 4:
-      dcode += "04 - Initialization Failled";
+      dcode += "Error 04 - Initialization Failled";
       comment += "because it failed to initialize its own base components. This error may be caused by one or more global classes which encountered errors.";
       break;
     case 5:
-      dcode += "05 - Preloading Error";
+      dcode += "Error 05 - Preloading Error";
       comment += "because an error occurend during the data preloading process. This error may be caused by corruped loaded data or importation classes's exceptions.";
       break;
     case 6:
-      dcode += "06 - Errors Flood";
+      dcode += "Error 06 - Errors Flood";
       comment += "because of too many errors was reported. This error is raised when too many errors was encountered, this generaly means that something goes really wrong.";
       break;
     case 7:
-      dcode += "07 - On Loop Runtime Error";
+      dcode += "Error 07 - On Loop Runtime Error";
       comment += "because an exception occured during the main runtime onloop process. This error may be caused by an exception thrown within the main client program loop method (Ovoid.onloop()).";
       break;
     case 8:
-      dcode += "08 - On Load Runtime Error";
+      dcode += "Error 08 - On Load Runtime Error";
       comment += "because an exception occured during the main runtime onload process. This error may be caused by an exception thrown within the main client program load method (Ovoid.onload()).";
       break;
     default:
@@ -225,12 +225,10 @@ Ovoid.error = function(code, message) {
       break;
   }
 
-  content += "<h2><b>" + dcode + "</b></h2>";
-  content += comment + '<hr>';
-  content += "</p><small>If you currently are developing an application using <i>OvoiD.JS's WebGL Wrapper</i> and think this error should not occur and/or is a library's issue, you can send a bug repport with the bellow error message and comments at:<br> <b>root (@) ovoid.org</b><br><br>";
-  content += 'You also can consult the OvoiD.JS reference documentation at: <br> <a style="color:#fa0;" href="http://www.ovoid.org/js/doc/">http://www.ovoid.org/js/doc/</a></small><p>';
-  content += '<div style="text-align:left;padding:10px;border-radius:8px;background-color:#eee;color:#000;font-family:courier,monospace;font-size:10pt;margin:0px;">';
-  content += '- Message - <br><span style="color:#a00">' + dcode + " :: " + message + '</span><br>';
+  content += "<h5>" + dcode + " :: " + message + "</h5>";
+  content += comment;
+  content += '</p><small>For more informations, bug repport or documentation about OvoiD.JS, please visit: <a style="color:#fa0;" href="http://www.ovoid.org/js/doc/">http://www.ovoid.org/js/</a></small><p>';
+  content += '<div style="text-align:left;padding:10px;background-color:#fff;color:#000;font-family:courier,monospace;font-size:7pt;margin:0px;">';
   content += '- last log/backtrace -<br>';
   var logs = Ovoid._log;
   logs = logs.replace(/    /g, '&nbsp;&nbsp;&nbsp;&nbsp;');

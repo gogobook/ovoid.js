@@ -48,11 +48,11 @@ void main(void)
   if(ENd) {
     gl_FragColor+=(Md*texture2D(Sd,Vu))*Cd;
     gl_FragColor+=(Ms*texture2D(Ss,Vu))*Cs;
-  }
-  if(Fd>0.0) {
-    Fz=gl_FragCoord.z/gl_FragCoord.w;
-    Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);
-    gl_FragColor=mix(Fc,gl_FragColor,Ff);
+    if(Fd>0.0) {
+      Fz=gl_FragCoord.z/gl_FragCoord.w;
+      Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);
+      gl_FragColor=mix(Fc,gl_FragColor,Ff);
+    }
   }
 	gl_FragColor.a = Mo;
 }

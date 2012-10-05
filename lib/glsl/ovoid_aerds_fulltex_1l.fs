@@ -1,4 +1,4 @@
-/** OvoiD.JS - Built-in fragment shader - AERDS_FULLTEX_1L
+/** OvoiD.JS - Built-in fragment shader - AERDS_FULLTEX_LP
  * 
  * Main fragment shader for per-pixel lighting full textured channels amibient,
  * emissive, reflexion, diffuse, specular with multiple lights.

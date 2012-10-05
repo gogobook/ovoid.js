@@ -82,8 +82,12 @@ Ovoid.Queuer.opt_defaultCameraRot = [0.0, 0.0, 0.0];
 Ovoid.Queuer._wgit = new Ovoid.WgIterator();
 
 
-/** Body stack. */
-Ovoid.Queuer.qbody = new Array(Ovoid.MAX_RENDER_LAYER);
+/** Solid body stack. */
+Ovoid.Queuer.qsolid = new Array(Ovoid.MAX_RENDER_LAYER);
+
+
+/** Alpha body stack. */
+Ovoid.Queuer.qalpha = new Array(Ovoid.MAX_RENDER_LAYER);
 
 
 /** Transform stack. */
@@ -130,7 +134,8 @@ Ovoid.Queuer.init = function() {
 
   /* Initialise les stack de body pour les render layers */
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-    Ovoid.Queuer.qbody[i] = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
+    Ovoid.Queuer.qsolid[i] = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
+    Ovoid.Queuer.qalpha[i] = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
   }
   
   /* initialisation de la camera par defaut */
@@ -237,12 +242,20 @@ Ovoid.Queuer._viewcull = function(o) {
         o.distFromEye = Ovoid.FLOAT_MIN;
         
       o.rendered = true;
-      Ovoid.Queuer.qbody[o.renderLayer].add(o);
+      if(o.renderAlpha) {
+        Ovoid.Queuer.qalpha[o.renderLayer].add(o);
+      } else {
+        Ovoid.Queuer.qsolid[o.renderLayer].add(o);
+      }
       return true;
     }
   } else {
     o.rendered = true;
-    Ovoid.Queuer.qbody[o.renderLayer].add(o);
+    if(o.renderAlpha) {
+      Ovoid.Queuer.qalpha[o.renderLayer].add(o);
+    } else {
+      Ovoid.Queuer.qsolid[o.renderLayer].add(o);
+    }
     return true;
   }
   return false;
@@ -293,7 +306,8 @@ Ovoid.Queuer._bodyZSortFunc = function(a, b) {
 Ovoid.Queuer.reset = function() {
 
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-    Ovoid.Queuer.qbody[i].empty();
+    Ovoid.Queuer.qsolid[i].empty();
+    Ovoid.Queuer.qalpha[i].empty();
   }
   Ovoid.Queuer.qlayer.empty();
   Ovoid.Queuer.qtext.empty();
@@ -474,7 +488,7 @@ Ovoid.Queuer.queueScene = function(sc) {
 
   /* Ordonne les bodys selon la distance à la camera */
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-    Ovoid.Queuer.qbody[i].sort(Ovoid.Queuer._bodyZSortFunc);
+    Ovoid.Queuer.qalpha[i].sort(Ovoid.Queuer._bodyZSortFunc);
   }
   
 

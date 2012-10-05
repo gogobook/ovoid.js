@@ -1,4 +1,4 @@
-/** OvoiD.JS - Built-in fragment shader - AERDS_FULLTEX_NL
+/** OvoiD.JS - Built-in fragment shader - AERDS_FULLTEX_1P
  * 
  * Main fragment shader for per-pixel lighting full textured channels amibient,
  * emissive, reflexion, diffuse, specular with multiple lights.
@@ -43,13 +43,13 @@ void main(void)
   EV=normalize(Ep-Vp).xyz;
   gl_FragColor=(Ma*Md*texture2D(Sd,Vu))*Ac;
   gl_FragColor+=(Me*texture2D(Se,Vu));
-  if(My!=0.0) {
+  if(My!=0.0){
     R=normalize(reflect(EV,Vn));
     Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;
     gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;
   }
-  for(int i = 0; i < ML; i++) {
-    if(Le[i]) {
+  for(int i=0;i<ML;i++){
+    if(Le[i]){
       if(Lp[i].w==1.0){
         LV=normalize(Lp[i]-Vp).xyz;
         LT=max(dot(Vn,LV),0.0);
@@ -66,10 +66,10 @@ void main(void)
       gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc[i]*Li[i])*Sw);
     }
   }
-  if(Fd>0.0) {
+  if(Fd>0.0){
     Fz=gl_FragCoord.z/gl_FragCoord.w;
     Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);
     gl_FragColor=mix(Fc,gl_FragColor,Ff);
   }
-	gl_FragColor.a = Mo;
+	gl_FragColor.a=Mo;
 }

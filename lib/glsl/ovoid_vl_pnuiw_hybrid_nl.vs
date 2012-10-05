@@ -1,4 +1,4 @@
-/** OvoiD.JS - Built-in vertex shader - VL_PNUIW_HYBRID_NL
+/** OvoiD.JS - Built-in vertex shader - VL_PNUIW_HYBRID_1P
  * 
  * Main vertex shader for per-vertex lighting with Mesh or Skin deform mode 
  * choosed through boolean uniform value.

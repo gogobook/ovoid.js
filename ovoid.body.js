@@ -85,6 +85,9 @@ Ovoid.Body = function(name) {
   /** Render layer index.
    * @type int */
   this.renderLayer = 0;
+  /** Render alpha flag.
+   * @type int */
+  this.renderAlpha = false;
 };
 Ovoid.Body.prototype = new Ovoid.Transform;
 Ovoid.Body.prototype.constructor = Ovoid.Body;
