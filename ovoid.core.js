@@ -282,7 +282,7 @@ Ovoid.init = function(canvas) {
                 Ovoid._hudbg.setBgColor(0.6,0.6,0.6,1.0);
                 Ovoid._hudbg.setSize(Ovoid.Frame.size.v[0], 17.0, 1.0);
                 Ovoid._dbg[7].setFormat(16.0, 0.5, 1.0);
-                Ovoid._dbg[7].moveXyz(2.0, 0.0, 0.0);
+                Ovoid._dbg[7].moveXyz(4.0, 0.0, 0.0);
                 Ovoid._dbg[7].setFgColor(1.0,1.0,1.0,0.6);
                 
                 Ovoid._dbgbg.setBgColor(0.0,0.0,0.0,0.5);

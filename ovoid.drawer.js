@@ -2310,18 +2310,19 @@ Ovoid.Drawer.zfailStack = function(light, stack) {
  */
 Ovoid.Drawer.drawQueueRP = function() {
   
-  Ovoid.Drawer.setCull(1); // cull back
   var i;
   // Picking frame
   if (Ovoid.opt_enablePicking) { 
+    Ovoid.Drawer.beginRpDraw();
     for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-      if(!Ovoid.Queuer.qsolid[i].count) continue;
       Ovoid.Drawer.switchBlend(0); // blend off
       Ovoid.Drawer.switchPipe(20,0); //PIPE_RP_GEOMETRY
       Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-      Ovoid.Drawer.beginRpDraw();
       Ovoid.Drawer.switchDepth(1); // depth mask on, test less
-      Ovoid.Drawer.bodyStack(Ovoid.Queuer.qsolid[i], i, true);
+      Ovoid.Drawer.setCull(1); // cull back
+      Ovoid.Drawer.bodyStack(Ovoid.Queuer.qsolid[i], 0, true);
+      Ovoid.Drawer.setCull(0); // no cull
+      Ovoid.Drawer.bodyStack(Ovoid.Queuer.qalpha[i], 0, true);
     }
     if (Ovoid.Drawer.opt_drawLayers) {
       Ovoid.Drawer.switchDepth(0); // depth all disable

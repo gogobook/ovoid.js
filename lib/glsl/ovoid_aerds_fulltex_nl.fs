@@ -28,12 +28,13 @@ uniform sampler2D Sd;
 uniform sampler2D Ss;
 uniform sampler2D Se;
 uniform sampler2D Sr;
-uniform vec4 Fc; /* Fog color */
-uniform float Fd; /* Fog density */
+uniform vec4 Fc;
+uniform float Fd;
 varying vec4 Vp;
 varying vec3 Vn;
 varying vec2 Vu;
 
+vec4 Td;
 float LT, Fw, Dw, Sw, Fz, Ff;
 vec3 EV, R, LV;
 vec2 Ru;
@@ -41,7 +42,8 @@ vec2 Ru;
 void main(void)
 {	
   EV=normalize(Ep-Vp).xyz;
-  gl_FragColor=(Ma*Md*texture2D(Sd,Vu))*Ac;
+  Td=texture2D(Sd,Vu);
+  gl_FragColor=(Ma*Md*Td)*Ac;
   gl_FragColor+=(Me*texture2D(Se,Vu));
   if(My!=0.0){
     R=normalize(reflect(EV,Vn));
@@ -62,7 +64,7 @@ void main(void)
       Dw=LT*Li[i]*Fw;
       R=normalize(reflect(-LV,Vn));
       Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;
-      gl_FragColor+=(Md*texture2D(Sd,Vu))*((Lc[i]*Li[i])*Dw);
+      gl_FragColor+=(Md*Td)*((Lc[i]*Li[i])*Dw);
       gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc[i]*Li[i])*Sw);
     }
   }
@@ -71,5 +73,5 @@ void main(void)
     Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);
     gl_FragColor=mix(Fc,gl_FragColor,Ff);
   }
-	gl_FragColor.a=Mo;
+	gl_FragColor.a=Td.a*Mo;
 }

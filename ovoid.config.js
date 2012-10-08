@@ -120,7 +120,7 @@ Ovoid.Drawer.opt_normalScale = 0.7;
 /* Draw the Wait screen or let blank during loading process */
 Ovoid.Loader.opt_drawWaitScreen = true;
 /* Wait screen foreground color */
-Ovoid.Loader.opt_foregroundColor = [0.0, 0.0, 0.0, 0.2];
+Ovoid.Loader.opt_foregroundColor = [0.0, 0.0, 0.0, 0.3];
 /* Wait screen background color */
 Ovoid.Loader.opt_backgroundColor = [1.0, 1.0, 1.0, 1.0];
 /* Wait screen background source image file */
@@ -169,6 +169,10 @@ Ovoid.Loader.opt_titleStr = "Loading Please Wait";
 Ovoid.Loader.opt_showDetails = false;
 /* Wait screen details X, Y position and font size */
 Ovoid.Loader.opt_detailsXys = [400, 310, 16];
+/* Wait screen long wait message X, Y position and font size */
+Ovoid.Loader.opt_longwaitXys = [400, 310, 16];
+/* Wait screen long wait message string */
+Ovoid.Loader.opt_longwaitStr = 'Loading screen may freezes but Please wait !';
 
 
 /* --------------------------- SOLVER OPTIONS ------------------------------- */

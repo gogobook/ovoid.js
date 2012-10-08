@@ -29,15 +29,17 @@ varying vec3 Vn;
 varying vec4 Vp;
 
 float Fz, Ff;
+vec4 Td;
 vec3 R, EV;
 vec2 Ru;
 
 void main(void)
 {	
   gl_FragColor=vec4(0.0,0.0,0.0,0.0);
+  Td=texture2D(Sd,Vu);
   if(ENa) {
-    gl_FragColor=(Md*Ma*texture2D(Sd,Vu))*Ac;
-    gl_FragColor+=texture2D(Se,Vu)*Me;
+    gl_FragColor=(Md*Ma*Td)*Ac;
+    gl_FragColor+=(texture2D(Se,Vu)*Me);
     if(My!=0.0) {
       EV=normalize(Ep-Vp).xyz;
       R=normalize(reflect(EV,Vn));
@@ -46,7 +48,7 @@ void main(void)
     }
   }
   if(ENd) {
-    gl_FragColor+=(Md*texture2D(Sd,Vu))*Cd;
+    gl_FragColor+=(Md*Td)*Cd;
     gl_FragColor+=(Ms*texture2D(Ss,Vu))*Cs;
     if(Fd>0.0) {
       Fz=gl_FragCoord.z/gl_FragCoord.w;
@@ -54,5 +56,5 @@ void main(void)
       gl_FragColor=mix(Fc,gl_FragColor,Ff);
     }
   }
-	gl_FragColor.a = Mo;
+	gl_FragColor.a=Mo*Td.a;
 }

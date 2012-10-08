@@ -372,6 +372,10 @@ Ovoid.Queuer.queueScene = function(sc) {
   i = sc.expression.length;
   while (i--) sc.expression[i].unCach(Ovoid.CACH_EXPRESSION);
 
+  /* Actualise les dependences pour les materiaux */
+  i = sc.material.length;
+  while (i--) Ovoid.Queuer._cachDependencies(sc.material[i]);
+
   /* Actualisation et mise en render queue des bodys */
   Ovoid.Queuer._wgit.init(sc.world);
   while (Ovoid.Queuer._wgit.explore())

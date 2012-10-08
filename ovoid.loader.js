@@ -190,6 +190,18 @@ Ovoid.Loader.opt_detailsXys = [387, 224, 16];
 Ovoid.Loader._detailsStr = '';
 
 
+/** Wait screen long wait message X, Y position and font size */
+Ovoid.Loader.opt_longwaitXys = [387, 224, 16];
+
+
+/** Wait screen long wait message string */
+Ovoid.Loader.opt_longwaitStr = 'Heavy computing, please wait...';
+
+
+/** May be heavy computing */
+Ovoid.Loader._heavyComput = false;
+
+
 /** Background layer*/
 Ovoid.Loader._bg = new Ovoid.Layer();
 
@@ -228,6 +240,10 @@ Ovoid.Loader._title = new Ovoid.Text();
 
 /** Current-loading-URL text */
 Ovoid.Loader._details = new Ovoid.Text();
+
+
+/** Current-loading-URL text */
+Ovoid.Loader._longwait = new Ovoid.Text();
 
 
 /** Fontmap texture for texts */
@@ -408,6 +424,13 @@ Ovoid.Loader.init = function() {
   Ovoid.Loader._details.cachTransform();
   Ovoid.Loader._details.cachLayer();
 
+  Ovoid.Loader._longwait.string = Ovoid.Loader.opt_longwaitStr;
+  Ovoid.Loader._longwait.setFormat(Ovoid.Loader.opt_longwaitXys[2],0.5,1.0);
+  Ovoid.Loader._longwait.fgColor.setv(Ovoid.Loader.opt_foregroundColor);
+  Ovoid.Loader._longwait.moveXyz(Ovoid.Loader.opt_longwaitXys[0]-(Ovoid.Loader._longwait.getWidth()*0.5),Ovoid.Loader.opt_longwaitXys[1],0.0);
+  Ovoid.Loader._longwait.cachTransform();
+  Ovoid.Loader._longwait.cachLayer();
+  
   if (Ovoid._logGlerror('Ovoid.Loader.init'))
     return false;
 
@@ -486,6 +509,11 @@ Ovoid.Loader._drawStep = function() {
     Ovoid.Loader._details.cachTransform();
     Ovoid.Drawer.model(Ovoid.Loader._details.layerMatrix.m);
     Ovoid.Drawer.text(Ovoid.Loader._details);
+  }
+  
+  if (Ovoid.Loader._heavyComput) {
+    Ovoid.Drawer.model(Ovoid.Loader._longwait.layerMatrix.m);
+    Ovoid.Drawer.text(Ovoid.Loader._longwait);
   }
   
   /* vide le cach error */
@@ -607,6 +635,7 @@ Ovoid.Loader._loadStep = function() {
                     Ovoid.Loader._item[3],
                     Ovoid.Loader._item[4],
                     Ovoid.Loader._item[5]);
+              Ovoid.Loader._heavyComput = false;
               break;
           }
           /* on insert les textures pour leur chargement ulterieur */
@@ -634,6 +663,7 @@ Ovoid.Loader._loadStep = function() {
             break;
           default:
             Ovoid.Loader._obj = new Ovoid.Collada();
+            Ovoid.Loader._heavyComput = true; // SALE !!
             break;
         }
         Ovoid.Loader._obj.loadSource(Ovoid.Loader._item[1], true);

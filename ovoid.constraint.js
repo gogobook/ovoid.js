@@ -29,13 +29,15 @@
  * The Constraint node is the base class for constraint nodes type. It 
  * implements a simple node targeting abstract mechanism. The Constraint node is 
  * a dependency node and does not takes place directly in the 3D world. The 
- * Constraint node is typically used to modify the transformation behaviours of 
- * one Body node.<br><br>
+ * Constraint node is typically used to modify the behaviours of one or several 
+ * nodes.<br><br>
  * 
  * @extends Ovoid.Node
  * 
  * @see Ovoid.Animation
  * @see Ovoid.Physics
+ * @see Ovoid.Expression
+ * @see Ovoid.Aim
  *
  * @param {string} name Name of the new node.
 */
