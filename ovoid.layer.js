@@ -119,7 +119,12 @@ Ovoid.Layer.prototype.setBgColor = function(r, g, b, a) {
  */
 Ovoid.Layer.prototype.setBgTexture = function(texture) {
 
+  if (this.bgTexture != null)
+    this.breakDepend(this.bgTexture);
+
   this.bgTexture = texture;
+  if (texture != null)
+    this.makeDepend(texture);
 };
 
 

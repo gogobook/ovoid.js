@@ -122,8 +122,11 @@ Ovoid.Scene = function(name) {
    * @type Animation[] */
   this.animation = new Array();
   /** Expression list.
-   * @type Animation[] */
+   * @type Expression[] */
   this.expression = new Array();
+  /** Aim list.
+   * @type Aim[] */
+  this.aim = new Array();
   /** Track list.
    * @type Track[] */
   this.track = new Array();
@@ -169,6 +172,7 @@ Ovoid.Scene = function(name) {
  * Ovoid.SKIN, <br>
  * Ovoid.ANIMATION, <br>
  * Ovoid.EXPRESSION, <br>
+ * Ovoid.AIM, <br>
  * Ovoid.ACTION, <br>
  * Ovoid.PHYSICS, <br>
  * Ovoid.EMITTER, <br>
@@ -260,6 +264,7 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
       break;
     case Ovoid.AIM:
       node = new Ovoid.Aim(name);
+      this.aim.push(node);
       break;
     case Ovoid.EXPRESSION:
       node = new Ovoid.Expression(name);
@@ -408,9 +413,6 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
   if (node.type & Ovoid.LIGHT)
     rmgroup = this.light;
 
-  if (node.type & Ovoid.TRANSFORM)
-    rmgroup = this.transform;
-
   if (node.type & Ovoid.MESH || 
       node.type & Ovoid.SKIN || 
       node.type & Ovoid.EMITTER)
@@ -427,6 +429,9 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
     
   if (node.type & Ovoid.EXPRESSION)
     rmgroup = this.expression;
+
+  if (node.type & Ovoid.AIM)
+    rmgroup = this.aim;
     
   if (node.type & Ovoid.TRACK)
     rmgroup = this.track;
@@ -448,15 +453,20 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
     
   i = rmgroup.length;
   while (i--) {
-
     if (rmgroup[i] === node)
       rmgroup.splice(i, 1);
-
   }
-
+  
+  if (node.type & Ovoid.TRANSFORM) {
+    i = transform.length;
+    while (i--) {
+      if (transform[i] === node)
+        transform.splice(i, 1);
+    }
+  }
+  
   i = this.node.length;
   while (i--) {
-
     if (this.node[i] === node)
       this.node.splice(i, 1);
   }
@@ -542,6 +552,9 @@ Ovoid.Scene.prototype.insert = function(node, parent, preserveParent, preserveUi
     
   if (node.type & Ovoid.EXPRESSION)
     this.expression.push(node);
+    
+  if (node.type & Ovoid.AIM)
+    this.aim.push(node);
     
   if (node.type & Ovoid.TRACK)
     this.track.push(node);
@@ -839,6 +852,44 @@ Ovoid.Scene.prototype.removeMatches = function(item, rdep) {
   }
   
   return f;
+};
+
+
+/**
+ * Clean the scene.<br><br>
+ * 
+ * Search and removes all unlinked/uninstancied nodes of this current scene.
+ */
+Ovoid.Scene.prototype.clean = function() {
+  
+  Ovoid.log(3, "Ovoid.Scene.clean", "start scene cleaning");
+  var i;
+  /* Since arrays indexing will change while removing nodes, we create a local one */
+  var array = new Array();
+  /* Adding all removables dependencies node */
+  /* top-level dependencies nodes */
+  for(i = 0; i < this.material.length; i++) array.push(this.material[i]);
+  for(i = 0; i < this.texture.length; i++) array.push(this.texture[i]);
+  for(i = 0; i < this.audio.length; i++) array.push(this.audio[i]);
+  /* shape nodes */
+  for(i = 0; i < this.shape.length; i++) array.push(this.shape[i]);
+  /* constraint nodes */
+  for(i = 0; i < this.animation.length; i++) array.push(this.animation[i]);
+  for(i = 0; i < this.expression.length; i++) array.push(this.expression[i]);
+  for(i = 0; i < this.action.length; i++) array.push(this.action[i]);
+  for(i = 0; i < this.physics.length; i++) array.push(this.physics[i]);
+  for(i = 0; i < this.aim.length; i++) array.push(this.aim[i]);
+
+  /* For all nodes we check if it has some links or not */
+  i = array.length;
+  while(i--) {
+    /* node has some links ? */
+    if(!array[i].link.length) {
+      /* no, then we remove it */
+      this.remove(array[i], true);
+    }
+  }
+  Ovoid.log(3, "Ovoid.Scene.clean", "scene cleaning finished");
 };
 
 

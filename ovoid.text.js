@@ -99,7 +99,12 @@ Ovoid.Text.prototype.setFormat = function(s, c, l) {
  */
 Ovoid.Text.prototype.setFontmap = function(texture) {
 
+  if (this.fontmap != null)
+    this.breakDepend(this.fontmap);
+
   this.fontmap = texture;
+  if (texture != null)
+    this.makeDepend(texture);
 };
 
 
