@@ -39,8 +39,7 @@ float LT, Fw, Dw, Sw, Fz, Ff;
 vec3 EV, R, LV;
 vec2 Ru;
 	
-void main(void)
-{	
+void main(void){	
   EV=normalize(Ep-Vp).xyz;
   Td=texture2D(Sd,Vu);
   gl_FragColor=(Ma*Md*Td)*Ac;
@@ -65,6 +64,7 @@ void main(void)
       R=normalize(reflect(-LV,Vn));
       Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;
       gl_FragColor+=(Md*Td)*((Lc[i]*Li[i])*Dw);
+      gl_FragColor.a=Td.a*Mo;
       gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc[i]*Li[i])*Sw);
     }
   }
@@ -73,5 +73,4 @@ void main(void)
     Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);
     gl_FragColor=mix(Fc,gl_FragColor,Ff);
   }
-	gl_FragColor.a=Td.a*Mo;
 }

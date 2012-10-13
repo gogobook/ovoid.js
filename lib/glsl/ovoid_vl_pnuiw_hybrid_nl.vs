@@ -60,7 +60,7 @@ void main(void){
   
   EV=normalize(Ep-Vp).xyz;
   
-  for(int i = 0; i < ML; i++) {
+  for(int i=0;i<ML;i++){
     if(Le[i]) {
       if(Lp[i].w==1.0){
         LV=normalize(Lp[i]-Vp).xyz;
