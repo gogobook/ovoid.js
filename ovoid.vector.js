@@ -477,6 +477,31 @@ Ovoid.Vector.prototype.transform3Inverse = function(mat3) {
 
 
 /**
+ * Transformation result assignment.<br><br>
+ * 
+ * Sets this instance to the result of the specified Vector transformed
+ * by the given 3x3 transformation matrix.
+ * 
+ * @param {Vector} vect Vector for the base of transformation.
+ * @param {Matrix3} mat3 3x3 transformation matrix.
+ */
+Ovoid.Vector.prototype.transform3Of = function(vect, mat3) {
+
+  this.v[0] = vect.v[0] * mat3.m[0] +
+      vect.v[1] * mat3.m[3] +
+      vect.v[2] * mat3.m[6];
+
+  this.v[1] = vect.v[0] * mat3.m[1] +
+      vect.v[1] * mat3.m[4] +
+      vect.v[2] * mat3.m[7];
+
+  this.v[2] = vect.v[0] * mat3.m[2] +
+      vect.v[1] * mat3.m[5] +
+      vect.v[2] * mat3.m[8];
+};
+
+
+/**
  * Inverse transformation result assignment.<br><br>
  * 
  * Sets this instance to the result of the specified Vector inverse transformed

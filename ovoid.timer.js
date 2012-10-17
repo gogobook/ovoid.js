@@ -119,8 +119,6 @@ Ovoid.Timer.update = function() {
     Ovoid.Timer._fcount = 0;
     Ovoid.Timer._fcumul = 0.0;
   }
-  //Ovoid.Timer.framerate = Math.floor(1.0 / Ovoid.Timer.quantum);
-  
 };
 
 

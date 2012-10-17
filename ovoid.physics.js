@@ -84,9 +84,13 @@ Ovoid.Physics = function(name) {
    * @type enum */
   this.model = Ovoid.RIGID_MASSIVE_SPHERE;
     
-  /** Damping factor.
+  /** Linear Damping factor.
    * @type float */
-  this.damping = 0.1;
+  this.linearDamping = 0.5;
+  
+  /** Angular Damping factor.
+   * @type float */
+  this.angularDamping = 0.5;
   
   /** Use friction for contact.
    * @type bool */
@@ -101,6 +105,11 @@ Ovoid.Physics = function(name) {
   /** Angular velocity.
    * @type Vector */
   this.angularVelocity = new Ovoid.Vector(0.0,0.0,0.0);
+  
+  /** Time scaled linear velocity */
+  this._scaledLinear = new Ovoid.Vector(0.0,0.0,0.0);
+  /** Time scaled angular velocity */
+  this._scaledTorque = new Ovoid.Vector(0.0,0.0,0.0);
   
   /** Linear influence accumulator.
    * @type Vector */
@@ -141,11 +150,13 @@ Ovoid.Physics.prototype.setMass = function(mass) {
  * <br><br>Sets the damping factor of this instance according to the specified 
  * value.
  *
- * @param {float} damp Damping factor.
+ * @param {float} ldamp Linear Damping factor.
+ * @param {float} adamp Angular Damping factor.
  */
-Ovoid.Physics.prototype.setDamping = function(damp) {
+Ovoid.Physics.prototype.setDamping = function(ldamp, adamp) {
   
-  this.damping = damp;
+  this.linearDamping = ldamp;
+  this.angularDamping = adamp;
 };
 
 
@@ -491,17 +502,19 @@ Ovoid.Physics.prototype.cachPhysics = function() {
       this.addCach(Ovoid.CACH_INFLUENCES);
     }
     
-    /* damping */
-    var d = Math.pow(this.damping, Ovoid.Timer.quantum);
     /* attenuation */
-    this.linearVelocity.scaleBy(d);
-    this.angularVelocity.scaleBy(d);
+    this.linearVelocity.scaleBy(Math.pow(this.linearDamping, Ovoid.Timer.quantum));
+    this.angularVelocity.scaleBy(Math.pow(this.angularDamping, Ovoid.Timer.quantum));
     
     /* ajoute a la transformation */
-    this.target[0].translation.addBy(this.linearVelocity);
+    this._scaledLinear.copy(this.linearVelocity);
+    this._scaledLinear.scaleBy(Ovoid.Timer.quantum);
+    this.target[0].translation.addBy(this._scaledLinear);
 
     /* ajoute la rotation */
-    this.target[0].rotation.vectorRotateBy(this.angularVelocity);
+    this._scaledTorque.copy(this.angularVelocity);
+    this._scaledTorque.scaleBy(Ovoid.Timer.quantum);
+    this.target[0].rotation.vectorRotateBy(this._scaledTorque);
     this.target[0].rotation.normalize();
     
     /* Mise en someil du node physique si ses mouvements sont 

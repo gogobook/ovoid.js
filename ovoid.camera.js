@@ -161,7 +161,7 @@ Ovoid.Camera.prototype.isWatching = function(transform) {
   if(S < transform.boundingSphere.radius) 
     return true;
 
-  var i = 6;
+  var i = 4; // On ignore near et far clip plane
   while (i--) {
     if ( (this._fstum[i].v[0] * transform.boundingSphere.worldCenter.v[0] + 
         this._fstum[i].v[1] * transform.boundingSphere.worldCenter.v[1] + 

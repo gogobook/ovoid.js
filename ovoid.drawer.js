@@ -2471,7 +2471,7 @@ Ovoid.Drawer.drawQueueFX = function(pipe) {
 
   Ovoid.Drawer.setCull(0); // disable face culling
   Ovoid.Drawer.switchBlend(3); // blend substractive alpha
-  Ovoid.Drawer.switchDepth(2); // depthMask off, depth test less
+  Ovoid.Drawer.switchDepth(3); // depthMask off, depth test less
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     if(!Ovoid.Queuer.qalpha[i].count) continue;
     // initialize projection pour particles
