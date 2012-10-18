@@ -420,9 +420,10 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
       n.parent = null;
       if (n.type & Ovoid.LAYER) {
         n.setParent(this._dstsc.overlay);
-      }
-      if (n.type & Ovoid.TRANSFORM) {
-        n.setParent(this._dstsc.world);
+      } else {
+        if (n.type & Ovoid.TRANSFORM) {
+          n.setParent(this._dstsc.world);
+        }
       }
     }
   }
@@ -1057,8 +1058,8 @@ Ovoid.Ojson.prototype._procLayer = function(n, j) {
    * .bgTexture*
    */
   n.size.setv(j.sz);
-  n.size.setv(j.fc);
-  n.size.setv(j.bc);
+  n.fgColor.setv(j.fc);
+  n.bgColor.setv(j.bc);
   (j.bt == 'null')?
     n.bgTexture=null:
     n.bgTexture=j.bt;

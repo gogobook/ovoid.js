@@ -493,6 +493,7 @@ Ovoid.Loader._drawStep = function() {
     Ovoid.Loader._percent.string = Math.floor(Ovoid.Loader._nratio).toString() + '%';
     Ovoid.Loader._percent.moveXyz(Ovoid.Loader.opt_percentageXys[0]-(Ovoid.Loader._percent.getWidth()*0.5),Ovoid.Loader.opt_percentageXys[1],0.0,0,1);
     Ovoid.Loader._percent.cachTransform();
+    Ovoid.Loader._percent.cachLayer();
     Ovoid.Drawer.model(Ovoid.Loader._percent.layerMatrix.m);
     Ovoid.Drawer.text(Ovoid.Loader._percent);
   }
@@ -505,8 +506,10 @@ Ovoid.Loader._drawStep = function() {
 
   if (Ovoid.Loader.opt_showDetails) {
     Ovoid.Loader._details.string = Ovoid.Loader._detailsStr;
+    
     Ovoid.Loader._details.moveXyz(Ovoid.Loader.opt_detailsXys[0]-(Ovoid.Loader._details.getWidth()*0.5),Ovoid.Loader.opt_detailsXys[1],0.0,0,1);
     Ovoid.Loader._details.cachTransform();
+    Ovoid.Loader._details.cachLayer();
     Ovoid.Drawer.model(Ovoid.Loader._details.layerMatrix.m);
     Ovoid.Drawer.text(Ovoid.Loader._details);
   }
@@ -554,6 +557,8 @@ Ovoid.Loader._loadStep = function() {
           Ovoid.Loader._obj.loadSource(Ovoid.Loader._item[1],
               Ovoid.Loader._item[2],
               Ovoid.Loader._item[3], true);
+              
+          Ovoid.Loader._detailsStr = 'Shader...('+Ovoid.Loader._obj.name+')';
         }
       }
     }

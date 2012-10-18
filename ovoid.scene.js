@@ -583,15 +583,15 @@ Ovoid.Scene.prototype.insert = function(node, parent, preserveParent, preserveUi
   
   /* parent par defaut */
   var dparent;
-  /* si la node est un layer */
-  if (node.type & Ovoid.LAYER) {
-    this.layer.push(node);
-    dparent = this.overlay;
-  }
   /* si la node est un transform */
   if (node.type & Ovoid.TRANSFORM) {
     this.transform.push(node);
     dparent = this.world;
+  }
+  /* si la node est un layer */
+  if (node.type & Ovoid.LAYER) {
+    this.layer.push(node);
+    dparent = this.overlay;
   }
   
   if (!preserveParent) { /* preserver la hierachie ? */

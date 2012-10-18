@@ -38,8 +38,8 @@ Ovoid.opt_audioPath = '';
 /* Environment: GLSL sahders source files search path */
 Ovoid.opt_shadersPath = Ovoid.opt_libPath + "lib/glsl/";
 /* Environment: Default fontmap Texture source image URL */
-Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_monofonto.png";
-//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_DroidSansMono.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_monofonto.png";
+Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_DroidSansMono.png";
 //Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_UbuntuMono.png";
 //Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_texgyrecursor.png";
 //Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_OxygenMono.png";

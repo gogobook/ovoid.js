@@ -237,12 +237,17 @@ Ovoid.Queuer._viewcull = function(o) {
   
   if (Ovoid.Queuer.opt_viewcull) {
     if (Ovoid.Queuer._rcamera.isWatching(o)) {
-      // Exception pour les particules, toujours dessinées en dernier.
-      if(o.shape.type & Ovoid.EMITTER)
-        o.distFromEye = Ovoid.FLOAT_MIN;
-        
+
       o.rendered = true;
       if(o.renderAlpha) {
+        // Calcul de la distance à la camera
+        if(o.shape.type & Ovoid.EMITTER) { 
+          // Exception pour les particules, toujours dessinées en dernier.
+          o.distFromEye = Ovoid.FLOAT_MIN;
+        } else {
+          var S = o.worldPosition.dist(Ovoid.Queuer._rcamera.worldPosition);
+          o.distFromEye = S - o.boundingSphere.radius;
+        }
         Ovoid.Queuer.qalpha[o.renderLayer].add(o);
       } else {
         Ovoid.Queuer.qsolid[o.renderLayer].add(o);
@@ -252,6 +257,14 @@ Ovoid.Queuer._viewcull = function(o) {
   } else {
     o.rendered = true;
     if(o.renderAlpha) {
+      // Calcul de la distance à la camera
+      if(o.shape.type & Ovoid.EMITTER) { 
+        // Exception pour les particules, toujours dessinées en dernier.
+        o.distFromEye = Ovoid.FLOAT_MIN;
+      } else {
+        var S = o.worldPosition.dist(Ovoid.Queuer._rcamera.worldPosition);
+        o.distFromEye = S - o.boundingSphere.radius;
+      }
       Ovoid.Queuer.qalpha[o.renderLayer].add(o);
     } else {
       Ovoid.Queuer.qsolid[o.renderLayer].add(o);

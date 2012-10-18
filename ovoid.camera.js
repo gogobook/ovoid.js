@@ -154,10 +154,6 @@ Ovoid.Camera.prototype.setCliping = function(n, f) {
  */
 Ovoid.Camera.prototype.isWatching = function(transform) {
 
-  /* Calcul de la distance à la camera */
-  var S = transform.worldPosition.dist(this.worldPosition);
-  transform.distFromEye = S - transform.boundingSphere.radius;
-  
   if(S < transform.boundingSphere.radius) 
     return true;
 
@@ -383,36 +379,38 @@ Ovoid.Camera.prototype.cachCamera = function() {
     this.eyeview.multOf(this.lookat, this.perspective);
 
     /* extraction des plans du frustum */
-    var p = 0;
-    for (i = 0; i < 3; i++)
-    {
-      // Pour i=0: Right; i=1: Top; i=2: Far
-      this._fstum[p].v[0] = this.eyeview.m[3] - this.eyeview.m[0 + i];
-      this._fstum[p].v[1] = this.eyeview.m[7] - this.eyeview.m[4 + i];
-      this._fstum[p].v[2] = this.eyeview.m[11] - this.eyeview.m[8 + i];
-      this._fstum[p].v[3] = this.eyeview.m[15] - this.eyeview.m[12 + i];
-      p++;
-      // Pour i=0: Left; i=1: Bottom; i=2: Near
-      this._fstum[p].v[0] = this.eyeview.m[3] + this.eyeview.m[0 + i];
-      this._fstum[p].v[1] = this.eyeview.m[7] + this.eyeview.m[4 + i];
-      this._fstum[p].v[2] = this.eyeview.m[11] + this.eyeview.m[8 + i];
-      this._fstum[p].v[3] = this.eyeview.m[15] + this.eyeview.m[12 + i];
-      p++;
-    }
+    if(Ovoid.Queuer.opt_viewcull) {
+      var p = 0;
+      for (i = 0; i < 3; i++)
+      {
+        // Pour i=0: Right; i=1: Top; i=2: Far
+        this._fstum[p].v[0] = this.eyeview.m[3] - this.eyeview.m[0 + i];
+        this._fstum[p].v[1] = this.eyeview.m[7] - this.eyeview.m[4 + i];
+        this._fstum[p].v[2] = this.eyeview.m[11] - this.eyeview.m[8 + i];
+        this._fstum[p].v[3] = this.eyeview.m[15] - this.eyeview.m[12 + i];
+        p++;
+        // Pour i=0: Left; i=1: Bottom; i=2: Near
+        this._fstum[p].v[0] = this.eyeview.m[3] + this.eyeview.m[0 + i];
+        this._fstum[p].v[1] = this.eyeview.m[7] + this.eyeview.m[4 + i];
+        this._fstum[p].v[2] = this.eyeview.m[11] + this.eyeview.m[8 + i];
+        this._fstum[p].v[3] = this.eyeview.m[15] + this.eyeview.m[12 + i];
+        p++;
+      }
 
-    var m;
-    var p = 6;
-    while (p--)
-    {
-      /* normalisation du point-plan, comme pour un point au detail
-       * pres que le w est normalisé sur base de la partie vecteur */
-      m = Math.sqrt(this._fstum[p].v[0] * this._fstum[p].v[0] +
-          this._fstum[p].v[1] * this._fstum[p].v[1] +
-          this._fstum[p].v[2] * this._fstum[p].v[2]);
-      this._fstum[p].v[0] /= m;
-      this._fstum[p].v[1] /= m;
-      this._fstum[p].v[2] /= m;
-      this._fstum[p].v[3] /= m;
+      var m;
+      var p = 6;
+      while (p--)
+      {
+        /* normalisation du point-plan, comme pour un point au detail
+         * pres que le w est normalisé sur base de la partie vecteur */
+        m = Math.sqrt(this._fstum[p].v[0] * this._fstum[p].v[0] +
+            this._fstum[p].v[1] * this._fstum[p].v[1] +
+            this._fstum[p].v[2] * this._fstum[p].v[2]);
+        this._fstum[p].v[0] /= m;
+        this._fstum[p].v[1] /= m;
+        this._fstum[p].v[2] /= m;
+        this._fstum[p].v[3] /= m;
+      }
     }
   }
 };

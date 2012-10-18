@@ -115,7 +115,7 @@ Ovoid.Text.prototype.setFontmap = function(texture) {
  * Returns the layer width according to the current string and font
  * parameters.
  */
-Ovoid.Text.prototype.getWidth = function(texture) {
+Ovoid.Text.prototype.getWidth = function() {
 
   return (this.string.length * (this.param.v[0] * this.param.v[1]));
 };

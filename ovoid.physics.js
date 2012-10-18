@@ -520,7 +520,7 @@ Ovoid.Physics.prototype.cachPhysics = function() {
     /* Mise en someil du node physique si ses mouvements sont 
      * stables depuis un certain temps */;
     var curmot = (this.linearVelocity.size2() + this.angularVelocity.size2());
-    var bias = Math.pow(0.5, Ovoid.Timer.quantum);
+    var bias = Math.pow(0.9, Ovoid.Timer.quantum);
     this._motion = bias*this._motion + (1-bias)*curmot;
     
     if (this._motion < Ovoid.PHYSICS_MOTION_EPSILON) {
