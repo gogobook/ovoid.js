@@ -245,7 +245,7 @@ Ovoid.Node.prototype.unCach = function(cach) {
  *
  * @param {bool} v Boolean value to set visibility.
  */
-Ovoid.Node.prototype.setVisible = function(v) {
+Ovoid.Node.prototype.setTreeVisible = function(v) {
 
   this.visible = v;
   var i = this.child.length;

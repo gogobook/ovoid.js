@@ -88,8 +88,8 @@ Ovoid.Solver.init = function() {
  * This function is typically used as class's private member and should not be 
  * called independently.
  * 
- * @param {Object} a First Physic node to test with the second.
- * @param {Object} b Second Physic node to test with the first.
+ * @param {Physics} a First Physics node to test with the second.
+ * @param {Physics} b Second Physics node to test with the first.
  * 
  * @return {bool} True if any contact with the two specified bodys allready 
  * exist, false otherwise.
@@ -114,9 +114,9 @@ Ovoid.Solver._hasContact = function (a, b) {
  * This function is typically used as class's private member and should not be 
  * called independently.
  * 
- * @param {Object} a First Physic node to test with the second.
- * @param {Object} b Second Physic node to test with the first.
- * @param {Object} m Margin tolerence to add to bounding spheres radius.
+ * @param {Physics} a First Physics node to test with the second.
+ * @param {Physics} b Second Physics node to test with the first.
+ * @param {float} m Margin tolerence to add to bounding spheres radius.
  * 
  * @return {bool} True if sphere intersect, false otherwise.
  */
@@ -133,10 +133,10 @@ Ovoid.Solver._canContact = function (a, b, m) {
  * Add a contact to the contact queue. This function simply set the contact at
  * the current stack position and jump stack forward.
  * 
- * @param {Ovoid.Body} b0 First body involved in contact.
- * @param {Ovoid.Body} b1 Second body involved in contact.
- * @param {Ovoid.Point} c Contact world position.
- * @param {Ovoid.Vector} n Contact normal.
+ * @param {Physics} b0 First Physics involved in contact.
+ * @param {Physics} b1 Second Physics involved in contact.
+ * @param {Point} c Contact world position.
+ * @param {Vector} n Contact normal.
  * @param {float} p Contact penetration.
  * @param {float} q Time delta to adjust physical parameters.
  */
@@ -150,6 +150,9 @@ Ovoid.Solver._addContact = function(b0, b1, c, n, p) {
     Ovoid.Solver._contactq.current().set(b0, b1, c, n, p,  Ovoid.Timer.quantum);
     /* Contact suivant dans la pile */
     Ovoid.Solver._contactq.forward();
+    /* Lance les fonctions oncontact */
+    b0.oncontact(b1, c, n);
+    if(b1) b1.oncontact(b0, c, n);
 };
 
 
@@ -158,8 +161,8 @@ Ovoid.Solver._addContact = function(b0, b1, c, n, p) {
  * This function is typically used as class's private member and should not be 
  * called independently.
  * 
- * @param {Object} a First Physic node to test collision as box.
- * @param {Object} l Second Physic node to test collision as landscape.
+ * @param {Physics} a First Physic node to test collision as box.
+ * @param {Physics} l Second Physic node to test collision as landscape.
  */
 Ovoid.Solver._getContactB2L = function (a, b) {
   

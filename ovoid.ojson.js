@@ -804,6 +804,9 @@ Ovoid.Ojson.prototype._procPhysic = function(n, j) {
   n.itensor.setv(j.it);
   n.model = j.md;
   n.damping = j.dm;
+  n.useFriction = j.uf;
+  n.restitution = j.re;
+  n.oncontact = this._parseFunc(j.oc);
 };
 
 

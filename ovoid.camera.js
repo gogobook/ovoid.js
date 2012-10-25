@@ -154,7 +154,7 @@ Ovoid.Camera.prototype.setCliping = function(n, f) {
  */
 Ovoid.Camera.prototype.isWatching = function(transform) {
 
-  if(S < transform.boundingSphere.radius) 
+  if(transform.worldPosition.dist(this.worldPosition) < transform.boundingSphere.radius) 
     return true;
 
   var i = 4; // On ignore near et far clip plane

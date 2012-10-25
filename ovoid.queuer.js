@@ -239,15 +239,14 @@ Ovoid.Queuer._viewcull = function(o) {
     if (Ovoid.Queuer._rcamera.isWatching(o)) {
 
       o.rendered = true;
+      // Calcul de la distance à la camera
+      if(o.shape.type & Ovoid.EMITTER) { 
+        // Exception pour les particules, toujours dessinées en dernier.
+        o.distFromEye = Ovoid.FLOAT_MIN;
+      } else {
+        o.distFromEye = o.worldPosition.dist(Ovoid.Queuer._rcamera.worldPosition) - o.boundingSphere.radius;
+      }
       if(o.renderAlpha) {
-        // Calcul de la distance à la camera
-        if(o.shape.type & Ovoid.EMITTER) { 
-          // Exception pour les particules, toujours dessinées en dernier.
-          o.distFromEye = Ovoid.FLOAT_MIN;
-        } else {
-          var S = o.worldPosition.dist(Ovoid.Queuer._rcamera.worldPosition);
-          o.distFromEye = S - o.boundingSphere.radius;
-        }
         Ovoid.Queuer.qalpha[o.renderLayer].add(o);
       } else {
         Ovoid.Queuer.qsolid[o.renderLayer].add(o);
@@ -256,15 +255,14 @@ Ovoid.Queuer._viewcull = function(o) {
     }
   } else {
     o.rendered = true;
+    // Calcul de la distance à la camera
+    if(o.shape.type & Ovoid.EMITTER) { 
+      // Exception pour les particules, toujours dessinées en dernier.
+      o.distFromEye = Ovoid.FLOAT_MIN;
+    } else {
+      o.distFromEye = o.worldPosition.dist(Ovoid.Queuer._rcamera.worldPosition) - o.boundingSphere.radius;
+    }
     if(o.renderAlpha) {
-      // Calcul de la distance à la camera
-      if(o.shape.type & Ovoid.EMITTER) { 
-        // Exception pour les particules, toujours dessinées en dernier.
-        o.distFromEye = Ovoid.FLOAT_MIN;
-      } else {
-        var S = o.worldPosition.dist(Ovoid.Queuer._rcamera.worldPosition);
-        o.distFromEye = S - o.boundingSphere.radius;
-      }
       Ovoid.Queuer.qalpha[o.renderLayer].add(o);
     } else {
       Ovoid.Queuer.qsolid[o.renderLayer].add(o);
@@ -286,9 +284,9 @@ Ovoid.Queuer._viewcull = function(o) {
  */
 Ovoid.Queuer._physicscull = function(o) {
 
-  //if(!(o.cach & Ovoid.CACH_PHYSICS) || o.target.rendered) {
+  if(o.visible) {
     Ovoid.Queuer.qphycs.add(o);
-  //} 
+  } 
 };
 
 

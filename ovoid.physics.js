@@ -106,6 +106,25 @@ Ovoid.Physics = function(name) {
    * @type Vector */
   this.angularVelocity = new Ovoid.Vector(0.0,0.0,0.0);
   
+  /** Overridable triggered function.<br><br>
+   * 
+   * This function is triggered each time this instance has contact with
+   * another one.<br><br>
+   * 
+   * The function accepts three parameters which are the other instance involved 
+   * in contact, contact point and contact normal.<br><br>
+   * 
+   * Note: If the orther instance involved in contact is a RIGID_LANDSCAPE model
+   * the passed parameter as node will be null.<br><br>
+   * 
+   * <blockcode>
+   * physics.oncontact = function (node, point, normal, velocity) { <codecomment>// do something</codecomment> };<br>
+   * </blockcode>
+   * @field
+   * @type Function
+   */
+  this.oncontact = function(node, point, normal) {};
+  
   /** Time scaled linear velocity */
   this._scaledLinear = new Ovoid.Vector(0.0,0.0,0.0);
   /** Time scaled angular velocity */
@@ -576,6 +595,9 @@ Ovoid.Physics.prototype.toJSON = function() {
   o['it'] = this.itensor;
   o['md'] = this.model;
   o['dm'] = this.damping;
+  o['uf'] = this.useFriction;
+  o['re'] = this.restitution;
+  o['oc'] = String(this.oncontact);
   
   return o;
 };
