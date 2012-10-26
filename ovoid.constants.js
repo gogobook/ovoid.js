@@ -127,7 +127,7 @@ Ovoid.MAX_RENDER_LAYER = 8;
  * @constant 
  * @memberOf _global_
  * @see Ovoid.Physics */
-Ovoid.PHYSICS_MOTION_EPSILON = 1.0;
+Ovoid.PHYSICS_MOTION_EPSILON = 0.1;
 
 
 /** Maximum body intersection count.

@@ -103,6 +103,10 @@ Ovoid.Input.intUp = new Uint8Array(256);
 Ovoid.Input.intHl = new Uint8Array(256);
 
 
+/** Input GamePad axis */
+Ovoid.Input.gpAxis = new Ovoid.Point(0.0, 0.0, 0.0, 0.0);
+
+
 /** Input On Key/button triggers array */
 Ovoid.Input.onInt = [new Array(), new Array(), new Array()];
 
@@ -236,6 +240,33 @@ Ovoid.Input._eventKeyUp = function(e) {
 
 
 /**
+ * Handle GamePad Axis.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid.Input._eventGpAxis = function(e) {
+
+ // Ne fonctionne pas pour le moment
+ 
+};
+
+/**
+ * Handle GamePad Connect.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid.Input._eventGpConnect = function(e) {
+
+ // Ne fonctionne pas pour le moment
+ 
+};
+
+
+/**
  * Input initialization.<br><br>
  * 
  * Global initialization method. This methode is called once during the library 
@@ -260,6 +291,10 @@ Ovoid.Input.init = function() {
   
   document.onkeydown = Ovoid.Input._eventKeyDn;
   document.onkeyup = Ovoid.Input._eventKeyUp;
+
+  // Inutiles, aucun browser standard compatible pour le moment
+  window.addEventListener("MozGamepadConnected", Ovoid.Input._eventGpConnect, false);
+  window.addEventListener("MozGamepadAxisMove", Ovoid.Input._eventGpAxis, false);
 
   return true;
 };

@@ -281,55 +281,58 @@ Ovoid.Physics.prototype.windXyz = function(x, y, z) {
  */
 Ovoid.Physics.prototype.impulse = function(force, point, c) {
   
-  this.linearInfluence.addBy(force);
+  if(force.size2() > 0.0) {
+    
+    this.linearInfluence.addBy(force);
 
-  /* vecteur radius = point -> centre de gravité */
-  var rx, ry, rz;
-  switch (c)
-  {
-    case 1: // Ovoid.LOCAL
-      // Transforme en coordonnées local à l'objet
-      rx = point.v[0] * this.target[0].worldMatrix.m[0] +
-              point.v[1] * this.target[0].worldMatrix.m[4] +
-              point.v[2] * this.target[0].worldMatrix.m[8];
+    /* vecteur radius = point -> centre de gravité */
+    var rx, ry, rz;
+    switch (c)
+    {
+      case 1: // Ovoid.LOCAL
+        // Transforme en coordonnées local à l'objet
+        rx = point.v[0] * this.target[0].worldMatrix.m[0] +
+                point.v[1] * this.target[0].worldMatrix.m[4] +
+                point.v[2] * this.target[0].worldMatrix.m[8];
 
-      ry = point.v[0] * this.target[0].worldMatrix.m[1] +
-              point.v[1] * this.target[0].worldMatrix.m[5] +
-              point.v[2] * this.target[0].worldMatrix.m[9];
+        ry = point.v[0] * this.target[0].worldMatrix.m[1] +
+                point.v[1] * this.target[0].worldMatrix.m[5] +
+                point.v[2] * this.target[0].worldMatrix.m[9];
 
-      rz = point.v[0] * this.target[0].worldMatrix.m[2] +
-              point.v[1] * this.target[0].worldMatrix.m[6] +
-              point.v[2] * this.target[0].worldMatrix.m[10];
-      break;
-    default:
-      rx = point.v[0] - this.target[0].worldPosition.v[0];
-      ry = point.v[1] - this.target[0].worldPosition.v[1];
-      rz = point.v[2] - this.target[0].worldPosition.v[2];
-      break;
+        rz = point.v[0] * this.target[0].worldMatrix.m[2] +
+                point.v[1] * this.target[0].worldMatrix.m[6] +
+                point.v[2] * this.target[0].worldMatrix.m[10];
+        break;
+      default:
+        rx = point.v[0] - this.target[0].worldPosition.v[0];
+        ry = point.v[1] - this.target[0].worldPosition.v[1];
+        rz = point.v[2] - this.target[0].worldPosition.v[2];
+        break;
+    }
+          
+    /* torque += rvect.cross(force) */
+    this.torqueInfluence.v[0] += ry * force.v[2] - rz * force.v[1];
+    this.torqueInfluence.v[1] += rz * force.v[0] - rx * force.v[2];
+    this.torqueInfluence.v[2] += rx * force.v[1] - ry * force.v[0];
+    
+    /*
+     * Le couple se calcul selon l'equation T = r * F
+     * où :
+     * T : couple
+     * r : vecteur rayon
+     * F : vecteur force
+     * 
+     *       T  r 
+     *       | / 
+     * F <___|/
+     *       . c
+     * 
+     * Le resultat est un axe de rotation dont la taille 
+     * représente la force.
+     */
+    
+    this.unCach(Ovoid.CACH_INFLUENCES|Ovoid.CACH_PHYSICS);
   }
-        
-  /* torque += rvect.cross(force) */
-  this.torqueInfluence.v[0] += ry * force.v[2] - rz * force.v[1];
-  this.torqueInfluence.v[1] += rz * force.v[0] - rx * force.v[2];
-  this.torqueInfluence.v[2] += rx * force.v[1] - ry * force.v[0];
-  
-  /*
-   * Le couple se calcul selon l'equation T = r * F
-   * où :
-   * T : couple
-   * r : vecteur rayon
-   * F : vecteur force
-   * 
-   *       T  r 
-   *       | / 
-   * F <___|/
-   *       . c
-   * 
-   * Le resultat est un axe de rotation dont la taille 
-   * représente la force.
-   */
-  
-  this.unCach(Ovoid.CACH_INFLUENCES|Ovoid.CACH_PHYSICS);
 };
 
 
@@ -538,9 +541,8 @@ Ovoid.Physics.prototype.cachPhysics = function() {
     
     /* Mise en someil du node physique si ses mouvements sont 
      * stables depuis un certain temps */;
-    var curmot = (this.linearVelocity.size2() + this.angularVelocity.size2());
-    var bias = Math.pow(0.9, Ovoid.Timer.quantum);
-    this._motion = bias*this._motion + (1-bias)*curmot;
+    var d = Math.pow(0.1, Ovoid.Timer.quantum);
+    this._motion = d*this._motion + (1-d)*(this.linearVelocity.size2() + this.angularVelocity.size2());
     
     if (this._motion < Ovoid.PHYSICS_MOTION_EPSILON) {
       /* Suppression de toutes vélocté*/
