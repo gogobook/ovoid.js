@@ -1376,14 +1376,15 @@ Ovoid.Drawer.light = function(light) {
     Ovoid.Drawer.sp.setUniform1iv(28, le); /*enabled*/
     
   } else {
-
-    Ovoid.Drawer.sp.setUniform4fv(20, light.worldPosition.v);
-    Ovoid.Drawer.sp.setUniform3fv(21, light.worldDirection.v);
-    Ovoid.Drawer.sp.setUniform4fv(22, light.color.v);
-    Ovoid.Drawer.sp.setUniform1f(23, light.intensity);
-    Ovoid.Drawer.sp.setUniform1f(24, light.range);
-    Ovoid.Drawer.sp.setUniform1f(25, light.falloff);
-    Ovoid.Drawer.sp.setUniform1f(26, light.spotAngle);
+    if (light.type) {
+      Ovoid.Drawer.sp.setUniform4fv(20, light.worldPosition.v);
+      Ovoid.Drawer.sp.setUniform3fv(21, light.worldDirection.v);
+      Ovoid.Drawer.sp.setUniform4fv(22, light.color.v);
+      Ovoid.Drawer.sp.setUniform1f(23, light.intensity);
+      Ovoid.Drawer.sp.setUniform1f(24, light.range);
+      Ovoid.Drawer.sp.setUniform1f(25, light.falloff);
+      Ovoid.Drawer.sp.setUniform1f(26, light.spotAngle);
+    }
   }
 };
 
@@ -1811,48 +1812,48 @@ Ovoid.Drawer.emitter = function(emitter, layer, color) {
   
   if (color) {
     if(emitter.billboard) {
-      Ovoid.Drawer.switchPipe(27,layer); // PIPE_RP_PARTICLE
+      Ovoid.Drawer.switchPipe(27,layer); // PIPE_RP_BILLBOARD
     } else {
       Ovoid.Drawer.switchPipe(22,layer); // PIPE_RP_PARTICLE
     }
-    /* disable depth */
-    Ovoid.Drawer.switchDepth(2);
-    
-    Ovoid.Drawer.sp.setUniform4fv(9, color.v); /* set color */
-    /* change texture */
-    Ovoid.gl.activeTexture(0x84C1); /* TEXTURE1 */
+    Ovoid.Drawer.sp.setUniform4fv(9, color.v); // set color
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera); // mise à jour de la perspective
+    Ovoid.gl.activeTexture(0x84C1); // TEXTURE1
     Ovoid.Drawer._tblank.bind();
     Ovoid.Drawer.sp.setUniformSampler(1,1);
-    Ovoid.Drawer.switchBlend(3); /* substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA */
+    Ovoid.Drawer.switchBlend(0); // substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA 
+    Ovoid.Drawer.switchDepth(2); // Disable depth mask
     
     if(emitter.billboard) {
+      Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[6]); // Buffer spirte billboard
+      Ovoid.Drawer.sp.setVertexAttribPointers(5,28); // VEC4_P|VEC3_U == 5 
       var m, s, i;
-      m = new Float32Array(16);
+      m = new Float32Array(16); // Matrice temporaire
       i = emitter._particles.length;
       while(i--) {
         s = emitter._particles[i];
         if(s.l > 0.0) {
-          m[0] = s.u.v[2];
-          m[12] = s.p.v[0]; m[13] = s.p.v[1]; m[14] = s.p.v[2]; m[15] = 1.0;
+          m[0] = s.u.v[2]; // Taille du sprite 
+          m[12] = s.p.v[0]; m[13] = s.p.v[1]; m[14] = s.p.v[2]; m[15] = 1.0; // Translations
           Ovoid.Drawer.model(m);
-          Ovoid.gl.drawArrays(5,0,4);
+          Ovoid.gl.drawArrays(5,0,4); // TRIANGLES_STRIP
           Ovoid.Drawer._drawnsprite++;
         }
       }
     } else {
-      /* Ovoid.VERTEX_PARTICLE, stride, gl.POINTS, */
+      // Ovoid.VERTEX_PARTICLE, stride, gl.POINTS,
       Ovoid.Drawer.raw(Ovoid.VERTEX_PARTICLE, 44, 0, emitter._alives, emitter._fbuffer);
       Ovoid.Drawer._drawnparticle+=emitter._alives;
     }
   } else {
-    /* model de rendu pour les particules */
+    // model de rendu pour les particules 
     switch(emitter.model) 
     {
-      case 3: /* Ovoid.EMISSIVE */
-        Ovoid.Drawer.switchBlend(1); /* additive alpha. SRC_ALPHA, ONE */
+      case 3: // Ovoid.EMISSIVE
+        Ovoid.Drawer.switchBlend(1); // additive alpha. SRC_ALPHA, ONE
         break;
-      default: /* Ovoid.DIFFUSE */
-        Ovoid.Drawer.switchBlend(3); /* substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA */
+      default: // Ovoid.DIFFUSE
+        Ovoid.Drawer.switchBlend(3); // substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA
         break;
     }
     if(emitter.billboard) {
@@ -1861,39 +1862,37 @@ Ovoid.Drawer.emitter = function(emitter, layer, color) {
       Ovoid.Drawer.switchPipe(2,layer); // PIPE_PARTICLE
     }
 
-    /* Force la mise à jour de la perspective */
-    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    /* change texture */
+    
+    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera); // Force la mise à jour de la perspective 
     Ovoid.gl.activeTexture(0x84C1); /* TEXTURE1 */
     (emitter.texture)?emitter.texture.bind():Ovoid.Drawer._tblank.bind();
     Ovoid.Drawer.sp.setUniformSampler(1,1);
-    /* disable depth */
-    Ovoid.Drawer.switchDepth(2);
-    Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[6]);
-    Ovoid.Drawer.sp.setVertexAttribPointers(5,28); /* VEC4_P|VEC3_U == 5 */
+    Ovoid.Drawer.switchDepth(2); // Disable depth mask
       
     if(emitter.billboard) {
+      Ovoid.gl.bindBuffer(0x8892,Ovoid.Drawer._bprimitive[6]); // Buffer spirte billboard
+      Ovoid.Drawer.sp.setVertexAttribPointers(5,28); // VEC4_P|VEC3_U == 5
       var m, s, i;
       m = new Float32Array(16);
       i = emitter._particles.length;
       while(i--) {
         s = emitter._particles[i];
         if(s.l > 0.0) {
-          m[0] = s.u.v[2];
-          m[12] = s.p.v[0]; m[13] = s.p.v[1]; m[14] = s.p.v[2]; m[15] = 1.0;
-          Ovoid.Drawer.sp.setUniform4fv(9, s.c.v); /* set color */
+          m[0] = s.u.v[2]; // Taille du sprite 
+          m[12] = s.p.v[0]; m[13] = s.p.v[1]; m[14] = s.p.v[2]; m[15] = 1.0; // Translations
+          Ovoid.Drawer.sp.setUniform4fv(9, s.c.v); // set color
           Ovoid.Drawer.model(m);
           Ovoid.gl.drawArrays(5,0,4);
           Ovoid.Drawer._drawnsprite++;
         }
       }
     } else {
-      /* Ovoid.VERTEX_PARTICLE, stride, gl.POINTS, */
+      // Ovoid.VERTEX_PARTICLE, stride, gl.POINTS,
       Ovoid.Drawer.raw(Ovoid.VERTEX_PARTICLE, 44, 0, emitter._alives, emitter._fbuffer);
       Ovoid.Drawer._drawnparticle+=emitter._alives;
     }
   }
-  /* restore depth, blend et pipe */
+  // restore depth, blend et pipe
   Ovoid.Drawer.restoreBlend();
   Ovoid.Drawer.restoreDepth();
   Ovoid.Drawer.restorePipe();
@@ -1919,7 +1918,7 @@ Ovoid.Drawer.shadow = function(light, body) {
   }
   if (body.shape.type & Ovoid.SKIN) {
     if (body.shape.mesh) {
-      /* tentative d'implémentation des shadow volume pour les skin */
+      // tentative d'implémentation des shadow volume pour les skin
       if (!Ovoid.opt_localSkinData)
         return;
       Ovoid.Drawer.model(body.worldMatrix.m);
@@ -1929,7 +1928,7 @@ Ovoid.Drawer.shadow = function(light, body) {
   
   if(!shape) return;
   
-  var l = 0; /* TODO: implementation du Lod si besoin */
+  var l = 0; // TODO: implementation du Lod si besoin
   var c = shape.triangles[l].length;
   
   var P = new Array(6);
@@ -1961,11 +1960,11 @@ Ovoid.Drawer.shadow = function(light, body) {
       
     if (LD.dot(body.shape.triangles[l][i].normal) > 0.0)
     {
-      /* triangles face lumiere */
+      // triangles face lumiere 
       P[0] = body.shape.vertices[l][body.shape.triangles[l][i].index[0]].p;
       P[1] = body.shape.vertices[l][body.shape.triangles[l][i].index[1]].p;
       P[2] = body.shape.vertices[l][body.shape.triangles[l][i].index[2]].p;
-      /* triangle extrudé à l'infini lumiere */
+      // triangle extrudé à l'infini lumiere 
       
       if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
         P[3].copy(LP);
@@ -1985,10 +1984,10 @@ Ovoid.Drawer.shadow = function(light, body) {
       V[n] = P[5].v[0]; n++; V[n] = P[5].v[1]; n++; V[n] = P[5].v[2]; n++; V[n] = 0.0; n++;
       V[n] = P[4].v[0]; n++; V[n] = P[4].v[1]; n++; V[n] = P[4].v[2]; n++; V[n] = 0.0; n++;
       
-      /* on verifie les adjacents */
+      // on verifie les adjacents 
       for (j = 0; j < 3; j++)
       {
-        /* a-t-il une face adjacente ? */
+        // a-t-il une face adjacente ?
         a = body.shape.triangles[l][i].adjacent[j];
         if (a != -1.0)
         {
@@ -2019,8 +2018,7 @@ Ovoid.Drawer.shadow = function(light, body) {
             V[n] = P[4].v[0]; n++;V[n] = P[4].v[1]; n++;V[n] = P[4].v[2]; n++;V[n] = 0.0; n++;
           }
         } else {
-          /* si pas de face adjacente c'est un face de bordure
-             on extrude les bords */
+          // si pas de face adjacente c'est un face de bordure on extrude les bords
           k = (j + 1) % 3;
           
           if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
@@ -2074,7 +2072,7 @@ Ovoid.Drawer.shadow = function(light, body) {
  */
 Ovoid.Drawer.normals = function(body, scale) {
   
-  var l = 0; /* Lod */
+  var l = 0; // Lod
   
   if(!body.shape.triangles)
     return;

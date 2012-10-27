@@ -284,7 +284,7 @@ Ovoid.Queuer._viewcull = function(o) {
  */
 Ovoid.Queuer._physicscull = function(o) {
 
-  if(o.visible) {
+  if(o.visible && this.model < 3) {
     Ovoid.Queuer.qphycs.add(o);
   } 
 };

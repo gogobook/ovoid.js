@@ -9,6 +9,6 @@ uniform vec4 Ep;
 
 void main(void) {
 
-  gl_PointSize = ((u.z * 10.0) / distance(p, Ep));
+  gl_PointSize = ((u.z * 640.0) / distance(p, Ep));
 	gl_Position = MEV * p;
 }

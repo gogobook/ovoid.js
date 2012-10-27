@@ -58,6 +58,14 @@
  * static collision landscape. The collision  shape is defined by the target 
  * node's mesh.
  * </li>
+ * <li><b>Ovoid.GHOST_MASSIVE_SPHERE</b><br>
+ * The Ghost Massive Sphere model corresponds to a sphere shaped body who 
+ * undergoes and react to applied forces (gravity, wind... ) but cannot collide.
+ * </li>
+ * <li><b>Ovoid.GHOST_MASSIVE_BOX</b><br>
+ * The Ghost Massive Box model corresponds to a box shaped body who 
+ * undergoes and react to applied forces (gravity, wind... ) but cannot collide.
+ * </li>
  * </ul>
  * 
  * @extends Ovoid.Constraint
@@ -282,7 +290,7 @@ Ovoid.Physics.prototype.windXyz = function(x, y, z) {
 Ovoid.Physics.prototype.impulse = function(force, point, c) {
   
   if(force.size2() > 0.0) {
-    
+
     this.linearInfluence.addBy(force);
 
     /* vecteur radius = point -> centre de gravité */

@@ -53,7 +53,7 @@ Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_DroidSansMono.p
 /* Environment: Default fontmap Texture filtering */
 Ovoid.opt_defaultFontmapFilter = true;
 /* Global gravity vector */
-Ovoid.opt_gravity = [0.0,-0.98,0.0];
+Ovoid.opt_gravity = [0.0,-9.8,0.0];
 
 /* --------------------------- FRAME OPTIONS -------------------------------- */
 /* Frame mode */

@@ -88,7 +88,7 @@ Ovoid.Emitter = function(name) {
   this.delta = 0.2;
   /** Particles scattering cone angle (in radians).
    * @type float */
-  this.scattering = 1.0;
+  this.scattering = 3.14;
   /** Particles birth and death color.
    * @type Color[] */
   this.color = Ovoid.Color.newArray(2);
@@ -111,7 +111,7 @@ Ovoid.Emitter = function(name) {
   this.texture = null;
   /** Use billboard technic flag.
    * @type bool */
-  this.billboard = false;
+  this.billboard = true;
   /** Particle time before new born */
   this._ctdown = 0.0;
   /** Particle alive count */

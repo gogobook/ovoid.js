@@ -1981,6 +1981,20 @@ Ovoid.RIGID_MASSIVE_BOX = 1;
 Ovoid.RIGID_MASSIVE_SPHERE = 2;
 
 
+/** Symbolic constant for physic object kind
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Physics */
+Ovoid.GHOST_MASSIVE_BOX = 3;
+
+
+/** Symbolic constant for physic object kind 
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Physics */
+Ovoid.GHOST_MASSIVE_SPHERE = 4;
+
+
 /** Symbolic constant for physic object kind 
  * @constant
  * @memberOf _global_
@@ -2790,19 +2804,18 @@ Ovoid.GLSL_C_TEX_STRING_FS='precision highp float;uniform vec4 C;uniform sampler
 /** Default built-in Glsl vertex shader string.
  * @constant
  * @memberOf _global_ */
-Ovoid.GLSL_PU_PARTICLE_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MEV;uniform vec4 Ep;void main(void){gl_PointSize=((u.z*10.0)/distance(p,Ep));gl_Position=MEV*p;}';
+Ovoid.GLSL_PU_PARTICLE_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MEV;uniform vec4 Ep;void main(void){gl_PointSize=((u.z*640.0)/distance(p,Ep));gl_Position=MEV*p;}';
 
 
 /** Default built-in Glsl vertex shader string.
  * @constant
  * @memberOf _global_ */                                                                                                                       
-Ovoid.GLSL_PUC_PARTICLE_VS='attribute vec4 p;attribute vec3 u;attribute vec4 c;uniform mat4 MEV;uniform vec4 Ep;varying vec4 Vc;void main(void){Vc=c;gl_PointSize=((u.z*10.0)/abs(distance(p,Ep)));gl_Position=MEV*p;}';
+Ovoid.GLSL_PUC_PARTICLE_VS='attribute vec4 p;attribute vec3 u;attribute vec4 c;uniform mat4 MEV;uniform vec4 Ep;varying vec4 Vc;void main(void){Vc=c;gl_PointSize=((u.z*640.0)/abs(distance(p,Ep)));gl_Position=MEV*p;}';
 
 
 /** Default built-in Glsl vertex shader string.
  * @constant
  * @memberOf _global_ */                                                                                                                       
-/*Ovoid.GLSL_PU_BILLBOARD_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MPJ;uniform mat4 MLA;uniform mat4 MXF;varying vec2 Vu;void main(void){Vu=u.xy;gl_Position=MPJ*(MLA*vec4(0.0,0.0,0.0,1.0)+(MXF*p));}';*/
 Ovoid.GLSL_PU_BILLBOARD_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MPJ;uniform mat4 MLA;uniform mat4 MXF;varying vec2 Vu;varying float z;void main(void){Vu=u.xy;gl_Position=MPJ*((MLA*MXF)*vec4(0.0,0.0,0.0,1.0)+(p*MXF[0][0]));}';
 
 /** Default built-in Glsl vertex shader string.

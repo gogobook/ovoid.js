@@ -13,5 +13,5 @@ varying vec2 Vu;
 void main(void) {
 
   Vu = u.xy;
-  gl_Position= MPJ * ((MLA*MXF) * vec4(0.0,0.0,0.0,1.0) + p);
+  gl_Position=MPJ*((MLA*MXF)*vec4(0.0,0.0,0.0,1.0)+(p*MXF[0][0]));
 }
