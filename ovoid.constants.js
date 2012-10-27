@@ -1274,6 +1274,14 @@ Ovoid.PIPE_RP_STRING = 24;
  * @memberOf _global_
  * @see Ovoid.Drawer
  */
+Ovoid.PIPE_RP_BILLBOARD = 27;
+
+
+/** Symbolic constant for drawer pipeline.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Drawer
+ */
 Ovoid.PIPE_L2_GEOMETRY_LP = 0;
 
 
@@ -1357,68 +1365,12 @@ Ovoid.PIPE_HELPER = 5;
 Ovoid.PIPE_SHADOW_VOLUME = 6;
 
 
-/** Symbolic constant for shader's slot. Keep in stock.
+/** Symbolic constant for drawer pipeline.
  * @constant
  * @memberOf _global_
  * @see Ovoid.Drawer
  */
-Ovoid.DRAWER_SP_STOCK = -1;
-
-
-/** Symbolic constant for shader's slot. Flat color drawing.
- * @constant
- * @memberOf _global_
- * @see Ovoid.Drawer
- */
-Ovoid.DRAWER_SP_COLOR = 2;
-
-
-/** Symbolic constant for shader's slot. Vertex flat color drawing.
- * @constant
- * @memberOf _global_
- * @see Ovoid.Drawer
- */
-Ovoid.DRAWER_SP_VERTEX_COLOR = 3;
-
-
-/** Symbolic constant for shader's slot. One light shading drawing.
- * @constant
- * @memberOf _global_
- * @see Ovoid.Drawer
- */
-Ovoid.DRAWER_SP_LPIGHT = 4;
-
-
-/** Symbolic constant for shader's slot. N light(s) shading drawing.
- * @constant
- * @memberOf _global_
- * @see Ovoid.Drawer
- */
-Ovoid.DRAWER_SP_1PIGHT = 5;
-
-
-/** Symbolic constant for shader's slot. Text layer drawing.
- * @constant
- * @memberOf _global_
- * @see Ovoid.Drawer
- */
-Ovoid.DRAWER_SP_TEXT = 6;
-
-
-/** Symbolic constant for shader's slot. Text drawing.
- * @constant
- * @memberOf _global_
- * @see Ovoid.Drawer
- */
-Ovoid.DRAWER_SP_LAYER = 7;
-
-
-/** Symbolic constant for shader's slot. Layer drawing.
- * @constant
- * @memberOf _global_
- * @see Ovoid.Drawer
- */
-Ovoid.DRAWER_SP_PARTICLES = 8;
+Ovoid.PIPE_BILLBOARD = 7;
 
 
 /** Symbolic constant bitmask for vertex format. float[4] Position component.
@@ -2849,6 +2801,12 @@ Ovoid.GLSL_PUC_PARTICLE_VS='attribute vec4 p;attribute vec3 u;attribute vec4 c;u
 
 /** Default built-in Glsl vertex shader string.
  * @constant
+ * @memberOf _global_ */                                                                                                                       
+Ovoid.GLSL_PU_BILLBOARD_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MPJ;uniform mat4 MLA;uniform mat4 MXF;varying vec2 Vu;void main(void){Vu=u.xy;gl_Position=MPJ*(MLA*vec4(0.0,0.0,0.0,1.0)+(MXF*p));}';
+
+
+/** Default built-in Glsl vertex shader string.
+ * @constant
  * @memberOf _global_ */
 Ovoid.GLSL_PIW_HYBRID_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute vec4 p;attribute vec4 i;attribute vec4 w;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];vec4 Vp;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;}else{Vp=MXF[0]*p;}gl_Position=MEV*Vp;}';
 
@@ -2905,6 +2863,12 @@ Ovoid.GLSL_C_TEX_FS='precision highp float;uniform vec4 C;uniform sampler2D Sd;v
  * @constant
  * @memberOf _global_ */
 Ovoid.GLSL_VC_TEX_PARTICLE_FS='precision highp float;uniform sampler2D Sd;varying vec4 Vc;void main(void){gl_FragColor=texture2D(Sd,gl_PointCoord)*Vc;}';
+
+
+/** Default built-in Glsl fragment shader string.
+ * @constant
+ * @memberOf _global_ */
+Ovoid.GLSL_C_TEX_BILLBOARD_FS='precision highp float;uniform sampler2D Sd;uniform vec4 C;varying vec2 Vu;void main(void){gl_FragColor=texture2D(Sd,Vu)*C;}';
 
 
 /** Default built-in Glsl fragment shader string.

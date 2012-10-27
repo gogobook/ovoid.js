@@ -101,12 +101,17 @@ Ovoid.Emitter = function(name) {
   this.size = new Array(2);
   
   this.size[0] = 1.0;
-  this.size[1] = 10.0
+  this.size[1] = 10.0;
   
+  /** Emitting flag. 
+   * @type bool */
   this.emits = true;
   /** Particles texture. 
    * @type Texture */
   this.texture = null;
+  /** Use billboard technic flag.
+   * @type bool */
+  this.billboard = false;
   /** Particle time before new born */
   this._ctdown = 0.0;
   /** Particle alive count */
@@ -334,7 +339,8 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         U.v[2] = this.size[1]+((this.size[0]-this.size[1])*L);
             
         /* Ajout de la particule au buffer */
-        this._particles[i].bufferCopy(this._fbuffer, this._alives * 11);
+        if(!this.billboard)
+          this._particles[i].bufferCopy(this._fbuffer, this._alives * 11);
 
         // Une particule vivante en plus
         this._alives++;
@@ -407,7 +413,8 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
             C.copy(this.color[0]);
             
             /* Ajout de la particule au buffer */
-            this._particles[i].bufferCopy(this._fbuffer, this._alives * 11);
+            if(!this.billboard)
+              this._particles[i].bufferCopy(this._fbuffer, this._alives * 11);
             // Alives en plus
             this._alives++
             // Nombre de particule a cree --
@@ -476,6 +483,7 @@ Ovoid.Emitter.prototype.toJSON = function() {
   o['sz'] = this.size;
   o['em'] = this.emits;
   o['tx'] = this.texture;
+  o['bb'] = this.billboard;
   return o;
 
 };

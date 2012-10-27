@@ -876,7 +876,7 @@ Ovoid.Ojson.prototype._procEmitter = function(n, j) {
   n.size[1] = j.sz[1];
   n.emits = j.em;
   (j.tx == 'null')?n.texture=null:n.texture=j.tx;
-  
+  n.billboard = j.bb;
 };
 
 

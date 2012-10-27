@@ -975,16 +975,26 @@ Ovoid.Loader.includeAudio = function(audio) {
  * This methode don't launch any loading at all: the loading occurs during the
  * main Library initialization.<br><br>
  * 
- * @param {int} slot Symbolic constant for drawing pipeline. Can be -1 to
+ * @param {int} pipe Symbolic constant for drawing pipeline. Can be -1 to
  * keep the sahder in the Drawer's stock without pluging it, or one of the 
- * following symbolic constants:
- * Ovoid.DRAWER_SP_COLOR,<br>
- * Ovoid.DRAWER_SP_VERTEX_COLOR,<br>
- * Ovoid.DRAWER_SP_LPIGHT,<br>
- * Ovoid.DRAWER_SP_1PIGHT,<br>
- * Ovoid.DRAWER_SP_TEXT,<br>
- * Ovoid.DRAWER_SP_LAYER,<br>
- * Ovoid.DRAWER_SP_PARTICLES<br><br>
+ * following symbolic constants or corresponding number:
+ * Ovoid.PIPE_RP_GEOMETRY (20),<br>
+ * Ovoid.PIPE_RP_PARTICLE (22),<br>
+ * Ovoid.PIPE_RP_LAYER (23),<br>
+ * Ovoid.PIPE_RP_STRING (24),<br>
+ * Ovoid.PIPE_RP_BILLBOARD (27),<br>
+ * Ovoid.PIPE_L2_GEOMETRY_LP (0),<br>
+ * Ovoid.PIPE_L2_GEOMETRY_1P (1),<br>
+ * Ovoid.PIPE_L1_GEOMETRY_LP (10),<br>
+ * Ovoid.PIPE_L1_GEOMETRY_1P (11),<br>
+ * Ovoid.PIPE_L0_GEOMETRY_LP (13),<br>
+ * Ovoid.PIPE_L0_GEOMETRY_1P (14),<br>
+ * Ovoid.PIPE_PARTICLE (2),<br>
+ * Ovoid.PIPE_LAYER (3),<br>
+ * Ovoid.PIPE_STRING (4),<br>
+ * Ovoid.PIPE_HELPER (5),<br>
+ * Ovoid.PIPE_SHADOW_VOLUME (6),<br>
+ * Ovoid.PIPE_BILLBOARD (7)<br><br>
  * 
  * @param {int} layer Render/Drawing layer to assing the shader to. Can be an
  * integer up to Ovoid.MAX_RENDER_LAYER or -1 to assing to all available 
@@ -1003,10 +1013,10 @@ Ovoid.Loader.includeAudio = function(audio) {
  *
  * @see Ovoid.Shader
  */
-Ovoid.Loader.includeShader = function(slot, layer, vs, fs, wm, name) {
+Ovoid.Loader.includeShader = function(pipe, layer, vs, fs, wm, name) {
 
   for(var i = 0; i < Ovoid.Loader._stackgls.length; i++) {
-    if(Ovoid.Loader._stackgls[i][0] == slot && 
+    if(Ovoid.Loader._stackgls[i][0] == pipe && 
         Ovoid.Loader._stackgls[i][1] == vs && 
         Ovoid.Loader._stackgls[i][2] == fs &&
         Ovoid.Loader._stackgls[i][3] == wm &&
@@ -1016,7 +1026,7 @@ Ovoid.Loader.includeShader = function(slot, layer, vs, fs, wm, name) {
   
   var i = Ovoid.Loader._stackgls.length;
   Ovoid.Loader._stackgls.push(new Array(4));
-  Ovoid.Loader._stackgls[i][0] = slot;
+  Ovoid.Loader._stackgls[i][0] = pipe;
   Ovoid.Loader._stackgls[i][1] = vs;
   Ovoid.Loader._stackgls[i][2] = fs;
   Ovoid.Loader._stackgls[i][3] = wm;
