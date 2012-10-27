@@ -562,9 +562,9 @@ Ovoid.Drawer.init = function() {
   Ovoid.gl.bindBuffer(0x8892, Ovoid.Drawer._bprimitive[0]);
   Ovoid.gl.bufferData(0x8892,new Float32Array(buffdata),0x88E4);
   
-  /* Sprite (triangle-strip) centered */ 
-  buffdata = [-0.5,-0.5,0.0,1.0,0.0,1.0,0.0, -0.5,0.5,0.0,1.0,0.0,0.0,0.0,
-            0.5,-0.5,0.0,1.0,1.0,1.0,0.0, 0.5,0.5,0.0,1.0,1.0,0.0,0.0];
+  /* Billboard (triangle-strip) */ 
+  buffdata = [-0.5,-0.5,0.0,0.0,0.0,1.0,0.0, -0.5,0.5,0.0,0.0,0.0,0.0,0.0,
+            0.5,-0.5,0.0,0.0,1.0,1.0,0.0, 0.5,0.5,0.0,0.0,1.0,0.0,0.0];
             
   Ovoid.Drawer._bprimitive[6] = Ovoid.gl.createBuffer();
   Ovoid.gl.bindBuffer(0x8892, Ovoid.Drawer._bprimitive[6]);
@@ -1832,9 +1832,8 @@ Ovoid.Drawer.emitter = function(emitter, layer, color) {
       while(i--) {
         s = emitter._particles[i];
         if(s.l > 0.0) {
-          m[0] = m[5] = m[10] = s.u.v[2];
+          m[0] = s.u.v[2];
           m[12] = s.p.v[0]; m[13] = s.p.v[1]; m[14] = s.p.v[2]; m[15] = 1.0;
-          Ovoid.Drawer.sp.setUniform4fv(9, s.c.v); /* set color */
           Ovoid.Drawer.model(m);
           Ovoid.gl.drawArrays(5,0,4);
           Ovoid.Drawer._drawnsprite++;
@@ -1880,7 +1879,7 @@ Ovoid.Drawer.emitter = function(emitter, layer, color) {
       while(i--) {
         s = emitter._particles[i];
         if(s.l > 0.0) {
-          m[0] = m[5] = m[10] = s.u.v[2];
+          m[0] = s.u.v[2];
           m[12] = s.p.v[0]; m[13] = s.p.v[1]; m[14] = s.p.v[2]; m[15] = 1.0;
           Ovoid.Drawer.sp.setUniform4fv(9, s.c.v); /* set color */
           Ovoid.Drawer.model(m);

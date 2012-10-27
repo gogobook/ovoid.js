@@ -2802,8 +2802,8 @@ Ovoid.GLSL_PUC_PARTICLE_VS='attribute vec4 p;attribute vec3 u;attribute vec4 c;u
 /** Default built-in Glsl vertex shader string.
  * @constant
  * @memberOf _global_ */                                                                                                                       
-Ovoid.GLSL_PU_BILLBOARD_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MPJ;uniform mat4 MLA;uniform mat4 MXF;varying vec2 Vu;void main(void){Vu=u.xy;gl_Position=MPJ*(MLA*vec4(0.0,0.0,0.0,1.0)+(MXF*p));}';
-
+/*Ovoid.GLSL_PU_BILLBOARD_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MPJ;uniform mat4 MLA;uniform mat4 MXF;varying vec2 Vu;void main(void){Vu=u.xy;gl_Position=MPJ*(MLA*vec4(0.0,0.0,0.0,1.0)+(MXF*p));}';*/
+Ovoid.GLSL_PU_BILLBOARD_VS='attribute vec4 p;attribute vec3 u;uniform mat4 MPJ;uniform mat4 MLA;uniform mat4 MXF;varying vec2 Vu;varying float z;void main(void){Vu=u.xy;gl_Position=MPJ*((MLA*MXF)*vec4(0.0,0.0,0.0,1.0)+(p*MXF[0][0]));}';
 
 /** Default built-in Glsl vertex shader string.
  * @constant
@@ -2868,7 +2868,7 @@ Ovoid.GLSL_VC_TEX_PARTICLE_FS='precision highp float;uniform sampler2D Sd;varyin
 /** Default built-in Glsl fragment shader string.
  * @constant
  * @memberOf _global_ */
-Ovoid.GLSL_C_TEX_BILLBOARD_FS='precision highp float;uniform sampler2D Sd;uniform vec4 C;varying vec2 Vu;void main(void){gl_FragColor=texture2D(Sd,Vu)*C;}';
+Ovoid.GLSL_C_TEX_BILLBOARD_FS='precision highp float;uniform sampler2D Sd;uniform vec4 C;varying vec2 Vu;varying float z;void main(void){gl_FragColor=texture2D(Sd,Vu)*C;}';
 
 
 /** Default built-in Glsl fragment shader string.
