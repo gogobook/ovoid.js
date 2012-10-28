@@ -127,7 +127,7 @@ Ovoid.Contact.prototype.set = function(b0, b1, c, n, p, q) {
     this._f = (b0.useFriction && b1.useFriction);
     this._r = (b0.restitution * b1.restitution);
   } else {
-    this._f = Ovoid.Solver.opt_landscapeFriction;
+    this._f = b0.useFriction;
     this._r = b0.restitution;
   }
   this._b[0] = b0;

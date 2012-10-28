@@ -224,7 +224,7 @@ Ovoid.Light.prototype.isLightening = function(tform) {
  */
 Ovoid.Light.prototype.cachLight = function() {
 
-  if(this.kind == Ovoid.LIGHT_DIRECTIONAL)
+  if(this.model == Ovoid.LIGHT_DIRECTIONAL)
     this.worldPosition.v[3] = 0.0;
       
   if (!(this.cach & Ovoid.CACH_LIGHT))
@@ -274,7 +274,7 @@ Ovoid.Light.prototype.toJSON = function() {
   o['to'] = this.orientation;
   o['tr'] = this.rotation;
   /* Ovoid.Light */
-  o['md'] = this.model = Ovoid.LIGHT_POINT;
+  o['md'] = this.model;
   o['cl'] = this.color;
   o['in'] = this.intensity;
   o['ac'] = this.attenuationC;

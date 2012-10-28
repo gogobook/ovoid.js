@@ -941,7 +941,7 @@ Ovoid.Ojson.prototype._procLight = function(n, j) {
   /* Importation hérité de "Ovoid.Transform" */
   this._procTransform(n, j);
   /* - OJSON.Light structure -
-   * .kind
+   * .model
    * .color[r,g,b,a]
    * .intensity
    * .attenuationC

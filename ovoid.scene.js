@@ -450,18 +450,20 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
     
   if (node.type & Ovoid.AUDIO)
     rmgroup = this.audio;
-    
-  i = rmgroup.length;
-  while (i--) {
-    if (rmgroup[i] === node)
-      rmgroup.splice(i, 1);
+  
+  if(rmgroup) {
+    i = rmgroup.length;
+    while (i--) {
+      if (rmgroup[i] === node)
+        rmgroup.splice(i, 1);
+    }
   }
   
   if (node.type & Ovoid.TRANSFORM) {
-    i = transform.length;
+    i = this.transform.length;
     while (i--) {
-      if (transform[i] === node)
-        transform.splice(i, 1);
+      if (this.transform[i] === node)
+        this.transform.splice(i, 1);
     }
   }
   

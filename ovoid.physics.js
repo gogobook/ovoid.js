@@ -94,11 +94,11 @@ Ovoid.Physics = function(name) {
     
   /** Linear Damping factor.
    * @type float */
-  this.linearDamping = 0.5;
+  this.linearDamping = 0.9;
   
   /** Angular Damping factor.
    * @type float */
-  this.angularDamping = 0.5;
+  this.angularDamping = 0.9;
   
   /** Use friction for contact.
    * @type bool */
@@ -113,6 +113,10 @@ Ovoid.Physics = function(name) {
   /** Angular velocity.
    * @type Vector */
   this.angularVelocity = new Ovoid.Vector(0.0,0.0,0.0);
+  
+  /** Sleeping motion thressold.
+   * @type float */
+  this.sleeping = 1.0;
   
   /** Overridable triggered function.<br><br>
    * 
@@ -388,7 +392,7 @@ Ovoid.Physics.prototype.clearInfluences = function() {
     this.linearInfluence.set(0.0,0.0,0.0);
     this.torqueInfluence.set(0.0,0.0,0.0);
     // Motion par defaut
-    this._motion = Ovoid.PHYSICS_MOTION_EPSILON * 10.0;
+    this._motion = this.sleeping * 10.0;
 };
 
 
@@ -550,9 +554,9 @@ Ovoid.Physics.prototype.cachPhysics = function() {
     /* Mise en someil du node physique si ses mouvements sont 
      * stables depuis un certain temps */;
     var d = Math.pow(0.1, Ovoid.Timer.quantum);
-    this._motion = d*this._motion + (1-d)*(this.linearVelocity.size2() + this.angularVelocity.size2());
+    this._motion = d*this._motion + (1-d)*(this.linearVelocity.size()+this.angularVelocity.size());
     
-    if (this._motion < Ovoid.PHYSICS_MOTION_EPSILON) {
+    if (this._motion < this.sleeping) {
       /* Suppression de toutes vélocté*/
       this.clearInfluences();
       /* Le CASH_PHYSICS correspond à une mise en someil */

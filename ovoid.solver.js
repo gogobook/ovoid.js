@@ -36,9 +36,6 @@ Ovoid.Solver.opt_iterativeSolver = true;
 /** Maximim iteration for iterative contact solving */
 Ovoid.Solver.opt_contactItFactor = 4;
 
-/** Enable or disable the friction for landscape collisions */
-Ovoid.Solver.opt_landscapeFriction = true;
-
 
 /** Contact stack */
 Ovoid.Solver._contactq = new Ovoid.Stack(Ovoid.MAX_CONTACT_BY_CYCLE);

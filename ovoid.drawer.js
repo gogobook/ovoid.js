@@ -1938,10 +1938,10 @@ Ovoid.Drawer.shadow = function(light, body) {
   var LP = new Ovoid.Point();
   var LD = new Ovoid.Vector();
   // 4 float par vertex, 3 vertex par face, le double de face = 24
-  var V = new Float32Array(c*24);
+  var V = new Float32Array(c*32);
 
   // position de la lumiere en coordonnée locale à l'objet 
-  if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
+  if(light.model == Ovoid.LIGHT_DIRECTIONAL) {
     LD.copy(light.worldDirection);
     LD.transform4Inverse(body.worldMatrix);
     LP.copy(LD);
@@ -1955,7 +1955,7 @@ Ovoid.Drawer.shadow = function(light, body) {
   var n = 0;
   for (var i = 0; i < c; i++)
   {
-    if(light.kind != Ovoid.LIGHT_DIRECTIONAL)
+    if(light.model != Ovoid.LIGHT_DIRECTIONAL)
       LD.subOf(LP, body.shape.triangles[l][i].center);
       
     if (LD.dot(body.shape.triangles[l][i].normal) > 0.0)
@@ -1966,7 +1966,7 @@ Ovoid.Drawer.shadow = function(light, body) {
       P[2] = body.shape.vertices[l][body.shape.triangles[l][i].index[2]].p;
       // triangle extrudé à l'infini lumiere 
       
-      if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
+      if(light.model == Ovoid.LIGHT_DIRECTIONAL) {
         P[3].copy(LP);
         P[4].copy(LP);
         P[5].copy(LP);
@@ -1991,7 +1991,7 @@ Ovoid.Drawer.shadow = function(light, body) {
         a = body.shape.triangles[l][i].adjacent[j];
         if (a != -1.0)
         {
-          if(light.kind != Ovoid.LIGHT_DIRECTIONAL)
+          if(light.model != Ovoid.LIGHT_DIRECTIONAL)
             LD.subOf(LP, body.shape.triangles[l][a].center);
             
           if (LD.dot(body.shape.triangles[l][a].normal) <= 0.0)
@@ -2001,7 +2001,7 @@ Ovoid.Drawer.shadow = function(light, body) {
              * peut donc être trouvé grace à un modulo :
              * (0+1)%3 = 1, (1+1)%3 = 2, (1+2)%3 = 0*/
             k = (j + 1) % 3;
-            if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
+            if(light.model == Ovoid.LIGHT_DIRECTIONAL) {
               P[3].copy(LP);
               P[4].copy(LP);
             } else {
@@ -2021,7 +2021,7 @@ Ovoid.Drawer.shadow = function(light, body) {
           // si pas de face adjacente c'est un face de bordure on extrude les bords
           k = (j + 1) % 3;
           
-          if(light.kind == Ovoid.LIGHT_DIRECTIONAL) {
+          if(light.model == Ovoid.LIGHT_DIRECTIONAL) {
             P[3].copy(LP);
             P[4].copy(LP);
           } else {
@@ -2254,7 +2254,6 @@ Ovoid.Drawer.bodyStack = function(stack, layer, rp) {
       Ovoid.Drawer.body(stack[i], layer);
     }
   }
-  Ovoid.Drawer._renderpasses++;
 };
 
 
@@ -2391,8 +2390,6 @@ Ovoid.Drawer.zfailStack = function(light, stack) {
  * <code>Ovoid.Queuer</code> global class. 
  */
 Ovoid.Drawer.drawQueueRP = function() {
-  
-  var i;
   // Picking frame
   if (Ovoid.opt_enablePicking) { 
     Ovoid.Drawer.beginRpDraw();
@@ -2416,6 +2413,7 @@ Ovoid.Drawer.drawQueueRP = function() {
       Ovoid.Drawer.textStack(Ovoid.Queuer.qtext, true);
     }
     Ovoid.Drawer.endRpDraw();
+    Ovoid.Drawer._renderpasses++;
   }
 }
 
@@ -2447,6 +2445,7 @@ Ovoid.Drawer.drawQueueHL = function() {
   }
   // Layers & text
   if (Ovoid.Drawer.opt_drawLayers) {
+    Ovoid.Drawer.switchBlend(3); // blend substracting alpha
     if(Ovoid.Queuer.qlayer.count) {
       Ovoid.Drawer.switchPipe(3,0); //PIPE_LAYER
       Ovoid.Drawer.screen(Ovoid.Frame.matrix);
@@ -2470,23 +2469,22 @@ Ovoid.Drawer.drawQueueHL = function() {
 Ovoid.Drawer.drawQueueLP = function(pipe) {
 
   Ovoid.Drawer.setCull(1); // cull back
-  Ovoid.Drawer.switchBlend(0); // blending disabled
+  Ovoid.Drawer.switchBlend(3); // blending substracting alpha
   Ovoid.Drawer.switchDepth(1); // depth mask on, test less
+  
   // initialize projection pour les shadow volume
   Ovoid.Drawer.switchPipe(6,0); // PIPE_SHADOW_VOLUME
   Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     if(!Ovoid.Queuer.qsolid[i].count) continue;
-    // initialize projection pour particles
-    Ovoid.Drawer.switchPipe(2,i); // PIPE_PARTICLE
-    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.switchPipe(pipe,i); // [VL_,LE_]PIPE_L2_GEOMETRY_LP
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.ambient();  // set scene ambiant parameters
     Ovoid.Drawer.disable(0); // disable diffuse; ENd 
     Ovoid.Drawer.enable(1);  // enable ambient; ENa 
-    Ovoid.Drawer.bodyStack( Ovoid.Queuer.qsolid[i], i, false);
+    Ovoid.Drawer.bodyStack(Ovoid.Queuer.qsolid[i], i, false);
   }
+  Ovoid.Drawer._renderpasses++;
   Ovoid.Drawer.switchBlend(2); // blend additive color
   Ovoid.Drawer.switchDepth(3); // depth mask off, test lessequal
   var l = Ovoid.Queuer.qlight.count
@@ -2498,19 +2496,23 @@ Ovoid.Drawer.drawQueueLP = function(pipe) {
       Ovoid.Drawer.switchDepth(2); // mask off, test less
       for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
         if(!Ovoid.Queuer.qsolid[i].count) continue;
-        Ovoid.Drawer.zfailStack(Ovoid.Queuer.qlight[l],  Ovoid.Queuer.qsolid[i]);
+        Ovoid.Drawer.zfailStack(Ovoid.Queuer.qlight[l], Ovoid.Queuer.qsolid[i]);
       }
-      Ovoid.Drawer.restoreDepth(); // mask off, test less equal
       Ovoid.Drawer.restoreBlend(); // one, one
+      Ovoid.Drawer.restoreDepth(); 
     }
+    
     for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
       if(!Ovoid.Queuer.qsolid[i].count) continue;
       Ovoid.Drawer.switchPipe(pipe,i); // [VL_,LE_]PIPE_L2_GEOMETRY_LP
+      Ovoid.Drawer.ambient(); // set scene ambiant parameters
       Ovoid.Drawer.enable(0); // enable diffuse
       Ovoid.Drawer.disable(1); // disable ambient
       Ovoid.Drawer.light(Ovoid.Queuer.qlight[l]);
-      Ovoid.Drawer.bodyStack( Ovoid.Queuer.qsolid[i], i, false);
+      Ovoid.Drawer.bodyStack(Ovoid.Queuer.qsolid[i], i, false);
     }
+    
+    Ovoid.Drawer._renderpasses++;
   }
   Ovoid.gl.disable(0x0B90); // STENCIL_TEST 
 }
@@ -2525,21 +2527,19 @@ Ovoid.Drawer.drawQueueLP = function(pipe) {
 Ovoid.Drawer.drawQueue1P = function(pipe) {
 
   Ovoid.Drawer.setCull(1); // cull back
-  Ovoid.Drawer.switchBlend(0); // blending disabled
+  Ovoid.Drawer.switchBlend(3); // blending disabled
   Ovoid.Drawer.switchDepth(1); // depth mask on, test less
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     if(!Ovoid.Queuer.qsolid[i].count) continue;
-    // initialize projection pour particles
-    Ovoid.Drawer.switchPipe(2,i); // PIPE_PARTICLE
-    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.switchPipe(pipe,i); // [VL_,LE_]PIPE_L2_GEOMETRY_1P
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-    Ovoid.Drawer.ambient();   // set scene ambiant parameters
+    Ovoid.Drawer.ambient(); // set scene ambiant parameters
     Ovoid.Drawer.enable(0); // enable diffuse; ENd 
     Ovoid.Drawer.enable(1); // enable ambient; ENa 
     Ovoid.Drawer.light(Ovoid.Queuer.qlight);
     Ovoid.Drawer.bodyStack( Ovoid.Queuer.qsolid[i], i, false);
   }
+  Ovoid.Drawer._renderpasses++;
 }
 
 /**
@@ -2556,15 +2556,13 @@ Ovoid.Drawer.drawQueueFX = function(pipe) {
   Ovoid.Drawer.switchDepth(2); // depthMask off, depth test less
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     if(!Ovoid.Queuer.qalpha[i].count) continue;
-    // initialize projection pour particles
-    Ovoid.Drawer.switchPipe(2,i); // PIPE_PARTICLE
-    Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.switchPipe(pipe,i); // [VL_,LE_]PIPE_L2_GEOMETRY_1P
     Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
     Ovoid.Drawer.ambient();   // set scene ambiant parameters
     Ovoid.Drawer.light(Ovoid.Queuer.qlight);
     Ovoid.Drawer.bodyStack( Ovoid.Queuer.qalpha[i], i, false);
   }
+  Ovoid.Drawer._renderpasses++;
 }
 
 
@@ -2606,7 +2604,6 @@ Ovoid.Drawer.drawQueue = function() {
     Ovoid.Drawer.drawQueue1P(G_1P);
   }
   Ovoid.Drawer.drawQueueFX(G_1P);
-  
   Ovoid.Drawer.drawQueueHL();
   Ovoid.Drawer.endDraw();
 };

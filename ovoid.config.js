@@ -84,7 +84,7 @@ Ovoid.Drawer.opt_fogDensity = 0.0;
 /* Level of performance */
 Ovoid.Drawer.opt_lopLevel = 2;
 /* Enable or disable adaptative level of performance */
-Ovoid.Drawer.opt_adaptativeLop = true;
+Ovoid.Drawer.opt_adaptativeLop = false;
 /* Adaptative level of performance threshold */
 Ovoid.Drawer.opt_adaptiveLopThreshold = 45;
 /* Enable or disable per-light pass render */
@@ -177,8 +177,6 @@ Ovoid.Loader.opt_longwaitStr = 'Loading screen may freezes but Please wait !';
 
 /* --------------------------- SOLVER OPTIONS ------------------------------- */
 if ( Ovoid.Solver ) {
-/* Enable or disable the friction for landscape collisions */
-Ovoid.Solver.opt_landscapeFriction = false;
 /* Enable or disable the iterative contact solving */
 Ovoid.Solver.opt_iterativeSolver = false;
 /* Maximim iteration for iterative contact solving */
