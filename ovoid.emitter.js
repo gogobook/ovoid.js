@@ -51,6 +51,19 @@
  * several Body nodes in the same scene, then you obtain several identical 
  * shapes with different transformations (rotation, position, etc...).<br><br>
  * 
+ * <b>Point-Sprite or Billboard</b><br><br>
+ * 
+ * By setting the <code>billboard</code> member variable to <code>true</code> or 
+ * <code>false</code> you can choose the particle rendering technique. 
+ * The Point-sprite technique use the hardware accelerated point-sprite which 
+ * offer serious performance gain but has the inconvenience of some limitations 
+ * and inconsistance depending the hardware, drivers and operating systems 
+ * (Typically, the point-sprite size is limited to 64 under Windows system). 
+ * The billboard technique use a generic quad-sprite geometry rendered as any 
+ * other geometry, causes more performance issues but has no limitations and 
+ * will be rendered the same way under all circumstances.
+ * 
+ * 
  * @see Ovoid.Body
  * 
  * @extends Ovoid.Node

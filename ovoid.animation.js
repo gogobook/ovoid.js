@@ -63,6 +63,23 @@
  * <li>Scalling Z (Ovoid.ANIMATION_CHANNEL_SCALE_Z)</li>
  * </ul>
  * 
+ * <b>Animation handling</b><br><br>
+ * 
+ * For interactivity purpose, the Animation node is designed to make able to 
+ * handle the animation end through a trigger function. The <code>onended</code> 
+ * trigger function member is called each time the animation ends. So you can 
+ * override this function to handle the animation ends and create some 
+ * interactive or scripts effects. The function should take one argument who 
+ * is the Animation node itself.<br><br>
+ * 
+ * <blockcode>
+ * var alarm = function(node) {<br>
+ * &nbsp;&nbsp;window.alert("The animation " + node.name + " just ended.");
+ * };<br>
+ * <br>
+ * animation.onended = alarm;<br>
+ * </blockcode><br><br>
+ * 
  * @extends Ovoid.Constraint
  *
  * @param {string} name Name of the node.

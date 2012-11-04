@@ -2,15 +2,13 @@
 
 /* ----------------------------- MAIN OPTIONS ------------------------------- */
 /* Environment: Default library path. */
-Ovoid.opt_libPath = 'ovoid.js/'
+Ovoid.opt_libPath = 'ovoid.js/lib/'
 /* Environment: Log verbose level */
 Ovoid.opt_logLevel = 2; // 0: disabled, 1: errors only, 2: errors+warinings, 3: all.
 /* Environment: Avoid browser cache (force (re)load source files) and force Body/Layer pickability */
 Ovoid.opt_debugMode = true;
 /* Environment: Dsiable alert messages */
 Ovoid.opt_disableAlerts = true;
-/* Environment: Enable or disable mouse picking system */
-Ovoid.opt_enablePicking = true;
 /* Environment: Enable local wheighted vertices data (perforance hit) */
 Ovoid.opt_localSkinData = true;
 /* Display: Show or hide Head-Up Display */
@@ -27,29 +25,19 @@ Ovoid.opt_antialias = true;
 Ovoid.opt_stencil = true;
 /* WebGL Context option: Enable or disable premultiplied alpha */
 Ovoid.opt_premultipliedAlpha = true;
-/* Environment: Textures source files search path */
-Ovoid.opt_texturePath = '';
-/* Environment: COLLADA/DE source files search path */
-Ovoid.opt_daePath = '';
-/* Environment: OJSON source files search path */
-Ovoid.opt_ojsonPath = '';
-/* Environment: Audio source files search path */
-Ovoid.opt_audioPath = '';
-/* Environment: GLSL sahders source files search path */
-Ovoid.opt_shadersPath = Ovoid.opt_libPath + "lib/glsl/";
 /* Environment: Default fontmap Texture source image URL */
-//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_monofonto.png";
-Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "lib/maps/font_DroidSansMono.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_UbuntuMono.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_texgyrecursor.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_OxygenMono.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_NotCourierSans.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_DejaVuSansMono.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_AurulentSansMono.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_Anonymous.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_VeraMono.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_CPMonoPlain.png";
-//Ovoid.opt_defaultFontmapUrl = "ovoid.js/lib/maps/font_saxmono.png";
+Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_DroidSansMono.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_monofonto.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_UbuntuMono.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_texgyrecursor.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_OxygenMono.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_NotCourierSans.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_DejaVuSansMono.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_AurulentSansMono.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_Anonymous.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_VeraMono.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_CPMonoPlain.png";
+//Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + "maps/font_saxmono.png";
 /* Environment: Default fontmap Texture filtering */
 Ovoid.opt_defaultFontmapFilter = true;
 /* Global gravity vector */
@@ -81,11 +69,13 @@ Ovoid.Drawer.opt_ambientColor = [0.2, 0.2, 0.2, 1.0];
 Ovoid.Drawer.opt_fogColor = [1.0, 1.0, 1.0, 1.0];
 /* Global fog/atmosphere density */
 Ovoid.Drawer.opt_fogDensity = 0.0;
-/* Level of performance */
+/* Interactive Read-Pixels Picking mode */
+Ovoid.Drawer.opt_pickingMode = 0;
+/* Level of performance (0 = low-end rendering, 1 = per-vertex lighting, 2 = per-pixel lighting) */
 Ovoid.Drawer.opt_lopLevel = 2;
 /* Enable or disable adaptative level of performance */
 Ovoid.Drawer.opt_adaptativeLop = false;
-/* Adaptative level of performance threshold */
+/* Adaptative level of performance threshold (fps) */
 Ovoid.Drawer.opt_adaptiveLopThreshold = 45;
 /* Enable or disable per-light pass render */
 Ovoid.Drawer.opt_perLightPass = true;
@@ -93,7 +83,7 @@ Ovoid.Drawer.opt_perLightPass = true;
 Ovoid.Drawer.opt_shadowCasting = true; 
 /* Z-fail shadow casting object exclusion tolerence (object minimum size) */
 Ovoid.Drawer.opt_shadowCastingExclusion = 0.8; 
-/* Enable or disable layers draws */
+/* Enable or disable layers (overlay objets) draws */
 Ovoid.Drawer.opt_drawLayers = true;
 /* Enable or disable helpers draws */
 Ovoid.Drawer.opt_drawHelpers = true; 
@@ -132,25 +122,25 @@ Ovoid.Loader.opt_iconsColor = [1.0, 1.0, 1.0, 0.8];
 /* Wait screen icons size */
 Ovoid.Loader.opt_iconsSize = [32, 32];
 /* Wait screen icon scenes source image file */
-Ovoid.Loader.opt_iconscenesSrc = "loader-geo.png";
+Ovoid.Loader.opt_iconscenesSrc = Ovoid.opt_libPath + "maps/loader-geo.png";
 /* Wait screen icon scenes X and Y position*/
 Ovoid.Loader.opt_iconscenesPos = [330, 270];
 /* Wait screen icon textures source image file */
-Ovoid.Loader.opt_icontexturesSrc = "loader-tex.png";
+Ovoid.Loader.opt_icontexturesSrc = Ovoid.opt_libPath + "maps/loader-tex.png";
 /* Wait screen icon textures X and Y position */
 Ovoid.Loader.opt_icontexturesPos = [370, 270];
 /* Wait screen icon audios source image file */
-Ovoid.Loader.opt_iconaudiosSrc = "loader-aud.png";
+Ovoid.Loader.opt_iconaudiosSrc = Ovoid.opt_libPath + "maps/loader-aud.png";
 /* Wait screen icon audios X and Y position */
 Ovoid.Loader.opt_iconaudiosPos = [405, 270];
 /* Wait screen icon config source image file */
-Ovoid.Loader.opt_iconconfigSrc = "loader-drw.png";
+Ovoid.Loader.opt_iconconfigSrc = Ovoid.opt_libPath + "maps/loader-drw.png";
 /* Wait screen icon config X and Y position */
 Ovoid.Loader.opt_iconconfigPos = [436, 270];
 /* Wait screen loading circle color */
 Ovoid.Loader.opt_loadcircleColor = [1.0, 1.0, 1.0, 0.5];
 /* Wait screen loading circle source image file */
-Ovoid.Loader.opt_loadcircleSrc = 'loader-lp.png';
+Ovoid.Loader.opt_loadcircleSrc = Ovoid.opt_libPath + 'maps/loader-lp.png';
 /* Wait screen loading circle size */
 Ovoid.Loader.opt_loadcircleSize = [64, 64];
 /* Wait screen loading circle X and Y position */

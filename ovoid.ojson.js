@@ -107,15 +107,12 @@ Ovoid.Ojson = function() {
  * value of -1 means the loading failed.<br><br>
  * 
  * @param {string} url Source file name to load.
- * <code>Ovoid.opt_ojsonPath</code> is used as base path.
  * 
  * @param {bool} async Optionnal asynchronous loading flag. If true or not null
  * the source is loaded in asynchronous way.
  * 
- * @param {bool} nopath ignore the default search path 
- * (<code>Ovoid.opt_ojsonPath</code>).
  */
-Ovoid.Ojson.prototype.loadSource = function(url, async, nopath) {
+Ovoid.Ojson.prototype.loadSource = function(url, async) {
 
   this.url = url;
 
@@ -149,9 +146,7 @@ Ovoid.Ojson.prototype.loadSource = function(url, async, nopath) {
     }
   }
 
-  var src;
-  nopath?src='':src=Ovoid.opt_ojsonPath;
-  src += this.url;
+  var src = this.url;
   if (Ovoid.opt_debugMode) 
     src += '?' + Math.random();
     
@@ -954,7 +949,7 @@ Ovoid.Ojson.prototype._procLight = function(n, j) {
    */
   n.model = j.md;
   n.color.setv(j.cl);
-  n.intensity = j.in;
+  n.intensity = j.it;
   n.attenuationC = j.ac;
   n.attenuationL = j.al;
   n.attenuationQ = j.aq;

@@ -180,21 +180,16 @@ Ovoid.Texture.prototype.setFilter = function(filter) {
  * value of -1 means the loading failed.<br><br>
  *
  * @param {string} url Source file name/url to load.
- * <code>Ovoid.opt_texturePath</code> is used as base path.
  * 
  * @param {bool} filter Enable or disable the texture filtering on loaded 
  * texture.
  * 
- * @param {bool} nopath ignore the default search path 
- * (<code>Ovoid.opt_texturePath</code>).
  */
-Ovoid.Texture.prototype.loadSource = function(url, filter, nopath) {
+Ovoid.Texture.prototype.loadSource = function(url, filter) {
 
   this.url = url;
   
-  var src;
-  nopath?src='':src=Ovoid.opt_texturePath;
-  src += this.url;
+  var src = this.url;
   if (Ovoid.opt_debugMode) 
     src += '?' + Math.random();
   

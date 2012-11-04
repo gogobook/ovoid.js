@@ -320,14 +320,12 @@ Ovoid.Loader.init = function() {
   if (!Ovoid.Loader.opt_drawWaitScreen)
     return true;
   
-  var dp = Ovoid.opt_libPath + 'lib/maps/';
-  
   var iconSize = new Ovoid.Coord(Ovoid.Loader.opt_iconsSize);
 
   if (Ovoid.Loader.opt_fontmapSrc.length > 1)
   {
     Ovoid.Loader._fontmap = new Ovoid.Texture();
-    Ovoid.Loader._fontmap.loadSource(dp+Ovoid.Loader.opt_fontmapSrc, 0, true);
+    Ovoid.Loader._fontmap.loadSource(Ovoid.Loader.opt_fontmapSrc, 0, true);
 
     Ovoid.Loader._percent.fontmap = Ovoid.Loader._fontmap;
     Ovoid.Loader._title.fontmap = Ovoid.Loader._fontmap;
@@ -336,7 +334,7 @@ Ovoid.Loader.init = function() {
   if (Ovoid.Loader.opt_loadcircleSrc.length > 1) {
     
     Ovoid.Loader._lcirclei.bgTexture = new Ovoid.Texture();
-    Ovoid.Loader._lcirclei.bgTexture.loadSource(dp+Ovoid.Loader.opt_loadcircleSrc, 1, true);
+    Ovoid.Loader._lcirclei.bgTexture.loadSource(Ovoid.Loader.opt_loadcircleSrc, 1, true);
     Ovoid.Loader._lcirclei.setSize(Ovoid.Loader.opt_loadcircleSize[0],Ovoid.Loader.opt_loadcircleSize[1]);
     Ovoid.Loader._lcirclei.bgColor.setv(Ovoid.Loader.opt_loadcircleColor);
     
@@ -352,7 +350,7 @@ Ovoid.Loader.init = function() {
   if (Ovoid.Loader.opt_backgroundSrc.length > 1)
   {
     Ovoid.Loader._bg.bgTexture = new Ovoid.Texture();
-    Ovoid.Loader._bg.bgTexture.loadSource(dp+Ovoid.Loader.opt_backgroundSrc, 0, true);
+    Ovoid.Loader._bg.bgTexture.loadSource(Ovoid.Loader.opt_backgroundSrc, 0, true);
   }
   Ovoid.Loader._bg.bgColor.setv(Ovoid.Loader.opt_backgroundColor);
   Ovoid.Loader._bg.moveXyz(0.0, 0.0, 0.0);
@@ -363,7 +361,7 @@ Ovoid.Loader.init = function() {
   if (Ovoid.Loader.opt_iconscenesSrc.length > 1) {
     
     Ovoid.Loader._iconscn.bgTexture = new Ovoid.Texture();
-    Ovoid.Loader._iconscn.bgTexture.loadSource(dp+Ovoid.Loader.opt_iconscenesSrc,1, true);
+    Ovoid.Loader._iconscn.bgTexture.loadSource(Ovoid.Loader.opt_iconscenesSrc,1, true);
     Ovoid.Loader._iconscn.bgColor.setv(Ovoid.Loader.opt_iconsColor);
     Ovoid.Loader._iconscn.moveXyz(Ovoid.Loader.opt_iconscenesPos[0],Ovoid.Loader.opt_iconscenesPos[1],0.0);
     Ovoid.Loader._iconscn.setSize(Ovoid.Loader.opt_iconsSize[0],Ovoid.Loader.opt_iconsSize[1]);
@@ -374,7 +372,7 @@ Ovoid.Loader.init = function() {
   if (Ovoid.Loader.opt_icontexturesSrc.length > 1) {
     
     Ovoid.Loader._icontex.bgTexture = new Ovoid.Texture();
-    Ovoid.Loader._icontex.bgTexture.loadSource(dp+Ovoid.Loader.opt_icontexturesSrc,1, true);
+    Ovoid.Loader._icontex.bgTexture.loadSource(Ovoid.Loader.opt_icontexturesSrc,1, true);
     Ovoid.Loader._icontex.bgColor.setv(Ovoid.Loader.opt_iconsColor);
     Ovoid.Loader._icontex.moveXyz(Ovoid.Loader.opt_icontexturesPos[0],Ovoid.Loader.opt_icontexturesPos[1],0.0);
     Ovoid.Loader._icontex.setSize(Ovoid.Loader.opt_iconsSize[0],Ovoid.Loader.opt_iconsSize[1]);
@@ -385,7 +383,7 @@ Ovoid.Loader.init = function() {
   if (Ovoid.Loader.opt_iconaudiosSrc.length > 1)
   {
     Ovoid.Loader._iconaud.bgTexture = new Ovoid.Texture();
-    Ovoid.Loader._iconaud.bgTexture.loadSource(dp+Ovoid.Loader.opt_iconaudiosSrc,1, true);
+    Ovoid.Loader._iconaud.bgTexture.loadSource(Ovoid.Loader.opt_iconaudiosSrc,1, true);
     Ovoid.Loader._iconaud.bgColor.setv(Ovoid.Loader.opt_iconsColor);
     Ovoid.Loader._iconaud.moveXyz(Ovoid.Loader.opt_iconaudiosPos[0],Ovoid.Loader.opt_iconaudiosPos[1],0.0);
     Ovoid.Loader._iconaud.setSize(Ovoid.Loader.opt_iconsSize[0], Ovoid.Loader.opt_iconsSize[1]);
@@ -396,7 +394,7 @@ Ovoid.Loader.init = function() {
   if (Ovoid.Loader.opt_iconconfigSrc.length > 1)
   {
     Ovoid.Loader._iconcgf.bgTexture = new Ovoid.Texture();
-    Ovoid.Loader._iconcgf.bgTexture.loadSource(dp+Ovoid.Loader.opt_iconconfigSrc, 1, true);
+    Ovoid.Loader._iconcgf.bgTexture.loadSource(Ovoid.Loader.opt_iconconfigSrc, 1, true);
     Ovoid.Loader._iconcgf.bgColor.setv(Ovoid.Loader.opt_iconsColor);
     Ovoid.Loader._iconcgf.moveXyz(Ovoid.Loader.opt_iconconfigPos[0],Ovoid.Loader.opt_iconconfigPos[1],0.0);
     Ovoid.Loader._iconcgf.setSize(Ovoid.Loader.opt_iconsSize[0], Ovoid.Loader.opt_iconsSize[1]);

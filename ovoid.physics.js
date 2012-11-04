@@ -68,6 +68,37 @@
  * </li>
  * </ul>
  * 
+ * <b>Simulation sleeping</b><br><br>
+ * 
+ * To keep performances and prevent the forever trembling objects on the floor, 
+ * the physics simulation includes a "sleep" mechanism who stop the simulation 
+ * of  the Physics node until something awake it. The "sleep" mechanism uses a 
+ * quantity of motion to evaluate when the simulation should stop. The quantiy 
+ * of motion threshold is defined by the <code>sleeping</code> attribute 
+ * (default = 1.0).<br><br>
+ * 
+ * <b>Contact/Collision handling</b><br><br>
+ * 
+ * For interactivity purpose, the physics engine is designed to make able to 
+ * handle rigid body collision events. The <code>oncontact</code> trigger 
+ * function member is called each time a collision of the Physics node with 
+ * another one happen. So you can override this function to handle the collision 
+ * and create some interactive effects. The function should take three argument 
+ * which are the other Physics node involved in the contact, the contact point 
+ * in world coordinates, and the contact normal in world coordinates. If the 
+ * other involved Physics node of the collision is a RIGID_LANDSCAPE model, 
+ * the first argument will be <code>null</code>.<br><br>
+ * 
+ * <blockcode>
+ * var shoot = function(node, point, normal) {<br>
+ * &nbsp;&nbsp;if(node.target[0].name == "bullet") {<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;this.target[0].visible = false;<br>
+ * &nbsp;&nbsp;}<br>
+ * };<br>
+ * <br>
+ * physics.oncontact = shoot;<br>
+ * </blockcode><br><br>
+ * 
  * @extends Ovoid.Constraint
  *
  * @param {string} name Name of the new node.
@@ -114,7 +145,7 @@ Ovoid.Physics = function(name) {
    * @type Vector */
   this.angularVelocity = new Ovoid.Vector(0.0,0.0,0.0);
   
-  /** Sleeping motion thressold.
+  /** Sleeping motion threshold.
    * @type float */
   this.sleeping = 1.0;
   
@@ -130,7 +161,7 @@ Ovoid.Physics = function(name) {
    * the passed parameter as node will be null.<br><br>
    * 
    * <blockcode>
-   * physics.oncontact = function (node, point, normal, velocity) { <codecomment>// do something</codecomment> };<br>
+   * physics.oncontact = function (node, point, normal) { <codecomment>// do something</codecomment> };<br>
    * </blockcode>
    * @field
    * @type Function

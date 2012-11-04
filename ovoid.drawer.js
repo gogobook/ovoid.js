@@ -34,31 +34,6 @@
  * example you don't draw particles like you draw common objects. This is why 
  * OvoiD.JS use several shaders.<br><br>
  * 
- * <b>Per-light passes or one passe</b><br><br>
- * 
- * The Drawer implement two drawing mechanisms, one for per-light passes and an
- * other for classical mutiple lights computed at once in one passe. Each 
- * mecanism uses a specific pipeline (*_1P for one passe and 
- * *_LP for per-light passes).<br><br>
- * 
- * <b>Solid and alpha objects</b><br><br>
- * 
- * Transparent objects should not be drawn like solid/opaque objets. For this
- * reason transparent objets are drawn in a speratate stage from a specific 
- * queue (see Ovoid.Queuer for more details). The pipeline used to draw 
- * transparent objects are ALLWAYS the "one passe" pipeline (*_1P) even if the
- * opt_perLightPass option is set to true.<br><br>
- * 
- * <b>Level of performance</b><br><br>
- * 
- * The level of performance is typically a graphic quality level option. There 
- * is up to three level of performance with dedicated drawing pipeline. The 
- * level of performance can be fixed or adaptive. Adaptive level of 
- * performance is enabled through the <code>opt_adaptativeLop</code> option. To
- * set a fixed level of performance uses the <code>opt_lopLevel</code> 
- * option.<br><br>
- * 
- * 
  * The currently implemented drawing pipelines are the following ones:<br><br>
  * 
  * <ul>
@@ -164,7 +139,7 @@
  * Number Id: 6<br><br>
  * Pipeline for shadow volumes draw. 
  * </li>
- * </ul>
+ * </ul><br><br>
  * 
  * <b>Custom Shaders</b><br><br>
  * 
@@ -178,6 +153,30 @@
  * Once shaders are in the Drawer stock, you can plug it to the desired 
  * pipeline using the <code>plugShader</code> method. This takes effect 
  * immediately.<br><br>
+ * 
+ * <b>Per-light passes or one passe</b><br><br>
+ * 
+ * The Drawer implement two drawing mechanisms, one for per-light passes and an
+ * other for classical mutiple lights computed at once in one passe. Each 
+ * mecanism uses a specific pipeline (*_1P for one passe and 
+ * *_LP for per-light passes).<br><br>
+ * 
+ * <b>Solid and alpha/fx objects</b><br><br>
+ * 
+ * Transparent objects should not be drawn like solid/opaque objets. For this
+ * reason transparent objets are drawn in a speratate stage from a specific 
+ * queue (see Ovoid.Queuer for more details). The pipeline used to draw 
+ * transparent objects are ALLWAYS the "one passe" pipeline (*_1P) even if the
+ * opt_perLightPass option is set to true.<br><br>
+ * 
+ * <b>Level of performance</b><br><br>
+ * 
+ * The level of performance is typically a graphic quality level option. There 
+ * is up to three level of performance with dedicated drawing pipeline. The 
+ * level of performance can be fixed or adaptive. Adaptive level of 
+ * performance is enabled through the <code>opt_adaptativeLop</code> option. To
+ * set a fixed level of performance uses the <code>opt_lopLevel</code> 
+ * option.<br><br>
  * 
  * <b>Render Layer</b><br><br>
  * 
@@ -257,6 +256,22 @@
  * For more informations about shaders link and wrapping see the 
  * <code>Ovoid.Shader</code> object documentation page.<br><br>
  * 
+ * <b>Picking modes</b><br><br>
+ * 
+ * OvoiD.JS implements a mouse picking system trough specific render passe in
+ * hidden render buffer. The Picking mode is set through the 
+ * <code>Drawer.opt_pickingMode</code>.<br><br>
+ * 
+ * The picking can be enabled for world objects only, overlay objects only, both
+ * world and overlay objects using the Ovoid.RP_WORLD and/or Ovoid.RP_OVERLAY 
+ * bitmask options, or disabled by setting <code>Drawer.opt_pickingMode</code> 
+ * to <code>0</code>.<br><br>
+ * 
+ * <blockcode>
+ * <codecomment>// Enable picking for both world and overlay objects</codecomment><br>
+ * Ovoid.Drawer.opt_pickingMode = Ovoid.RP_WORLD|Ovoid.RP_OVERLAY;<br>
+ * </blockcode><br><br>
+ * 
  */
 Ovoid.Drawer = {};
 
@@ -275,6 +290,10 @@ Ovoid.Drawer.opt_fogColor = [1.0, 1.0, 1.0, 1.0];
 
 /** Global fog/atmosphere density */
 Ovoid.Drawer.opt_fogDensity = 0.0;
+
+
+/** Picking mode. */
+Ovoid.Drawer.opt_pickingMode = 0;
 
 
 /** Level of performance */
@@ -1390,9 +1409,9 @@ Ovoid.Drawer.light = function(light) {
 
 
 /**
- * Set ambient.<br><br>
+ * Set ambient and fog parameters.<br><br>
  * 
- * Setup ambient lighting color for the current used shader.
+ * Setup ambient lighting color and fog parameters for the current used shader.
  */
 Ovoid.Drawer.ambient = function() {
   
@@ -1449,9 +1468,9 @@ Ovoid.Drawer.screen = function(matrix) {
 
 
 /**
- * Set camera.<br><br>
+ * Set model transformations.<br><br>
  * 
- * Setup transform and normal matrices matrices for the current 
+ * Setup transform and normal matrices for the current 
  * used shader.
  * 
  * @param {Float32Array[16]} tmatrix Transformation matrix.
@@ -1610,7 +1629,7 @@ Ovoid.Drawer.symStar = function(color) {
 
 
 /**
- * Draw point sprite string.<br><br>
+ * Draw point-sprite string.<br><br>
  * 
  * Draws a point-sprite string. This method should use a special shader. The 
  * generated point-sprite vertices embeds special data instead of z position
@@ -2391,19 +2410,21 @@ Ovoid.Drawer.zfailStack = function(light, stack) {
  */
 Ovoid.Drawer.drawQueueRP = function() {
   // Picking frame
-  if (Ovoid.opt_enablePicking) { 
+  if (Ovoid.Drawer.opt_pickingMode) { 
     Ovoid.Drawer.beginRpDraw();
-    for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-      Ovoid.Drawer.switchBlend(0); // blend off
-      Ovoid.Drawer.switchPipe(20,0); //PIPE_RP_GEOMETRY
-      Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-      Ovoid.Drawer.switchDepth(1); // depth mask on, test less
-      Ovoid.Drawer.setCull(1); // cull back
-      Ovoid.Drawer.bodyStack(Ovoid.Queuer.qsolid[i], 0, true);
-      Ovoid.Drawer.setCull(0); // no cull
-      Ovoid.Drawer.bodyStack(Ovoid.Queuer.qalpha[i], 0, true);
+    if(Ovoid.Drawer.opt_pickingMode & Ovoid.RP_WORLD) {
+      for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+        Ovoid.Drawer.switchBlend(0); // blend off
+        Ovoid.Drawer.switchPipe(20,0); //PIPE_RP_GEOMETRY
+        Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
+        Ovoid.Drawer.switchDepth(1); // depth mask on, test less
+        Ovoid.Drawer.setCull(1); // cull back
+        Ovoid.Drawer.bodyStack(Ovoid.Queuer.qsolid[i], 0, true);
+        Ovoid.Drawer.setCull(0); // no cull
+        Ovoid.Drawer.bodyStack(Ovoid.Queuer.qalpha[i], 0, true);
+      }
     }
-    if (Ovoid.Drawer.opt_drawLayers) {
+    if (Ovoid.Drawer.opt_drawLayers && Ovoid.Drawer.opt_pickingMode & Ovoid.RP_OVERLAY) {
       Ovoid.Drawer.switchDepth(0); // depth all disable
       Ovoid.Drawer.switchPipe(23,0); //PIPE_RP_LAYER
       Ovoid.Drawer.screen(Ovoid.Frame.matrix);
@@ -2543,7 +2564,7 @@ Ovoid.Drawer.drawQueue1P = function(pipe) {
 }
 
 /**
- * Draw current queue subfunction for one Passe aplha and particles objects.<br><br>
+ * Draw current queue subfunction for one Passe aplha/FX objects.<br><br>
  * 
  * Draws all the current queue available in <code>Ovoid.Queuer</code>. 
  * This method does not takes argument because it get data directly from the 

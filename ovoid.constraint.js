@@ -76,6 +76,28 @@ Ovoid.Constraint.prototype.setTarget = function(node) {
 
 
 /**
+ * Remove a target node of this instance.<br><br>
+ *
+ * Unassing and break dependencies of the specified node as target node 
+ * of this instance.
+ * 
+ * @param {Node} node Node object to remove as target.
+ * 
+ * @see Ovoid.Node
+ */
+Ovoid.Constraint.prototype.remTarget = function(node) {
+
+    var c = this.target.length;
+    while(c--) {
+      if(this.target[c] === node) {
+        this.target.splice(c, 1);
+        node.breakDepend(this);
+      }
+    }
+};
+
+
+/**
  * JavaScript Object Notation (JSON) serialization method.
  * 
  * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class

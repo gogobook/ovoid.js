@@ -191,18 +191,13 @@ Ovoid.Audio.prototype._handleError = function() {
  * value of -1 means the loading failed.<br><br>
  *
  * @param {string} url Source file name/url to load. 
- * <code>Ovoid.opt_audioPath</code> is used as base path.
  * 
- * @param {bool} nopath ignore the default search path 
- * (<code>Ovoid.opt_audioPath</code>).
  */
-Ovoid.Audio.prototype.loadSource = function(url, nopath) {
+Ovoid.Audio.prototype.loadSource = function(url) {
 
   this.url = url;
   
-  var src;
-  nopath?src='':src=Ovoid.opt_audioPath;
-  src += this.url;
+  var src = this.url;
   if (Ovoid.opt_debugMode) 
     src += '?' + Math.random();
   

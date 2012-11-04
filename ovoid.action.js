@@ -122,7 +122,7 @@
  * action.setTrigger(Ovoid.ON_INTERSECT_ENTER, enter, mybox2);<br>
  * <codecomment>// Link this action to mybox1</codecomment><br>
  * action.linkNode(mybox1);<br>
- * <blockcode>
+ * </blockcode>
  * 
  * In the above example, the event will be triggered once mybox1 and mybox2, 
  * and only mybox1 and mybox2 will intersect.
@@ -139,7 +139,7 @@
  * action.setTrigger(Ovoid.ON_INTERSECT_ENTER, enter);<br>
  * <codecomment>// Link this action to mybox1</codecomment><br>
  * action.linkNode(mybox1);<br>
- * <blockcode>
+ * </blockcode>
  * 
  * In the above example, the event will be triggered once mybox1 and any 
  * Body will intersect. <i>The body must be set as <code>intersectable</code></i><br><br>

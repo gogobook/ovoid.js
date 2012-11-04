@@ -45,36 +45,12 @@ Ovoid.opt_premultipliedAlpha = true;
 Ovoid.opt_debugMode = false;
 
 
-/** Default path for Textures's images source files. */
-Ovoid.opt_texturePath = 'data/map/';
-
-
-/** Default path for Scenes's DAE/Collada source files. */
-Ovoid.opt_daePath = 'data/dae/';
-
-
-/** Default path for Scenes's OJSON source files. */
-Ovoid.opt_ojsonPath = 'data/ojsn/';
-
-
-/** Default path for Audio's sound source files. */
-Ovoid.opt_audioPath = 'data/snd/';
-
-
-/** Default path for Shaders's GLSL source files. */
-Ovoid.opt_shadersPath = 'data/glsl/';
-
-
 /** Default source image filename for font texture map. */
-Ovoid.opt_defaultFontmapUrl = 'font_CPMonoPlain.png';
+Ovoid.opt_defaultFontmapUrl = Ovoid.opt_libPath + 'lib/maps/font_DroidSansMono.png';
 
 
 /** Default filter level for font texture map. */
 Ovoid.opt_defaultFontmapFilter = 0;
-
-
-/** Enable mouse interacive picking. */
-Ovoid.opt_enablePicking = true;
 
 
 /** Disable alert messages. */
@@ -577,8 +553,6 @@ Ovoid._mainloop = function() {
   
   try {
     /* BEGIN FRAME */    
-    /* USER CUSTOM LOOP FUNC */
-    Ovoid.onloop();
     
     /* Reset render queue */
     Ovoid.Queuer.reset();
@@ -589,6 +563,9 @@ Ovoid._mainloop = function() {
     /* SOLVE PHYSICS QUEUE */
     if(Ovoid.Solver != undefined)   
       Ovoid.Solver.solveQueue();
+    
+    /* USER CUSTOM LOOP FUNC */
+    Ovoid.onloop();
     
     /* DRAW QUEUE */
     Ovoid.ondraw();

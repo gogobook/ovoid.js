@@ -77,7 +77,28 @@
  * <li><b>The Nodes Groups</b><br>
  * For access, performance and design issues, all nodes are stored in groups 
  * (Array) according to their type and / or typical usage.</li>
- * </ul>
+ * </ul><br><br>
+ * 
+ * 
+ * <b>Node search or removing</b><br><br>
+ * 
+ * The Scene object provides powerful functions to search and/or remove nodes 
+ * without side effects. This is especially recommended for node removing which 
+ * can produce many undesired side effets as broken links or 
+ * lost-in-nowhere nodes.<br><br>
+ * 
+ * The <code>search</code> method allow to find a particular node by its exact 
+ * name (if string) or uid (if number). The <code>searchMatches</code>  method 
+ * allow to find all nodes which the name contains the string (if string) or 
+ * the type include the bitmask (if bitmask).<br><br>
+ * 
+ * The <code>remove</code> method allow to remove a particular node directly or
+ * by its exact name (if string) or uid (if number). The <code>removeMatches</code>  
+ * method allow to removes all nodes which the name contains the string 
+ * (if string) or the type include the bitmask (if bitmask).<br><br>
+ * 
+ * The <code>clean</code> method removes all unused nodes, for example a 
+ * Material with no references or a Mesh who is never used as shape.<br><br>
  * 
  * @see Ovoid.Node
  * 

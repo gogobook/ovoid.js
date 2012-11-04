@@ -49,6 +49,48 @@
  * &nbsp;&nbsp;body2.setShape(mesh);<br>
  * </blockcode><br><br>
  * 
+ * <b>Body intersection handling</b><br><br>
+ * 
+ * For interactivity purpose, the Body node is designed to be able detect 
+ * intersections with each others through the bounding sphere. To enable this 
+ * functionnaly you must set the <code>intersectable</code> attribute to true. 
+ * The intersection is detected only if both body are set as "intersectable". 
+ * Each Body keeps its list of Body in intersection with him in the 
+ * <code>intersect</code> member, while the list of Body just enterd and just 
+ * leaved in/from intersection are stored (during ONE frame) in the 
+ * <code>enter</code> and <code>leave</code> member.<br><br>
+ * 
+ * For more information about intesection usage and handling you should refer to
+ * the <a href="Ovoid.Action.php"><code>Ovoid.Action</code></a> node 
+ * documentation.<br><br>
+ * 
+ * <b>Render Layer and Alpha</b><br><br>
+ * 
+ * For rendering purposes, a Body can be placed in a particular render layer. 
+ * You can set the render layer of the body through the <code>renderLayer</code> 
+ * attribute member. The <code>renderLayer</code> value must be an integer 
+ * between 0 to  <code>Ovoid.MAX_RENDER_LAYER</code> (8). You also can define 
+ * the Body as an Alpha (Transparent/FX) object through the 
+ * <code>renderAlpha</code> attribute member. If your object is dedicated to be 
+ * transparent or a particle emitter, you should set this attribute to 
+ * <code>true</code>.<br><br>
+ * 
+ * For more informations about render layers and alpha you should refer to the
+ * <a href="Ovoid.Drawer.php"><code>Ovoid.Drawer</code></a> global class  
+ * documentation.<br><br>
+ * 
+ * <b>Shadow casting</b><br><br>
+ * 
+ * You can include or exclude a Body node of the shadow casting process through 
+ * the <code>shadowCasting</code> attribute member. If set to <code>true</code> 
+ * (default) and the Body's shape is a Mesh while the cast shadow rendering is 
+ * enabled, the shadow volum of the mesh will be computed and rendered, 
+ * otherwise the Mesh's shadow computation is jumped.
+ * 
+ * For more informations about cast shadows you should refer to the
+ * <a href="Ovoid.Drawer.php"><code>Ovoid.Drawer</code></a> global class  
+ * documentation.<br><br>
+ * 
  * @extends Ovoid.Transform
  *
  * @param {string} name Name of the node.

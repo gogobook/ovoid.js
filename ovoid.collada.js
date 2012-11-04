@@ -3068,15 +3068,11 @@ Ovoid.Collada.prototype._procAni = function(dae) {
  * value of -1 means the loading failed.<br><br>
  *
  * @param {string} url Source file url to load.
- * <code>Ovoid.opt_daePath</code> is used as base path.
  * 
  * @param {bool} async Optionnal asynchronous loading flag. If true or not null
  * the source is loaded in asynchronous way.
- * 
- * @param {bool} nopath ignore the default search path 
- * (<code>Ovoid.opt_daePath</code>).
  */
-Ovoid.Collada.prototype.loadSource = function(url, async, nopath) {
+Ovoid.Collada.prototype.loadSource = function(url, async) {
 
   this.url = url;
 
@@ -3106,9 +3102,7 @@ Ovoid.Collada.prototype.loadSource = function(url, async, nopath) {
     }
   }
 
-  var src;
-  nopath?src='':src=Ovoid.opt_daePath;
-  src += this.url;
+  var src = this.url;
   if (Ovoid.opt_debugMode) 
     src += '?' + Math.random();
   

@@ -30,7 +30,7 @@
  * rendered scene. It uses the texture mapped font technic to draw characters as 
  * point-sprites. Inherited from the Layer node, it is a world-transformable 
  * node, which means it can be transformed in a 2D space coordinate who 
- * corresponds to the canvas/client area.
+ * corresponds to the canvas/client area.<br><br>
  * 
  * <blockcode>
  * var hello = scene.create(Ovoid.TEXT, "BlueText");<br>

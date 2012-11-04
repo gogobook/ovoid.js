@@ -46,13 +46,31 @@
  * node.  Because it does not create dependency relationship (but has animations
  * as dependencies) and is obviously not a world node.<br><br>
  * 
- * <b>Track creation at Collada import<b><br><br>
+ * <b>Track creation at Collada import</b><br><br>
+ * 
  * One Track node is created per COLLADA scene importation (if the suitable 
  * option Ovoid.DAE_CREATE_TRACK is passed in the importation method's mask 
  * parameter). The created Track node will contains all the Animation nodes 
  * imported during the importation process (which are supposed to be grouped, 
- * for example : walk animation, jump animation, run animation, etc...).
+ * for example : walk animation, jump animation, run animation, etc...).<br><br>
  *
+ * <b>Track handling</b><br><br>
+ * 
+ * For interactivity purpose, the Track node is designed to make able to 
+ * handle the track end through a trigger function. The <code>onended</code> 
+ * trigger function member is called each time all Track's animations ends. So 
+ * you can override this function to handle the Track ends and create some 
+ * interactive or scripts effects. The function should take one argument who 
+ * is the Track node itself.<br><br>
+ * 
+ * <blockcode>
+ * var alarm = function(node) {<br>
+ * &nbsp;&nbsp;window.alert("The animation track " + node.name + " just ended.");
+ * };<br>
+ * <br>
+ * track.onended = alarm;<br>
+ * </blockcode><br><br>
+ * 
  * @param {string} name Name of the node.
  */
 Ovoid.Track = function(name) {

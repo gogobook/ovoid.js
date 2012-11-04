@@ -47,6 +47,44 @@
  * Ovoid.Input.trigger(Ovoid.CTR_HELD, Ovoid.KB_LARROW, Ovoid.HELD, lookleft);<br>
  * </blockcode><br>
  * 
+ * <b>Node Grabbing</b><br><br>
+ * 
+ * Node-grabbing consists in focusing on a node while ignoring events of 
+ * other nodes.<br><br>
+ * 
+ * Suppose you want to rotate a node by moving the mouse while you maintain the 
+ * left button pressed. While you move your mouse pointer to rotate the object, 
+ * the pointer should leave the node's region, resulting that the trigger 
+ * function stops, since the mouse now rolls over another node (or the 
+ * background).<br><br>
+ * 
+ * The "node-grabbing" prevents this kind of side effects by forcing to focus on 
+ * the grabbed node while ignoring the others. You also must release the grabbed 
+ * node to return in the normal interaction behaviour.<br><br>
+ * 
+ * The node grabbing dedicated functions are <code>grabNode</code> 
+ * and <code>grabRelease</code>.<br><br>
+ * 
+ * For more information about node-grabbing usage, see the 
+ * <code>Ovoid.Action</code> node documentation page.
+ * 
+ * <b>Mouse behaviours and 3D cursor</b><br><br>
+ * 
+ * All the mouse behaviours and cursor screen position are stored in the 
+ * <code>mouseWheelDelta</code>, <code>mousePosition</code> and 
+ * <code>mouseVelocity</code> members. These members describes the standard 
+ * mouse parameters collected through the browser.<br><br>
+ * 
+ * The <code>mouseCursor</code>
+ * member is a 4x4 transformation matrix (Ovoid.Matrix4) who describes the mouse
+ * cursor position in 3D space in the current 3D world through an unprojection 
+ * mechanism. This parameter is valid ONLY if the mouse picking system is 
+ * enabled.
+ * 
+ * For more information about Picking mode you should refer to the
+ * <a href="Ovoid.Drawer.php"><code>Ovoid.Drawer</code></a> global class  
+ * documentation.<br><br>
+ * 
  */
 Ovoid.Input = {};
 

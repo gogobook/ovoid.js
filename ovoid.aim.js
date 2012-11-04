@@ -26,10 +26,15 @@
  * 
  * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
  * 
- * The Aim node is a Constraint node who apply orientation on a Transform node 
- * to aim another one.<br><br>
+ * The Aim node is a Constraint node who apply orientation on  
+ * Transform node to aim another one.<br><br> The Aim node can be applied to 
+ * several constrained-target nodes.<br><br>
  * 
  * <blockcode>
+ * var Aim = scene.create(Ovoid.AIM, "aimToBox1");<br>
+ * Aim.aimat = Box1;<br>
+ * Aim.setTarget(Eye1);<br>
+ * Aim.setTarget(Eye2);<br>
  * </blockcode><br><br>
  * 
  * @extends Ovoid.Constraint
@@ -74,11 +79,14 @@ Ovoid.Aim.prototype.constructor = Ovoid.Aim;
 Ovoid.Aim.prototype.cachAim = function() {
 
   if(this.aimat) {
+    // Pour chaque target
+    var i = this.target.length;
+    while(i--) {
       if(!(this.aimat.cach & Ovoid.CACH_WORLD) || 
-          !(this.target[0].cach & Ovoid.CACH_WORLD)) {
+          !(this.target[i].cach & Ovoid.CACH_WORLD)) {
         
         // Construits les axes 
-        this._z.subOf(this.target[0].worldPosition, this.aimat.worldPosition);
+        this._z.subOf(this.target[i].worldPosition, this.aimat.worldPosition);
         this._z.normalize();
         this._x.crossOf(this.upvector, this._z);
         this._y.crossOf(this._z, this._x);
@@ -102,9 +110,10 @@ Ovoid.Aim.prototype.cachAim = function() {
           rz = 0.0;
         }
         // On applique la rotation au target
-        this.target[0].rotateXyz(0.0,0.0,0.0,0,1);
-        this.target[0].rotateXyz(rx,ry,rz);
+        this.target[i].rotateXyz(0.0,0.0,0.0,0,1);
+        this.target[i].rotateXyz(rx,ry,rz);
       }
+    }
   }
   
 };

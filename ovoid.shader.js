@@ -275,21 +275,16 @@ Ovoid.Shader.prototype._handleError = function() {
  * and a value of -1 means the loading failed.<br><br>
  *
  * @param {string} vs Vertex program shader source file url. 
- * <code>Ovoid.opt_shadersPath</code> is used as base path. 
  * 
  * @param {string} fs Fragment program shader source file url.
- * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
  * @param {string} wm XML or JSON wrap map file url.
- * <code>Ovoid.opt_shadersPath</code> is used as base path.
  * 
- * @param {bool} as Optionnal asynchronous loading flag. If true or not null
+ * @param {bool} async Optionnal asynchronous loading flag. If true or not null
  * the source is loaded in asynchronous way.
  * 
- * @param {bool} np ignore the default search path 
- * (<code>Ovoid.opt_shadersPath</code>).
  */
-Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, as, np) {
+Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, async) {
 
   this.verturl = vs;
   this.fragurl = fs;
@@ -297,18 +292,15 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, as, np) {
   
   var fsrc, vsrc, wsrc;
   
-  np?fsrc='':fsrc=Ovoid.opt_shadersPath;
-  fsrc += fs;
+  var fsrc = fs;
   if (Ovoid.opt_debugMode) 
     fsrc += '?' + Math.random();
   
-  np?vsrc='':vsrc=Ovoid.opt_shadersPath;
-  vsrc += vs;
+  var vsrc = vs;
   if (Ovoid.opt_debugMode) 
     vsrc += '?' + Math.random();
     
-  np?wsrc='':wsrc=Ovoid.opt_shadersPath;
-  wsrc += wm;
+  var wsrc = wm;
   if (Ovoid.opt_debugMode) 
     wsrc += '?' + Math.random();
     
@@ -326,7 +318,7 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, as, np) {
   
   /* La définition de onreadystatechange n'est utile qu'en
    * mode asynchrone */
-  if (as) {
+  if (async) {
     var hthndfunc =  function()
     {
       if (this.readyState == 4) {
@@ -383,15 +375,15 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, as, np) {
     wxhr.onreadystatechange = hthndfunc;
   }
 
-  wxhr.open("GET", wsrc, as);
+  wxhr.open("GET", wsrc, async);
   wxhr.send();
-  fxhr.open("GET", fsrc, as);
+  fxhr.open("GET", fsrc, async);
   fxhr.send();
-  vxhr.open("GET", vsrc, as);
+  vxhr.open("GET", vsrc, async);
   vxhr.send();
   
   // Si nous sommes en mode synchrone
-  if (!as) {
+  if (!async) {
     if (wxhr.status == 200 || wxhr.status == 304) {
       this.wrapsource = wxhr.responseText;
       this._wmlstatus = 1;

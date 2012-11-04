@@ -1373,6 +1373,22 @@ Ovoid.PIPE_SHADOW_VOLUME = 6;
 Ovoid.PIPE_BILLBOARD = 7;
 
 
+/** Symbolic constant for picking mode. 
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Loader
+ */
+Ovoid.RP_OVERLAY = Ovoid.BIT1;
+
+
+/** Symbolic constant for picking mode. 
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Loader
+ */
+Ovoid.RP_WORLD = Ovoid.BIT2;
+
+
 /** Symbolic constant bitmask for vertex format. float[4] Position component.
  * @constant
  * @memberOf _global_

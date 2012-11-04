@@ -43,7 +43,7 @@
  * 
  * This mechanism can be enabled or disabled by modifying the global option
  * <code>Ovoid.Queuer.opt_viewcull</code>
- * </li>
+ * </li><br>
  * 
  * <li><b>Light culling</b><br>
  * The light culling mechanism checks whether a light is needed to draw the 
@@ -53,7 +53,52 @@
  * This mechanism can be enabled or disabled by modifying the global option 
  * <code>Ovoid.Queuer.opt_lightcull</code>
  * </li>
+ * </ul><br><br>
+ * 
+ * <b>Body intersection</b><br><br>
+ * 
+ * For interactivity purpose, the Body node and Queuer is designed to be able 
+ * handle intersection of a Body with each others through the bounding sphere.
+ * To enable or disable the Body intersection detection in a global way, you can
+ * set the <code>Ovoid.Queuer.opt_intersect</code> options to <code>true</code> 
+ * or <code>false</code>.<br><br>
+ * 
+ * <b>Queues</b><br><br>
+ * 
+ * Each frames, the Queuer makes several queues (this is why it is named Queuer) 
+ * of nodes which are used by several other global classes. For example, the 
+ * Queuer makes some lists of nodes which will be rendered by the Drawer 
+ * (Ovoid.Drawer). The Drawer will use the Queuer's queues as a rendering stacks.
+ * 
+ * <ul>
+ * <li><b>qsolid</b><br>
+ * This is the main Body nodes's list which are rendered as "non transparent" 
+ * objects by the Drawer.
+ * </li><br>
+ * <li><b>qalpha</b><br>
+ * This is the main Body nodes's list which are rendered as "transparent/FX" 
+ * objects by the Drawer.
+ * </li><br>
+ * <li><b>qtform</b><br>
+ * This is the main Transform nodes's list which are used by the Drawer to 
+ * render object's helpers (bounding boxes, spheres, axis, etc.)
+ * </li><br>
+ * <li><b>qlight</b><br>
+ * This is the main Light nodes's list which are involved in the rendering 
+ * process, used to define Lights by the Drawer.
+ * </li><br>
+ * <li><b>qlayer</b><br>
+ * This is the main Layer nodes's list which are rendered by the Drawer.
+ * </li><br>
+ * <li><b>qtext</b><br>
+ * This is the main Text nodes's list which are rendered by the Drawer.
+ * </li><br>
+ * <li><b>qphycs</b><br>
+ * This is the main Physics nodes's list which are tested for collisions by the 
+ * Solver (Ovoid.Solver).
+ * </li>
  * </ul>
+ * 
  */
 Ovoid.Queuer = {};
 

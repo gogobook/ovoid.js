@@ -731,8 +731,7 @@ Ovoid.Debug.Input = function() {
 Ovoid.Debug.Drawer = function() {
     
   var d = 'Ovoid.Drawer status\n{\n';
-  d += '   rp:';
-  Ovoid.opt_enablePicking?d += 'yes':d += 'no';
+  d += '   rp:' + Ovoid.Drawer.opt_pickingMode;
   d += ' lp:';
   Ovoid.Drawer.opt_perLightPass?d += 'yes':d += 'no';
   d += ' zf:';
@@ -922,7 +921,7 @@ Ovoid.Debug.Sumary = function() {
   d += ' Mouse:[x' + Ovoid.Input.mousePosition.v[0];
   d += ' y' +  Ovoid.Input.mousePosition.v[1] + ']';
   d += ' Picking:[';
-  Ovoid.opt_enablePicking?d+='on':d+='off';
+  Ovoid.Drawer.opt_enablePicking?d+='on':d+='off';
   d += ']';
   d +=' Timeq:[' + (Math.round(Ovoid.Timer.quantum*1000) / 1000) + ']';
   return d;

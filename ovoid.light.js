@@ -35,7 +35,7 @@
  * spot.setColor(1.0, 0.0, 0.0, 1.0);<br>
  * spot.setSpotAngle(45.0, 0.05);<br>
  * <br>
- * var lamp = scene.create(Ovoid.LIGHT, "pointLight");
+ * var lamp = scene.create(Ovoid.LIGHT, "pointLight");<br>
  * lamp.setColor(1.0, 1.0, 1.0, 1.0);<br>
  * </blockcode><br><br>
  * 
@@ -276,7 +276,7 @@ Ovoid.Light.prototype.toJSON = function() {
   /* Ovoid.Light */
   o['md'] = this.model;
   o['cl'] = this.color;
-  o['in'] = this.intensity;
+  o['it'] = this.intensity;
   o['ac'] = this.attenuationC;
   o['al'] = this.attenuationL;
   o['aq'] = this.attenuationQ;
