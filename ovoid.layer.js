@@ -145,6 +145,27 @@ Ovoid.Layer.prototype.setFgColor = function(r, g, b, a) {
 
 
 /**
+ * Check if point is over.<br><br>
+ * 
+ * Checks if the given point is over the layer according to its 
+ * position on the screen.<br><br>
+ * 
+ * Note: This method returns inaccurate values if the layer has some rotation.
+ *
+ * @param {Coord} coord Coord object to check.
+ * 
+ * @return True if the point is over the layer, false otherwize.
+ */
+Ovoid.Layer.prototype.isPointOver = function(coord) {
+  
+  return (coord.v[0] >= this.worldMatrix.m[12] && 
+              coord.v[0] <= (this.worldMatrix.m[12] + this.size.v[0]) &&
+              coord.v[1] >= this.worldMatrix.m[13] && 
+              coord.v[1] <= (this.worldMatrix.m[13] + this.size.v[1]));
+};
+
+
+/**
  * Node's caching function.
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 

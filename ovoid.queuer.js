@@ -565,6 +565,9 @@ Ovoid.Queuer.queueScene = function(sc) {
     }
   }
 
+  if (Ovoid.Drawer.opt_pickingMode == 0) { 
+    Ovoid.Input.mouseEnterUid = 0;
+  }
   /* Actualisation et mise en render queue des layers */
   Ovoid.Queuer._wgit.init(sc.overlay);
   while (Ovoid.Queuer._wgit.explore()) {
@@ -576,8 +579,24 @@ Ovoid.Queuer.queueScene = function(sc) {
       if (o.type & Ovoid.TEXT) {
         Ovoid.Queuer.qtext.add(o);
       } else {
+        /* Si le picking est off, picking de substitution */
+        if (Ovoid.Drawer.opt_pickingMode == 0) { 
+          /* verifie si le pointeur est over */
+          if(o.isPointOver(Ovoid.Input.mousePosition))
+            Ovoid.Input.mouseEnterUid = o.uid;
+        }
         Ovoid.Queuer.qlayer.add(o);
       }
     }
   }
+  
+  if (Ovoid.Drawer.opt_pickingMode == 0) { 
+    if(Ovoid.Input.mouseEnterUid == Ovoid.Input.mouseOverUid) {
+      Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseLeaveUid = 0;
+    } else {
+      Ovoid.Input.mouseLeaveUid = Ovoid.Input.mouseOverUid;
+      Ovoid.Input.mouseOverUid = Ovoid.Input.mouseEnterUid;
+    }
+  }
+  
 };

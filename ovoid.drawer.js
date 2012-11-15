@@ -1315,36 +1315,36 @@ Ovoid.Drawer.beginRpDraw = function() {
  * Conclude the current readPixels drawing sub-session.
  */
 Ovoid.Drawer.endRpDraw = function() {
-  
-  /* Read pixel a la position du pointeur actuel */
-  Ovoid.gl.readPixels(Ovoid.Input.mousePosition.v[0],
-      (Ovoid.Frame.size.v[1] - Ovoid.Input.mousePosition.v[1]),
-      1,1,0x1908,0x1401,/* RGBA, UNSIGNED_BYTE */
-      Ovoid.Drawer._rpcolor);
-      
-  Ovoid.gl.bindFramebuffer(0x8D40, null); /* FRAMEBUFFER */
-  
-  Ovoid.Input.mouseLeaveUid = Ovoid.Input.mouseOverUid;
-  
-  /* convertis RGB en entier */
-  Ovoid.Input.mouseOverUid = 0x000000 |
-      ((Ovoid.Drawer._rpcolor[0]) << 16) |
-      ((Ovoid.Drawer._rpcolor[1]) << 8) |
-      ((Ovoid.Drawer._rpcolor[2]));
-  
-  Ovoid.Drawer._rpdepth[0] = (Ovoid.Drawer._rpcolor[3] / 255);
-  
-  /* calcule l'unproject */
-  Ovoid.Queuer._rcamera.unproject(Ovoid.Input.mousePosition.v[0],
-      (Ovoid.Frame.size.v[1] - Ovoid.Input.mousePosition.v[1]),
-      Ovoid.Drawer._rpdepth[0],
-      Ovoid.Input.mouseCursor);
-      
-  if(Ovoid.Input.mouseLeaveUid != Ovoid.Input.mouseOverUid) {
-    Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseOverUid;
-  } else {
-    Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseLeaveUid = 0;
-  }
+    
+    /* Read pixel a la position du pointeur actuel */
+    Ovoid.gl.readPixels(Ovoid.Input.mousePosition.v[0],
+        (Ovoid.Frame.size.v[1] - Ovoid.Input.mousePosition.v[1]),
+        1,1,0x1908,0x1401,/* RGBA, UNSIGNED_BYTE */
+        Ovoid.Drawer._rpcolor);
+        
+    Ovoid.gl.bindFramebuffer(0x8D40, null); /* FRAMEBUFFER */
+    
+    Ovoid.Input.mouseLeaveUid = Ovoid.Input.mouseOverUid;
+    
+    /* convertis RGB en entier */
+    Ovoid.Input.mouseOverUid = 0x000000 |
+        ((Ovoid.Drawer._rpcolor[0]) << 16) |
+        ((Ovoid.Drawer._rpcolor[1]) << 8) |
+        ((Ovoid.Drawer._rpcolor[2]));
+    
+    Ovoid.Drawer._rpdepth[0] = (Ovoid.Drawer._rpcolor[3] / 255);
+    
+    /* calcule l'unproject */
+    Ovoid.Queuer._rcamera.unproject(Ovoid.Input.mousePosition.v[0],
+        (Ovoid.Frame.size.v[1] - Ovoid.Input.mousePosition.v[1]),
+        Ovoid.Drawer._rpdepth[0],
+        Ovoid.Input.mouseCursor);
+        
+    if(Ovoid.Input.mouseLeaveUid != Ovoid.Input.mouseOverUid) {
+      Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseOverUid;
+    } else {
+      Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseLeaveUid = 0;
+    }
 }
   
 /* ********************** DRAWING SHADER SETUP METHODS ********************** */
@@ -2412,20 +2412,21 @@ Ovoid.Drawer.drawQueueRP = function() {
   // Picking frame
   if (Ovoid.Drawer.opt_pickingMode) { 
     Ovoid.Drawer.beginRpDraw();
+    Ovoid.Drawer.switchBlend(0); // blend off
+    Ovoid.Drawer.switchDepth(1); // depth mask on, test less
     if(Ovoid.Drawer.opt_pickingMode & Ovoid.RP_WORLD) {
       for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-        Ovoid.Drawer.switchBlend(0); // blend off
         Ovoid.Drawer.switchPipe(20,0); //PIPE_RP_GEOMETRY
         Ovoid.Drawer.persp(Ovoid.Queuer._rcamera);
-        Ovoid.Drawer.switchDepth(1); // depth mask on, test less
         Ovoid.Drawer.setCull(1); // cull back
         Ovoid.Drawer.bodyStack(Ovoid.Queuer.qsolid[i], 0, true);
         Ovoid.Drawer.setCull(0); // no cull
         Ovoid.Drawer.bodyStack(Ovoid.Queuer.qalpha[i], 0, true);
       }
     }
-    if (Ovoid.Drawer.opt_drawLayers && Ovoid.Drawer.opt_pickingMode & Ovoid.RP_OVERLAY) {
+    if (Ovoid.Drawer.opt_drawLayers && (Ovoid.Drawer.opt_pickingMode & Ovoid.RP_OVERLAY)) {
       Ovoid.Drawer.switchDepth(0); // depth all disable
+      //Ovoid.Drawer.setCull(1); // cull back
       Ovoid.Drawer.switchPipe(23,0); //PIPE_RP_LAYER
       Ovoid.Drawer.screen(Ovoid.Frame.matrix);
       Ovoid.Drawer.layerStack(Ovoid.Queuer.qlayer, true);
@@ -2618,7 +2619,6 @@ Ovoid.Drawer.drawQueue = function() {
   
   var i;
   
-  Ovoid.Drawer.drawQueueRP();
   if (Ovoid.Drawer.opt_perLightPass) {
     Ovoid.Drawer.drawQueueLP(G_LP);
   } else {
@@ -2626,5 +2626,6 @@ Ovoid.Drawer.drawQueue = function() {
   }
   Ovoid.Drawer.drawQueueFX(G_1P);
   Ovoid.Drawer.drawQueueHL();
+  Ovoid.Drawer.drawQueueRP();
   Ovoid.Drawer.endDraw();
 };
