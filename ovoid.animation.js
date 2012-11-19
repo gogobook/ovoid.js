@@ -106,7 +106,7 @@ Ovoid.Animation = function(name) {
    * algorythme. Linear interpolation is often sufficiant and performance 
    * saver.
    * @type bool */
-  this.smooth = false;
+  this.smooth = true;
   /** Animation playing factor.
    * Define the time factor to play and interpolate the animation. The factor 
    * can be negative to play the animation backward. For example a value of -2.0
@@ -132,6 +132,8 @@ Ovoid.Animation = function(name) {
   this._channel = new Array(21);
   /** Animation output array */
   this._output = new Float32Array(21);
+  /** Animation playing time */
+  this._time = 0.0;
 };
 Ovoid.Animation.prototype = new Ovoid.Constraint;
 Ovoid.Animation.prototype.constructor = Ovoid.Animation;
@@ -372,10 +374,21 @@ Ovoid.Animation.prototype.rewind = function(factor) {
       this.target[0].unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
     }
   }
-    
+  this._time = 0.0;
   this.ended = false;
 };
 
+/**
+ * Get Animation time.<br><br>
+ * 
+ * Returns the current Animation playing time since begining.
+ *
+ * @return Current Track playing time.
+ */
+Ovoid.Animation.prototype.time = function() {
+
+  return this._time;
+};
 
 /**
  * Node's caching function.<br><br>
@@ -417,6 +430,9 @@ Ovoid.Animation.prototype.cachAnimation = function() {
       }
     }
 
+    /* Incremente le temps */
+    this._time += (Ovoid.Timer.quantum * this.factor);
+    
     /* Controle d'animation play/end/loop */
     if (!this.playing) {
       this.onended(this);
@@ -439,6 +455,7 @@ Ovoid.Animation.prototype.cachAnimation = function() {
             }
           }
         }
+        this._time = 0.0;
         this.ended = false;
         this.playing = true;
       } else {

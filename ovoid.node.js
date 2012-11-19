@@ -89,7 +89,7 @@ Ovoid.Node = function(name) {
   this.visible = true;
   /** Node pickability.
    * @type bool */
-  this.pickable = false;
+  this.pickable = true;
   /** Unique identification number.
    * @type int */
   this.uid = 0;

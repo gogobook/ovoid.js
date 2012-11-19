@@ -2624,7 +2624,7 @@ Ovoid.Drawer.drawQueue = function() {
   }
   
   var i;
-  
+  Ovoid.Drawer.drawQueueRP();
   if (Ovoid.Drawer.opt_perLightPass) {
     Ovoid.Drawer.drawQueueLP(G_LP);
   } else {
@@ -2632,6 +2632,5 @@ Ovoid.Drawer.drawQueue = function() {
   }
   Ovoid.Drawer.drawQueueFX(G_1P);
   Ovoid.Drawer.drawQueueHL();
-  Ovoid.Drawer.drawQueueRP();
   Ovoid.Drawer.endDraw();
 };
