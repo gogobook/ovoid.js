@@ -326,15 +326,53 @@ Ovoid.Animation.prototype.rewind = function(factor) {
 
   if (this.factor > 0.0) {
     while (i--) {
-      if (this._channel[i]) this._channel[i].seekStart(this.smooth, 0);
-      if (this._channel[i]) this._channel[i]._stop = false;
+      if (this._channel[i]) { 
+        this._channel[i].seekStart(this.smooth, 0);
+        this._channel[i]._stop = false;
+        this._output[i] = this._channel[i].getOutput(this.smooth);
+      }
     }
   } else {
     while (i--) {
-      if (this._channel[i]) this._channel[i].seekEnd(this.smooth, 0);
-      if (this._channel[i]) this._channel[i]._stop = false;
+      if (this._channel[i]) { 
+        this._channel[i].seekEnd(this.smooth, 0);
+        this._channel[i]._stop = false;
+        this._output[i] = this._channel[i].getOutput(this.smooth);
+      }
     }
   }
+
+  if(this.target[0]) {
+    if (this._format & Ovoid.ANIMATION_CHANNEL_TRANSLATE)
+    {
+      this.target[0].translation.setv(this._output.subarray(0, 3));
+      this.target[0].unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
+    }
+
+    if (this._format & Ovoid.ANIMATION_CHANNEL_ROTATE)
+    {
+      this.target[0].rotation.fromEulerXyz(this._output[3],
+                                        this._output[4],
+                                        this._output[5]);
+
+      this.target[0].unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
+    }
+
+    if (this._format & Ovoid.ANIMATION_CHANNEL_ORIENTE) {
+
+      this.body.orientation.fromEulerXyz(this._output[6],
+          this._output[7],
+          this._output[8]);
+
+      this.target[0].unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
+    }
+
+    if (this._format & Ovoid.ANIMATION_CHANNEL_SCALE) {
+      this.target[0].scaling.setv(this._output.subarray(9, 12));
+      this.target[0].unCach(Ovoid.CACH_WORLD | Ovoid.CACH_TRANSFORM);
+    }
+  }
+    
   this.ended = false;
 };
 
@@ -381,16 +419,30 @@ Ovoid.Animation.prototype.cachAnimation = function() {
 
     /* Controle d'animation play/end/loop */
     if (!this.playing) {
+      this.onended(this);
       if (this.loop) {
-        i = 32;
-        while (i--) {
-          if (this._channel[i]) this._channel[i]._stop = false;
+        /* Rewind curves */
+        if (this.factor > 0.0) {
+          while (i--) {
+            if (this._channel[i]) { 
+              this._channel[i].seekStart(this.smooth, 0);
+              this._channel[i]._stop = false;
+              this._output[i] = this._channel[i].getOutput(this.smooth);
+            }
+          }
+        } else {
+          while (i--) {
+            if (this._channel[i]) { 
+              this._channel[i].seekEnd(this.smooth, 0);
+              this._channel[i]._stop = false;
+              this._output[i] = this._channel[i].getOutput(this.smooth);
+            }
+          }
         }
         this.ended = false;
         this.playing = true;
       } else {
         this.ended = true;
-        this.onended(this);
         return;
       }
     }

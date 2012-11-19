@@ -315,9 +315,11 @@ Ovoid.Sound.prototype.volum = function(gain) {
   switch(Ovoid.al.type)
   {
     case 1: /* Ovoid.HTML5_AUDIO */
+      if(gain > 1.0) gain = 1.0;
       this._alsource.volume = gain;
     break;
     case 2: /* Ovoid.MOZ_AUDIO_API */
+      if(gain > 1.0) gain = 1.0;
       this._alsource.volume = gain;
     break;
     case 3: /* Ovoid.WEBKIT_AUDIO_API */

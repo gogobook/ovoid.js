@@ -172,8 +172,16 @@ Ovoid.Body.prototype.cachBody = function() {
   if (!(this.cach & Ovoid.CACH_BOUNDING_SHAPE))
   {
     if (this.shape) {
-      this.boundingBox.copy(this.shape.boundingBox);
-      this.boundingSphere.copy(this.shape.boundingSphere);
+      
+        this.boundingBox.copy(this.shape.boundingBox);
+        this.boundingSphere.copy(this.shape.boundingSphere);
+        
+      if (this.shape.type & Ovoid.SKIN) {
+          /* Correction du centre des volumes, ça ne fonctionne pas très bien
+           * pour la bounding box, mais c'est suffisant pour la bounding sphere. */
+          this.boundingBox.center.transform4Inverse(this.worldMatrix);
+          this.boundingSphere.center.transform4Inverse(this.worldMatrix);
+      }
     }
     this.addCach(Ovoid.CACH_BOUNDING_SHAPE);
   }

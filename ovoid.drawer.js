@@ -1940,7 +1940,9 @@ Ovoid.Drawer.shadow = function(light, body) {
       // tentative d'implémentation des shadow volume pour les skin
       if (!Ovoid.opt_localSkinData)
         return;
-      Ovoid.Drawer.model(body.worldMatrix.m);
+      /* les vertices sont déja transformmé en coordonnée monde, pas besoin
+       * de transformer le modelview */
+      Ovoid.Drawer.model(new Ovoid.Matrix4().m);
       shape = body.shape.mesh;
     }
   }
@@ -1962,12 +1964,16 @@ Ovoid.Drawer.shadow = function(light, body) {
   // position de la lumiere en coordonnée locale à l'objet 
   if(light.model == Ovoid.LIGHT_DIRECTIONAL) {
     LD.copy(light.worldDirection);
-    LD.transform4Inverse(body.worldMatrix);
+    /* les vertices sont déja transformmé en coordonnée monde, pas besoin
+       * de transformer le modelview pour le skin */
+    if (body.shape.type & Ovoid.MESH) LD.transform4Inverse(body.worldMatrix);
     LP.copy(LD);
     LP.scaleBy(-1.0);
   } else {
     LP.copy(light.worldPosition);
-    LP.transform4Inverse(body.worldMatrix);
+    /* les vertices sont déja transformmé en coordonnée monde, pas besoin
+       * de transformer le modelview pour le skin */
+    if (body.shape.type & Ovoid.MESH) LP.transform4Inverse(body.worldMatrix);
   }
   
   // on parcour la liste de triangles pour creer le vertex buffer du shadow volum

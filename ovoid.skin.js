@@ -321,7 +321,6 @@ Ovoid.Skin.prototype.cachSkin = function() {
           
         /* normalise le poids */
         sv.p.normalizeWeight();
-        
         // calcul min et max pour le bounding volum
         if (sv.p.v[0] > max.v[0]) max.v[0] = sv.p.v[0];
         if (sv.p.v[1] > max.v[1]) max.v[1] = sv.p.v[1];

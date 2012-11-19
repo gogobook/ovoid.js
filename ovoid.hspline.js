@@ -145,7 +145,7 @@ Ovoid.Hspline.prototype.seekForward = function(xerp, seconds) {
       this._i++;
 
       if (this._i > this._e - 1) {
-        this.seekStart(xerp, (this._t - this._d));
+        //this.seekStart(xerp, (this._t - this._d));
         this._stop = true;
         return;
       }
@@ -192,7 +192,7 @@ Ovoid.Hspline.prototype.seekBackward = function(xerp, seconds) {
       this._i--;
 
       if (this._i < this._n) {
-        this.seekEnd(xerp, this._t);
+        //this.seekEnd(xerp, this._t);
         this._stop = true;
         return;
       }

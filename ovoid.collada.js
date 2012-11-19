@@ -3467,6 +3467,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
             /* la node est insere en scene durant le process */
             /* Ajoute l'animation au track si demandé */
             if (this._mask & Ovoid.DAE_CREATE_TRACK) {
+              Ovoid.log(3, 'Ovoid.Collada '+this.name,
+                "adding animation '"+node.name+"' to Track '"+track.name+"'");
               track.addAnimation(node);
             }
           }
@@ -3478,6 +3480,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
   /* Ajoute le track à la scene des animations ont été importés */
   if (this._mask & Ovoid.DAE_CREATE_TRACK) {
     if (track.animation.length > 0) {
+      Ovoid.log(2, 'Ovoid.Collada '+this.name,
+                "Importation has generated new Animation Track '"+track.name+"'");
       this._dstsc.insert(track);
     }
   }

@@ -39,6 +39,20 @@
  * lamp.setColor(1.0, 1.0, 1.0, 1.0);<br>
  * </blockcode><br><br>
  * 
+ * <b>Lights Model</b><br><br>
+ * 
+ * The light model is defined by the <code>model</code> attribute of the Light 
+ * node. Available light model are the following:
+ * 
+ * <ul>
+ * <li><b>Ovoid.LIGHT_DIRECTIONAL</b><br>
+ * This symbolic constant set the light model as a directionnal light.<br><br></li>
+ * <li><b>Ovoid.LIGHT_POINT</b><br>
+ * This symbolic constant set the light model as a point light.<br><br></li>
+ * <li><b>Ovoid.LIGHT_SPOT</b><br>
+ * This symbolic constant set the light model as a spot light.<br><br></li>
+ * </ul>
+ * 
  * <b>Lights, Materials and Shaders issue</b><br><br>
  * 
  * One important thing to know is that all the render process is finaly 

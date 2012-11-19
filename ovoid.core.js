@@ -1423,6 +1423,9 @@ Ovoid.inputTrigger = function(m, k, s, f) {
  * 
  * @param {Function} f The trigger function to call for this event.
  * 
+ * @param {string|Node} [item] Additionnal trigger argument. Can be a node to 
+ * define an intersection trigger.
+ * 
  * @return {Action} The created Action node reference.
  */
 Ovoid.setAction = function(e, target, f, item) {

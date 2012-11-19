@@ -88,29 +88,31 @@ Ovoid.Texture.prototype._handleLoad = function() {
 
   Ovoid._clearGlerror();
 
-  this.owner.width = this.width;
-  this.owner.height = this.height;
-  Ovoid.gl.bindTexture(this.owner.target, this.owner.handle);
-  Ovoid.gl.texImage2D(this.owner.target,0,0x1908,0x1908,0x1401,this);
+  this.o.width = this.width;
+  this.o.height = this.height;
+  Ovoid.gl.bindTexture(this.o.target, this.o.handle);
+  Ovoid.gl.texImage2D(this.o.target,0,0x1908,0x1908,0x1401,this);
   
   if (Ovoid.isPowerOfTwo(this.width) && Ovoid.isPowerOfTwo(this.height)) {
-    Ovoid.gl.generateMipmap(this.owner.target);
+    Ovoid.gl.generateMipmap(this.o.target);
+    Ovoid.log(2, 'Ovoid.Texture', "'" + this.o.name
+        +"' is NPO2, unable to create mipmaps.");
   }
   
-  this.owner.setFilter(this.owner.filter);
+  this.o.setFilter(this.o.filter);
   
   /* unbind la texture */
-  Ovoid.gl.bindTexture(this.owner.target, null);
+  Ovoid.gl.bindTexture(this.o.target, null);
 
   if (Ovoid._logGlerror('Ovoid.Texture._handleLoad :: ' +
-      this.owner.url))
+      this.o.url))
   {
     return false;
   }
 
-  this.owner.loadStatus = 1;
+  this.o.loadStatus = 1;
   
-  Ovoid.log(3, 'Ovoid.Texture', "'" + this.owner.name +"' loaded");
+  Ovoid.log(3, 'Ovoid.Texture', "'" + this.o.name +"' loaded");
       
   return true;
 };
@@ -121,10 +123,10 @@ Ovoid.Texture.prototype._handleLoad = function() {
  */
 Ovoid.Texture.prototype._handleError = function() {
 
-  Ovoid.log(2, 'Ovoid.Texture', "'" + this.owner.name +
-      "' unable to load '" + this.owner.url + "'");
+  Ovoid.log(2, 'Ovoid.Texture', "'" + this.o.name +
+      "' unable to load '" + this.o.url + "'");
 
-  this.owner.loadStatus = -1;
+  this.o.loadStatus = -1;
 };
 
 
@@ -149,7 +151,8 @@ Ovoid.Texture.prototype.setFilter = function(filter) {
       Ovoid.gl.texParameteri(this.target,0x2800,0x2601);
       Ovoid.gl.texParameteri(this.target,0x2801,0x2703);
     } else {
-      Ovoid.log(2, 'Ovoid.Texture', "'" + this.owner.name +"' unable to set filter.");
+      Ovoid.log(2, 'Ovoid.Texture', "'" + this.name 
+            +"' is NPO2, unable to set filtering.");
       Ovoid.gl.texParameteri(this.target,0x2802,0x812F);
       Ovoid.gl.texParameteri(this.target,0x2803,0x812F);
       Ovoid.gl.texParameteri(this.target,0x2800,0x2601);
@@ -199,7 +202,7 @@ Ovoid.Texture.prototype.loadSource = function(url, filter) {
   this.filter = filter;
 
   this.pixmap = new Image();
-  this.pixmap.owner = this;
+  this.pixmap.o = this;
   this.pixmap.onload = this._handleLoad;
   this.pixmap.onerror = this._handleError;
   /*this.pixmap.addEventListener('error', this._handleError, false);*/

@@ -80,17 +80,25 @@ Ovoid.Track = function(name) {
   this.type |= Ovoid.TRACK;
   /** node name */
   this.name = name;
-  /** Animation playing flag */
+  /** Track playing flag */
   this.playing = false;
-  /** Animation loop flag */
+  /** Track loop flag */
   this.loop = false;
-  /** Animation ended flag */
+  /** Track ended flag */
   this.ended = false;
-  /** Animation channel curves */
+  /** Track playing factor.
+   * Define the time factor to play and interpolate the animation. The factor 
+   * can be negative to play the animation backward. For example a value of -2.0
+   * will play the animation backward twice the normal speed.
+   * @type float */
+  this.factor = 1.0;
+  /** Track animation list */
   this.animation = new Array();
-  /** Animation overridable onended function
+  /** Track overridable onended function
     * @param {Object} node Animation's target node. */
   this.onended = function(node) {};
+  /** Track playing time */
+  this._time = 0.0;
 };
 Ovoid.Track.prototype = new Ovoid.Node;
 Ovoid.Track.prototype.constructor = Ovoid.Track;
@@ -143,7 +151,7 @@ Ovoid.Track.prototype.remAnimation = function(anim) {
 Ovoid.Track.prototype.setLoop = function(loop) {
 
   var i = this.animation.length;
-  while (i--) this.animation[i].loop = loop;
+  this.loop = loop;
 };
 
 
@@ -159,8 +167,9 @@ Ovoid.Track.prototype.setLoop = function(loop) {
  */
 Ovoid.Track.prototype.setFactor = function(factor) {
 
+  this.factor = factor;
   var i = this.animation.length;
-  while (i--) this.animation[i].factor = factor;
+  while (i--) this.animation[i].factor = this.factor;
 };
 
 
@@ -170,15 +179,21 @@ Ovoid.Track.prototype.setFactor = function(factor) {
  * Play all the animations of this instance from the current time with the 
  * specified pitch.
  *
- * @param {float} factor Pitch time factor.
+ * @param {float} [factor] Optionnal pitch time factor.
  * The factor can be positive to increase the animation pitch or negative to 
  * play the animation backward. For example a value of -2.0 will play the 
  * animation backward twice the normal speed.
  */
 Ovoid.Track.prototype.play = function(factor) {
 
+  if(factor)
+    this.factor = factor;
+    
+  if(this.ended)
+    this.rewind();
+    
   var i = this.animation.length;
-  while (i--) this.animation[i].play(factor);
+  while (i--) this.animation[i].play(this.factor);
   this.playing = true;
 };
 
@@ -202,15 +217,32 @@ Ovoid.Track.prototype.stop = function() {
  * Rewind all the animation at the end or the begining according to the s
  * pecified pitch.
  *
- * @param {float} factor Pitch time factor.
+ * @param {float} [factor] Optionnal pitch time factor.
  * A positive value will set the track at its begining, a negative value 
  * will set the track at its end.
  */
 Ovoid.Track.prototype.rewind = function(factor) {
 
+  if(factor)
+    this.factor = factor;
+    
   var i = this.animation.length;
-  while (i--) this.animation[i].rewind(factor);
+  while (i--) this.animation[i].rewind(this.factor);
   this.ended = false;
+  this._time = 0.0;
+};
+
+
+/**
+ * Get Track time.<br><br>
+ * 
+ * Returns the current Track playing time since begining.
+ *
+ * @return Current Track playing time.
+ */
+Ovoid.Track.prototype.time = function() {
+
+  return this._time;
 };
 
 
@@ -236,15 +268,23 @@ Ovoid.Track.prototype.cachTrack = function() {
         break;
       }
     }
+    /* Incremente le temps */
+    this._time += (Ovoid.Timer.quantum * this.factor);
   
     /* Controle d'animation play/end/loop */
     if (!this.playing) {
+      this.onended(this);
       if (this.loop) {
-        this.rewind();
+        var i = this.animation.length;
+        while (i--) { 
+          this.animation[i].rewind();
+          this.animation[i].play();
+        }
+        this._time = 0.0;
+        this.ended = false;
         this.playing = true;
       } else {
         this.ended = true;
-        this.onended(this);
         return;
       }
     }
