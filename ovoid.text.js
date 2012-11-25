@@ -77,9 +77,9 @@ Ovoid.Text.prototype.constructor = Ovoid.Text;
  * 
  * Sets text font format according to the specified values.
  *
- * @param {float} s Character sprite size in pixel.
- * @param {float} c Interchar value in pixel.
- * @param {float} l Interline value in pixel.
+ * @param {float} s Character sprite size in pixel (default = 16.0).
+ * @param {float} c Interchar proportionnal value (default = 0.5).
+ * @param {float} l Interline proportionnal value (default = 1.0).
  */
 Ovoid.Text.prototype.setFormat = function(s, c, l) {
 
@@ -117,7 +117,17 @@ Ovoid.Text.prototype.setFontmap = function(texture) {
  */
 Ovoid.Text.prototype.getWidth = function() {
 
-  return (this.string.length * (this.param.v[0] * this.param.v[1]));
+  var l, ml;
+  l = ml = 0;
+  for(var i = 0; i < this.string.length; i++) {
+    if(this.string[i] == '\n') {
+      if(l > ml) ml = l;
+      l = 0;
+    }
+    l++;
+  }
+  if(l > ml) ml = l;
+  return (ml * (this.param.v[0] * this.param.v[1]));
 };
 
 
@@ -131,11 +141,11 @@ Ovoid.Text.prototype.getWidth = function() {
  * 
  * @private
  */
-Ovoid.Layer.prototype.toJSON = function() {
+Ovoid.Text.prototype.toJSON = function() {
   
   var o = new Object();
   /* node type */
-  o['t'] = Ovoid.LAYER;
+  o['t'] = Ovoid.TEXT;
   /* Ovoid.Node */
   o['n'] = this.name;
   o['v'] = this.visible;

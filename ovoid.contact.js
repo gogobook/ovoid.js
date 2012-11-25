@@ -130,6 +130,9 @@ Ovoid.Contact.prototype.set = function(b0, b1, c, n, p, q) {
     this._f = b0.useFriction;
     this._r = b0.restitution;
   }
+  
+  if(this._r < 0.0) return;
+  
   this._b[0] = b0;
   this._b[1] = b1;
   this._c.copy(c);
@@ -228,6 +231,8 @@ Ovoid.Contact.prototype.set = function(b0, b1, c, n, p, q) {
  */
 Ovoid.Contact.prototype._adjustPositions = function(p) {
   
+  if(this._r < 0.0) return;
+  
   /* si p n'est pas défini on utilise la pénétration courente du contact */
  // if(p == undefined || p == null) p = this._p;
   
@@ -312,6 +317,8 @@ Ovoid.Contact.prototype._adjustPositions = function(p) {
  * Apply the bodys's collision responses.<br><br>
  */
 Ovoid.Contact.prototype._applyImpulses = function() {
+
+  if(this._r < 0.0) return;
 
   /* Impulsion du contact */
   var impulse = new Ovoid.Vector();

@@ -2269,7 +2269,7 @@ Ovoid.Drawer.bodyStack = function(stack, layer, rp) {
   if (rp) {
     var color = new Ovoid.Color();
     while(i--) {
-      if(stack[i].pickable || Ovoid.opt_debugMode) {
+      if(stack[i].pickable) {
         color.fromInt(stack[i].uid);
         Ovoid.Drawer.body(stack[i], layer, color);
       }
@@ -2297,7 +2297,7 @@ Ovoid.Drawer.layerStack = function(stack, rp) {
   if (rp) {
     var color = new Ovoid.Color();
     for (var i = 0; i < c; i++) {
-      if(stack[i].pickable || Ovoid.opt_debugMode) {
+      if(stack[i].pickable) {
         color.fromInt(stack[i].uid);
         Ovoid.Drawer.model(stack[i].layerMatrix.m);
         Ovoid.Drawer.layer(stack[i], color);
@@ -2329,7 +2329,7 @@ Ovoid.Drawer.textStack = function(stack, rp) {
   if (rp) {
     var color = new Ovoid.Color();
     for (i = 0; i < c; i++) {
-      if(stack[i].pickable || Ovoid.opt_debugMode) {
+      if(stack[i].pickable) {
         color.fromInt(stack[i].uid);
         Ovoid.Drawer.model(stack[i].layerMatrix.m);
         Ovoid.Drawer.text(stack[i], color);
