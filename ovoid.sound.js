@@ -99,7 +99,7 @@ Ovoid.Sound = function(name) {
     break;
     case 3: /* Ovoid.WEBKIT_AUDIO_API */
       this._alsource = Ovoid.al.createBufferSource();
-      this._algain = Ovoid.al.createGainNode();
+      this._algain = Ovoid.al.createGain(); /* was Ovoid.al.createGainNode() (deprecated) */
       this._alpanner = Ovoid.al.createPanner();
       /* non local par defaut */
       this._algain.connect(Ovoid.al.destination);
@@ -269,7 +269,7 @@ Ovoid.Sound.prototype.play = function() {
       else
         this._alsource.connect(this._alpanner);
       this._alsource.buffer = this.audio._albuffer;
-      this._alsource.noteOn(0);
+      this._alsource.start(0); /* was this._alsource.noteOn(0); (deprecated) */
     break;
   }
 };

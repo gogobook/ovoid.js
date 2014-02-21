@@ -194,9 +194,9 @@ Ovoid.init = function(canvas) {
     /* Recherche d'une Audio API */
     if(window.AudioContext) {
       try {
-        Ovoid.log(3, 'Ovoid.init', 'Using Webkit Audio API.');
+        Ovoid.log(3, 'Ovoid.init', 'Using Web Audio API.');
         Ovoid.al = new AudioContext();
-        Ovoid.al.type = Ovoid.WEBKIT_AUDIO_API;
+        Ovoid.al.type = Ovoid.WEB_AUDIO_API;
       } 
       catch (e) {
         Ovoid.log(2, 'Ovoid.init', "new AudioContext error : " + e);
@@ -206,7 +206,7 @@ Ovoid.init = function(canvas) {
         try {
           Ovoid.log(3, 'Ovoid.init', 'Using Webkit Audio API.');
           Ovoid.al = new webkitAudioContext();
-          Ovoid.al.type = Ovoid.WEBKIT_AUDIO_API;
+          Ovoid.al.type = Ovoid.WEB_AUDIO_API;
         } 
         catch (e) {
           Ovoid.log(2, 'Ovoid.init', "new webkitAudioContext error : " + e);
@@ -216,15 +216,9 @@ Ovoid.init = function(canvas) {
          * des evenement, on le garde pour que Ovoid.al ne soit pas null */
         Ovoid.al = new Audio();
         if (Ovoid.al) {
-          if (Ovoid.al.mozWriteAudio != undefined) {
-            /* Utilisation de la couche Moz audio data API */
-            Ovoid.log(2, 'Ovoid.init', 'Using Moz Audio Data API: Spatial sound not available.');
-            Ovoid.al.type = Ovoid.MOZ_AUDIO_API;
-          } else {
             /* Utilisation de la couche audio HTML5 classique */
             Ovoid.log(2, 'Ovoid.init', 'Using HTML5 Audio Object: Spatial sound not available.');
             Ovoid.al.type = Ovoid.HTML5_AUDIO;
-          }
         } else {
           Ovoid.al = {};
           Ovoid.al.type = 0;

@@ -83,12 +83,12 @@ Ovoid.Audio = function(name) {
   switch(Ovoid.al.type)
   {
     case 2: /* Ovoid.MOZ_AUDIO_API */
-      this._albuffer = null;
+      // inutilise
     break;
-    case 3: /* Ovoid.WEBKIT_AUDIO_API */
+    case 3: /* Ovoid.WEB_AUDIO_API */
       this._albuffer = Ovoid.al.createBuffer(1, 1, 22050);
     break;
-    default:
+    default: /* Ovoid.HTML5_AUDIO */
       this._albuffer = null;
     break;
   }
@@ -105,10 +105,11 @@ Ovoid.Audio.prototype._handleLoad = function(e) {
   switch(Ovoid.al.type)
   {
     case 2: /* Ovoid.MOZ_AUDIO_API */
-      this.owner.loadStatus = 1;
-      this.owner.duration = this.duration;
+      // inutilise
     break;
-    case 3: /* Ovoid.WEBKIT_AUDIO_API */
+    case 3: /* Ovoid.WEB_AUDIO_API */
+	  // Deprecated version Webkit Audio API
+	  /*
       if(this.response.byteLength > 311) {
         this.owner._albuffer = Ovoid.al.createBuffer(this.response, false);
         this.owner.loadStatus = 1;
@@ -116,55 +117,25 @@ Ovoid.Audio.prototype._handleLoad = function(e) {
         Ovoid.log(2, 'Ovoid.Audio', "'" + this.owner.name +
           "' unable to load '" + this.owner.src + "'");
         this.owner.loadStatus = -1;
-      }
+      } */
+      // Update to standard Web Audio API
+	  var owner = this.owner;
+      Ovoid.al.decodeAudioData(this.response,
+	                           function(buffer){ 
+	                             owner._albuffer = buffer; 
+                                 owner.loadStatus = 1; },
+                               function(){
+                                 Ovoid.log(2, 'Ovoid.Audio', "'" + owner.name +
+                                 "' unable to load '" + owner.src + "'");
+                                 owner.loadStatus = -1;
+                               });
     break;
-    default:
+    default: /* Ovoid.HTML5_AUDIO */
       this.owner.loadStatus = 1;
-      this.owner.duration = this.duration;
+      this.owner.duration = this.duration;   
     break;
   }
   
-};
-
-
-/**
- * Handle sound buffer data loading.
- */
-Ovoid.Audio.prototype._handleBuffer = function(e) {
-  
-  switch(Ovoid.al.type)
-  {
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-      var size = 0;
-      if( this.owner._albuffer ) size += this.owner._albuffer.length;
-      size += e.frameBuffer.length;
-      
-      var albuffer = new Float32Array(size);
-      if( this.owner._albuffer ) {
-        albuffer.set(this.owner._albuffer, 0);
-        albuffer.set(e.frameBuffer, this.owner._albuffer.length);
-      } else {
-        albuffer.set(e.frameBuffer);
-      }
-      
-      this.owner._albuffer = albuffer;
-    break;
-  }
-};
-
-
-/**
- * Handle sound meta data.
- */
-Ovoid.Audio.prototype._handleMeta = function(e) {
-  
-  switch(Ovoid.al.type)
-  {
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-      this.owner.channels = this.mozChannels;
-      this.owner.samplerate = this.mozSampleRate;
-    break;
-  }
 };
 
 
@@ -203,40 +174,24 @@ Ovoid.Audio.prototype.loadSource = function(url) {
   
   switch(Ovoid.al.type)
   {
-    case 1: /* Ovoid.HTML5_AUDIO */
-      this._albuffer = new Audio();
-      this._albuffer.owner = this;
-      this._albuffer.addEventListener('canplaythrough', this._handleLoad, false);
-      this._albuffer.addEventListener('error', this._handleError, false);
-      this._albuffer.src = src;
-      this._albuffer.load();
-    break;
     case 2: /* Ovoid.MOZ_AUDIO_API */
-      /* Moz Audio API = CACA
-      var audio = new Audio();
-      audio.owner = this;
-      audio.addEventListener('canplaythrough', this._handleLoad, false);
-      audio.addEventListener('MozAudioAvailable', this._handleBuffer, false);
-      audio.addEventListener('progress', this._handleBuffer, false);
-      audio.addEventListener('loadedmetadata', this._handleMeta, false);
-      audio.addEventListener('error', this._handleError, false);
-      audio.src = src;
-      audio.play();
-      */
-      this._albuffer = new Audio();
-      this._albuffer.owner = this;
-      this._albuffer.addEventListener('loadeddata', this._handleLoad, false);
-      this._albuffer.addEventListener('error', this._handleError, false);
-      this._albuffer.src = src;
-      this._albuffer.load();
+      // inutilise
     break;
-    case 3: /* Ovoid.WEBKIT_AUDIO_API */
+    case 3: /* Ovoid.WEB_AUDIO_API */
       var xhr = new XMLHttpRequest();
       xhr.owner = this;
       xhr.onload = this._handleLoad;
       xhr.open("GET", src, true);
       xhr.responseType = "arraybuffer";
       xhr.send();
+    break;
+    default: /* Ovoid.HTML5_AUDIO */
+      this._albuffer = new Audio();
+      this._albuffer.owner = this;
+      this._albuffer.addEventListener('canplaythrough', this._handleLoad, false);
+      this._albuffer.addEventListener('error', this._handleError, false);
+      this._albuffer.src = src;
+      this._albuffer.load();    
     break;
   }
 };

@@ -1234,7 +1234,7 @@ Ovoid.MOZ_AUDIO_API = 2;
  * @constant
  * @memberOf _global_
  */
-Ovoid.WEBKIT_AUDIO_API = 3;
+Ovoid.WEB_AUDIO_API = 3;
 
 
 /** Symbolic constant for drawer pipeline.
