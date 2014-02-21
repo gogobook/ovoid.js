@@ -174,6 +174,8 @@ Ovoid.error = function(code, message) {
   }
   
   /* compose le contenu html */
+  /* Ancienne version remplacé par un vomi de text simple */
+  /*
   var content = '<div style="text-align:center;width:600px;font-family:sans-serif;font-size:8pt;margin:auto;background-color:#fff;color:#444;padding:20px;">';
   content += '<h5>OVOID.JS ERROR</h5><span style="color:#444;">';
 
@@ -237,6 +239,44 @@ Ovoid.error = function(code, message) {
   logs = logs.replace(/\n/g, '<br>');
   content += '<span style="color:#00a">' + logs;
   content += '</div></div>';
+  */
+  var content = "Ovoid.JS ";
+  switch(code)
+  {
+    case 1:
+      content += "error 1: webGL context failled.";
+      break;
+    case 2:
+      content += "error 2: webGL context exception.";
+      break;
+    case 3:
+      content += "error 3: webGL context not found.";
+      break;
+    case 4:
+      content += "error 4: library init failled.";
+      break;
+    case 5:
+      content += "error 5: runtime on-preload error.";
+      break;
+    case 6:
+      content += "error 6: too much errors - self abort.";
+      break;
+    case 7:
+      content += "error 7: runtime on-loop error.";
+    case 8:
+      content += "error 8: runtime on-load error.";
+      break;
+    default:
+      content += code + ": unregistered error.";
+      break;
+  }
+  content += "<br>message: " + message + "<br>";
+  var logs = Ovoid._log;
+  logs = logs.replace(/    /g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+  logs = logs.replace(/</g, '&lt;');
+  logs = logs.replace(/>/g, '&gt;');
+  logs = logs.replace(/\n/g, '<br>');
+  content += "backtrace:<br>" + logs;
   document.write(content);
 
 };
