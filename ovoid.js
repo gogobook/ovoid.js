@@ -138,6 +138,15 @@ Ovoid._glerror = 0;
  */
 Ovoid.opt_logLevel = 2;
 
+/** 
+ * Custom error HTML content.<br><br>
+ * 
+ * String used to display a custom HTML content if application fail in
+ * non-debug mode. You can define it with a string of HTML code which 
+ * will be displayed alternatively in case of WebGL faillure or another
+ * errors when the debug mode is disabled.<br><br>
+ */
+Ovoid.opt_customErrContent = "";
 
 /** Display a global error.<br><br>
  * 
@@ -162,10 +171,7 @@ Ovoid.error = function(code, message) {
   /* Delete Audio Context */
   Ovoid.al = null;
   
-  /* ne rien faire si pas en debug-mode */
-  if(!Ovoid.opt_debugMode)
-    return;
-    
+  var content;
   var canvas;
   /* Retrouve le canvas pour le reduire a taille minimum */
   var canvas_list = document.getElementsByTagName('canvas');
@@ -176,46 +182,50 @@ Ovoid.error = function(code, message) {
     canvas.width = 1;
     canvas.height = 1;
   }
-  
-  var content = "Ovoid.JS error code";
-  switch(code)
-  {
-    case 1:
-      content += "#1 (webGL context failled)";
-      break;
-    case 2:
-      content += "#2 (webGL context exception)";
-      break;
-    case 3:
-      content += "#3 (webGL context not found)";
-      break;
-    case 4:
-      content += "#4 (library init failled)";
-      break;
-    case 5:
-      content += "#5 (runtime on-preload error.";
-      break;
-    case 6:
-      content += "#6 (too much errors - self abort)";
-      break;
-    case 7:
-      content += "#7 (runtime on-loop error)";
-    case 8:
-      content += "#8 (runtime on-load error)";
-      break;
-    default:
-      content += code + "#U (unregistered error)";
-      break;
-  }
-  content += " :: " + message + "<br><br>";
-  var logs = Ovoid._log;
-  logs = logs.replace(/    /g, '&nbsp;&nbsp;&nbsp;&nbsp;');
-  logs = logs.replace(/</g, '&lt;');
-  logs = logs.replace(/>/g, '&gt;');
-  logs = logs.replace(/\n/g, '<br>');
-  content += "log backtrace:<br>" + logs;
-  document.write(content);
 
+  /* si debug mode off affiche le contenu customisé */
+  if(!Ovoid.opt_debugMode) {
+    content = Ovoid.opt_customErrContent;
+  } else {
+    content = "Ovoid.JS error code";
+    switch(code)
+    {
+      case 1:
+        content += "#1 (webGL context failled)";
+        break;
+      case 2:
+        content += "#2 (webGL context exception)";
+        break;
+      case 3:
+        content += "#3 (webGL context not found)";
+        break;
+      case 4:
+        content += "#4 (library init failled)";
+        break;
+      case 5:
+        content += "#5 (runtime on-preload error.";
+        break;
+      case 6:
+        content += "#6 (too much errors - self abort)";
+        break;
+      case 7:
+        content += "#7 (runtime on-loop error)";
+      case 8:
+        content += "#8 (runtime on-load error)";
+        break;
+      default:
+        content += code + "#U (unregistered error)";
+        break;
+    }
+    content += " :: " + message + "<br><br>";
+    var logs = Ovoid._log;
+    logs = logs.replace(/    /g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+    logs = logs.replace(/</g, '&lt;');
+    logs = logs.replace(/>/g, '&gt;');
+    logs = logs.replace(/\n/g, '<br>');
+    content += "log backtrace:<br>" + logs;
+  }
+  document.write(content);
 };
 
 /* Les très TRES vielles versions ne connaissant pas l'objet console... */
