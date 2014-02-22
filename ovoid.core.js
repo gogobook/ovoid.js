@@ -171,20 +171,20 @@ Ovoid.init = function(canvas) {
         catch (e) {
           Ovoid.log(1, 'Ovoid.init', "getContext 'webgl' error : " + e);
           Ovoid.error(2, "WebGL context 'webgl' creation exception");
-          return;
+          return false;
         }
       }
 
       if (!Ovoid.gl) {
         Ovoid.log(0, 'Ovoid.init', 'WebGL context not found');
         Ovoid.error(3, 'Unable to find a suitable WebGL context');
-        return;
+        return false;
       }
     }
     else {
       Ovoid.log(0, 'Ovoid.init', 'Ovoid.Frame initialization error');
       Ovoid.error(4, 'Frame class initialization error');
-      return;
+      return false;
     }
 
     Ovoid.log(3, 'Ovoid.init', 'WebGL context created in: ' + 
@@ -244,7 +244,7 @@ Ovoid.init = function(canvas) {
                     Ovoid.log(0, 'Ovoid.init',
                       'Ovoid.Solver initialization error');
                     Ovoid.error(4, 'Solver class initialization error');
-                    return;
+                    return false;
                   }
                 }
                 
@@ -309,39 +309,40 @@ Ovoid.init = function(canvas) {
                 Ovoid.log(0, 'Ovoid.init',
                     'Ovoid.Loader initialization error');
                 Ovoid.error(4, 'Loader class initialization error');
-                return;
+                return false;
               }
             } else {
               Ovoid.log(0, 'Ovoid.init',
                   'Ovoid.Queuer initialization error');
               Ovoid.error(4, 'Scener class initialization error');
-              return;
+              return false;
             }
           } else {
             Ovoid.log(0, 'Ovoid.init',
                 'Ovoid.Timer initialization error');
             Ovoid.error(4, 'Timer class initialization error');
-            return;
+            return false;
           }
         } else {
           Ovoid.log(0, 'Ovoid.init',
               'Ovoid.Input initialization error');
           Ovoid.error(4, 'Input class initialization error');
-          return;
+          return false;
         }
       } else {
         Ovoid.log(0, 'Ovoid.init',
             'Ovoid.Drawer initialization error');
         Ovoid.error(4, 'Drawer class initialization error');
-        return;
+        return false;
       }
     }
     catch (e) {
       Ovoid.log(0, 'Ovoid.init', '(Exception) ' + e.stack);
       Ovoid.error(4, 'Initialization Exception thrown');
-      return;
+      return false;
     }
   }
+  return true;
 };
 
 
@@ -648,7 +649,7 @@ Ovoid._mainloop = function() {
   catch(e) {
     Ovoid.log(0, 'Ovoid.onloop', '(Exception) ' + e.stack);
     Ovoid.error(7, 'Main loop Exception thrown');
-    return;
+    return false;
   }
 };
 

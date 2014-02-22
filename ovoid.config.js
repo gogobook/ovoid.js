@@ -5,7 +5,7 @@
 Ovoid.opt_libPath = 'ovoid.js/lib/'
 /* Environment: Log verbose level */
 Ovoid.opt_logLevel = 2; // 0: disabled, 1: errors only, 2: errors+warinings, 3: all.
-/* Environment: Avoid browser cache (force (re)load source files) and force Body/Layer pickability */
+/* Environment: Avoid browser cache, force Body/Layer pickability, enable errors output */
 Ovoid.opt_debugMode = true;
 /* Environment: Dsiable alert messages */
 Ovoid.opt_disableAlerts = true;

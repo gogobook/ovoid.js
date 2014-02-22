@@ -162,6 +162,10 @@ Ovoid.error = function(code, message) {
   /* Delete Audio Context */
   Ovoid.al = null;
   
+  /* ne rien faire si pas en debug-mode */
+  if(!Ovoid.opt_debugMode)
+    return;
+    
   var canvas;
   /* Retrouve le canvas pour le reduire a taille minimum */
   var canvas_list = document.getElementsByTagName('canvas');
