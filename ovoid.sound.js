@@ -91,20 +91,16 @@ Ovoid.Sound = function(name) {
   this._alpanner = null;
   
   /* init les nodes Audio API */
-  switch(Ovoid.al.type)
-  {
-    case 1: /* Ovoid.HTML5_AUDIO */
-    break;
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-    break;
-    case 3: /* Ovoid.WEBKIT_AUDIO_API */
-      this._alsource = Ovoid.al.createBufferSource();
-      this._algain = Ovoid.al.createGain(); /* was Ovoid.al.createGainNode() (deprecated) */
-      this._alpanner = Ovoid.al.createPanner();
-      /* non local par defaut */
-      this._algain.connect(Ovoid.al.destination);
-    break;
-  }
+  if(Ovoid.al.type == 3) { 
+    /* Ovoid.WEB_AUDIO_API */
+    this._alsource = Ovoid.al.createBufferSource();
+    this._algain = Ovoid.al.createGain(); /* was Ovoid.al.createGainNode() (deprecated) */
+    this._alpanner = Ovoid.al.createPanner();
+    this._alpanner.distanceModel = "inverse";
+    this._alpanner.panningModel = "HRTF";
+    /* non local par defaut */
+    this._algain.connect(Ovoid.al.destination);
+  } 
   
   this.unCach(Ovoid.CACH_SOUND);
 };
@@ -122,13 +118,15 @@ Ovoid.Sound.prototype.constructor = Ovoid.Sound;
 Ovoid.Sound.prototype.spatialize = function(e) {
   
   if(Ovoid.al.type == 3) { 
-    /* Ovoid.WEBKIT_AUDIO_API */
+    /* Ovoid.WEB_AUDIO_API */
     this._alpanner.disconnect();
     this._algain.disconnect();
     if(!e) {
+      // src --> gain --> dest
       this._algain.connect(Ovoid.al.destination);
       this.flat = true;
     } else {
+	  // src --> panner --> gain --> dest
       this._alpanner.connect(this._algain);
       this._algain.connect(Ovoid.al.destination);
       this.flat = false;
@@ -188,16 +186,8 @@ Ovoid.Sound.prototype.setPannerDist = function(ref, max, rolloff) {
  */
 Ovoid.Sound.prototype.setAudio = function(audio) {
 
-  switch(Ovoid.al.type)
-  {
-    case 1: /* Ovoid.HTML5_AUDIO */
-        this._alsource = audio._albuffer.cloneNode(true);
-    break;
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-        this._alsource = audio._albuffer.cloneNode(true);
-    break;
-    case 3: /* Ovoid.WEBKIT_AUDIO_API */
-    break;
+  if(Ovoid.al.type != 3) {  /* Ovoid.HTML5_AUDIO */
+	  this._alsource = audio._albuffer.cloneNode(true);
   }
   
   /* crée la dépendence */
@@ -221,18 +211,8 @@ Ovoid.Sound.prototype.setLoop = function(e) {
   if(!this._alsource)
     return;
     
-  switch(Ovoid.al.type)
-  {
-    case 1: /* Ovoid.HTML5_AUDIO */
-      this._alsource.loop = e;
-    break;
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-      this._alsource.loop = e;
-    break;
-    case 3: /* Ovoid.WEBKIT_AUDIO_API */
-      this._alsource.loop = e;
-    break;
-  }
+  this._alsource.loop = e;
+
 };
 
 
@@ -246,31 +226,25 @@ Ovoid.Sound.prototype.play = function() {
   if(!this._alsource)
     return;
 
-  switch(Ovoid.al.type)
-  {
-    case 1: /* Ovoid.HTML5_AUDIO */
-      if(this._alsource.readyState != 4)
-        return;
-      this._alsource.currentTime = 0;
-      this._alsource.play();
-    break;
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-      if(this._alsource.readyState != 4)
-        return;
-      this._alsource.currentTime = 0;
-      this._alsource.play();
-    break;
-    case 3: /* Ovoid.WEBKIT_AUDIO_API */
-      /* He bien oui, il faut refaire tout ça pour 
+  if(Ovoid.al.type == 3) {
+    /* Ovoid.WEB_AUDIO_API */
+    /* He bien oui, il faut refaire tout ça pour 
        * rejouer un son... */
       this._alsource = Ovoid.al.createBufferSource();
+      this._alsource.buffer = this.audio._albuffer;
       if(this.flat) 
+        // src --> gain -> dest
         this._alsource.connect(this._algain);
       else
+        // src --> panner --> gain --> dest
         this._alsource.connect(this._alpanner);
-      this._alsource.buffer = this.audio._albuffer;
       this._alsource.start(0); /* was this._alsource.noteOn(0); (deprecated) */
-    break;
+  } else {
+    /* Ovoid.HTML5_AUDIO */
+    if(this._alsource.readyState != 4)
+      return;
+    this._alsource.currentTime = 0;
+    this._alsource.play();
   }
 };
 
@@ -284,18 +258,12 @@ Ovoid.Sound.prototype.stop = function() {
   
   if(!this._alsource)
     return;
-
-  switch(Ovoid.al.type)
-  {
-    case 1: /* Ovoid.HTML5_AUDIO */
-      this._alsource.pause();
-    break;
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-      this._alsource.pause();
-    break;
-    case 3: /* Ovoid.WEBKIT_AUDIO_API */
-      this._alsource.noteOff(0);
-    break;
+  if(Ovoid.al.type == 3) { 
+    /* Ovoid.WEB_AUDIO_API */
+    this._alsource.stop(0);
+  } else { 
+    /* Ovoid.HTML5_AUDIO */
+    this._alsource.pause();
   }
 };
 
@@ -312,20 +280,15 @@ Ovoid.Sound.prototype.volum = function(gain) {
   if(!this._alsource)
     return;
     
-  switch(Ovoid.al.type)
-  {
-    case 1: /* Ovoid.HTML5_AUDIO */
-      if(gain > 1.0) gain = 1.0;
-      this._alsource.volume = gain;
-    break;
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-      if(gain > 1.0) gain = 1.0;
-      this._alsource.volume = gain;
-    break;
-    case 3: /* Ovoid.WEBKIT_AUDIO_API */
-      this._algain.gain.value = gain;
-    break;
+  if(Ovoid.al.type == 3) { 
+    /* Ovoid.WEB_AUDIO_API */
+    this._algain.gain.value = gain;
+  } else { 
+    /* Ovoid.HTML5_AUDIO */
+    if(gain > 1.0) gain = 1.0;
+    this._alsource.volume = gain;
   }
+
 };
 
 /**
@@ -341,8 +304,8 @@ Ovoid.Sound.prototype.cachSound = function() {
 
   /* Petit hack pour éviter les blocages lorsque la lecture arrive en 
    * fin de buffer... c'est moche, mais bon... */
-  if (this.audio && Ovoid.al.type < 3) {
-    
+  if (this.audio && Ovoid.al.type != 3) { 
+    /* Ovoid.HTML5_AUDIO */
     if(this._alsource.duration) {
       if(this._alsource.currentTime > this._alsource.duration - 0.7) {
         this._alsource.pause();
@@ -354,15 +317,13 @@ Ovoid.Sound.prototype.cachSound = function() {
   if ( !(this.cach & Ovoid.CACH_SOUND)) {
    
     if (Ovoid.al.type == 3) {
-      /* Ovoid.WEBKIT_AUDIO_API */
+      /* Ovoid.WEB_AUDIO_API */
       this._alpanner.coneInnerAngle = this.innerCone;
       this._alpanner.coneOuterAngle = this.outerCone;
       this._alpanner.coneOuterGain = this.outerGain;
       this._alpanner.refDistance = this.refDistance;
       this._alpanner.maxDistance = this.maxDistance;
       this._alpanner.rolloffFactor = this.rolloffFactor;
-    } else {
-
     }
     this.addCach(Ovoid.CACH_SOUND); 
   }
