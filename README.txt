@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
- OvoiD.JS - WebGL Wrapper Library
+ OvoiD.JS - WebGL Based Multimedia Middleware API
 --------------------------------------------------------------------------------
  Copyright (C) 2011 - 2014  Eric Mahieu.
 

@@ -1,7 +1,7 @@
 /**
- * OvoiD.JS - WebGL Wrapper Library
+ * OvoiD.JS - WebGL Based Multimedia Middleware API
  * 
- * Copyright (C) 2011 - 2012  Eric M.
+ * Copyright (C) 2011 - 2014  Eric M.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
