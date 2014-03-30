@@ -20,11 +20,11 @@
 
 
 /**
- * Joint node constructor.
+ * Constructor method.
  * 
  * @class Skeketon Joint node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Joint node implements a joint (often called bone) of a rig/skeleton
  * structure. 
@@ -35,8 +35,9 @@
  * @extends Ovoid.Transform
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Joint = function(name) {
+Ovoid.Joint = function(name, i) {
 
   Ovoid.Transform.call(this);
   /** node type */
@@ -50,6 +51,10 @@ Ovoid.Joint = function(name) {
   /** Joint's bone size.
    * @type float */
   this.size = 1.0;
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Joint.prototype = new Ovoid.Transform;
 Ovoid.Joint.prototype.constructor = Ovoid.Joint;
@@ -60,7 +65,7 @@ Ovoid.Joint.prototype.constructor = Ovoid.Joint;
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  */
 Ovoid.Joint.prototype.cachJoint = function() {
   
@@ -74,7 +79,7 @@ Ovoid.Joint.prototype.cachJoint = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

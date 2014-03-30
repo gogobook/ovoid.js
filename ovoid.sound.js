@@ -20,11 +20,11 @@
 
 
 /**
- * Sound node constructor.
+ * Constructor method.
  * 
  * @class Sound node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Sound node implements a global or localized in space sound emitter. 
  * Inherited from the Transform node, it is a world-transformable node, which 
@@ -49,10 +49,11 @@
  * @see Ovoid.Audio
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Sound = function(name) {
+Ovoid.Sound = function(name, i) {
 
-  Ovoid.Node.call(this);
+  Ovoid.Transform.call(this);
   /** Node type.
    * @type bitmask */
   this.type |= Ovoid.SOUND;
@@ -91,16 +92,24 @@ Ovoid.Sound = function(name) {
   this._alpanner = null;
   
   /* init les nodes Audio API */
-  if(Ovoid.al.type == 3) { 
+  if(i.al) { 
     /* Ovoid.WEB_AUDIO_API */
-    this._alsource = Ovoid.al.createBufferSource();
-    this._algain = Ovoid.al.createGain(); /* was Ovoid.al.createGainNode() (deprecated) */
-    this._alpanner = Ovoid.al.createPanner();
+    this._alsource = i.al.createBufferSource();
+    this._algain = i.al.createGain(); /* was Ovoid.al.createGainNode() (deprecated) */
+    this._alpanner = i.al.createPanner();
     this._alpanner.distanceModel = "inverse";
     this._alpanner.panningModel = "HRTF";
     /* non local par defaut */
-    this._algain.connect(Ovoid.al.destination);
-  } 
+    this._algain.connect(i.al.destination);
+  } else {
+    this._alsource = null;
+    this._algain = null;
+    this._alpanner = null;
+  }
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
   
   this.unCach(Ovoid.CACH_SOUND);
 };
@@ -117,22 +126,18 @@ Ovoid.Sound.prototype.constructor = Ovoid.Sound;
  */
 Ovoid.Sound.prototype.spatialize = function(e) {
   
-  if(Ovoid.al.type == 3) { 
-    /* Ovoid.WEB_AUDIO_API */
+  if(this._i.al) { 
     this._alpanner.disconnect();
     this._algain.disconnect();
     if(!e) {
-      // src --> gain --> dest
-      this._algain.connect(Ovoid.al.destination);
+      this._algain.connect(this._i.al.destination);
       this.flat = true;
     } else {
-	  // src --> panner --> gain --> dest
       this._alpanner.connect(this._algain);
-      this._algain.connect(Ovoid.al.destination);
+      this._algain.connect(this._i.al.destination);
       this.flat = false;
     }
   } else {
-    /* Ovoid.HTML5_AUDIO */
     this.flat = true;
   }
 };
@@ -186,10 +191,6 @@ Ovoid.Sound.prototype.setPannerDist = function(ref, max, rolloff) {
  */
 Ovoid.Sound.prototype.setAudio = function(audio) {
 
-  if(Ovoid.al.type != 3) {  /* Ovoid.HTML5_AUDIO */
-	  this._alsource = audio._albuffer.cloneNode(true);
-  }
-  
   /* crée la dépendence */
   if (this.audio != null) {
     this.breakDepend(this.audio);
@@ -208,11 +209,7 @@ Ovoid.Sound.prototype.setAudio = function(audio) {
  */
 Ovoid.Sound.prototype.setLoop = function(e) {
   
-  if(!this._alsource)
-    return;
-    
-  this._alsource.loop = e;
-
+  if(this._alsource) this._alsource.loop = e;
 };
 
 
@@ -223,28 +220,15 @@ Ovoid.Sound.prototype.setLoop = function(e) {
  */
 Ovoid.Sound.prototype.play = function() {
   
-  if(!this._alsource)
-    return;
-
-  if(Ovoid.al.type == 3) {
-    /* Ovoid.WEB_AUDIO_API */
-    /* He bien oui, il faut refaire tout ça pour 
-       * rejouer un son... */
-      this._alsource = Ovoid.al.createBufferSource();
+  if(this._alsource) {
+    /* He bien oui, il faut refaire tout ça pour rejouer un son... */
+      this._alsource = this._i.al.createBufferSource();
       this._alsource.buffer = this.audio._albuffer;
       if(this.flat) 
-        // src --> gain -> dest
         this._alsource.connect(this._algain);
       else
-        // src --> panner --> gain --> dest
         this._alsource.connect(this._alpanner);
-      this._alsource.start(0); /* was this._alsource.noteOn(0); (deprecated) */
-  } else {
-    /* Ovoid.HTML5_AUDIO */
-    if(this._alsource.readyState != 4)
-      return;
-    this._alsource.currentTime = 0;
-    this._alsource.play();
+      this._alsource.start(0);
   }
 };
 
@@ -256,15 +240,7 @@ Ovoid.Sound.prototype.play = function() {
  */
 Ovoid.Sound.prototype.stop = function() {
   
-  if(!this._alsource)
-    return;
-  if(Ovoid.al.type == 3) { 
-    /* Ovoid.WEB_AUDIO_API */
-    this._alsource.stop(0);
-  } else { 
-    /* Ovoid.HTML5_AUDIO */
-    this._alsource.pause();
-  }
+  if(this._alsource) this._alsource.stop(0);
 };
 
 
@@ -277,18 +253,7 @@ Ovoid.Sound.prototype.stop = function() {
  */
 Ovoid.Sound.prototype.volum = function(gain) {
   
-  if(!this._alsource)
-    return;
-    
-  if(Ovoid.al.type == 3) { 
-    /* Ovoid.WEB_AUDIO_API */
-    this._algain.gain.value = gain;
-  } else { 
-    /* Ovoid.HTML5_AUDIO */
-    if(gain > 1.0) gain = 1.0;
-    this._alsource.volume = gain;
-  }
-
+  if(this._algain) this._algain.gain.value = gain;
 };
 
 /**
@@ -296,28 +261,15 @@ Ovoid.Sound.prototype.volum = function(gain) {
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
 Ovoid.Sound.prototype.cachSound = function() {
 
-  /* Petit hack pour éviter les blocages lorsque la lecture arrive en 
-   * fin de buffer... c'est moche, mais bon... */
-  if (this.audio && Ovoid.al.type != 3) { 
-    /* Ovoid.HTML5_AUDIO */
-    if(this._alsource.duration) {
-      if(this._alsource.currentTime > this._alsource.duration - 0.7) {
-        this._alsource.pause();
-        this._alsource.currentTime = 0;
-      }
-    }
-  }
-
   if ( !(this.cach & Ovoid.CACH_SOUND)) {
    
-    if (Ovoid.al.type == 3) {
-      /* Ovoid.WEB_AUDIO_API */
+    if (this._alpanner) {
       this._alpanner.coneInnerAngle = this.innerCone;
       this._alpanner.coneOuterAngle = this.outerCone;
       this._alpanner.coneOuterGain = this.outerGain;
@@ -352,7 +304,7 @@ Ovoid.Sound.prototype.cachSound = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -405,19 +357,4 @@ Ovoid.Sound.prototype.toJSON = function() {
   }
   
   return o;
-};
-
-
-/**
- * Create a new array of Sound nodes.
- *
- * @param {int} count Size of the new array.
- *
- * @return {Object[]} Array of Sound node objects.
- */
-Ovoid.Sound.newArray = function(count) {
-
-  var array = new Array;
-  while (count--) array.push(new Ovoid.Sound());
-  return array;
 };

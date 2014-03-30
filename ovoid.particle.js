@@ -20,12 +20,12 @@
 
 
 /**
- * Create a Particle object.
+ * Constructor method.
  * 
  * @class Particle object.<br><br>
  * 
  * This class provides an implementation of a particle. Particles are
- * used by the <code>Ovoid.Emitter</code> class.
+ * used by the <c>Ovoid.Emitter</c> class.
  * 
  * @see Ovoid.Emitter
  */
@@ -74,21 +74,6 @@ Ovoid.Particle.prototype.bufferCopy = function(buffer, at) {
 
 
 /**
- * Create a new array of Particles.
- *
- * @param {int} count Size of the new array.
- *
- * @return {Particle[]} Array of Particle objects.
- */
-Ovoid.Particle.newArray = function(count) {
-
-  var array = new Array;
-  while (count--) array.push(new Ovoid.Particle());
-  return array;
-};
-
-
-/**
  * Translate Particles array in Float32Array.<br><br>
  * 
  * Translates the specified Particles Array in Float32Array 
@@ -117,3 +102,16 @@ Ovoid.Particle.arrayAsVbo = function(particles) {
 };
 
 
+/**
+ * Create a new array of Particle objets.
+ *
+ * @param {int} count Size of the new array.
+ *
+ * @return {Object[]} Array of Particle objects.
+ */
+Ovoid.Particle.newArray = function(count) {
+
+  var array = new Array;
+  while (count--) array.push(new Ovoid.Particle());
+  return array;
+};

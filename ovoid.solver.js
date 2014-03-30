@@ -19,43 +19,79 @@
 
 
 /**
- * Solver global static class.
+ * Constructor method.
  *
- * @namespace Solver global class.<br><br>
+ * @class Solver Module Class.<br><br>
  * 
- * The Solver class implements a physics engine. It is a global 
- * static (namespace) class. The Solver class is an optionnal global class who
- * enable the collision detection and reposes between rigid bodys.<br><br>
+ * The Solver class implements a physics engine. This is 
+ * what is called a Module class because used as core module for the 
+ * Ovoid.Instance class. A Module class is a part of Instance class and 
+ * can be used only within the Instance class.<br><br>
+ * 
+ * The Solver is the main physics engine of the Instance and computes 
+ * the collision detection and reposes between scene's rigid bodys.<br><br>
+ * 
+ * This Module class does not provide public data or method since  it is 
+ * an internal Module who does not offer usefull data to be retrieved or 
+ * way to control anything.<br><br>
+ * 
+ * For more details about rigid body, collision control and interactions
+ * see the <a href="Ovoid.Physics.php">Ovoid.Physics</a> node 
+ * documentation reference.
+ * 
+ * <b>Gravity</b><br><br>
+ * 
+ * The Solver currently work with only one constant force: Gravity. 
+ * Gravity is a vector who describe the constant applyed force to all
+ * rigid bodies. Gravity is defined by the 
+ * <c>Instance.opt_gravity</c> option, also used by particles 
+ * Emitter.<br><br>
+ * 
+ * <b>Iterative collision solving</b><br><br>
+ * 
+ * To compensate collision overlapping side effects when several objets 
+ * collided to each others, the solver can use an iterative solving. 
+ * Iterative solving can produce performance hit in some case, this is 
+ * why you can defines the maximum iterration count, or simply disable 
+ * the iterative solving.<br><br>
+ * 
+ * To enable or disable the iterrative solving, you can set the 
+ * <c>Instance.opt_physicsIterativeSolver</c>
+ * option to <c>true</c> or <c>false</c>.<br><br>
+ * 
+ * To define the maximum iterration count, you can set the 
+ * <c>Instance.opt_physicsContactItFactor</c> option by an 
+ * integer.<br><br>
+ * 
+ * @param {object} i Instance object to register object to.
+ * 
  */
-Ovoid.Solver = {};
+Ovoid.Solver = function(i) {
+  
+  /** Instance parent */
+  this._i = i;
 
 
-/** Enable or disable the iterative contact solving */
-Ovoid.Solver.opt_iterativeSolver = true;
-
-/** Maximim iteration for iterative contact solving */
-Ovoid.Solver.opt_contactItFactor = 4;
+  /** Contact stack */
+  this._contactq = new Ovoid.Stack(Ovoid.MAX_CONTACT_BY_CYCLE);
 
 
-/** Contact stack */
-Ovoid.Solver._contactq = new Ovoid.Stack(Ovoid.MAX_CONTACT_BY_CYCLE);
+  /** Vector array stock for temporary computing */
+  this._tmpVect = Ovoid.Vector.newArray(22);
 
 
-/** Vector array stock for temporary computing */
-Ovoid.Solver._tmpVect = Ovoid.Vector.newArray(22);
+  /** Point array stock for temporary computing */
+  this._tmpPoint = Ovoid.Point.newArray(11);
 
 
-/** Point array stock for temporary computing */
-Ovoid.Solver._tmpPoint = Ovoid.Point.newArray(11);
+  /** Point for temporary contact center computing */
+  this._tmpc = new Ovoid.Point();
 
 
-/** Point for temporary contact center computing */
-Ovoid.Solver._tmpc = new Ovoid.Point();
+  /** Vector for temporary contact normal computing */
+  this._tmpn = new Ovoid.Vector();
 
-
-/** Vector for temporary contact normal computing */
-Ovoid.Solver._tmpn = new Ovoid.Vector();
-
+};
 
 /**
  * Solver initialization.<br><br>
@@ -67,14 +103,14 @@ Ovoid.Solver._tmpn = new Ovoid.Vector();
  *
  * @return {bool} True if initialization succeeds, false otherwise.
  */
-Ovoid.Solver.init = function() {
+Ovoid.Solver.prototype._init = function() {
   
-  Ovoid.log(3, 'Ovoid.Solver', 'initialization');
-  
-  var i = Ovoid.Solver._contactq.length;
+  var i = this._contactq.length;
   while(i--) {
-    Ovoid.Solver._contactq[i] = new Ovoid.Contact();
+    this._contactq[i] = new Ovoid.Contact();
   }
+  
+  Ovoid._log(3, this._i, '.Solver._init', ' done');
   
   return true;
 };
@@ -91,14 +127,14 @@ Ovoid.Solver.init = function() {
  * @return {bool} True if any contact with the two specified bodys allready 
  * exist, false otherwise.
  */
-Ovoid.Solver._hasContact = function (a, b) {
+Ovoid.Solver.prototype._hasContact = function (a, b) {
 
-  var i = Ovoid.Solver._contactq.count; 
+  var i = this._contactq.count; 
   while(i--) {
-    if((Ovoid.Solver._contactq[i]._b[0] == b && 
-        Ovoid.Solver._contactq[i]._b[1] == a) || 
-        (Ovoid.Solver._contactq[i]._b[0] == a && 
-        Ovoid.Solver._contactq[i]._b[1] == b)) {  
+    if((this._contactq[i]._b[0] == b && 
+        this._contactq[i]._b[1] == a) || 
+        (this._contactq[i]._b[0] == a && 
+        this._contactq[i]._b[1] == b)) {  
           return true;
         }
   }
@@ -117,7 +153,7 @@ Ovoid.Solver._hasContact = function (a, b) {
  * 
  * @return {bool} True if sphere intersect, false otherwise.
  */
-Ovoid.Solver._canContact = function (a, b, m) {
+Ovoid.Solver.prototype._canContact = function (a, b, m) {
   /* a.dist2(b) <= a.r2 + b.r2 + t */
   return a.target[0].boundingSphere.worldCenter.dist(
       b.target[0].boundingSphere.worldCenter) <= 
@@ -137,16 +173,16 @@ Ovoid.Solver._canContact = function (a, b, m) {
  * @param {float} p Contact penetration.
  * @param {float} q Time delta to adjust physical parameters.
  */
-Ovoid.Solver._addContact = function(b0, b1, c, n, p) {
+Ovoid.Solver.prototype._addContact = function(b0, b1, c, n, p) {
 
-    if (Ovoid.Solver._contactq.isFull()) {
-      Ovoid.log(2, "Ovoid.Solver", "Contact stack overflow.");
+    if (this._contactq.isFull()) {
+      Ovoid._log(2, this._i, ".Solver._addContact", " contact stack overflow.");
       return;
     }
     /* init le contact courent dans la liste */
-    Ovoid.Solver._contactq.current().set(b0, b1, c, n, p,  Ovoid.Timer.quantum);
+    this._contactq.current().set(b0, b1, c, n, p,  this._i.Timer.quantum);
     /* Contact suivant dans la pile */
-    Ovoid.Solver._contactq.forward();
+    this._contactq.forward();
     /* Lance les fonctions oncontact */
     b0.oncontact(b1, c, n);
     if(b1) b1.oncontact(b0, c, n);
@@ -161,7 +197,7 @@ Ovoid.Solver._addContact = function(b0, b1, c, n, p) {
  * @param {Physics} a First Physic node to test collision as box.
  * @param {Physics} l Second Physic node to test collision as landscape.
  */
-Ovoid.Solver._getContactB2L = function (a, b) {
+Ovoid.Solver.prototype._getContactB2L = function (a, b) {
   
   /* On retrouve le mesh du landscape pour tester les collisions */
   var mesh = null;
@@ -183,7 +219,7 @@ Ovoid.Solver._getContactB2L = function (a, b) {
   var Ta = a.target[0].worldMatrix;
   
   /* Transforme le centre de la box dans le repère du landscape */
-  var Lc = Ovoid.Solver._tmpPoint[8];
+  var Lc = this._tmpPoint[8];
   Lc.transform4InverseOf(Ba.worldCenter, Tb);
   
   /* On calcul le rayon maximum de la box pour verifier si 
@@ -193,21 +229,21 @@ Ovoid.Solver._getContactB2L = function (a, b) {
   
   /* Constitution des 8 vertices de la box qu'on transforme */
   var bv = new Array(8);
-  bv[0] = Ovoid.Solver._tmpPoint[0];
+  bv[0] = this._tmpPoint[0];
   bv[0].set(Ba.min.v[0], Ba.min.v[1], Ba.min.v[2], 1.0);
-  bv[1] = Ovoid.Solver._tmpPoint[1];
+  bv[1] = this._tmpPoint[1];
   bv[1].set(Ba.min.v[0], Ba.min.v[1], Ba.max.v[2], 1.0);
-  bv[2] = Ovoid.Solver._tmpPoint[2];
+  bv[2] = this._tmpPoint[2];
   bv[2].set(Ba.max.v[0], Ba.min.v[1], Ba.min.v[2], 1.0);
-  bv[3] = Ovoid.Solver._tmpPoint[3];
+  bv[3] = this._tmpPoint[3];
   bv[3].set(Ba.max.v[0], Ba.min.v[1], Ba.max.v[2], 1.0);
-  bv[4] = Ovoid.Solver._tmpPoint[4];
+  bv[4] = this._tmpPoint[4];
   bv[4].set(Ba.min.v[0], Ba.max.v[1], Ba.min.v[2], 1.0);
-  bv[5] = Ovoid.Solver._tmpPoint[5];
+  bv[5] = this._tmpPoint[5];
   bv[5].set(Ba.min.v[0], Ba.max.v[1], Ba.max.v[2], 1.0);
-  bv[6] = Ovoid.Solver._tmpPoint[6];
+  bv[6] = this._tmpPoint[6];
   bv[6].set(Ba.max.v[0], Ba.max.v[1], Ba.min.v[2], 1.0);
-  bv[7] = Ovoid.Solver._tmpPoint[7];
+  bv[7] = this._tmpPoint[7];
   bv[7].set(Ba.max.v[0], Ba.max.v[1], Ba.max.v[2], 1.0);
 
   var j = 8;
@@ -222,9 +258,9 @@ Ovoid.Solver._getContactB2L = function (a, b) {
   /* Informations de contact */
   var nC = 0;
   var P = 0.0;
-  var C = Ovoid.Solver._tmpc;
+  var C = this._tmpc;
   C.set(0.0,0.0,0.0,1.0);
-  var N = Ovoid.Solver._tmpn;
+  var N = this._tmpn;
   N.set(0.0,0.0,0.0);
   var nD = 0.0;
   var nN = new Ovoid.Vector();
@@ -233,9 +269,9 @@ Ovoid.Solver._getContactB2L = function (a, b) {
   /* trois vertices et une normale */
   var v0, v1, v2, n;
   /* stuff pour le calcul du point dans le triangle */
-  var t0 = Ovoid.Solver._tmpVect[1];
-  var t1 = Ovoid.Solver._tmpVect[2];
-  var t2 = Ovoid.Solver._tmpVect[3];
+  var t0 = this._tmpVect[1];
+  var t1 = this._tmpVect[2];
+  var t2 = this._tmpVect[3];
   var dot00, dot01, dot02, dot11, dot12;
   var f, u, v;
   /* distance */
@@ -307,7 +343,7 @@ Ovoid.Solver._getContactB2L = function (a, b) {
         C.v[2] /= nC;
         C.v[3] = 1.0;
       }
-      Ovoid.Solver._addContact(a, null, C, N, nD*1.5);
+      this._addContact(a, null, C, N, nD*1.5);
       return;
     }
   }
@@ -322,7 +358,7 @@ Ovoid.Solver._getContactB2L = function (a, b) {
  * @param {Object} a First Physic node to test collision as sphere.
  * @param {Object} l Second Physic node to test collision as landscape.
  */
-Ovoid.Solver._getContactS2L = function (a, b) {
+Ovoid.Solver.prototype._getContactS2L = function (a, b) {
  
   /* On retrouve le mesh du landscape pour tester les collisions */
   var mesh = null;
@@ -343,15 +379,15 @@ Ovoid.Solver._getContactS2L = function (a, b) {
   var Ta = a.target[0].worldMatrix;
   
   /* Transforme la sphere dans le repère du landscape */
-  var Lc = Ovoid.Solver._tmpPoint[0];
+  var Lc = this._tmpPoint[0];
   Lc.transform4InverseOf(Sa.worldCenter, Tb);
   
   /* trois vertices et une normale */
   var v0, v1, v2, n;
   /* stuff pour le calcul du point dans le triangle */
-  var t0 = Ovoid.Solver._tmpVect[1];
-  var t1 = Ovoid.Solver._tmpVect[2];
-  var t2 = Ovoid.Solver._tmpVect[3];
+  var t0 = this._tmpVect[1];
+  var t1 = this._tmpVect[2];
+  var t2 = this._tmpVect[3];
   var dot00, dot01, dot02, dot11, dot12;
   var f, u, v;
   /* distance */
@@ -390,20 +426,20 @@ Ovoid.Solver._getContactS2L = function (a, b) {
       if ( (u >= 0.0) && (v >= 0.0) && (u + v < 1.0) ) {
         /* Informations de contact */
         var P = 0.0;
-        var C = Ovoid.Solver._tmpc;
-        var N = Ovoid.Solver._tmpn;
+        var C = this._tmpc;
+        var N = this._tmpn;
         /* Penetration */
         P = Sa.radius - d;
         /* Retrouve la normale du contact en coordonnée monde  */
         N.transform4Of(n, Tb);
-        var Np = Ovoid.Solver._tmpVect[0];
+        var Np = this._tmpVect[0];
         Np.copy(N);
         Np.scaleBy(-d);
         C.addOf(Lc, Np);
         C.v[3] = 1.0;
         C.transform4(Tb);
         /* Ajoute un contact */
-        Ovoid.Solver._addContact(a, null, C, N, P);
+        this._addContact(a, null, C, N, P);
         return;
       }
     }
@@ -420,14 +456,14 @@ Ovoid.Solver._getContactS2L = function (a, b) {
  * @param {Object} a First Physic node to test collision as sphere.
  * @param {Object} b Second Physic node to test collision as sphere.
  */
-Ovoid.Solver._getContactS2S = function (a, b) {
+Ovoid.Solver.prototype._getContactS2S = function (a, b) {
   
   /* Les boundingBox et boundingSphere des deux bodys */
   var Sa = a.target[0].boundingSphere;
   var Sb = b.target[0].boundingSphere;
   
   /* vecteur entre les deux body */
-  var atob = Ovoid.Solver._tmpVect[16];
+  var atob = this._tmpVect[16];
   atob.subOf(Sa.worldCenter, Sb.worldCenter);
   
   var d = atob.size();
@@ -439,8 +475,8 @@ Ovoid.Solver._getContactS2S = function (a, b) {
 
   /* Informations de contact */
   var P = 0.0;
-  var C = Ovoid.Solver._tmpc;
-  var N = Ovoid.Solver._tmpn;
+  var C = this._tmpc;
+  var N = this._tmpn;
   
   P = r - d;
   atob.normalize();
@@ -449,7 +485,7 @@ Ovoid.Solver._getContactS2S = function (a, b) {
   C.addOf(Sa.worldCenter, atob);
 
   /* Ajoute un contact */
-  Ovoid.Solver._addContact(a, b, C, N, P);
+  this._addContact(a, b, C, N, P);
   return;
 };
 
@@ -463,7 +499,7 @@ Ovoid.Solver._getContactS2S = function (a, b) {
  * @param {Object} a First Physic node to test collision as box.
  * @param {Object} b Second Physic node to test collision as sphere.
  */
-Ovoid.Solver._getContactB2S = function (a, b) {
+Ovoid.Solver.prototype._getContactB2S = function (a, b) {
   
   /* Les boundingBox et boundingSphere des deux bodys */
   var Ba = a.target[0].boundingBox;
@@ -472,13 +508,13 @@ Ovoid.Solver._getContactB2S = function (a, b) {
   var Ta = a.target[0].worldMatrix;
   
   /* Transforme la sphere dans le repère de la box */
-  var Lc = Ovoid.Solver._tmpPoint[0];
+  var Lc = this._tmpPoint[0];
   Lc.transform4InverseOf(Sb.worldCenter, Ta);
   
   /* Informations de contact */
   var P = 0.0;
-  var C = Ovoid.Solver._tmpc;
-  var N = Ovoid.Solver._tmpn;
+  var C = this._tmpc;
+  var N = this._tmpn;
   
   C.copy(Lc);
   
@@ -508,7 +544,7 @@ Ovoid.Solver._getContactB2S = function (a, b) {
   P = r - d;
   
   /* Ajoute un contact */
-  Ovoid.Solver._addContact(a, b, C, N, P);
+  this._addContact(a, b, C, N, P);
   return;
 };
 
@@ -521,7 +557,7 @@ Ovoid.Solver._getContactB2S = function (a, b) {
  * @param {Object} a First Physic node to test collision as box.
  * @param {Object} b Second Physic node to test collision as box.
  */
-Ovoid.Solver._getContactB2B = function (a, b) {
+Ovoid.Solver.prototype._getContactB2B = function (a, b) {
 
   /* Les boundingBox des deux bodys */
   var Ba = a.target[0].boundingBox;
@@ -531,11 +567,11 @@ Ovoid.Solver._getContactB2B = function (a, b) {
   var Tb = b.target[0].worldMatrix;
 
   /* vecteur entre les deux body */
-  var btoa = Ovoid.Solver._tmpVect[16];
+  var btoa = this._tmpVect[16];
   btoa.subOf(Bb.worldCenter, Ba.worldCenter);
     
   /* Le tableau de vecteur pour les axes overlas */
-  var olaps = Ovoid.Solver._tmpVect;
+  var olaps = this._tmpVect;
 
   /* constitue la liste des axes de projection pour les test d'overlaps */
   /* Les axes principaux de chaque box */
@@ -614,8 +650,8 @@ Ovoid.Solver._getContactB2B = function (a, b) {
 
   /* Informations de contact */
   var P = 0.0;
-  var C = Ovoid.Solver._tmpc;
-  var N = Ovoid.Solver._tmpn;
+  var C = this._tmpc;
+  var N = this._tmpn;
         
   P = cp;
   
@@ -647,9 +683,9 @@ Ovoid.Solver._getContactB2B = function (a, b) {
 
     /* il faut retrouver les deux points sur edege les plus proches du point de 
      * collision */
-    var e1p = Ovoid.Solver._tmpVect[17];
+    var e1p = this._tmpVect[17];
     e1p.copy(Ba.hsize);
-    var e2p = Ovoid.Solver._tmpVect[18];
+    var e2p = this._tmpVect[18];
     e2p.copy(Bb.hsize);
   
     /* Encore une fois on recupere les overlaps en lieu et place des axes de
@@ -707,7 +743,7 @@ Ovoid.Solver._getContactB2B = function (a, b) {
     var e2s = Bb.hsize.v[ae2];
     
     /* on récupere le vecteur entre les deux points on edge */
-    var e1ptoe2p = Ovoid.Solver._tmpVect[19];
+    var e1ptoe2p = this._tmpVect[19];
     e1ptoe2p.subOf(e1p, e2p);
     
     /* taille (au carré) des deux vecteurs direction de edge */
@@ -728,7 +764,7 @@ Ovoid.Solver._getContactB2B = function (a, b) {
       (ma > 2)?C.copy(e1p):C.copy(e2p);
       
       /* Ajoute un contact */
-      Ovoid.Solver._addContact(a, b, C, N, P);
+      this._addContact(a, b, C, N, P);
       return true;
     }
     
@@ -746,13 +782,13 @@ Ovoid.Solver._getContactB2B = function (a, b) {
       (ma > 2)?C.copy(e1p):C.copy(e2p);
       
       /* Ajoute un contact */
-      Ovoid.Solver._addContact(a, b, C, N, P);
+      this._addContact(a, b, C, N, P);
       return;
       
     } else {
         /* on retrouve le point d'intersection des deux edges */
-      var c1 = Ovoid.Solver._tmpVect[20];
-      var c2 = Ovoid.Solver._tmpVect[21];
+      var c1 = this._tmpVect[20];
+      var c2 = this._tmpVect[21];
       
       e1d.scaleBy(mua);
       e2d.scaleBy(mub);
@@ -766,7 +802,7 @@ Ovoid.Solver._getContactB2B = function (a, b) {
       C.addOf(c1, c2);
       
       /* Ajoute un contact */
-      Ovoid.Solver._addContact(a, b, C, N, P);
+      this._addContact(a, b, C, N, P);
       return;
     }
   } else {
@@ -810,7 +846,7 @@ Ovoid.Solver._getContactB2B = function (a, b) {
       C.transform4(Tb);
     }
     /* Ajoute un contact */
-    Ovoid.Solver._addContact(a, b, C, N, P);
+    this._addContact(a, b, C, N, P);
     return;
   }
 };
@@ -819,29 +855,29 @@ Ovoid.Solver._getContactB2B = function (a, b) {
 /**
  * Detect all contacts between physic nodes.
  */
-Ovoid.Solver._detectContacts = function() {
+Ovoid.Solver.prototype._detectContacts = function() {
   
   /* Reset le contact stack */
-  Ovoid.Solver._contactq.empty();
+  this._contactq.empty();
 
   var a, b, i, j;
   
-  i = Ovoid.Queuer.qphycs.count;
+  i = this._i.Queuer.qphycs.count;
   while(i--) {
-    j = Ovoid.Queuer.qphycs.count;
+    j = this._i.Queuer.qphycs.count;
     while(j--) {
       
-      if(j != i && !Ovoid.Solver._contactq.isFull()) {
+      if(j != i && !this._contactq.isFull()) {
         
-        a = Ovoid.Queuer.qphycs[i];
-        b = Ovoid.Queuer.qphycs[j];
+        a = this._i.Queuer.qphycs[i];
+        b = this._i.Queuer.qphycs[j];
         
         /* Si les deux body sont trop éloignés pour rentrer en contact
          * on peut laisser tomber */
-        if(!Ovoid.Solver._canContact(a, b, 0.0))
+        if(!this._canContact(a, b, 0.0))
           continue;
 
-        if(Ovoid.Solver._hasContact(a, b))
+        if(this._hasContact(a, b))
           continue;
 
         /* Selon le type physic on choisi le test de contact */
@@ -851,17 +887,17 @@ Ovoid.Solver._detectContacts = function() {
             switch(b.model)
             {
               case 2: /* Ovoid.RIGID_MASSIVE_SPHERE */
-                Ovoid.Solver._getContactS2S(a, b);
+                this._getContactS2S(a, b);
                 break;
               case 0: /* Ovoid.RIGID_LANDSCAPE */
                 /* Le CASH_PHYSICS correspond à une mise en someil, signifie donc
                  * que le physic est immobile, on ne calcul donc pas de collision
                  * avec les landscapes. */
                 if (!(a.cach & Ovoid.CACH_PHYSICS))
-                  Ovoid.Solver._getContactS2L(a, b);
+                  this._getContactS2L(a, b);
                 break;
               default: /* Ovoid.RIGID_MASSIVE_BOX */
-                Ovoid.Solver._getContactB2S(b, a);
+                this._getContactB2S(b, a);
                 break;
             }
             break;
@@ -872,17 +908,17 @@ Ovoid.Solver._detectContacts = function() {
             switch(b.model)
             {
               case 2: /* Ovoid.RIGID_MASSIVE_SPHERE */
-                Ovoid.Solver._getContactB2S(a, b);
+                this._getContactB2S(a, b);
                 break;
               case 0: /* Ovoid.RIGID_LANDSCAPE */
                 /* Le CASH_PHYSICS correspond à une mise en someil, signifie donc
                  * que le physic est immobile, on ne calcul donc pas de collision
                  * avec les landscapes */
                 if (!(a.cach & Ovoid.CACH_PHYSICS))
-                  Ovoid.Solver._getContactB2L(a, b);
+                  this._getContactB2L(a, b);
                 break;
               default: /* Ovoid.RIGID_MASSIVE_BOX */
-                Ovoid.Solver._getContactB2B(a, b);
+                this._getContactB2B(a, b);
                 break;
             }
             break;
@@ -898,10 +934,10 @@ Ovoid.Solver._detectContacts = function() {
  * This function use an iterative algorithm to solve and adjust contacts 
  * interpenetration and response. (Not sure if this is very usefull)
  */
-Ovoid.Solver._solveContactsHr = function() {
+Ovoid.Solver.prototype._solveContactsHr = function() {
   
   // Resolution des contacts 
-  var m = Ovoid.Solver._contactq.count * Ovoid.Solver.opt_contactItFactor;
+  var m = this._contactq.count * this._i.opt_physicsContactItFactor;
 
   var p;
   var i,c;
@@ -915,23 +951,23 @@ Ovoid.Solver._solveContactsHr = function() {
   {
     // trouve la plus grand penetration parmi tous les contacts 
     p = 0.0; // epsilon
-    c = Ovoid.Solver._contactq.count;
+    c = this._contactq.count;
     i = c;
     while(i--) {
-        if(Ovoid.Solver._contactq[i]._p > p) {
-            p = Ovoid.Solver._contactq[i]._p;
+        if(this._contactq[i]._p > p) {
+            p = this._contactq[i]._p;
             c = i;
         }
     }
-    if (c == Ovoid.Solver._contactq.count) break;
-    cc = Ovoid.Solver._contactq[c];
+    if (c == this._contactq.count) break;
+    cc = this._contactq[c];
     // Resoud l'interpenetration pour ce contact
     cc._adjustPositions(p);
     // Cette action a du changer la penetration d'autres bodys en contact
     // adjacents, on update donc les contacts si nécéssaire 
-    i = Ovoid.Solver._contactq.count;
+    i = this._contactq.count;
     while(i--) {
-      ci = Ovoid.Solver._contactq[i];
+      ci = this._contactq[i];
       if(ci._b[0] === cc._b[0]) {
         adjust.crossOf(ci._ar[0], ci._rc[0]);
         adjust.addBy(ci._ap[0]);
@@ -963,37 +999,37 @@ Ovoid.Solver._solveContactsHr = function() {
   while(it < m) {
     // trouve la plus grande magnitude d'influence parmi tous les contacts 
     d = 0.0;
-    c = Ovoid.Solver._contactq.count;
+    c = this._contactq.count;
     i = c;
     while(i--) {
-        if(Ovoid.Solver._contactq[i]._d > d) {
-            d = Ovoid.Solver._contactq[i]._d;
+        if(this._contactq[i]._d > d) {
+            d = this._contactq[i]._d;
             c = i;
         }
     }
-    if (c == Ovoid.Solver._contactq.count) break;
-    cc = Ovoid.Solver._contactq[c];
+    if (c == this._contactq.count) break;
+    cc = this._contactq[c];
     // Resoud l'impulsion pour ce contact
     cc._applyImpulses();
     // blah blah blah blah ....
-    i = Ovoid.Solver._contactq.count;
+    i = this._contactq.count;
     while(i--) {
   
-      ci = Ovoid.Solver._contactq[i];
+      ci = this._contactq[i];
       if (ci._b[0]) {
         if (ci._b[0] === cc._b[0]) {
           adjust.crossOf(ci._ti[0], ci._rc[0]);
           adjust.addBy(ci._li[0]);
           adjust.transform3Inverse(ci._matrix);
           ci._v.addBy(adjust);
-          ci._solveDelta(Ovoid.Timer.quantum);
+          ci._solveDelta(this._i.Timer.quantum);
         }
         else if (ci._b[0] === cc._b[1]) {
           adjust.crossOf(ci._ti[1], ci._rc[0]);
           adjust.addBy(ci._li[1]);
           adjust.transform3Inverse(ci._matrix);
           ci._v.addBy(adjust);
-          ci._solveDelta(Ovoid.Timer.quantum);
+          ci._solveDelta(this._i.Timer.quantum);
         }
       }
       if (ci._b[1]) {
@@ -1002,14 +1038,14 @@ Ovoid.Solver._solveContactsHr = function() {
           adjust.addBy(ci._li[0]);
           adjust.transform3Inverse(ci._matrix);
           ci._v.subBy(adjust);
-          ci._solveDelta(Ovoid.Timer.quantum);
+          ci._solveDelta(this._i.Timer.quantum);
         }
         else if (ci._b[1]==cc._b[1]) {
           adjust.crossOf(ci._ti[1], ci._rc[1]);
           adjust.addBy(ci._li[1]);
           adjust.transform3Inverse(ci._matrix);
           ci._v.subBy(adjust);
-          ci._solveDelta(Ovoid.Timer.quantum);
+          ci._solveDelta(this._i.Timer.quantum);
         }
       }
     }
@@ -1022,12 +1058,12 @@ Ovoid.Solver._solveContactsHr = function() {
  * Solves all contacts from the contact stack in coarse (Low Resolution) way.
  * This function simply solve contact reponses in one pass.
  */
-Ovoid.Solver._solveContactsLr = function() {
+Ovoid.Solver.prototype._solveContactsLr = function() {
   
-  var i = Ovoid.Solver._contactq.count;
+  var i = this._contactq.count;
   while(i--) {
-    Ovoid.Solver._contactq[i]._adjustPositions(Ovoid.Solver._contactq[i]._p);
-    Ovoid.Solver._contactq[i]._applyImpulses();
+    this._contactq[i]._adjustPositions(this._contactq[i]._p);
+    this._contactq[i]._applyImpulses();
   }
 };
 
@@ -1040,18 +1076,18 @@ Ovoid.Solver._solveContactsLr = function() {
  * 
  * This method does not takess argument because it work directly with 
  * Ovoid.Queuer stacks. This function should be called after an
- * <code>Ovoid.Queuer.QueueScene</code> call.<br><br>
+ * <c>Ovoid.Queuer.QueueScene</c> call.<br><br>
  * 
  * This methode is automaticaly called at each main loop. 
  * It shoulds not be called manually.
  * 
  * @see Ovoid.Queuer
  */
-Ovoid.Solver.solveQueue = function() {
+Ovoid.Solver.prototype._solveQueue = function() {
   
-  Ovoid.Solver._detectContacts();
+  this._detectContacts();
   
-  Ovoid.Solver.opt_iterativeSolver?
-    Ovoid.Solver._solveContactsHr():
-    Ovoid.Solver._solveContactsLr();
+  this._i.opt_physicsIterativeSolver?
+    this._solveContactsHr():
+    this._solveContactsLr();
 };

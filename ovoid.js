@@ -18,221 +18,185 @@
  */
 
 
-/** OvoiD.JS main namespace.
+/** Ovoid.JS root namespace.
  * 
- * @namespace OvoiD.JS main namespace.<br><br>
+ * @namespace Ovoid.JS global methods and members.
  * 
- * The Ovoid namespace gathers all the global and top level options and methods.<br><br>
+ * Ovoid.JS provides some global functions for essential tasks, they are
+ * members or the main namespace.<br><br>
  * 
- * <b>Global Methods</b><br><br>
+ * <b>Instance creation</b><br><br>
  * 
- * Global methods provides library's fundamental features:
+ * In order to do something in Ovoid.JS you have to create an  
+ * application Instance. The Instance object is the main class that 
+ * provides the main entries to the Ovoid.JS API. The Instance object 
+ * is NOT a singleton, it is more like a thread, you can create as many 
+ * Instance as you want. However, an Instance object must be registered 
+ * to the main API thread, this is why there is a dedicated method to 
+ * Instance creation. To create a new instance you should use the 
+ * <c>Ovoid.newInstance()</c> method.<br><br>
  * 
- * <ul>
- * <li><a href="#.init"><code>Ovoid.init</code></a> (Library main initialization)</li>
- * <li><a href="#.onload"><code>Ovoid.onload</code></a> (Overridable onload method)</li>
- * <li><a href="#.onloop"><code>Ovoid.onloop</code></a> (Overridable onloop method)</li>
- * <li><a href="#.error"><code>Ovoid.error</code></a> (Display error)</li>
- * <li><a href="#.log"><code>Ovoid.log</code></a> (Log message and write console)</li>
- * <li><a href="#.getLog"><code>Ovoid.getLog</code></a> (Get the log string)</li>
- * </ul>
+ * An Instance has many options, the most of them can be modified after 
+ * the Instance's initialization by simply change the appropriate member 
+ * of the instance. However, some options must be passed before the 
+ * initialization to take effect, and other should be defined before 
+ * by convenience. This is why there is an Ovoid.Config class that 
+ * provides a copy of all Instance options. You can use this object to 
+ * make some presets and pass it for the Instance creation. After the
+ * Instance's creation, the Config object can be reused for a new
+ * Instance creation or deleted.<br><br>
  * 
- * <b>Utility Methods</b><br><br>
+ * <blockcode>
+ * <cc>// Create a new config object and sets some options</cc><br>
+ * var myConf = Ovoid.newConfig();
+ * myConf.opt_GLalpha = true;<cc>// WebGL context option, must be defined at initialization to override the default Ovoid.JS setting</cc><br>
+ * myConf.opt_logLevel = 3;<br>
+ * myConf.opt_debugMode = true;<br>
+ * myConf.opt_renderClearColor = [0.5, 0.5, 0.5, 1.0];<br>
+ * <cc>// Create a new instance</cc><br>
+ * var Instance = Ovoid.newInstance("myOvoid", "myCanvas", myConf);<br>
+ * <cc>// The Config object is now useless</cc><br>
+ * delete myConf;<br>
+ * <cc>// Creation successfull ? </cc><br>
+ * if(Instance) {<br>
+ * &nbsp;&nbsp; <cc>// Continue to define your app here </cc>
+ * &nbsp;&nbsp; <cc>// ... </cc>
+ * &nbsp;&nbsp; <cc>// Finaly, start the Instance </cc>
+ * &nbsp;&nbsp;Instance.start();<br>
+ * }<br>
+ * </blockcode><br><br>
  * 
- * Utility methods are some small functions for common i/o or mathematical tasks:
+ * For more details and documentations about Ovoid.JS Instance, see the 
+ * <a href="Ovoid.Instance.php">Ovoid.Instance</a> 
+ * class reference documentation.<br><br>
  * 
- * <ul>
- * <li><a href="#.deg2Rad"><code>Ovoid.deg2Rad</code></a> (Degrees to radians conversion)</li>
- * <li><a href="#.rad2Deg"><code>Ovoid.rad2Deg</code></a> (Radians to degrees conversion)</li>
- * <li><a href="#.isPowerOfTwo"><code>Ovoid.isPowerOfTwo</code></a> (Is power of two test)</li>
- * <li><a href="#.noise"><code>Ovoid.noise</code></a> (Perlin noise value generator)</li>
- * <li><a href="#.randInt"><code>Ovoid.randInt</code></a> (Get random integer)</li>
- * <li><a href="#.randFloat"><code>Ovoid.randFloat</code></a> (Get random float)</li>
- * <li><a href="#.getContent"><code>Ovoid.getContent</code></a> (Get file content)</li>
- * <li><a href="#.getXml"><code>Ovoid.getXml</code></a> (Get file parsed XML content)</li>
- * <li><a href="#.getJson"><code>Ovoid.getJson</code></a> (Get file parsed JSON content)</li>
- * <li><a href="#.getBinary"><code>Ovoid.getBinary</code></a> (Get file binary content)</li>
- * <li><a href="#.extractName"><code>Ovoid.extractName</code></a> (Exctract file name from url)</li>
- * <li><a href="#.extractExt"><code>Ovoid.extractExt</code></a> (Exctract file extention from url)</li>
- * <li><a href="#.frnd"><code>Ovoid.frnd</code></a> (Decimal round)</li>
- * </ul>
+ * <b>Utilities methods</b><br><br>
  * 
- * <b>Top-Level Prealoading Methods</b><br><br>
- * 
- * Preloading methods are top-level shortcuts methods to facilitate external 
- * content preloading. These methods mainly refere to the 
- * <code>Ovoid.Loader</code> global class.
- * 
- * <ul>
- * <li><a href="#.includeShader"><code>Ovoid.includeShader</code></a> (Include GLSL shader)</li>
- * <li><a href="#.includeTexture"><code>Ovoid.includeTexture</code></a> (Include texture)</li>
- * <li><a href="#.includeAudio"><code>Ovoid.includeAudio</code></a> (Include audio)</li>
- * <li><a href="#.includeDaeMesh"><code>Ovoid.includeDaeMesh</code></a> (Include meshs from DAE scene)</li>
- * <li><a href="#.includeDaeAnimation"><code>Ovoid.includeDaeAnimation</code></a> (Include animations from DAE scene)</li>
- * <li><a href="#.includeDaeScene"><code>Ovoid.includeDaeScene</code></a> (Include DAE scene)</li>
- * <li><a href="#.includeOjsScene"><code>Ovoid.includeOjsScene</code></a> (Include OJSON scene)</li>
- * </ul>
- * 
- * <b>Top-Level Interface methods</b><br><br>
- * 
- * Interface methods are top-level shortcuts methods to facilitate the most 
- * common tasks.
+ * Ovoid.JS provides some small utility methods. You can use these 
+ * methods at you convenience.<br><br>
  * 
  * <ul>
- * <li><a href="#.useScene"><code>Ovoid.useScene</code></a> (Set active scene)</li>
- * <li><a href="#.useCamera"><code>Ovoid.useCamera</code></a> (Set active camera)</li>
- * <li><a href="#.search"><code>Ovoid.search</code></a> (Search node)</li>
- * <li><a href="#.searchMatches"><code>Ovoid.searchMatches</code></a> (Search nodes by matches)</li>
- * <li><a href="#.cameraYaw"><code>Ovoid.cameraYaw</code></a> (Adjust active camera yaw)</li>
- * <li><a href="#.cameraPitch"><code>Ovoid.cameraPitch</code></a> (Adjust active camera pitch)</li>
- * <li><a href="#.cameraRoll"><code>Ovoid.cameraRoll</code></a> (Adjust active camera roll)</li>
- * <li><a href="#.cameraDolly"><code>Ovoid.cameraDolly</code></a> (Adjust active camera dolly)</li>
- * <li><a href="#.move"><code>Ovoid.move</code></a> (Move a Transform node)</li>
- * <li><a href="#.rotate"><code>Ovoid.rotate</code></a> (Rotate a Transform node)</li>
- * <li><a href="#.scale"><code>Ovoid.scale</code></a> (Scale a Transform node)</li>
- * <li><a href="#.trackRewind"><code>Ovoid.trackRewind</code></a> (Rewind a Track node)</li>
- * <li><a href="#.trackPlay"><code>Ovoid.trackPlay</code></a> (Play a Track node)</li>
- * <li><a href="#.trackPause"><code>Ovoid.trackPause</code></a> (Pause a Track node)</li>
- * <li><a href="#.soundRewind"><code>Ovoid.soundRewind</code></a> (Rewind a Sound node)</li>
- * <li><a href="#.soundPlay"><code>Ovoid.soundPlay</code></a> (Play a Sound node)</li>
- * <li><a href="#.soundPause"><code>Ovoid.soundPause</code></a> (Pause a Sound node)</li>
- * <li><a href="#.inputTrigger"><code>Ovoid.inputTrigger</code></a> (Set or modify an input trigger)</li>
- * <li><a href="#.setAction"><code>Ovoid.setAction</code></a> (Assign an Action node to one or several pickable nodes)</li>
- * <li><a href="#.setConstraint"><code>Ovoid.setConstraint</code></a> (Assign Constraint nodes to one or several Transform nodes)</li>
- * <li><a href="#.grabNode"><code>Ovoid.grabNode</code></a> (Grab node)</li>
- * <li><a href="#.grabRelease"><code>Ovoid.grabRelease</code></a> (Release grab)</li>
- * </ul>
+ * <li><c>Ovoid.deg2Rad()</c> Converts degrees to radians.</li>
+ * <li><c>Ovoid.rad2Deg()</c> Converts radians to degrees.</li>
+ * <li><c>Ovoid.isPowerOfTwo()</c> Checks if a number is a power of two.</li>
+ * <li><c>Ovoid.noise()</c> Generates perlin noise random value.</li>
+ * <li><c>Ovoid.randInt()</c> Generates random integer value.</li>
+ * <li><c>Ovoid.randFloat()</c> Generates random float value.</li>
+ * <li><c>Ovoid.frnd()</c> Rounds a number at its fourth decimal.</li>
+ * <li><c>Ovoid.genFontmap()</c> Generates font mapping image.</li>
+ * <li><c>Ovoid.extractName()</c> Extracts name component of a filename.</li>
+ * <li><c>Ovoid.extractExt()</c> Extracts extention component of a filename.</li>
+ * </ul><br><br>
  * 
  */
 var Ovoid = {};
 
 
-/** full log string */
-Ovoid._log = '';
+/** Ovoid.JS Instance objects array. */
+Ovoid._inst = new Array();
 
 
-/** log error count. */
-Ovoid._lerror = 0;
+/** Request Animation Frame function alias */
+Ovoid._curBrower = "null";
 
 
-/** log fatal. */
-Ovoid._lfatal = false;
+/** Current browser's user-agent. */
+Ovoid._ua = navigator.userAgent.toLowerCase();
 
-
-/** log warning count. */
-Ovoid._lwarning = 0;
-
-
-/** The latest WebGL error code */
-Ovoid._glerror = 0;
-
-
-/** 
- * Log verbosity level.<br><br>
- * 
- * Verbosity level correspond to log severity level, and are the following:<br><br>
- * 0:Fatal error,<br>
- * 1:Error,<br>
- * 2:Warning,<br>
- * 3:Comment<br>
- */
-Ovoid.opt_logLevel = 2;
-
-/** 
- * Custom error HTML content.<br><br>
- * 
- * String used to display a custom HTML content if application fail in
- * non-debug mode. You can define it with a string of HTML code which 
- * will be displayed alternatively in case of WebGL faillure or another
- * errors when the debug mode is disabled.<br><br>
- */
-Ovoid.opt_customErrContent = "";
 
 /** Display a global error.<br><br>
  * 
  * Stops the library process and display a general error message.
- *
- * @param {int} code Error code. The error codes are the following ones:<br> 
- * 1: Non-compatible Web Browser, <br>
- * 2: WebGL Context Exception,<br>
- * 3: WebGL Context Not Found,<br>
- * 4: Initialization Failled,<br>
- * 5: Preloading Error,<br>
- * 6: Errors Flood,<br>
- * 7: On loop runtime error,<br>
- * 8: On load runtime error<br>
+ * 
+ * @param {int} code Error code. The error codes are the following ones:<br>
+ * 0: general error, <br>
+ * 1: instance WebGL context error, <br>
+ * 2: instance init error,<br>
+ * 3: instance preload error,<br>
+ * 4: instance onload error,<br>
+ * 5: instance runtime error,<br>
+ * 6: instance aborted<br>
+ * 
+ * @param {object} instance Ovoid.JS instance object.
  * 
  * @param {string} message The error message string.
 */
-Ovoid.error = function(code, message) {
+Ovoid._err = function(code, instance, message) {
 
-  /* Delete WebGL Context */
-  Ovoid.gl = null;
-  /* Delete Audio Context */
-  Ovoid.al = null;
+  var stderr = null; // string erreur standard
+  var csterr = null; // string erreur custom
   
-  var content;
-  var canvas;
-  /* Retrouve le canvas pour le reduire a taille minimum */
-  var canvas_list = document.getElementsByTagName('canvas');
-  if (canvas_list.length) {
-    var canvas = canvas_list[0];
-    canvas.style.width = "1px";
-    canvas.style.height = "1px";
-    canvas.width = 1;
-    canvas.height = 1;
+  if (instance) {
+    csterr = instance.opt_customErrContent;
+    if (instance.opt_debugMode || !csterr) {
+       stderr = "Ovoid.JS '" + instance.name + "' Instance ";
+    }
+  } else {
+    stderr = "Ovoid.JS Global ";
   }
 
-  /* si debug mode off affiche le contenu customisé */
-  if(!Ovoid.opt_debugMode) {
-    content = Ovoid.opt_customErrContent;
-  } else {
-    content = "Ovoid.JS error code";
+  if(stderr) {
     switch(code)
     {
       case 1:
-        content += "#1 (webGL context failled)";
+        stderr += "WebGL context error";
         break;
       case 2:
-        content += "#2 (webGL context exception)";
+        stderr += "init error";
         break;
       case 3:
-        content += "#3 (webGL context not found)";
+        stderr += "preload error";
         break;
       case 4:
-        content += "#4 (library init failled)";
+        stderr += "onload error";
         break;
       case 5:
-        content += "#5 (runtime on-preload error.";
+        stderr += "runtime error";
         break;
       case 6:
-        content += "#6 (too much errors - self abort)";
+        stderr += "aborted";
         break;
       case 7:
-        content += "#7 (runtime on-loop error)";
-      case 8:
-        content += "#8 (runtime on-load error)";
+        stderr += "browser error";
         break;
-      default:
-        content += code + "#U (unregistered error)";
+      default: /* 0 */
+        stderr += "general error";
         break;
     }
-    content += " :: " + message + "<br><br>";
-    var logs = Ovoid._log;
-    logs = logs.replace(/    /g, '&nbsp;&nbsp;&nbsp;&nbsp;');
-    logs = logs.replace(/</g, '&lt;');
-    logs = logs.replace(/>/g, '&gt;');
-    logs = logs.replace(/\n/g, '<br>');
-    content += "log backtrace:<br>" + logs;
+    stderr += " :: " + message + "<br><br>";
   }
-  document.write(content);
+  
+  if(code < 3 || code > 5) {
+    
+    /* desinitialise l'instance */
+    instance._runstat = 3;
+    
+    /* Retrouve le parent du canvas pour ecrir l'erreur */
+    var DOMnode
+    if(instance.Frame.canvas) {
+      DOMnode = instance.Frame.canvas.parentNode;
+    } else {
+      DOMnode = document.getElementsByTagName('BODY')[0];
+    }
+
+    /* Affiche l'erreur standard ou custom selon cas */
+    if(stderr) {
+      if(instance) {
+         var logs = instance._log;
+        logs = logs.replace(/    /g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+        logs = logs.replace(/</g, '&lt;');
+        logs = logs.replace(/>/g, '&gt;');
+        logs = logs.replace(/\n/g, '<br>');
+        DOMnode.innerHTML = stderr + "Logs backtrace:<br>" + logs;
+      } else {
+        DOMnode.innerHTML = stderr;
+      }
+    }
+  } else {
+    console.log(stderr);
+  }
 };
 
-/* Les très TRES vielles versions ne connaissant pas l'objet console... */
-if(typeof(console) == "undefined") {
-
-  Ovoid.error(1, "console object unavailable (update your browser !)");
-}
 
 /**
  * Write a message in log string.<br><br>
@@ -256,63 +220,659 @@ if(typeof(console) == "undefined") {
  * 2: WARNING,<br>
  * 3: NOTICE<br>
  * 
+ * @param {object} instance Ovoid.JS instance object.
+ * 
  * @param {string} scope Log scope. Usually the class or function from 
  * where the log is written.
  *
  * @param {string} message Details of the log message.
 */
-Ovoid.log = function(level, scope, message) {
+Ovoid._log = function(level, instance, scope, message) {
 
-  if (message)
-  {
-    if (level <= Ovoid.opt_logLevel)
+  if (message) {
+    if(instance) {
+      if (level > instance.opt_logLevel)
+        return;
+    }
+    /* variables pour construir le log */
+    var root, type, tstm, log;
+    /* timestamp */
+    tstm = '['+new Date().getHours()+':'+new Date().getMinutes()+':'+new Date().getSeconds()+']';
+    /* scope racine */
+    (instance)?root=instance.name:root="Ovoid";
+    /* type de log */
+    switch (level)
     {
-      var log;
-      var time = new Date();
-      var timestamp = '[' + time.getHours() +
-              ':' + time.getMinutes() +
-              ':' + time.getSeconds() + '] ';
-
-      switch (level)
-      {
-        case 0:
-          log = timestamp + 'FATAL: ' + scope +
-                  ':: ' + message + '\n';
-
-          Ovoid._lerror++;
-          Ovoid._lfatal = true;
-          break;
-        case 1:
-          log = timestamp + 'ERROR: ' + scope +
-                  ':: ' + message + '\n';
-
-          this._lerror++;
-          break;
-        case 2:
-          log = timestamp + 'WARNING: ' + scope +
-                  ':: ' + message + '\n';
-
-          Ovoid._lwarning++;
-          break;
-        case 3:
-          log = timestamp + 'NOTICE: ' + scope +
-                  ':: ' + message + '\n';
-          break;
+      case 0:
+        type='FATAL:';
+        if(instance) instance._nerror++;
+        break;
+      case 1:
+        type='ERROR:';
+        if(instance) instance._nerror++;
+        break;
+      case 2:
+        type='WARNING:';
+        break;
+      case 3:
+        type='NOTICE:';
+        break;
+    }
+    
+    /* assemblage */
+    log = tstm+' '+type+' @'+root+scope+'::'+message+'\n';
+    /* on balance sur la console */
+    console.log(log);
+    /* ajoute aux logs instance */
+    if(instance) {
+      instance._log = log + instance._log;
+      /* control de flux d'erreur */
+      if (instance._nerror > 10) {
+        Ovoid._err(6, instance, "Too many errors");
       }
-      
-      Ovoid._log = log + Ovoid._log;
-      console.log(log);
-      if (Ovoid._lerror > 10) {
-        Ovoid.error(6, "No more, 10 errors, it's enought !");
-      }
-
     }
   }
 };
 
 
-/* Preliminary incompatible browser detection */
-if (typeof(Float32Array) == "undefined" || typeof(Uint16Array) == "undefined") {
-  Ovoid.log(0, "Ovoid", 'Undefined Float32Array/Uint16Array objects.');
-  Ovoid.error(1, "ArrayBuffer objects unavailable");
+/**
+ * Main library start and loop function.<br><br>
+ */
+Ovoid._run = function() {
+  var i = Ovoid._inst.length;
+  while(i--) {
+    switch(Ovoid._inst[i]._runstat)
+    {
+      case 3: // instance en pause
+      break;
+      case 2: // instance en runtime
+        Ovoid._inst[i]._mainloop();
+      break;
+      case 1: // instance en preload
+        Ovoid._inst[i]._loadstep();
+      break;
+      case 0: // instance non démarré
+        Ovoid._inst[i]._loadstart();
+      break;
+      case -1: // instance en creation
+      break;
+      default: // a priori impossible
+        /* on note l'instance */
+        var inst = Ovoid._inst[i];
+        /* Delete WebGL Context */
+        inst.gl = null;
+        /* Delete Audio Context */
+        inst.al = null;
+        /* on enlève l'instance de la liste */
+        Ovoid._inst.splice(i, 1);
+        /* on delete l'instance */
+        delete inst;
+      break;
+    }
+  }
+  // C'est ce qui fonctionne le mieux partout...
+  window.setTimeout(Ovoid._run,0);
+};
+
+
+/**
+ * Create Ovoid.JS Config.<br><br>
+ * 
+ * Create a new Ovoid.JS instance Config object.<br><br>
+ * 
+ * @return {object} New Ovoid.JS Config object.
+ */
+Ovoid.newConfig = function() {
+  
+  return new Ovoid.Config();
+};
+
+
+/**
+ * Create a new Ovoid.JS Instance.<br><br>
+ * 
+ * Create and initialize a new Ovoid.JS Instance.<br><br>
+ * 
+ * For more details about Ovoid.JS Instance see the 
+ * <a href="Ovoid.Instance.php">Ovoid.Instance</a> class 
+ * documentation reference.
+ * 
+ * @param {string} name Indicative name of the new Instance.
+ * @param {string} canvas HTML canvas name to initialize the Instance to.
+ * @param {object} [options] Options object to copy options.
+ * 
+ * @return {object} New Ovoid.JS Insance object.
+ */
+Ovoid.newInstance = function(name, canvas, options) {
+  
+  var c = document.getElementById(canvas);
+  if(c.tagName.toUpperCase() == "CANVAS") {
+    var i = new Ovoid.Instance(name);
+    Ovoid._log(3,null,""," new instance '"+name+"' on canvas '"+canvas+"'");
+    if(options instanceof Ovoid.Config) {
+      i._setoptions(options);
+    }
+    if(i._init(c)) {
+      Ovoid._inst.push(i);
+      Ovoid._log(3,null,""," instance '"+name+"' added in stack.");
+      return i;
+    } else {
+      delete(i);
+      return null;
+    }
+  } else {
+    Ovoid._log(3,null,""," '"+canvas+"' is not a CANVAS.");
+    return null;
+  }
+};
+
+
+/**
+ * Degrees to radians conversion.<br><br>
+ * 
+ * Converts the specified value from degrees to radians.
+ *
+ * @param {float} degrees Degrees value.
+ *
+ * @return {float} Radians value.
+ */
+Ovoid.deg2Rad = function(degrees) {
+
+  /* radians = degrees * PI / 180 */
+  return degrees * 0.017453293;
+  /* / 180 = * 0.00555 ; PI * 0.00555 = 0.017453293 */
+};
+
+
+/**
+ * Radians to degrees conversion.<br><br>
+ * 
+ * Converts the specified value from radians to degrees.
+ *
+ * @param {float} radians Radians value.
+ *
+ * @return {float} Degrees value.
+ */
+Ovoid.rad2Deg = function(radians) {
+
+  /* degres = radians / PI * 180 */
+  return radians * 57.295779513;
+  /* / 3.14159... = * 0.31830; 0.31830 * 180 = 57.295779513 */
+};
+
+
+/**
+ * Power of two number.<br><br>
+ * 
+ * Checks whether a number is a power of two.
+ *
+ * @param {int} val Number to check.
+ *
+ * @return {bool} True if the specified number is power of two,
+ * false otherwise.
+ */
+Ovoid.isPowerOfTwo = function(val) {
+
+  return (val & (val - 1)) == 0;
+};
+
+
+/**
+ * Get perlin noise.<br><br>
+ * 
+ * Returns a perlin noise value according to the specified seed.
+ *
+ * @param {int} f Perlin noise seed.
+ *
+ * @return {bool} Perlin noise value.
+ */
+Ovoid.noise = function(f) {
+  //f = (f << 13) ^ f;
+  return ( 1.0 - ( (f * (f * f * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
+};
+
+
+/**
+ * Get random integer.<br><br>
+ * 
+ * Returns a random integer between the specified values.
+ *
+ * @param {int} min Range min interger value.
+ * @param {int} max Range max interger value.
+ *
+ * @return {bool} Random integer between min and max.
+ */
+Ovoid.randInt = function(min, max) {
+
+		return min + Math.round((Math.random() * (max - min)));
+};
+
+
+/**
+ * Get random float.<br><br>
+ * 
+ * Returns a random float between the specified values.
+ *
+ * @param {int} min Range min float value.
+ * @param {int} max Range max float value.
+ *
+ * @return {bool} Random float between min and max.
+ */
+Ovoid.randFloat = function(min, max) {
+
+		return min + (Math.random() * (max - min));
+};
+
+
+/**
+ * Decimal round.<br><br>
+ * 
+ * Rounds a number at its fourth decimal.
+ *
+ * @param {float} f Float value to be rounded.
+ *
+ * @return {string} Rounded float.
+ */
+Ovoid.frnd = function(f) {
+
+  return (Math.round(f*1000) / 1000);
+};
+
+
+/**
+ * Generate fontmap image.<br><br>
+ * 
+ * Generates a fontmap image on HTML canvas with the given parameters.
+ *
+ * @param {int} msize Map size in pixel.
+ * @param {int} csize Cell size in pixel.
+ * @param {int} sx X shift to draw char.
+ * @param {int} sy Y shift to draw char.
+ * @param {string} font Y Font format description.
+ *
+ * @return {object} HTML canvas object of the generated fontmap.
+ */
+Ovoid.genFontmap = function(msize, csize, sx, sy, font) {
+
+  /* generation de la fontmap par defaut */
+  var cv = document.createElement('canvas');
+  cv.width = msize;
+  cv.height = msize;
+  var ct = cv.getContext('2d');
+  ct.font = font;
+  ct.fillStyle = 'rgba(255,255,255,255)';
+  ct.textAlign = 'center';
+  ct.textBaseline = 'middle';
+
+  /* la fontmap est divisée en celules de même taille */
+  // <----map---->
+  // +---+---+---+
+  // | A | B | C | <-- celule (L = 0)
+  // +---+---+---+
+  // | a | b | c | (L = 1)
+  // +---+---+---+
+  // | 1 | 2 | 3 | (L = 2)
+  // +---+---+---+
+
+  var c, n;     // char code ASCII, nombre de char
+  var M = ((msize/csize)*(msize/csize)); // nombre max de char dans la map
+  var C;        // numero de colone de celule
+  var L;        // numero de linge de celule
+  
+  for(c = 32, n = 0; n < M; c++, n++ ) {
+    
+    C = Math.floor(n % (msize / csize));
+    L = Math.floor(n / (msize / csize));
+    
+    ct.fillText(String.fromCharCode(c),((C*csize)+sx),((L*csize)+sy));
+  }
+  
+  /* A cause de Firefox (encore lui, décidément), il faut manipuler les
+  pixels RGB pour les rendre "blancs" car le canvas par defaut n'est pas
+  netoyé, et fillrect ou clearrect n'y fait rien. */
+  
+  var px = ct.getImageData(0,0,msize,msize);
+  for(var i = 0, s = px.data.length; i < s; i+=4){
+    px.data[i] = 255;   // R
+    px.data[i+1] = 255; // G
+    px.data[i+2] = 255; // B
+  }
+  
+  return px;
+};
+
+
+/**
+ * Exctract file name.<br><br>
+ * 
+ * Extrats the file name from the specified full URL string.
+ *
+ * @param {string} url URL string to extract name.
+ * @param {bool} ext Keep the file extention.
+ *
+ * @return {string} Extracted file name.
+ */
+Ovoid.extractName = function(url, ext) {
+
+  var name = url.split('/');
+  name = name[name.length-1];
+  if(!ext) {
+    name = name.split('.');
+    name = name[name.length-2]
+  }
+  return name;
+};
+
+
+/**
+ * Exctract file extention.<br><br>
+ * 
+ * Extrats the file extention from the specified full URL string.
+ *
+ * @param {string} url URL string to extract extention.
+ *
+ * @return {string} Extracted file extention.
+ */
+Ovoid.extractExt = function(url) {
+
+  var ext = url.split('/');
+  ext = ext[ext.length-1];
+  ext = ext.split('.');
+  return ext[ext.length-1];
+};
+
+
+/**
+ * Compact string according Javascript syntax.<br><br>
+ * 
+ * Deletes useless spaces, comments and cariage returns of an string 
+ * according the javascript syntax.
+ *
+ * @param {string} str String to compact.
+ *
+ * @return {string} Compacted string.
+ */
+Ovoid.compact = function(str) {
+  
+  var s = new String(str);
+  /* remplace certains espaces par un caractere '`' pour certains
+   * mots clefs, pour éviter de réduire ces espaces lors du compactage,
+   * c'est pas très fin, mais ça marche. */
+  s = s.replace(/ in /g,"`in`");
+  s = s.replace(/var /g,"var`");
+  s = s.replace(/new /g,"new`");
+  s = s.replace(/const /g,"const`");
+  s = s.replace(/delete /g,"delete`");
+  s = s.replace(/ typeof /g,"`typeof`");
+  s = s.replace(/ instanceof /g,"`instanceof`");
+  // finalement on split
+  s = s.split('');
+  var o = '';
+  var l = s.length;
+  var i = 0;
+  while(i < l) {
+    // Strings ""
+    if(s[i] == "\"") {
+      o += s[i++];
+      while(s[i] != "\"") o += s[i++];
+    }
+    // Strings ''
+    if(s[i] == "'") {
+      o += s[i++];
+      while(s[i] != "'") o += s[i++];
+    }
+    // Commentaires //
+    if(s[i] == "/" && s[i+1] == "/") {
+      while(s[i] != "\n") i++;
+    }
+    // Commentaires /**/
+    if(s[i] == "/" && s[i+1] == "*") {
+      while(!(s[i] == "*" && s[i+1] == "/")) i++;
+      i+=2;
+    }
+    // espaces, retour chariots etc...
+    if(s[i] == "\n" || s[i] == "\r" || s[i] == " " || s[i] == "\t") {
+      i++; 
+    } else {
+      o += s[i++];
+    }
+  }
+  // remplace le carctere '`' par des espaces.
+  o = o.replace(/`in`/g," in ");
+  o = o.replace(/var`/g,"var ");
+  o = o.replace(/new`/g,"new ");
+  o = o.replace(/const`/g,"const ");
+  o = o.replace(/delete`/g,"delete ");
+  o = o.replace(/`typeof`/g," typeof ");
+  o = o.replace(/`instanceof`/g," instanceof ");
+  
+  return o;
 }
+
+
+/**
+ * Handle Mouse button down.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid._eventMouseDn = function(e) {
+
+  var i = Ovoid._inst.length;
+  while(i--) {
+    Ovoid._inst[i].Input.intDn[e.button] = true;
+    Ovoid._inst[i].Input.intUp[e.button] = false;
+    Ovoid._inst[i].Input.intHl[e.button] = true;
+  }
+};
+
+
+/**
+ * Handle Mouse button up.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid._eventMouseUp = function(e) {
+
+  var i = Ovoid._inst.length;
+  while(i--) {
+    Ovoid._inst[i].Input.intDn[e.button] = false;
+    Ovoid._inst[i].Input.intUp[e.button] = true;
+    Ovoid._inst[i].Input.intHl[e.button] = false;
+  }
+};
+
+
+/**
+ * Handle Mouse move.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid._eventMouseMove = function(e) {
+
+  var i = Ovoid._inst.length;
+  while(i--) {
+    /* calcul de la position relative de la souris */
+    var x = e.clientX - Ovoid._inst[i].Frame.position.v[0] + Ovoid._inst[i].Frame.scroll.v[0];
+    var y = e.clientY - Ovoid._inst[i].Frame.position.v[1] + Ovoid._inst[i].Frame.scroll.v[1];
+
+    Ovoid._inst[i].Input.mouseVelocity.set(
+        Ovoid._inst[i].Input.mousePosition.v[0] - x, 
+        Ovoid._inst[i].Input.mousePosition.v[1] - y,
+        0.0);
+        
+    Ovoid._inst[i].Input.mousePosition.set(x, y, 0.0);
+  }
+};
+
+
+/**
+ * Handle Mouse wheel.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid._eventMouseWheel = function(e) {
+
+  var i = Ovoid._inst.length;
+  while(i--) {
+    if (!e) /* IE */
+      e = window.event;
+    
+    var w;
+    if (e.wheelDelta) { /* IE/Opera */
+      w = e.wheelDelta/120;
+    } else if (e.detail) { /* Mozilla */
+      w = -e.detail/3;
+    }
+
+    if (w > 0) {
+      Ovoid._inst[i].Input.intUp[7] = true;
+    } else if (w < 0) {
+      Ovoid._inst[i].Input.intDn[7] = true;
+    }
+    Ovoid._inst[i].Input.mouseWheelDelta = w;
+  }
+}
+
+
+/**
+ * Handle key down.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid._eventKeyDn = function(e) {
+  var i = Ovoid._inst.length;
+  while(i--) {
+    Ovoid._inst[i].Input.intDn[e.keyCode] = true;
+    Ovoid._inst[i].Input.intHl[e.keyCode] = true;
+  }
+};
+
+
+/**
+ * Handle key up.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid._eventKeyUp = function(e) {
+
+  var i = Ovoid._inst.length;
+  while(i--) {
+    Ovoid._inst[i].Input.intUp[e.keyCode] = true;
+    Ovoid._inst[i].Input.intHl[e.keyCode] = false;
+  }
+};
+
+
+/**
+ * Handle GamePad Axis.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid._eventGpAxis = function(e) {
+
+ // Ne fonctionne pas pour le moment
+ 
+};
+
+/**
+ * Handle GamePad Connect.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ * 
+ * @param {Object} e DOM Event object.
+ */
+Ovoid._eventGpConnect = function(e) {
+
+ // Ne fonctionne pas pour le moment
+ 
+};
+
+/**
+ * Handle window resizing.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ */
+Ovoid._handleResize = function() {
+
+  var i = Ovoid._inst.length;
+  while(i--) {
+    switch(Ovoid._inst[i].Frame.mode) 
+    {
+      case 0: // FRAME_MANUAL_SIZE
+        Ovoid._inst[i].Frame._updatepos();
+      break;
+      case 1: // FRAME_CLIENT_SIZE
+        Ovoid._inst[i].Frame._updatesize();
+        Ovoid._inst[i].Frame._updatepos();
+      break;
+      case 2: // FRAME_FULL_SCREEN
+      break;
+    }
+  }
+  
+};
+
+
+/**
+ * Handle window scrolling.
+ * This function is typically used as class's private member and should not be 
+ * called independently.
+ */
+Ovoid._handleScroll = function() {
+
+  var i = Ovoid._inst.length;
+  while(i--) {
+    Ovoid._inst[i].Frame._updatepos();
+  }
+};
+
+/* ----------------- Opération globales préliminaire ---------------- */
+
+// Detection du navigateur
+if(/opera/.test(Ovoid._ua))Ovoid._curBrower="opera";
+if(/safari/.test(Ovoid._ua))Ovoid._curBrower="safari";
+if(/chrome/.test(Ovoid._ua))Ovoid._curBrower="chrome";
+if(/msie/.test(Ovoid._ua))Ovoid._curBrower="msie";
+if(/firefox/.test(Ovoid._ua))Ovoid._curBrower="firefox";
+Ovoid._log(3,null,""," user agent: "+Ovoid._ua+"");
+Ovoid._log(3,null,""," browser '"+Ovoid._curBrower+"' detected");
+
+// Attribution des fonctions d'evenements clavier/souris.
+window.onmousedown = Ovoid._eventMouseDn;
+window.onmouseup = Ovoid._eventMouseUp;
+window.onmousemove = Ovoid._eventMouseMove;
+window.onmousewheel = Ovoid._eventMouseWheel;
+
+window.addEventListener('DOMMouseScroll', 
+    Ovoid._eventMouseWheel, 
+    false);
+
+document.onkeydown = Ovoid._eventKeyDn;
+document.onkeyup = Ovoid._eventKeyUp;
+
+// Inutiles, aucun browser standard compatible pour le moment
+window.addEventListener("MozGamepadConnected", Ovoid._eventGpConnect, false);
+window.addEventListener("MozGamepadAxisMove", Ovoid._eventGpAxis, false);
+
+// Attribution des fonction d'evenements fenetre client.
+window.onresize = Ovoid._handleResize;
+window.onscroll = Ovoid._handleScroll;
+
+// On lance finalement l'API
+Ovoid._run();
+Ovoid._log(3,null,""," API is now running");
+

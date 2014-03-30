@@ -20,7 +20,7 @@
 
 
 /**
- * Create a Polygon polyset object.
+ * Constructor method.
  *
  * @class Polygon polyset object.<br><br>
  * 
@@ -31,7 +31,7 @@
  */
 Ovoid.Polyset = function() {
 
-  /** Indices offset.
+  /** Indices offset (bytes).
    * @type int */
   this.ioffset = 0;
   /** Indices count.
@@ -40,13 +40,28 @@ Ovoid.Polyset = function() {
   /** Material reference.
    * @type Material */
   this.material = null;
+  /** Drawing mode.
+   * @type enum */
+  this.mode = 4; /* TRIANGLES */
+  /** Associated Vertex Buffer.
+   * @type int */
+  this.ibuffer = null;
+  /** Associated Indices Buffer.
+   * @type int */
+  this.vbuffer = null;
+  /** Vertex Format.
+   * @type bitmask */
+  this.vformat = 0;
+  /** Vertex size in bytes.
+   * @type int */
+  this.vfbytes = 0;
 };
 
 
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

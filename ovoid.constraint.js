@@ -20,11 +20,11 @@
 
 
 /**
- * Constraint node constructor.
+ * Constructor method.
  *
  * @class Constraint node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Constraint node is the base class for constraint nodes type. It 
  * implements a simple node targeting abstract mechanism. The Constraint node is 
@@ -40,8 +40,9 @@
  * @see Ovoid.Aim
  *
  * @param {string} name Name of the new node.
+ * @param {object} i Instance object to register object to.
 */
-Ovoid.Constraint = function(name) {
+Ovoid.Constraint = function(name, i) {
 
   Ovoid.Node.call(this);
   /** node type */
@@ -52,6 +53,10 @@ Ovoid.Constraint = function(name) {
   /** Constraint's target node 
    * @type Node */
   this.target = new Array();
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 
 };
 Ovoid.Constraint.prototype = new Ovoid.Node;
@@ -100,7 +105,7 @@ Ovoid.Constraint.prototype.remTarget = function(node) {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

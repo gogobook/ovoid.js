@@ -20,60 +20,143 @@
 
 
 /**
- * OJSON translator constructor.
+ * Constructor method.
  * 
  * @class OvoiD.JSON translator object.<br><br>
  *
  * The Ojson object implements a JSON format scene exporter/importer.<br><br>
  * 
- * <b>The OvoiD.JSON File Format</b><br><br>
+ * <b>The OvoiD.JSON Files</b><br><br>
  * 
- * OvoiD.JSON is a JSON formated file who store an OvoiD.JS specific data 
- * encapsulation object.<br><br>
+ * OvoiD.JSON is a JSON formated file who store an OvoiD.JS specific 
+ * data.<br><br>
  * 
- * <blockcode>
- * {"OJSON":1, "type":"scene", "scene":{...}}<br>
- * </blockcode><br><br>
+ * OvoiD.JSON is designed to be used as the main OvoiD.JS Library saving 
+ * and loading file format. It currently provides full support for 
+ * Scene and Instance's environment.<br><br>
  * 
- * OvoiD.JSON is designed to be used as the main OvoiD.JS Library saving and 
- * loading file format. It currently provides full support for Scene exporation
- * and importation.<br><br>
+ * The Ovoid.Ojson class can export and import two file type, one 
+ * dedicated to Scene data, with the ".ojs" extention, and another 
+ * dedicated to Instance's environment, with the ".oje" extention. 
+ * The data type and file format is automaticaly selected depending 
+ * the object's type you pass as argument to the <c>save()</c> method. 
+ * If you give an Scene object, it will export an ".ojs" file with 
+ * Scene data. If you give an Instance object, it will export an 
+ * ".oje" file with Instance's environment data.<br><br>
  * 
- * <blockcode>
- * var ojson = new Ovoid.Ojson();<br>
- * ojson.exportScene(scene);<br>
- * </blockcode><br><br>
+ * <b>Which data is saved ?</b><br><br>
  * 
- * <b>Saving your work</b><br><br>
- * 
- * The exportation process is rather rustical since the Javascript environment 
- * is client side and forbids some basic functionnalities. It currently consist 
- * of a simple popup window who contains the resulting JSON export in text 
- * format. You have to copy and paste the text to save in any file.<br><br>
- * 
- * <blockcode>
- * var ojson = new Ovoid.Ojson();<br>
- * ojson.loadSource("savedscene.ojsn");<br>
- * ojson.importScene(scene);<br>
- * </blockcode><br><br>
- * 
- * The Ojson export includes all OvoiD.JS nodes with custom trigger functions, 
- * optimized mesh data and global nodes status.
- * 
- * <b>Why use Ojson instead of COLLADA</b>
+ * For the Scene data ".ojs" file:<br>
  * <ul>
- * <li>COLLADA import is slower and COLLADA files are heavier than OJSON for 
- * less contents.</li>
- * <li>COLLADA doese not contain all the scene interactions nodes such as Action
- * node with scripts, and Physics node constraints with parameters.</li>
- * <li>If your final scene is composed of several COLLADA files (to have 
- * several animations for the same object for exemple), you can save the 
- * final result as OJSON and then reimports all at once.</li>
- * <li>With COLLADA you have to optimize all your meshs at loading. 
- * OSJON save the optimized mesh data.</li>
- * </ul>
- * COLLADA is a good way to import data from 3D softwares and to build complex 
- * composite scenes. But is rather a bad way for the final show.
+ * <li>Scene's name and Uid</li>
+ * <li>All Scene's Nodes with data including user-defined functions.</li>
+ * </ul><br><br>
+ * 
+ * For the Instance's environment data ".oje" file:<br>
+ * <ul>
+ * <li>Instance's options, except WebGL context options (who must be 
+ * defined before Instance's creation).</li>
+ * <li>Input's triggers with user-defined functions</li>
+ * <li><c>onloop()</c>, <c>ondraw()</c> and <c>waitdraw()</c> user-defined 
+ * methods (the <c>onload()</c> method is not saved since it may produce 
+ * redundant code)</li>
+ * <li>Custom user-defined Drawer's Shaders with pipes and layers 
+ * configuration</li>
+ * </ul><br><br>
+ * 
+ * <b>Saving data</b><br><br>
+ * 
+ * Once you created an interactive application using Action Nodes, 
+ * Expression Nodes, COLLADA importations, user-defined onload() and 
+ * onloop(), Input triggers, custom shaders with layers configuration, 
+ * etc... you can save all data using the Ojson translator. It's simple, 
+ * you just have to create an Ovoid.Ojson object and call the <c>save()</c> 
+ * method at the good time in your code.
+ * 
+ * <blockcode>
+ * <cc>// Our application entry, called via 'onload="main()"' in our HTML code</cc><br>
+ * function main() {<br>
+ * &nbsp;&nbsp;<cc>// Create a Config object
+ * &nbsp;&nbsp;var myConf = Ovoid.newConfig();<br>
+ * &nbsp;&nbsp;<cc>// Adjust some options</cc><br>
+ * &nbsp;&nbsp;<cc>// ...</cc><br>
+ * &nbsp;&nbsp;<cc>// Create a new instance</cc><br>
+ * &nbsp;&nbsp;var Instance = Ovoid.newInstance("myOvoid", "myCanvas", myConf);<br>
+ * &nbsp;&nbsp;<cc>// The Config object is now useless</cc><br>
+ * &nbsp;&nbsp;delete myConf;<br>
+ * &nbsp;&nbsp;<cc>// Creation successfull ? </cc><br>
+ * &nbsp;&nbsp;if(Instance) {<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<cc>// Include stuff to load</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<cc>// ...</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<cc>// Then define the onload() function</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;Instance.onload = function() {<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cc>// ...</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cc>// Create a Ojson object</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var ojson = new Ovoid.Ojson();<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cc>// Export the current Instance's environment</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ojson.save(this);<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cc>// Export the current Instance's active Scene</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ojson.save(this.Scene);<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<cc>// And define the onloop() function</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;Instance.onloop = function() {<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cc>// ...</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<cc>// All is ready now, we can start the Instance</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;Instance.start();<br>
+ * &nbsp;&nbsp;}<br>
+ * }<br>
+ * </blockcode>
+ * 
+ * With the above example, your browser will prompt you to dowload two
+ * files, an .oje, this is the Instance's Env data, and an .ojs, this
+ * is the Scene's data.<br><br>
+ * 
+ * <b>Restore saved data</b><br><br>
+ * 
+ * Once you saved an Instance's environment and/or a scene
+ * you can erase almost all your code and just have to restore it via 
+ * the <c>Instance.includeOjson()</c> method before starting the 
+ * Instance.<br><br>
+ * 
+ * <blockcode>
+ * <cc>// Our application entry, called via 'onload="main()"' in our HTML code</cc><br>
+ * function main() {<br>
+ * &nbsp;&nbsp;<cc>// Create a Config object<br>
+ * &nbsp;&nbsp;var myConf = Ovoid.newConfig();<br>
+ * &nbsp;&nbsp;<cc>// Adjust some options </cc><br>
+ * &nbsp;&nbsp;<cc>// ... </cc><br>
+ * &nbsp;&nbsp;<cc>// Create a new instance</cc><br>
+ * &nbsp;&nbsp;var Instance = Ovoid.newInstance("myOvoid", "myCanvas", myConf);<br>
+ * &nbsp;&nbsp;<cc>// The Config object is now useless</cc><br>
+ * &nbsp;&nbsp;delete myConf;<br>
+ * &nbsp;&nbsp;<cc>// Creation successfull ? </cc><br>
+ * &nbsp;&nbsp;if(Instance) {<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<cc>// Include our saved Instance's Env</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;Instance.includeOjson("myOvoid.oje");<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<cc>// Include our saved Scene</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;Instance.includeOjson("myOvoidScene.ojs");<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<cc>// Then just start the instance</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;Instance.start();<br>
+ * &nbsp;&nbsp;}<br>
+ * }<br>
+ * </blockcode><br><br>
+ * 
+ * <b>Why using Ojson instead still use Dae/Collada file ?</b><br><br>
+ * 
+ * Dae/Collada is an exchange format. It is optimised to make easy the 
+ * translation from a 3D application to another, but NOT optimized for 
+ * weight and data storing. In Ovoid.JS,  and if you don't specify the 
+ * option, all mesh's data from a Dae file are imported as raw data 
+ * then optimized to be more lightweight, take less memory and 
+ * optimized for some computation (like shadow volums). This operation 
+ * can take many time if the mesh is complex. If you export the 
+ * optimised mesh as Ojson, the mesh is stored as a native node, full 
+ * ready and optimized. It is lightweight to load, and is computed 
+ * quickly. And more, the Ojson format saves ALL Ovoid.JS specific 
+ * data, like Lod data, Body's visible range, layers,  interactive 
+ * configuration, etc...<br><br>
+ * 
  */ 
 Ovoid.Ojson = function() {
 
@@ -92,126 +175,8 @@ Ovoid.Ojson = function() {
   /** Loading status code.
    * @type int */
   this.loadStatus = 0;
-};
-
-
-/**
- * Load the specified source file for this instance.<br><br>
- * 
- * Loads the specified external source file and extracts, decodes or parses the 
- * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
- *  
- * The <code>loadSatus</code> member indicates the loading status through an 
- * integer value of 0, 1 or -1. A value of 0 means that the file is not yet 
- * loaded, a value of 1 means that the source was successfully loaded, and a 
- * value of -1 means the loading failed.<br><br>
- * 
- * @param {string} url Source file name to load.
- * 
- * @param {bool} async Optionnal asynchronous loading flag. If true or not null
- * the source is loaded in asynchronous way.
- * 
- */
-Ovoid.Ojson.prototype.loadSource = function(url, async) {
-
-  this.url = url;
-
-  Ovoid.log(3, 'Ovoid.Ojson', "loading source file '" + this.url + "'");
-          
-  this.loadStatus = 0;
-  var htreq = new XMLHttpRequest();
-
-  /* La définition de onreadystatechange n'est utile qu'en
-   * mode asynchrone */
-  if (async) {
-    htreq.owner = this;
-    htreq.onreadystatechange = function()
-    {
-      if (this.readyState == 4) {
-        if (this.status == 200 || this.status == 304) {
-          Ovoid.log(3, 'Ovoid.Ojson', "parsing source file '" + this.owner.url + "'");
-          try{
-            this.owner._json = JSON.parse(this.responseText);
-          } catch(e) {
-            Ovoid.log(2, 'Ovoid.Ojson', "parse error '" + e.stack + "'");
-          }
-          this.owner.loadStatus = 1;
-        } else {
-          this.owner.loadStatus = -1;
-          Ovoid.log(2, 'Ovoid.Ojson ' + this.name,
-              "unable to load source '" +
-              this.owner.url + "'");
-        }
-      }
-    }
-  }
-
-  var src = this.url;
-  if (Ovoid.opt_debugMode) 
-    src += '?' + Math.random();
-    
-  htreq.open('GET',src, async);
-  htreq.send(null);
-
-  /* Si nous sommes en mode synchrone */
-  if (!async) {
-    if (htreq.status == 200 || htreq.status == 304) {
-      this._json = JSON.parse(htreq.responseText);
-      this.loadStatus = 1;
-    } else {
-      this.loadStatus = -1;
-      Ovoid.log(1, 'Ovoid.Ojson ' + this.name,
-          "unable to load source '" +
-          this.url + "'");
-    }
-  }
-};
-
-
-/**
- * Export Scene as OJSON data.<br><br>
- * 
- * Exports the given scene with all included nodes and properties. It returns 
- * the exportation result in a string and creates a popup window filled with the 
- * exportation data result in text format. You have to copy and paste the text 
- * to save in any file.<br><br>
- * 
- * (be sure your browser will autorize popup window before using this method)
- *
- * @param {Object} scene Scene object to export.
- * 
- * @return {String} Exportation result string.
- */
-Ovoid.Ojson.prototype.exportScene = function(scene) {
-  
-  /* Entête d'objet */
-  this._json = new Object();
-  this._json['OJSON'] = Ovoid.OVOIDJS_VERSION;
-  this._json['TYPE'] = "SCN";
-  /* Export de la scene */
-  this._json['SCENE'] = scene;
-  var Ojson = JSON.stringify(this._json);
-
-  /* reformate le json pour inclure quelques espaces pour permetre le retour
-   * a la ligne automatique, sans ca l'outup peut bugger */
-  var c = Ojson.length;
-  var p = 0;
-  for(var i = 0; i < c; i++, p++) {
-    if(p > 2048) {
-      if(Ojson[i] == ',') {
-        Ojson = [Ojson.slice(0, i+1), '<br>', Ojson.slice(i+1)].join('');
-        p = 0;
-      }
-    }
-  }
-  /* Affiche le popup avec le contenu JSON */
-  var pop = window.open("scene.ojsn","Ojson export","width=600,height=300,scrollbars=yes,resizable=yes", true);
-  var doc = pop.document.open();
-  doc.write("<html><header><title>Ojson export</title><header><body style=\"font-family:monospace;font-size:10\">");
-  doc.write(Ojson);
-  doc.write("</body></html>");
-
-  return Ojson;
+  /** pointer to attached Ovoid.JS instance */
+  this._i = null;
 };
 
 
@@ -255,7 +220,8 @@ Ovoid.Ojson.prototype._linkReport = function(n, l, s) {
     lname = "null";
   }
   
-  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "relink '" + n.name + "' has "+ s +" '" + lname + "'");
+  Ovoid._log(3,this._i,'::Ojson._linkReport', this.name + 
+      ":: relink '" + n.name + "' has "+ s +" '" + lname + "'");
 }
 
 /**
@@ -268,133 +234,133 @@ Ovoid.Ojson.prototype._importNode = function(j) {
   switch (j.t)
   {
     case Ovoid.TRANSFORM:
-      n = new Ovoid.Transform(j.n);
+      n = new Ovoid.Transform(j.n, this._i);
       this._procTransform(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Transform node '" + j.n + "'");
+      Ovoid._log(3,this._i, '::Ojson._importNode', this.name + 
+        ":: import Transform node '" + j.n + "'");
       break;
     case Ovoid.CAMERA:
-      n = new Ovoid.Camera(j.n);
+      n = new Ovoid.Camera(j.n, this._i);
       this._procCamera(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Camera node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name + 
+        ":: import Camera node '" + j.n + "'");
       break;
     case Ovoid.LIGHT:
-      n = new Ovoid.Light(j.n);
+      n = new Ovoid.Light(j.n, this._i);
       this._procLight(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Light node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name + 
+        ":: import Light node '" + j.n + "'");
       break;
     case Ovoid.BODY:
-      n = new Ovoid.Body(j.n);
+      n = new Ovoid.Body(j.n, this._i);
       this._procBody(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Body node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name + 
+        ":: import Body node '" + j.n + "'");
       break;
     case Ovoid.JOINT:
-      n = new Ovoid.Joint(j.n);
+      n = new Ovoid.Joint(j.n, this._i);
       this._procJoint(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Joint node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name + 
+        ":: import Joint node '" + j.n + "'");
       break;
     case Ovoid.MESH:
-      n = new Ovoid.Mesh(j.n);
+      n = new Ovoid.Mesh(j.n, this._i);
       this._procMesh(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Mesh node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Mesh node '" + j.n + "'");
       break;
     case Ovoid.MATERIAL:
-      n = new Ovoid.Material(j.n);
+      n = new Ovoid.Material(j.n, this._i);
       this._procMaterial(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Material node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name + 
+        ":: import Material node '" + j.n + "'");
       break;
     case Ovoid.TEXTURE:
-      n = new Ovoid.Texture(j.n);
+      n = new Ovoid.Texture(j.n, this._i);
       this._procTexture(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Texture node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Texture node '" + j.n + "'");
       break;
     case Ovoid.ACTION:
-      n = new Ovoid.Action(j.n);
+      n = new Ovoid.Action(j.n, this._i);
       this._procAction(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Action node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name + 
+        ":: import Action node '" + j.n + "'");
       break;
     case Ovoid.PHYSICS:
-      n = new Ovoid.Physics(j.n);
+      n = new Ovoid.Physics(j.n, this._i);
       this._procPhysic(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Physics node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Physics node '" + j.n + "'");
       break;
     case Ovoid.ANIMATION:
-      n = new Ovoid.Animation(j.n);
+      n = new Ovoid.Animation(j.n, this._i);
       this._procAnimation(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
         "import Animation node '" + j.n + "'");
       break;
     case Ovoid.EXPRESSION:
-      n = new Ovoid.Expression(j.n);
+      n = new Ovoid.Expression(j.n, this._i);
       this._procExpression(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Expression node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Expression node '" + j.n + "'");
       break;
     case Ovoid.AIM:
-      n = new Ovoid.Aim(j.n);
+      n = new Ovoid.Aim(j.n, this._i);
       this._procAim(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Aim node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Aim node '" + j.n + "'");
       break;
     case Ovoid.TRACK:
-      n = new Ovoid.Track(j.n);
+      n = new Ovoid.Track(j.n, this._i);
       this._procTrack(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Track node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name + 
+        ":: import Track node '" + j.n + "'");
       break;
     case Ovoid.SKIN:
-      n = new Ovoid.Skin(j.n);
+      n = new Ovoid.Skin(j.n, this._i);
       this._procSkin(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Skin node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Skin node '" + j.n + "'");
       break;
     case Ovoid.EMITTER:
-      n = new Ovoid.Emitter(j.n);
+      n = new Ovoid.Emitter(j.n, this._i);
       this._procEmitter(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Emitter node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Emitter node '" + j.n + "'");
       break;
     case Ovoid.AUDIO:
-      n = new Ovoid.Audio(j.n);
+      n = new Ovoid.Audio(j.n, this._i);
       this._procAudio(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Audio node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Audio node '" + j.n + "'");
       break;
     case Ovoid.TEXT:
-      n = new Ovoid.Text(j.n);
+      n = new Ovoid.Text(j.n, this._i);
       this._procText(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Text node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Text node '" + j.n + "'");
       break;
     case Ovoid.LAYER:
-      n = new Ovoid.Layer(j.n);
+      n = new Ovoid.Layer(j.n, this._i);
       this._procLayer(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Layer node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Layer node '" + j.n + "'");
       break;
     case Ovoid.SOUND:
-      n = new Ovoid.Sound(j.n);
+      n = new Ovoid.Sound(j.n, this._i);
       this._procSound(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Sound node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name + 
+        ":: import Sound node '" + j.n + "'");
       break;
     default:
-      n = new Ovoid.Node(j.n);
+      n = new Ovoid.Node(j.n, this._i);
       this._procNode(n, j);
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "import Null node '" + j.n + "'");
+      Ovoid._log(3,this._i,'::Ojson._importNode', this.name +
+        ":: import Null node '" + j.n + "'");
       break;
   }
-  this._dstsc.insert(n, null, true, true);
+  this._dstsc.insNode(n, null, true, true);
   this._rlnkstack.push(n);
 };
 
@@ -409,7 +375,7 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
   /* relink du node de base */
   if(n.parent != null) {
     if(n.parent != 0) {
-      n.parent = this._dstsc.search(n.parent);
+      n.parent = this._dstsc.findNode(n.parent);
     } else {
       /* parent par defaut */
       n.parent = null;
@@ -424,30 +390,30 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
   }
   
   for(var i = 0; i < n.child.length; i++) 
-    n.child[i] = this._dstsc.search(n.child[i]);
+    n.child[i] = this._dstsc.findNode(n.child[i]);
     
   for(var i = 0; i < n.depend.length; i++)
-    n.depend[i] = this._dstsc.search(n.depend[i]);
+    n.depend[i] = this._dstsc.findNode(n.depend[i]);
     
   for(var i = 0; i < n.link.length; i++)
-    n.link[i] = this._dstsc.search(n.link[i]);
+    n.link[i] = this._dstsc.findNode(n.link[i]);
     
   if(n.type & Ovoid.CONSTRAINT)
     for(var i = 0; i < n.target.length; i++)
-      n.target[i] = this._dstsc.search(n.target[i]);
+      n.target[i] = this._dstsc.findNode(n.target[i]);
   
   if(n.type & Ovoid.AIM)
-    n.aimat[i] = this._dstsc.search(n.aimat[i]);
+    n.aimat[i] = this._dstsc.findNode(n.aimat[i]);
 
   if(n.type & Ovoid.BODY)
-    n.shape = this._dstsc.search(n.shape);
+    n.shape = this._dstsc.findNode(n.shape);
 
   if(n.type & Ovoid.SKIN) {
-    n.mesh = this._dstsc.search(n.mesh);
+    n.mesh = this._dstsc.findNode(n.mesh);
     /* retrouve les joints */
     var joints = new Array();
     for(var i = 0; i < n.joint.length; i++) {
-      n.joint[i] = this._dstsc.search(n.joint[i]);
+      n.joint[i] = this._dstsc.findNode(n.joint[i]);
       this._linkReport(n, n.joint[i], "joint");
       /* Il faut aussi recréer les tableaux de matrices */
       n.bindJointMatrix.push(new Ovoid.Matrix4());
@@ -462,44 +428,47 @@ Ovoid.Ojson.prototype._relinkNode = function(n) {
   }
 
   if(n.type & Ovoid.JOINT)
-      n.skin = this._dstsc.search(n.skin);
+      n.skin = this._dstsc.findNode(n.skin);
   
   if(n.type & Ovoid.SOUND)
-      n.audio = this._dstsc.search(n.audio);
+      n.audio = this._dstsc.findNode(n.audio);
 
   if(n.type & Ovoid.LAYER)
-      n.bgTexture = this._dstsc.search(n.bgTexture);
+      n.bgTexture = this._dstsc.findNode(n.bgTexture);
 
   if(n.type & Ovoid.TEXT)
-      n.fontmap = this._dstsc.search(n.fontmap);
+      n.fontmap = this._dstsc.findNode(n.fontmap);
     
   if(n.type & Ovoid.MATERIAL)
     for(var i = 0; i < n.texture.length; i++)
-        n.texture[i] = this._dstsc.search(n.texture[i]);
+        n.texture[i] = this._dstsc.findNode(n.texture[i]);
   
   if(n.type & Ovoid.TRACK)
     for(var i = 0; i < n.animation.length; i++)
-        n.animation[i] = this._dstsc.search(n.animation[i]);
+        n.animation[i] = this._dstsc.findNode(n.animation[i]);
   
   if(n.type & Ovoid.MESH) {
     for (var l = 0; l < Ovoid.MAX_MESH_LOD; l++) {
       for (var s = 0; s < n.polyset[l].length; s++) {
-        n.polyset[l][s].material = this._dstsc.search(n.polyset[l][s].material);
+        n.polyset[l][s].material = this._dstsc.findNode(n.polyset[l][s].material);
         if(!n.polyset[l][s].material) {
-          Ovoid.log(2, 'Ovoid.Ojson ' + this.name, 
-              "polyset #" + l + " of '" + n.name + "' has null material.");
+          Ovoid._log(2,this._i,'::Ojson._relinkNode', this.name + 
+              ":: polyset #" + l + " of '" + n.name + "' has null material.");
         }
       }
     }
   }
-  
+
+  if(n.type & Ovoid.EMITTER)
+    n.texture = this._dstsc.findNode(n.texture);
+        
   if(n.type & Ovoid.ACTION) {
     for (var i = 0; i < n.onIntersect[0].length; i++)
-        n.onIntersect[0][i] = this._dstsc.search(n.onIntersect[0][i]);
+        n.onIntersect[0][i] = this._dstsc.findNode(n.onIntersect[0][i]);
     for (var i = 0; i < n.onIntersectEnter[0].length; i++)
-        n.onIntersectEnter[0][i] = this._dstsc.search(n.onIntersectEnter[0][i]);
+        n.onIntersectEnter[0][i] = this._dstsc.findNode(n.onIntersectEnter[0][i]);
     for (var i = 0; i < n.onIntersectLeave[0].length; i++) 
-      n.onIntersectLeave[0][i] = this._dstsc.search(n.onIntersectLeave[0][i]);
+      n.onIntersectLeave[0][i] = this._dstsc.findNode(n.onIntersectLeave[0][i]);
   }
 };
 
@@ -672,8 +641,8 @@ Ovoid.Ojson.prototype._procMesh = function(n, j) {
     }
     
     if(j.mv[l].length > 0) {
-      Ovoid.log(3, 'Ovoid.Ojson ' + this.name, 
-        "unpack vertices buffer:" + j.mv[l].length + " floats");
+      Ovoid._log(3,this._i, '::Ojson._procMesh', this.name + 
+        ":: unpack vertices buffer:" + j.mv[l].length + " floats");
       n.vertices[l] = Ovoid.Vertex.upack(j.mf, j.mv[l]);
     }
     
@@ -690,6 +659,8 @@ Ovoid.Ojson.prototype._procMesh = function(n, j) {
       }
     }
     
+    n._lodt[l] = j.lt[l];
+    
     n.recalcTriangles(l);
   }
   
@@ -697,7 +668,7 @@ Ovoid.Ojson.prototype._procMesh = function(n, j) {
   n._vformat = j.mf;
   (j.mm == 'null')?n.modifier=null:n.modifier=j.mm;
   
-  n.createBuffers(n._vformat, Ovoid.BUFFER_STATIC);
+  n._createBuffers(n._vformat, Ovoid.BUFFER_STATIC);
 };
 
 
@@ -980,6 +951,7 @@ Ovoid.Ojson.prototype._procBody = function(n, j) {
   n.shadowCasting = j.bc;
   n.renderLayer = j.bl;
   n.renderAlpha = j.ba;
+  n.visibleRange = j.vr;
 };
 
 
@@ -1197,74 +1169,111 @@ Ovoid.Ojson.prototype._procAction = function(n, j) {
 
 
 /**
+ * Export data as Ovoid.JSON file.<br><br>
+ * 
+ * Exports the given object to Ovoid.JSON file. Once exportation done, 
+ * the browser will prompts to download the generated file.<br><br>
+ * 
+ * The output file format depend of the object's type you pass as 
+ * argument. An Scene object will export the Scene and outputs an .ojs 
+ * file. An Instance object will export the Instance's environment and 
+ * outputs an .oje file.<br><br>
+ *
+ * @param {Object} recp Source object to export, can be a Scene object 
+ * or Instance object.
+ * 
+ * @return {String} Exportation result string.
+ */
+Ovoid.Ojson.prototype.save = function(recp) {
+  
+  this._json = new Object();
+  this._json['OJSN'] = Ovoid.VERSION;
+  var ext;
+      
+  if(recp instanceof Ovoid.Scene) {
+    /* Entête d'objet */
+    this._i = recp._i;
+    this._json['TYPE'] = "SCN";
+    this._json['SCENE'] = recp;
+    ext = ".ojs";
+  } else {
+    if(recp instanceof Ovoid.Instance) {
+      this._i = recp;
+      this._json['TYPE'] = "ENV";
+      this._json['INENV'] = recp;
+      ext = ".oje";
+    } else {
+      Ovoid._log(1,this._i,'::Ojson.export', this.name + 
+      ":: invalid object type to export, expected Scene or Instance.");
+      delete this._json;
+      return null;
+    }
+  }
+  
+  /* Export des données */
+  var Ojson = JSON.stringify(this._json);
+
+  var dl = document.createElement('a');
+  if(dl) {
+    dl.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(Ojson));
+    dl.setAttribute('download', recp.name + ext);
+    dl.click();
+  } else {
+    Ovoid._log(1,this._i,'::Ojson.export', this.name + 
+      ":: unable to create download link");
+    alert("Ovoid :: Ojson.exportScene :: unable to create download link.");
+  }
+  
+  return Ojson;
+};
+
+
+/**
  * Import OJSON scene data.<br><br>
  * 
- * Interprets the current parsed OSJON source and import the result in the
- * given recipient scene.
+ * Interprets the current parsed OSJON source and import the result in 
+ * the given recipient scene.
  *
  * @param {Object} scene Recipient Scene object.
  * 
  * @return {bool} True if import suceeds, false otherwise.
  */
-Ovoid.Ojson.prototype.importScene = function(scene) {
-
-  /* détermine le nom du ojson d'apres l'url */
-  var tmp = this.url;
-  tmp = tmp.split('/');
-  tmp = tmp[tmp.length - 1];
-  tmp = tmp.split('.');
-  this.name = tmp[0];
-  
-  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "importScene START");
-  
-  /* Si le JSON object n'existe on ne peut rien faire */
-  if (!this._json) {
-    Ovoid.log(1, 'Ovoid.Ojson ' + this.name, "no data to import.");
-    return false;
-  }
-
-  /* Verifie le format JSON */
-  if(!this._json.OJSON) {
-    Ovoid.log(1, 'Ovoid.Ojson ' + this.name,
-          "is not a valid Ovoid JSON format");
-    return false;
-  }
-  
-  if(this._json.TYPE != "SCN") {
-    Ovoid.log(1, 'Ovoid.Ojson ' + this.name,
-          "is not a valid Ovoid JSON Scene");
-    return false;
-  }
-  
+Ovoid.Ojson.prototype._importScene = function(scene) {
+    
   if(!this._json.SCENE) {
-    Ovoid.log(1, 'Ovoid.Ojson ' + this.name,
-          "no scene object found in Ovoid JSON");
+    Ovoid._log(1,this._i, '::Ojson._importScene', this.name +
+          ":: no scene object found in Ovoid JSON");
     return false;
   }
   
+  Ovoid._log(3,this._i, '::Ojson._importScene', this.name + 
+      ":: begin");
+      
   /* reset le relink stack */
   this._rlnkstack = new Array();
   
   /* Scene de destination */
   this._dstsc = scene;
   
-  //var debug = '';
   var jsonnode = this._json.SCENE.nl;
   /* importation de toutes les nodes */
-  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "importing nodes...");
+  Ovoid._log(3,this._i,'::Ojson._importScene', this.name + 
+      ":: importing nodes...");
   for (var i = 0; i < jsonnode.length; i++) {
     //debug += jsonnode[i].name + "\n";
     try {
       this._importNode(jsonnode[i]);
     } catch (e) {
-      Ovoid.log(1, 'Ovoid.Ojson ' + this.name,
-          "Error during node importation:"
+      Ovoid._log(1,this._i,'::Ojson._importScene', this.name +
+          ":: error during node importation:"
           + e.stack
-          + " File may be corrupted.");
+          + " file may be corrupted.");
+      return false;
     }
   }
   /* relink / reparente toutes les nodes */
-  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "relinking nodes...");
+  Ovoid._log(3,this._i,'::Ojson._importScene', this.name + 
+      ":: relinking nodes...");
   for (var i = 0; i < this._rlnkstack.length; i++) {
     this._relinkNode(this._rlnkstack[i]);
   }
@@ -1272,7 +1281,302 @@ Ovoid.Ojson.prototype.importScene = function(scene) {
   this._dstsc.name = this._json.SCENE.n;
   this._dstsc._uidn = this._json.SCENE.u;
   
-  Ovoid.log(3, 'Ovoid.Ojson ' + this.name, "importScene END");
+  Ovoid._log(3,this._i,'::Ojson._importScene', this.name + 
+      ":: done");
   
   return true;
+};
+
+
+/**
+ * Import OJSON Instance's Env data.<br><br>
+ * 
+ * Interprets the current parsed OSJON source and import the result in 
+ * the given recipient Instance.
+ *
+ * @param {Object} inst Recipient Instance object.
+ * 
+ * @return {bool} True if import suceeds, false otherwise.
+ */
+Ovoid.Ojson.prototype._importEnv = function(inst) {
+
+  if(!this._json.INENV) {
+    Ovoid._log(1,this._i, '::Ojson._importEnv', this.name +
+          ":: no Instance Env object found in Ovoid JSON");
+    return false;
+  }
+  var env = this._json.INENV;
+  
+  Ovoid._log(3,this._i, '::Ojson._importEnv', this.name + 
+      ":: begin");
+  
+  try {
+    /* Import des input triggers */
+    var s, c, t, i;
+    for(s = 0; s < 3; s++) {
+      c = env.oi[s].length;
+      for(t = 0; t < c; t++) {
+        this._i.Input.setTrigger(0, env.oi[s][t][0], s, this._parseFunc(env.oi[s][t][1]));
+      }
+      c = env.oci[s].length;
+      for(t = 0; t < c; t++) {
+        this._i.Input.setTrigger(1, env.oci[s][t][0], s, this._parseFunc(env.oci[s][t][1]));
+      }
+      c = env.oai[s].length;
+      for(t = 0; t < c; t++) {
+        this._i.Input.setTrigger(2, env.oai[s][t][0], s, this._parseFunc(env.oai[s][t][1]));
+      }
+      c = env.osi[s].length;
+      for(t = 0; t < c; t++) {
+        this._i.Input.setTrigger(3, env.osi[s][t][0], s, this._parseFunc(env.osi[s][t][1]));
+      }
+      c = env.olsi[s].length;
+      for(t = 0; t < c; t++) {
+        this._i.Input.setTrigger(4, env.olsi[s][t][0], s, this._parseFunc(env.olsi[s][t][1]));
+      }
+      c = env.orsi[s].length;
+      for(t = 0; t < c; t++) {
+        this._i.Input.setTrigger(5, env.orsi[s][t][0], s, this._parseFunc(env.orsi[s][t][1]));
+      }
+    }
+    
+    /* Import des fonctions */
+    this._i.onloop = this._parseFunc(env.olp);
+    this._i.ondraw = this._parseFunc(env.odw);
+    this._i.waitdraw = this._parseFunc(env.wdw);
+    
+    /* import des shaders */
+    this._i.Drawer._splib[i] = new Array();
+    c = env.sl.length;
+    for(i = 0; i < c; i++) {
+      s = new Ovoid.Shader(env.sl[i].n, this._i);
+      s.setSources(env.sl[i].vs, env.sl[i].fs, env.sl[i].ws);
+      this._i.Drawer._splib[i] = s;
+    }
+    
+    /* import des index pipes shader */
+    this._i.Drawer._sppipe = new Array(Ovoid.MAX_RENDER_LAYER);
+    c = env.sp.length;
+    for(i = 0; i < c; i++) {
+      this._i.Drawer._sppipe[i] = env.sp[i];
+    }
+    
+    this._i.opt_debugMode = env.o[0];
+    this._i.opt_enableAlerts = env.o[1];
+    this._i.opt_logLevel = env.o[2];
+    this._i.opt_customErrContent = env.o[3];
+    this._i.opt_showHud = env.o[4];
+    this._i.opt_showDebug = env.o[5];
+    this._i.opt_gravity = env.o[6];
+    /* Options de preload */
+    this._i.opt_preloadStyle = env.o[7];
+    this._i.opt_preloadBgColor = env.o[8];
+    this._i.opt_preloadFgColor = env.o[9];
+    this._i.opt_preloadAcColor = env.o[10];
+    /* Options de frame */
+    this._i.opt_frameMode = env.o[11];
+    /* Options du drawer */
+    this._i.opt_renderClearColor = env.o[12];
+    this._i.opt_renderAmbientColor = env.o[13];
+    this._i.opt_renderFogColor = env.o[14];
+    this._i.opt_renderFogDensity = env.o[15];
+    this._i.opt_renderPickingMode = env.o[16];
+    this._i.opt_renderLopLevel = env.o[17];
+    this._i.opt_renderAdaptLop = env.o[18];
+    this._i.opt_renderAdaptLopThreshold = env.o[19];
+    this._i.opt_renderPerLightPass = env.o[20];
+    this._i.opt_renderShadowCasting = env.o[21];
+    this._i.opt_renderShadowCastingExclusion = env.o[22];
+    this._i.opt_renderDrawLayers = env.o[23];
+    this._i.opt_renderDrawHelpers = env.o[24];
+    this._i.opt_renderDrawAxis = env.o[25];
+    this._i.opt_renderDrawBoundingBox = env.o[26];
+    this._i.opt_renderDrawBoundingSphere = env.o[27];
+    this._i.opt_renderDrawJoints = env.o[28];
+    this._i.opt_renderDrawLights = env.o[29];
+    this._i.opt_renderDrawCameras = env.o[30];
+    this._i.opt_renderDrawNormals = env.o[31];
+    this._i.opt_renderJointSize = env.o[32];
+    this._i.opt_renderNormalScale = env.o[33];
+    /* Options du queuer */
+    this._i.opt_sceneViewcull = env.o[34];
+    this._i.opt_sceneLightcull = env.o[35];
+    this._i.opt_sceneIntersectDetect = env.o[36];
+    this._i.opt_sceneDefaultViewPosition = env.o[37];
+    this._i.opt_sceneDefaultViewRotation = env.o[38];
+    /* Options du solver */
+    this._i.opt_physicsIterativeSolver = env.o[39];
+    this._i.opt_physicsContactItFactor = env.o[40];
+  
+  } catch (e) {
+    Ovoid._log(1,this._i,'::Ojson._importEnv', this.name +
+        ":: error during Env importation:"
+        + e.stack
+        + " file may be corrupted.");
+    return false;
+  }
+  
+  Ovoid._log(3,this._i,'::Ojson._importEnv', this.name + 
+      ":: done");
+      
+  return true;
+};
+
+/**
+ * Handle loaded JSON file.<br><br>
+ * 
+ * Analyses the loaded JSON file and dispatch it to the proper importer
+ * method.
+ * 
+ * @param {Object} d Recipient destination object, Scene or Instance.
+ */
+Ovoid.Ojson.prototype._importOjson = function(d) {
+  
+  /* Si le JSON object n'existe on ne peut rien faire */
+  if (!this._json) {
+    Ovoid._log(1,this._i, '::Ojson._importOjson', this.name + 
+        ":: no JSON data.");
+    return false;
+  }
+
+  /* Verifie si c'est un OJSON */
+  if(!this._json.OJSN) {
+    Ovoid._log(1,this._i, '::Ojson._importOjson', this.name +
+          ":: is not a valid Ovoid.JSON format");
+    return false;
+  } else {
+    /* Vérifie la version OJSON*/
+    if(this._json.OJSN != Ovoid.VERSION) {
+      Ovoid._log(1,this._i, '::Ojson._importOjson', this.name +
+          ":: wrong Ovoid.JSON version, is:" + this._json.OJSN +
+          " expected:" + Ovoid.VERSION);
+      return false;
+    }
+  }
+
+  /* Est-ce une Scene ? */
+  if(this._json.TYPE == "SCN") {
+    if(d instanceof Ovoid.Scene) {
+      return this._importScene(d);
+    } else {
+      Ovoid._log(1,this._i, '::Ojson._importOjson', this.name +
+          ":: invalid destination object for Scene type Ovoid.JSON, Ovoid.Scene object expected");
+      return false;
+    }
+  } else {
+    /* Si non est-ce un Env ? */
+    if(this._json.TYPE == "ENV") {
+      if(d instanceof Ovoid.Instance) {
+        return this._importEnv(d);
+      } else {
+        Ovoid._log(1,this._i, '::Ojson._importOjson', this.name +
+            ":: invalid destination object for Env type Ovoid.JSON, Ovoid.Instance object expected");
+        return false;
+      }
+    } else {
+      Ovoid._log(1,this._i, '::Ojson._importOjson', this.name +
+          ":: unknow Ovoid.JSON type.");
+      return false;
+    }
+  }
+}
+
+
+/**
+ * Load and import Ojson file.<br><br>
+ * 
+ * Loads the specified Ojson file and once the source file is 
+ * successfully loaded, imports data into the specified recipient 
+ * Scene.<br><br>
+ *  
+ * The <c>loadSatus</c> member indicates the loading status through an 
+ * integer value of 0, 1 or -1. A value of 0 means that the file is not 
+ * yet loaded, a value of 1 means that the source was successfully 
+ * loaded, and a value of -1 means the loading failed.<br><br>
+ * 
+ * @param {string} url Source file name to load.
+ * 
+ * @param {Object} recp Recipient object, must be Scene or Instance.
+ * 
+ * @param {bool} async Sets synchronous or asynchronous way for data loading. 
+ * If false or null the source is loaded in synchronous way.
+ */
+Ovoid.Ojson.prototype.loadSource = function(url, recp, async) {
+  
+  this.loadStatus = 0;
+  
+  this.url = url;
+  
+  if(recp instanceof Ovoid.Scene) {
+    this._i = recp._i;
+  } else {
+    if(recp instanceof Ovoid.Instance) {
+      this._i = recp;
+    } else {
+      Ovoid._log(1,this._i, '::Ojson._importOjson', this.name +
+          ":: invalid destination object, expected Scene or Instance");
+      return false;
+    }
+  }
+  
+  /* détermine le nom du ojson d'apres l'url */
+  this.name = Ovoid.extractName(this.url);
+  
+  Ovoid._log(3,this._i, '::Ojson.loadSource', this.name + 
+      ":: loading source file '" + this.url + "'");
+          
+  var xhr = new XMLHttpRequest();
+  if(async) {
+    xhr.o = this;
+    xhr._i = this._i;
+    xhr.d = recp;
+    xhr.onreadystatechange = function()
+    {
+      if (this.readyState == 4) {
+        if (this.status == 200 || this.status == 304) {
+          Ovoid._log(3,this._i, '::Ojson.loadSource', this.o.name + 
+              ":: parsing source file '" + this.o.url + "'");
+          try{
+            this.o._json = JSON.parse(this.responseText);
+          } catch(e) {
+            Ovoid._log(2,this._i, '::Ojson.loadSource', this.o.name + 
+                ":: parse error '" + e.stack + "'");
+          }
+          this.o.loadStatus = 1;
+          this.o._importOjson(this.d);
+        } else {
+          this.o.loadStatus = -1;
+          Ovoid._log(2,this._i, 'Ojson.loadSource', + this.o.name +
+              ":: unable to load source '" + this.o.url + "'");
+        }
+      }
+    }
+  }
+  
+  var src = this.url;
+  if (this._i.opt_debugMode) 
+    src += '?' + Math.random();
+    
+  xhr.open('GET',src, async);
+  xhr.send(null);
+  
+  /* Si nous sommes en mode synchrone */
+  if (!async) {
+    if (xhr.status == 200 || xhr.status == 304) {
+        Ovoid._log(3,this._i, '::Ojson.loadSource', this.name + 
+            ":: parsing source file '" + this.url + "'");
+        try{
+          this._json = JSON.parse(xhr.responseText);
+        } catch(e) {
+          Ovoid._log(2,this._i, '::Ojson.loadSource', this.name + 
+              ":: parse error '" + e.stack + "'");
+        }
+        this.loadStatus = 1;
+        this._importOjson(recp);
+    } else {
+      this.loadStatus = -1;
+      Ovoid._log(2,this._i, 'Ojson.loadSource', + this.name +
+              ":: unable to load source '" + this.url + "'");
+    }
+  }
 };

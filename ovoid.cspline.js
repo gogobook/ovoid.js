@@ -20,7 +20,7 @@
 
 
 /**
- * Create a new cosine curve object.
+ * Constructor method.
  *
  * @class Cosine Interpolated curve object.<br><br>
  * 

@@ -20,11 +20,11 @@
 
 
 /**
- * Animation node constructor.
+ * Constructor method.
  * 
  * @class Animation node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Animation node is a Constraint node who apply an prerecorded animation 
  * to one other node. Animations are composed of several curves which describes 
@@ -34,7 +34,7 @@
  * other node.<br><br>
  * 
  * <blockcode>
- * var youpi = scene.create(Ovoid.ANIMATION, "youpiAnim");<br>
+ * var youpi = myOvoid.Scene.newNode(Ovoid.ANIMATION, "youpiAnim");<br>
  * youpi.setCspline(Ovoid.ANIMATION_CHANNEL_ROTATE_X, keyTimes, keyValues);<br>
  * <br>
  * youpi.setTarget(box);<br>
@@ -66,7 +66,7 @@
  * <b>Animation handling</b><br><br>
  * 
  * For interactivity purpose, the Animation node is designed to make able to 
- * handle the animation end through a trigger function. The <code>onended</code> 
+ * handle the animation end through a trigger function. The <c>onended</c> 
  * trigger function member is called each time the animation ends. So you can 
  * override this function to handle the animation ends and create some 
  * interactive or scripts effects. The function should take one argument who 
@@ -83,8 +83,9 @@
  * @extends Ovoid.Constraint
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Animation = function(name) {
+Ovoid.Animation = function(name, i) {
 
   Ovoid.Constraint.call(this);
   /** node type */
@@ -120,7 +121,7 @@ Ovoid.Animation = function(name) {
    * The function accepts one parameter which is the involved 'this' instance.<br><br>
    * 
    * <blockcode>
-   * animation.onended = function (node) { <codecomment>// do something</codecomment> };<br>
+   * animation.onended = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field
    * @type Function
@@ -134,6 +135,10 @@ Ovoid.Animation = function(name) {
   this._output = new Float32Array(21);
   /** Animation playing time */
   this._time = 0.0;
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Animation.prototype = new Ovoid.Constraint;
 Ovoid.Animation.prototype.constructor = Ovoid.Animation;
@@ -395,7 +400,7 @@ Ovoid.Animation.prototype.time = function() {
  *
  * Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -406,7 +411,7 @@ Ovoid.Animation.prototype.cachAnimation = function() {
     this.playing = false;
 
     /* Avance/recule les curves et update les output */
-    var qt = Ovoid.Timer.quantum * this.factor;
+    var qt = this._i.Timer.quantum * this.factor;
     var i = 32;
     if (this.factor > 0.0) {
       while (i--) {
@@ -431,11 +436,16 @@ Ovoid.Animation.prototype.cachAnimation = function() {
     }
 
     /* Incremente le temps */
-    this._time += (Ovoid.Timer.quantum * this.factor);
+    this._time += (this._i.Timer.quantum * this.factor);
     
     /* Controle d'animation play/end/loop */
     if (!this.playing) {
-      this.onended(this);
+      try { /* handle exceptions car des fonctions sont custom */
+        this.onended(this);
+      } catch(e) {
+        Ovoid._log(0, this._i, '::Animation.cachAnimation', this.name + 
+              ':: Custom onended() function exception thrown:\n' + e.stack);
+      }
       if (this.loop) {
         /* Rewind curves */
         if (this.factor > 0.0) {
@@ -502,7 +512,7 @@ Ovoid.Animation.prototype.cachAnimation = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -551,6 +561,6 @@ Ovoid.Animation.prototype.toJSON = function() {
       o['cn'][i] = 'null';
     }
   }
-  o['oe'] = String(this.onended);
+  o['oe'] = Ovoid.compact(this.onended);
   return o;
 };

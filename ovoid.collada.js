@@ -20,7 +20,7 @@
 
 
 /**
- * COLLADA scene importer constructor.
+ * Constructor method.
  *
  * @class COLLADA scene importer object.<br><br>
  * 
@@ -51,7 +51,7 @@
  * <li><b>Textures</b><br>
  * Textures are imported without image data (which is not included in 
  * the COLLADA file). The source image filename is
- * stored in the <code>url</code> field of the Texture node.
+ * stored in the <c>url</c> field of the Texture node.
  * </li>
  * <li><b>Lights</b><br>
  * Lights are imported with the common available attributes: Color; 
@@ -81,9 +81,8 @@
  * 
  * <blockcode>
  * var collada = new Ovoid.Collada();<br>
- * collada.loadSource("homework.dae");<br>
  * var options = Ovoid.DAE_ALL_NODES|Ovoid.DAE_OPTIMIZE_ALL|Ovoid.DAE_CREATE_TRACK|Ovoid.DAE_FORCE_CSPLINE;<br>
- * collada.importDae(options, scene);<br>
+ * collada.loadSource("myCollada.dae", scene, options);<br>
  * </blockcode><br><br>
  * 
  * <b>Importation Options</b><br><br>
@@ -177,7 +176,7 @@
  * basic renaming rules using prefix and suffis during the importation process.
  * Nodes are renamed according to the prefix and suffix as follow:<br><br>
  * 
- * <code>prefix.nodeName.suffix</code><br><br>
+ * <c>prefix.nodeName.suffix</c><br><br>
  * 
  * Renaming rules is implemented to allow to organize complex scenes filled by 
  * successive COLLADA importations which can cause name collision or simply 
@@ -186,8 +185,8 @@
  * suffix in their name.<br><br>
  * 
  * <blockcode>
- * var group1 = scene.searchMatches("group1.");<br>
- * var group2 = scene.searchMatches(".group2");<br>
+ * var group1 = scene.findMatches("group1.");<br>
+ * var group2 = scene.findMatches(".group2");<br>
  * </blockcode><br><br>
  * 
  * <b>Scene merging and animations</b><br><br>
@@ -200,14 +199,9 @@
  * 
  * <blockcode>
  * var collada = new Ovoid.Collada();<br>
- * collada.loadSource("characterBase.dae");<br>
- * collada.importDae(Ovoid.DAE_ALL_NODES|Ovoid.DAE_OPTIMIZE_ALL, scene, 'guybrush', null);<br>
- * <br>
- * collada.loadSource("characterWalk.dae");<br>
- * collada.importDae(Ovoid.DAE_ANIMATIONS|Ovoid.DAE_MERGE_DEPENDENCIES, scene, 'guybrush', 'walk');<br>
- * <br>
- * collada.loadSource("characterJump.dae");<br>
- * collada.importDae(Ovoid.DAE_ANIMATIONS|Ovoid.DAE_MERGE_DEPENDENCIES, scene, 'guybrush', 'jump');<br>
+ * collada.loadSource("characterBase.dae", scene, Ovoid.DAE_ALL_NODES|Ovoid.DAE_OPTIMIZE_ALL, 'guybrush', null, false);<br>
+ * collada.loadSource("characterWalk.dae", scene, Ovoid.DAE_ANIMATIONS|Ovoid.DAE_MERGE_DEPENDENCIES, 'guybrush', 'walk', false);<br>
+ * collada.loadSource("characterJump.dae", scene, Ovoid.DAE_ANIMATIONS|Ovoid.DAE_MERGE_DEPENDENCIES, 'guybrush', 'jump', false);<br>
  * </blockcode><br><br>
  * 
  * Since Animation nodes are named according to the target's name, and the 
@@ -312,7 +306,7 @@ Ovoid.Collada = function() {
    * @type string */
   this.name = '';
   /** DAE source file name.
-   * Keep in mind that the <code>Ovoid.opt_daePath</code> option will be used 
+   * Keep in mind that the <c>Ovoid.opt_daePath</c> option will be used 
    * to retrieve the file.
    * @type string */
   this.url = '';
@@ -335,6 +329,8 @@ Ovoid.Collada = function() {
   this._sfix = '';
   /** Importation destination scene */
   this._dstsc = null;
+  /** pointer to attached Ovoid.JS instance */
+  this._i = null;
 };
 
 
@@ -508,7 +504,7 @@ Ovoid.Collada.prototype._retrieveNode = function(name) {
   if (this._mask & Ovoid.DAE_MERGE_DEPENDENCIES) {
 
     name = this._pfix + name;
-    node = this._dstsc.search(name);
+    node = this._dstsc.findNode(name);
     if (node) 
       return node;
     
@@ -517,7 +513,7 @@ Ovoid.Collada.prototype._retrieveNode = function(name) {
   } else {
     name = this._pfix + name + this._sfix;
   }
-  node = this._dstsc.search(name);
+  node = this._dstsc.findNode(name);
   return node;
 };
 
@@ -633,10 +629,10 @@ Ovoid.Collada.prototype._procCam = function(dae) {
   /* confection du nom de notre future node */
   var name = this._pfix + dae.getAttribute('id') + this._sfix;
   /* creation de la node */
-  var node = new Ovoid.Camera(name);
+  var node = new Ovoid.Camera(name, this._i);
   /* message de log optionnel */
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-      "Camera '" + node.name + "' : created");
+  Ovoid._log(3,this._i, '::Collada._procCam', this.name +
+      ":: Camera '" + node.name + "' created");
 
   /* l'élément <technique_common> du <camera> */
   var tc = dae.getElementsByTagName('technique_common');
@@ -669,8 +665,8 @@ Ovoid.Collada.prototype._procCam = function(dae) {
     }
   } else {
     /* pas de <technique_common> dans <camera> ? anormal */
-    Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-        "Camera '" + node.name +
+    Ovoid._log(2,this._i,'::Collada._procCam', this.name +
+        ":: Camera '" + node.name +
         "' missing <technique_common>: Camera data not found.");
     return null;
   }
@@ -695,11 +691,10 @@ Ovoid.Collada.prototype._procLig = function(dae) {
   /* confection du nom de notre future node */
   var name = this._pfix + dae.getAttribute('id') + this._sfix;
   /* creation de la node */
-  var node = new Ovoid.Light(name);
+  var node = new Ovoid.Light(name, this._i);
   /* message de log optionnel */
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-      "Light '" + node.name +
-      "' : created");
+  Ovoid._log(3,this._i, '::Collada._procLig', this.name +
+      ":: Light '" + node.name + "' created");
 
   /* l'élément <technique_common> du <light> */
   var tc = dae.getElementsByTagName('technique_common');
@@ -718,9 +713,8 @@ Ovoid.Collada.prototype._procLig = function(dae) {
           1.0);
     } else {
       /* pas d'élement <color> ? bizarre */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Light '" + node.name +
-          "' : missing <color>: Light color data not found.");
+      Ovoid._log(2,this._i,'::Collada._procLig', this.name + 
+        ":: Light '" + node.name + "' missing <color>: Light color data not found.");
     }
 
     /* l'élément <intensity> du <light> */
@@ -731,28 +725,27 @@ Ovoid.Collada.prototype._procLig = function(dae) {
     }
 
     /* on recherche le type <ambient>, <point> etc... */
-    node.kind = -1;
+    node.model = -1;
     if (tc[0].getElementsByTagName('ambient').length) {
-      node.kind = Ovoid.LIGHT_AMBIENT;
+      node.model = Ovoid.LIGHT_AMBIENT;
     }
     if (tc[0].getElementsByTagName('point').length) {
-      node.kind = Ovoid.LIGHT_POINT;
+      node.model = Ovoid.LIGHT_POINT;
     }
     if (tc[0].getElementsByTagName('directional').length) {
-      node.kind = Ovoid.LIGHT_DIRECTIONAL;
+      node.model = Ovoid.LIGHT_DIRECTIONAL;
     }
-    if (tc[0].getElementsByTagName('spot').length)
-    {
+    if (tc[0].getElementsByTagName('spot').length) {
       /* si c'est un <spot> on recupere des infos
        * supplémentaires */
-      node.kind = Ovoid.LIGHT_SPOT;
+      node.model = Ovoid.LIGHT_SPOT;
       /* le <falloff_angle> du <spot> */
       if (tc[0].getElementsByTagName('falloff_angle').length) {
         node.spotAngle = 0.5 * Ovoid.deg2Rad(parseFloat(tc[0].getElementsByTagName('falloff_angle')[0].childNodes[0].data));
       } else {
         /* pas de <falloff_angle> ? est-ce bien un spot ? */
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name, "Light '" +
-            node.name + "' : missing <spot>/<falloff_angle>: Light data not found.");
+        Ovoid._log(2,this._i,'::Collada._procLig', this.name + 
+          "::Light '" + node.name + "' missing <spot>/<falloff_angle>: Light data not found.");
       }
       /* le <falloff_exponent> du <spot> */
       if (tc[0].getElementsByTagName('falloff_exponent').length) {
@@ -762,9 +755,8 @@ Ovoid.Collada.prototype._procLig = function(dae) {
 
     if (node.kind == -1) {
       /* pas trouvé le type de lumiere ? étrange */
-      Ovoid.log(2, 'Ovoid.Collada ' +
-          this.name, "Light '" + node.name +
-          "' : missing <ambient>|<point>|<directional>|<spot>: Light data not found.");
+      Ovoid._log(2,this._i,'::Collada._procLig', this.name + 
+          ":: Light '" + node.name + "' missing <ambient>|<point>|<directional>|<spot>: Light data not found.");
     }
     /* si ce n'est pas une directional */
     if (node.kind != Ovoid.LIGHT_AMBIENT &&
@@ -796,9 +788,8 @@ Ovoid.Collada.prototype._procLig = function(dae) {
     }
   } else {
     /* pas de <technique_common> dans <light> ? anormal */
-    Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-        "Light '" + node.name +
-        "' : missing <technique_common>: Light data not found.");
+    Ovoid._log(2,this._i,'::Collada._procLig', this.name +
+        ":: Light '" + node.name + "' missing <technique_common>: Light data not found.");
     return null;
   }
   
@@ -822,10 +813,10 @@ Ovoid.Collada.prototype._procImg = function(dae) {
   /* confection du nom de notre future node */
   var name = this._pfix + dae.getAttribute('name') + this._sfix;
   /* creation de la node */
-  var node = new Ovoid.Texture(name);
+  var node = new Ovoid.Texture(name, this._i);
   /* message de log optionnel */
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-      "Texture '" + node.name + "' : created");
+  Ovoid._log(3,this._i, '::Collada._procImg', this.name +
+      ":: Texture '" + node.name + "' created");
 
   /* l'élément <init_from> du <image> */
   var it = dae.getElementsByTagName('init_from');
@@ -844,16 +835,14 @@ Ovoid.Collada.prototype._procImg = function(dae) {
       node.url = d[d.length - 1];
     } else {
       /* ce nom d'image parrait invalide */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Texture '" + node.name +
-          "' : invalid URI.");
+      Ovoid._log(2,this._i,'::Collada._procImg', this.name +
+          ":: Texture '" + node.name + "' invalid URI.");
       return null;
     }
   } else {
     /* pas de <init_from> ? inquiétant */
-    Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-        "Texture '" + node.name +
-        "' : missing <init_from>: Image data not found.");
+    Ovoid._log(2,this._i,'::Collada._procImg', this.name +
+        ":: Texture '" + node.name + "' missing <init_from>: Image data not found.");
     return null;
   }
 
@@ -941,16 +930,14 @@ Ovoid.Collada.prototype._procEfxComp = function(node, dae, di, mi) {
           }
         } else {
           /* si on a pas trouvé de <image> c'est inquiétant */
-          Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-              "Material '" + node.name +
-              "' : missing <" + di + '>/<texture>/<image>: Material/Texture data not found.');
+          Ovoid._log(2,this._i,'::Collada._procEfxComp', this.name +
+              ":: Material '" + node.name + "' missing <" + di + '>/<texture>/<image>: Material/Texture data not found.');
         }
       } else {
         /* pas de <color> ni de <texture> ? qu'est-ce que ça peut
          * bien être... */
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Material '" + node.name +
-            "' : missing <" + di + '>/<color>|<texture>: Material/Texture data not found.');
+        Ovoid._log(2,this._i,'::Collada._procEfxComp', this.name +
+            ":: Material '" + node.name + "' missing <" + di + '>/<color>|<texture>: Material/Texture data not found.');
       }
     }
   } else {
@@ -976,11 +963,10 @@ Ovoid.Collada.prototype._procMat = function(dae) {
   /* confection du nom de notre future node */
   var name = this._pfix + dae.getAttribute('name') + this._sfix;
   /* creation de la node */
-  var node = new Ovoid.Material(name);
+  var node = new Ovoid.Material(name, this._i);
   /* message de log optionnel */
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-      "Material '" + node.name +
-      "' : created");
+  Ovoid._log(3,this._i, '::Collada._procMat', this.name +
+      ":: Material '" + node.name + "' created");
 
   /* on retrouve l'élément <effect> référencé par ce <material> */
   var e = this._getById('effect',
@@ -1039,6 +1025,306 @@ Ovoid.Collada.prototype._procMat = function(dae) {
   return node;
 };
 
+/**
+ * Proceed to creation of Mesh's polyset by extracting data from 
+ * polyset <lines>|<polylist>|<polygons>|<triangles> array of a DOM 
+ * node of a DAE <geometry> descriptor.
+ * 
+ * @param {Node} node Mesh Object to create polyset to.
+ * @param {Object} dae DOM node of the DAE geometry descriptor.
+ * @param {Object} GS Geometry source array.
+ * @param {Object} pl Array of polysets of the DAE geometry component
+ * to extract data from.
+ * @param {int} gt Polyset geometry type to store mesh data.
+ * 
+ * @returns {int} Count of polyset extracted.
+ * 
+ * @see Ovoid.Mesh
+ */
+Ovoid.Collada.prototype._procPset = function(node, dae, gs, pl, gt) {
+
+    if(!pl.length) {
+      return 0;
+    }
+    /* parcour le la liste des polyset */
+    var i = pl.length;
+    while (i--) {
+      /* le format de vertex pour le future polyset */
+      var svf = 0;
+
+      /* le nombre de vertices et elements pour ce polyset */
+      var stc = pl[i].getAttribute('count');
+      if(gt == 1) var svc = stc * 2;
+      if(gt == 4) var svc = stc * 3;
+
+      /* recupere le nom symbolique du materiel pour ce polyset */
+      var sms = pl[i].getAttribute('material');
+      if (!sms) { /* pas de <material> trouvé ? */
+        sms = 'null';
+        /* on prévient qu'aucun material n'est assigné */
+        Ovoid._log(2,this._i,'::Collada._procGeo', this.name + 
+            ":: Geometry '" + node.name + '/polyset ' + i + "' missing material symbol.");
+      }
+
+      /* Partie de code supprimé jusqu'à nouvel ordre, elle ne sert à 
+       * rien et pose problème pour l'extraction des <polygons> et 
+       * <lines>
+       * ---------------------------------------------------------------
+      // On verifie la triangulation du mesh. si il s'agit
+      // de <polylist>, un élément <vcount> devrait être présent
+      var vct = pl[i].getElementsByTagName('vcount');
+      if (vct.length) { // l'élément <vcount> a été trouvé ?
+        var d = vct[0].childNodes[0].data;
+        // on verifie brievement qu'il n'y a pas autre chose que des 3
+        if (d.indexOf('4', 0) != -1 ||
+            d.indexOf('5', 0) != -1 ||
+            d.indexOf('6', 0) != -1 ||
+            d.indexOf('7', 0) != -1 ||
+            d.indexOf('8', 0) != -1)
+        {
+          // dans le cas contraire on ne peut pas aller plus loin
+          Ovoid._log(2,this._i,'::Collada._procGeo', this.name + 
+              ":: Geometry '" + node.name + '/' + sms + "' bad mesh triangulation: mesh ingnored.");
+          return null;
+        }
+      }
+      * ----------------------------------------------------------------
+      */
+        
+      /* On constitue un tableau des input de ce polyset qui référencent
+       * les sources utilisé pour ce polyset et leur arrangement */
+      var pi = new Object();
+      pi['enable'] = new Object();
+      pi['source'] = new Object();
+      pi['offset'] = new Object();
+
+      /* parcour la liste des éléments <input> du polyset */
+      var pli = pl[i].getElementsByTagName('input');
+
+      var sid, l, c;
+      var j = pli.length;
+      while (j--)
+      {
+        /* L'attribut 'semantic' de cet <input> est-il "VERTEX" ? */
+        if (pli[j].getAttribute('semantic') == 'VERTEX') {
+
+          /* Retrouve la source pour cet input, il s'agit d'un
+           * élément <vertices> dans lequel il y'a d'autres
+           * <input> */
+          var vi = this._getById('vertices', pli[j].getAttribute('source').substring(1)).getElementsByTagName('input');
+          /* Parcours des <input> du <vertices> */
+          var k = vi.length;
+          while (k--)
+          {
+            /* L'attribut 'semantic' de cet <input>
+             * est-il "POSITION" ? */
+            if (vi[k].getAttribute('semantic') == 'POSITION')
+            {
+              /* Voilà le nom de la source de nos positions de
+               * vertices */
+              sid = vi[k].getAttribute('source').substring(1);
+              l = gs['id'].length;
+              /* on la retrouve dans notre liste précédemment
+               * confectionné */
+              while (l--) {
+                if (gs['id'][l] == sid) {
+                  pi['source']['p'] = l;
+                  /* cette source est activé */
+                  pi['enable']['p'] = true;
+                  /* on note l'offset du <input> 'VERTEX' */
+                  pi['offset']['p'] = parseInt(pli[j].getAttribute('offset'));
+                  /* on ajoute le format VEC4_P au format de vertex */
+                  svf |= Ovoid.VERTEX_VEC4_P;
+                }
+              }
+            }
+            /* parfois l'input des normals se trouve dans
+             * l'élément <vertices> alors qu'il est traditionnellement
+             * directement dans l'élément <polygons> */
+
+            /* L'attribut 'semantic' de cet <input>
+             * est-il "NORMAL" ? */
+            if (vi[k].getAttribute('semantic') == 'NORMAL')
+            {
+              /* Voilà le nom de la source de nos normals de vertices */
+              sid = vi[k].getAttribute('source').substring(1);
+              l = gs['id'].length;
+              while (l--) {
+                if (gs['id'][l] == sid) {
+                  pi['source']['n'] = l;
+                  pi['enable']['n'] = true;
+                  pi['offset']['n'] = parseInt(pli[j].getAttribute('offset'));
+                  svf |= Ovoid.VERTEX_VEC3_N;
+                }
+              }
+            }
+          }
+
+          if (pi['source']['p'] == -1) {
+            /* pas de positions pour ce mehs ? est-ce une blague ? */
+            Ovoid._log(2,this._i,'::Collada._procGeo', this.name +  
+                ":: Geometry '" + node.name + '/' + sms + "' missing vertices POSITION source: polyset ignored.");
+            continue;
+          }
+        }
+
+        /* L'attribut 'semantic' de cet <input> est-il "NORMAL" ? */
+        if (pli[j].getAttribute('semantic') == 'NORMAL') {
+          sid = pli[j].getAttribute('source').substring(1);
+          l = gs['id'].length;
+          while (l--) {
+            if (gs['id'][l] == sid) {
+              pi['source']['n'] = l;
+              pi['enable']['n'] = true;
+              pi['offset']['n'] = parseInt(pli[j].getAttribute('offset'));
+              svf |= Ovoid.VERTEX_VEC3_N;
+            }
+          }
+        }
+        /* L'attribut 'semantic' de cet <input> est-il "TEXCOORD" ? */
+        if (pli[j].getAttribute('semantic') == 'TEXCOORD') {
+          sid = pli[j].getAttribute('source').substring(1);
+          l = gs['id'].length;
+          while (l--) {
+            if (gs['id'][l] == sid) {
+              pi['source']['u'] = l;
+              pi['enable']['u'] = true;
+              pi['offset']['u'] = parseInt(pli[j].getAttribute('offset'));
+              svf |= Ovoid.VERTEX_VEC3_U;
+            }
+          }
+        }
+      }
+
+      /* récuperation de la liste des indices pour ce polyset */
+      /* les elements <p> du polyset */
+      var p = pl[i].getElementsByTagName('p');
+      /* la future liste d'indices unsigned short */
+      //var indices = new Uint16Array((stc * 3) * pli.length);
+      if(gt == 1) var indices = new Uint16Array((stc * 2) * pli.length);
+      if(gt == 4) var indices = new Uint16Array((stc * 3) * pli.length);
+      
+      l = 0; c = p.length;
+      /* pour chaque <p> d'indice (dans l'ordre) */
+      for (var j = 0; j < c; j++) {
+        /* la liste des indices de <p> splités */
+        var d = this._gTxtDataSplit(p[j].childNodes);
+        var b = d.length;
+        /* on a joute à la liste d'indice générale */
+        for (var k = 0; k < b; k++) {
+          indices[l] = parseInt(d[k]);
+          if (!isNaN(indices[l])) l++;
+        }
+      }
+      
+      /* Ce n'est jamais arrivé mais on sait jamais... */
+      if ( indices.length != l ) {
+        Ovoid._log(2,this._i,'::Collada._procGeo', this.name + 
+            ":: Geometry '" + node.name + '/' + sms + "' found indices mismatch triangles count (" + l + "/" + indices.length + ")");
+      }
+
+      /* notre future liste de vertices pour ce polyset */
+      var vertices = Ovoid.Vertex.newArray(svc);
+
+      /* les indices dans le fichier collada sont disposé tel que:
+       *
+       * [        Triangle1        ][        triangle2        ][etc.
+       * [vertex1][vertex2][vertex3][vertex1][vertex2][vertex3][etc.
+       * [p][n][u][p][n][u][p][n][u][p][n][u][p][n][u][p][n][u][etc.
+       *  0  0  0  1  2  1  2  2  3  2  5  2  1  2  3  3  7  4  4
+
+      /* les quelque variables utiles */
+      var r, t, y, u, d, v;
+      /* nombre d'input de ce polyset, donne un stride pour parcourir
+       * la liste d'indices */
+      u = pli.length;
+      /* remplissage des positions */
+      if (pi['enable']['p']) {
+        r = pi['source']['p'];  /* l'index de notre source */
+        t = pi['offset']['p'];  /* l'offset des indices */
+        y = gs['stride'][r];  /* nombre de composant par indice */
+        d = gs['data'][r];    /* notre liste de composants */
+        for (var j = 0; j < svc; j++) {
+          /* l'indice de l'élément dans la source */
+          v = indices[(j * u) + t] * y;
+          /* on applique à notre liste de vertices */
+          vertices[j].p.set(d[v + 0], d[v + 1], d[v + 2], 1.0);
+        }
+      }
+      /* idem pour les normales si elles existent */
+      if (pi['enable']['n']) {
+        r = pi['source']['n'];
+        t = pi['offset']['n'];
+        y = gs['stride'][r];
+        d = gs['data'][r];
+        for (var j = 0; j < svc; j++) {
+          v = indices[(j * u) + t] * y;
+          vertices[j].n.set(d[v + 0], d[v + 1], d[v + 2]);
+        }
+      }
+      /* idem pour les texcoord si elles existent */
+      if (pi['enable']['u']) {
+        r = pi['source']['u'];
+        t = pi['offset']['u'];
+        y = gs['stride'][r];
+        d = gs['data'][r];
+        for (var j = 0; j < svc; j++) {
+          v = indices[(j * u) + t] * y;
+          vertices[j].u.set(d[v + 0], d[v + 1], 0.0);
+        }
+      }
+      /* On retrouve le material correspondant à ce polyset. La référence
+       * se trouve dans les instances du node, dans <visual_scene> */
+
+      /* notre futur material, null par defaut */
+      var material = null;
+      /* avons nous trouvé un symbole de material pour ce polyset ? */
+      if (sms != 'null') {
+        /* Les éléments <instance_material> du fichier entier */
+        var im = this._dae.getElementsByTagName('instance_material');
+        /* on parcour la liste des  <instance_material> */
+        var j = im.length;
+        while (j--) {
+          /* L'attribut 'symbol' du <instance_material>
+           * correspond au 'symbol' du polyset ? */
+          if (im[j].getAttribute('symbol') == sms) {
+            /* On retrouve la node material par son nom */
+            material = this._retrieveNode(this._getNameById('material',
+                    im[j].getAttribute('target').substring(1)));
+            break;
+          }
+        }
+        /* avons nous trouvé une node material ? */
+        if (!material) {
+          /* Si ce n'est pas le cas, on en crée un nouveau par defaut */
+          Ovoid._log(2,this._i,'::Collada._procGeo', this.name + 
+              ":: Geometry '" + node.name + '/' + sms + "' material not found");
+
+          material = new Ovoid.Material('newmaterial#'+this._dstsc.material.length,this._i);
+                                        
+          Ovoid._log(2,this._i,'::Collada._procGeo', this.name + 
+              ":: Geometry '" + node.name + '/polyset ' + i + "' : assign new material node " + material.name);
+            
+          this._dstsc.insNode(material);
+        }
+      } else {
+        /* pas de 'symbol' ? on crée un material par défaut */
+        material = new Ovoid.Material('newmaterial#'+this._dstsc.material.length, this._i);
+        
+        Ovoid._log(2,this._i,'::Collada._procGeo', this.name + 
+            ":: Geometry '" + node.name + '/polyset ' + i + "' assign new material node " + material.name);
+            
+        this._dstsc.insNode(material);
+      }
+
+      /* On ajoute ce polyset a la node mesh */
+      Ovoid._log(3,this._i,'::Collada._procGeo', this.name + 
+              ":: Geometry '" + node.name + "' polyset#" + i  + ": " + vertices.length + " vertices.");
+      node.addPolyset(0, vertices, material, gt, svf, Ovoid.BUFFER_STATIC);
+    }
+    
+    return pl.length;
+}
 
 /**
  * Proceed to creation and setting of a new mesh node from a
@@ -1055,21 +1341,21 @@ Ovoid.Collada.prototype._procGeo = function(dae) {
   /* confection du nom de notre future node */
   var name = this._pfix + dae.getAttribute('id') + this._sfix;
   /* creation de la node */
-  var node = new Ovoid.Mesh(name);
+  var node = new Ovoid.Mesh(name, this._i);
   /* message de log optionnel */
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-      "Mesh '" + node.name + "' : created");
+  Ovoid._log(3,this._i, '::Collada._procGeo', this.name + 
+      ":: Mesh '" + node.name + "' created");
 
   /* recuperation de toutes les sources (position, normal, etc...) avec
    * les informations d'acces (stride, count, etc...)
 
   /* Le tableau des sources, nous serviera plus tard */
-  var GS = new Object();
+  var gs = new Object();
 
-  GS['id'] = new Array();        /* l'attribut Id de la source */
-  GS['count'] = new Array();     /* le nombre d'elements */
-  GS['stride'] = new Array();    /* le stride des elements */
-  GS['data'] = new Array();      /* les donnnées*/
+  gs['id'] = new Array();        /* l'attribut Id de la source */
+  gs['count'] = new Array();     /* le nombre d'elements */
+  gs['stride'] = new Array();    /* le stride des elements */
+  gs['data'] = new Array();      /* les donnnées*/
 
   /* parcour de la liste des éléments <source> du <geometry> */
   var s = dae.getElementsByTagName('source');
@@ -1078,12 +1364,12 @@ Ovoid.Collada.prototype._procGeo = function(dae) {
   var i = s.length;
   while (i--) {
     /* <source id= */
-    GS['id'].push(s[i].getAttribute('id'));
+    gs['id'].push(s[i].getAttribute('id'));
     /* élément <accessor> du <source> */
     sa = s[i].getElementsByTagName('accessor');
     /* <accessor count="..  stride=".. > */
-    GS['stride'].push(parseInt(sa[0].getAttribute('stride')));
-    GS['count'].push(parseInt(sa[0].getAttribute('count')));
+    gs['stride'].push(parseInt(sa[0].getAttribute('stride')));
+    gs['count'].push(parseInt(sa[0].getAttribute('count')));
     /* élement <float_array > du <source> */
     fa = s[i].getElementsByTagName('float_array');
     /* on recupere la liste des floats */
@@ -1099,331 +1385,48 @@ Ovoid.Collada.prototype._procGeo = function(dae) {
       if (!isNaN(sd[u])) u++;
     }
     /* on ajoute nos data a l'array des sources */
-    GS['data'].push(sd);
+    gs['data'].push(sd);
   }
 
   /* On procède maintenant à l'extraction des listes de triangles du
    * descripteur <geometry> avec leur configuration */
   var pl;
-  /* il existe trois types de descripteur pour les listes de polygons */
-  /* s'agit-il de <polylist> ? */
-  pl = dae.getElementsByTagName('polylist');
-  if (pl.length == 0)
-  { /* s'agit-il de <polygons> */
-    pl = dae.getElementsByTagName('polygons');
-    if (pl.length == 0)
-    { /* s'agit-il de <triangles> */
-      pl = dae.getElementsByTagName('triangles');
-      if (pl.length == 0) {
-        /* si aucun n'a été trouvé inutile de continuer */
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Geometry '" + node.name +
-            "' : missing polyset <polylist>|<polygons>|<triangles>: Mesh data not found.");
-        return null;
-      }
-    }
+  var pc = 0;
+  /* il existe plusieurs types de descripteur pour les listes de 
+   * polygons, on en gère que deux pour le moment <polylist>, <polygons>
+   * <triangles> et <lines>. */
+  
+  /* On traite les <lines> (si il y'en a) */
+  pc += this._procPset(node, dae, gs, dae.getElementsByTagName('lines'), 1);
+  /* On traite les <polylist> (si il y'en a) */
+  pc += this._procPset(node, dae, gs, dae.getElementsByTagName('polylist'), 4);
+  /* On traite les <polygons> (si il y'en a) */
+  pc += this._procPset(node, dae, gs, dae.getElementsByTagName('polygons'), 4);
+  /* On traite les <triangles> (si il y'en a) */
+  pc += this._procPset(node, dae, gs, dae.getElementsByTagName('triangles'), 4);
+  
+  /* aucun type de géométrie géré trouvé, inutile de continuer */
+  if (pc) {
+    Ovoid._log(3,this._i,'::Collada._procGeo', this.name + 
+        ":: Geometry '" + node.name + "' "+pc+" polyset(s) extracted.");
+  } else {
+    Ovoid._log(2,this._i,'::Collada._procGeo', this.name + 
+        ":: Geometry '" + node.name + "' no supported geometry type (<polylist>|<lines>) found: no Mesh data loaded.");
+    return null;
   }
-
-  /* parcour de la liste des polyset (<polylist>, <polygons>
-   * ou <trianges>) */
-  var i = pl.length;
-  while (i--)
-  {
-    /* le format de vertex pour le future polyset */
-    var svf = 0;
-
-    /* le nombre de vertices et triangles pour ce polyset */
-    var stc = pl[i].getAttribute('count');
-    var svc = stc * 3;
-
-    /* recupere le nom symbolique du materiel pour ce polyset */
-    var sms = pl[i].getAttribute('material');
-    if (!sms) { /* pas de <material> trouvé ? */
-      sms = 'null';
-      /* on prévient qu'aucun material n'est assigné */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Geometry '" + node.name + '/polyset ' + i +
-          "' : missing material symbol.");
-    }
-
-    /* On verifie la triangulation du mesh. si il s'agit
-     * de <polylist>, un élément <vcount> devrait être présent */
-    var vct = pl[i].getElementsByTagName('vcount');
-    if (vct.length) { /* l'élément <vcount> a été trouvé ? */
-      var d = vct[0].childNodes[0].data;
-      /* on verifie brievement qu'il n'y a pas autre chose que des 3 */
-      if (d.indexOf('4', 0) != -1 ||
-          d.indexOf('5', 0) != -1 ||
-          d.indexOf('6', 0) != -1 ||
-          d.indexOf('7', 0) != -1 ||
-          d.indexOf('8', 0) != -1)
-      {
-        /* dans le cas contraire on ne peut pas aller plus loin */
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Geometry '" + node.name + '/' + sms +
-            "' : bad mesh triangulation: mesh ingnored.");
-        return null;
-      }
-    }
-
-    /* On constitue un tableau des input de ce polyset qui référencent
-     * les sources utilisé pour ce polyset et leur arrangement */
-    var PI = new Object();
-    PI['enable'] = new Object();
-    PI['source'] = new Object();
-    PI['offset'] = new Object();
-
-    /* parcour la liste des éléments <input> du polyset */
-    var pli = pl[i].getElementsByTagName('input');
-
-    var sid, l, c;
-    var j = pli.length;
-    while (j--)
-    {
-      /* L'attribut 'semantic' de cet <input> est-il "VERTEX" ? */
-      if (pli[j].getAttribute('semantic') == 'VERTEX') {
-
-        /* Retrouve la source pour cet input, il s'agit d'un
-         * élément <vertices> dans lequel il y'a d'autres
-         * <input> */
-        var vi = this._getById('vertices', pli[j].getAttribute('source').substring(1)).getElementsByTagName('input');
-        /* Parcours des <input> du <vertices> */
-        var k = vi.length;
-        while (k--)
-        {
-          /* L'attribut 'semantic' de cet <input>
-           * est-il "POSITION" ? */
-          if (vi[k].getAttribute('semantic') == 'POSITION')
-          {
-            /* Voilà le nom de la source de nos positions de
-             * vertices */
-            sid = vi[k].getAttribute('source').substring(1);
-            l = GS['id'].length;
-            /* on la retrouve dans notre liste précédemment
-             * confectionné */
-            while (l--) {
-              if (GS['id'][l] == sid) {
-                PI['source']['p'] = l;
-                /* cette source est activé */
-                PI['enable']['p'] = true;
-                /* on note l'offset du <input> 'VERTEX' */
-                PI['offset']['p'] = parseInt(pli[j].getAttribute('offset'));
-                /* on ajoute le format VEC4_P au format de vertex */
-                svf |= Ovoid.VERTEX_VEC4_P;
-              }
-            }
-          }
-          /* parfois l'input des normals se trouve dans
-           * l'élément <vertices> alors qu'il est traditionnellement
-           * directement dans l'élément <polygons> */
-
-          /* L'attribut 'semantic' de cet <input>
-           * est-il "NORMAL" ? */
-          if (vi[k].getAttribute('semantic') == 'NORMAL')
-          {
-            /* Voilà le nom de la source de nos normals de vertices */
-            sid = vi[k].getAttribute('source').substring(1);
-            l = GS['id'].length;
-            while (l--) {
-              if (GS['id'][l] == sid) {
-                PI['source']['n'] = l;
-                PI['enable']['n'] = true;
-                PI['offset']['n'] = parseInt(pli[j].getAttribute('offset'));
-                svf |= Ovoid.VERTEX_VEC3_N;
-              }
-            }
-          }
-        }
-
-        if (PI['source']['p'] == -1) {
-          /* pas de positions pour ce mehs ? est-ce une blague ? */
-          Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-              "Geometry '" + node.name + '/' + sms +
-              "' : missing vertices POSITION source: polyset ignored.");
-          continue;
-        }
-      }
-
-      /* L'attribut 'semantic' de cet <input> est-il "NORMAL" ? */
-      if (pli[j].getAttribute('semantic') == 'NORMAL') {
-        sid = pli[j].getAttribute('source').substring(1);
-        l = GS['id'].length;
-        while (l--) {
-          if (GS['id'][l] == sid) {
-            PI['source']['n'] = l;
-            PI['enable']['n'] = true;
-            PI['offset']['n'] = parseInt(pli[j].getAttribute('offset'));
-            svf |= Ovoid.VERTEX_VEC3_N;
-          }
-        }
-      }
-      /* L'attribut 'semantic' de cet <input> est-il "TEXCOORD" ? */
-      if (pli[j].getAttribute('semantic') == 'TEXCOORD') {
-        sid = pli[j].getAttribute('source').substring(1);
-        l = GS['id'].length;
-        while (l--) {
-          if (GS['id'][l] == sid) {
-            PI['source']['u'] = l;
-            PI['enable']['u'] = true;
-            PI['offset']['u'] = parseInt(pli[j].getAttribute('offset'));
-            svf |= Ovoid.VERTEX_VEC3_U;
-          }
-        }
-      }
-    }
-
-    /* récuperation de la liste des indices pour ce polyset */
-    /* les elements <p> du polyset */
-    var p = pl[i].getElementsByTagName('p');
-    /* la future liste d'indices unsigned short */
-    var indices = new Uint16Array((stc * 3) * pli.length);
-
-    l = 0; c = p.length;
-    /* pour chaque <p> d'indice (dans l'ordre) */
-    for (var j = 0; j < c; j++) {
-      /* la liste des indices de <p> splités */
-      var d = this._gTxtDataSplit(p[j].childNodes);
-      var b = d.length;
-      /* on a joute à la liste d'indice générale */
-      for (var k = 0; k < b; k++) {
-        indices[l] = parseInt(d[k]);
-        if (!isNaN(indices[l])) l++;
-      }
-    }
-    
-    /* Ce n'est jamais arrivé mais on sait jamais... */
-    if ( indices.length != l ) {
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Geometry '" + node.name + '/' + sms +
-            "' found indices mismatch triangles count (" + l 
-            + "/" + indices.length + ")");
-    }
-
-    /* notre future liste de vertices pour ce polyset */
-    var vertices = Ovoid.Vertex.newArray(svc);
-
-    /* les indices dans le fichier collada sont disposé tel que:
-     *
-     * [        Triangle1        ][        triangle2        ][etc.
-     * [vertex1][vertex2][vertex3][vertex1][vertex2][vertex3][etc.
-     * [p][n][u][p][n][u][p][n][u][p][n][u][p][n][u][p][n][u][etc.
-     *  0  0  0  1  2  1  2  2  3  2  5  2  1  2  3  3  7  4  4
-
-    /* les quelque variables utiles */
-    var r, t, y, u, d, v;
-    /* nombre d'input de ce polyset, donne un stride pour parcourir
-     * la liste d'indices */
-    u = pli.length;
-    /* remplissage des positions */
-    if (PI['enable']['p']) {
-      r = PI['source']['p'];  /* l'index de notre source */
-      t = PI['offset']['p'];  /* l'offset des indices */
-      y = GS['stride'][r];  /* nombre de composant par indice */
-      d = GS['data'][r];    /* notre liste de composants */
-      for (var j = 0; j < svc; j++) {
-        /* l'indice de l'élément dans la source */
-        v = indices[(j * u) + t] * y;
-        /* on applique à notre liste de vertices */
-        vertices[j].p.set(d[v + 0], d[v + 1], d[v + 2], 1.0);
-      }
-    }
-    /* idem pour les normales si elles existent */
-    if (PI['enable']['n']) {
-      r = PI['source']['n'];
-      t = PI['offset']['n'];
-      y = GS['stride'][r];
-      d = GS['data'][r];
-      for (var j = 0; j < svc; j++) {
-        v = indices[(j * u) + t] * y;
-        vertices[j].n.set(d[v + 0], d[v + 1], d[v + 2]);
-      }
-    }
-    /* idem pour les texcoord si elles existent */
-    if (PI['enable']['u']) {
-      r = PI['source']['u'];
-      t = PI['offset']['u'];
-      y = GS['stride'][r];
-      d = GS['data'][r];
-      for (var j = 0; j < svc; j++) {
-        v = indices[(j * u) + t] * y;
-        vertices[j].u.set(d[v + 0], d[v + 1], 0.0);
-      }
-    }
-    /* On retrouve le material correspondant à ce polyset. La référence
-     * se trouve dans les instances du node, dans <visual_scene> */
-
-    /* notre futur material, null par defaut */
-    var material = null;
-    /* avons nous trouvé un symbole de material pour ce polyset ? */
-    if (sms != 'null') {
-      /* Les éléments <instance_material> du fichier entier */
-      var im = this._dae.getElementsByTagName('instance_material');
-      /* on parcour la liste des  <instance_material> */
-      var j = im.length;
-      while (j--) {
-        /* L'attribut 'symbol' du <instance_material>
-         * correspond au 'symbol' du polyset ? */
-        if (im[j].getAttribute('symbol') == sms) {
-          /* On retrouve la node material par son nom */
-          material = this._retrieveNode(this._getNameById('material',
-                  im[j].getAttribute('target').substring(1)));
-          break;
-        }
-      }
-      /* avons nous trouvé une node material ? */
-      if (!material) {
-        /* Si ce n'est pas le cas, on en crée un nouveau par defaut */
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Geometry '" + node.name + '/' + sms +
-            "' : material not found");
-
-        material = new Ovoid.Material('newmaterial#' +
-                                      this._dstsc.material.length);
-                                      
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Geometry '" + node.name + '/polyset ' + i +
-          "' : assign new material node " + material.name);
-          
-        this._dstsc.insert(material);
-      }
-    } else {
-      /* pas de 'symbol' ? on crée un material par défaut */
-      material = new Ovoid.Material('newmaterial#' +
-                                    this._dstsc.material.length);
-                                    
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Geometry '" + node.name + '/polyset ' + i +
-          "' : assign new material node " + material.name);
-          
-      this._dstsc.insert(material);
-    }
-
-    /* On ajoute ce polyset a la node mesh */
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-            "Geometry '" + node.name + "' polyset#" + i  + ": " + vertices.length + " vertices.");
-    node.addPolyset(0, vertices, material);
-  }
-
+  
   /* sur mension explicite dans le mask d'import uniquement
    * (car ça peut être TRES long) on applique les optimisations
    * du mesh */
 
   /* optimise la liste des vertices en double dans le mesh */
   if (this._mask & Ovoid.DAE_OPTIMIZE_MESH_VERTICES) {
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-            "Geometry '" + node.name + "' Optimize vertices.");
+    Ovoid._log(3,this._i,'::Collada._procGeo', this.name + 
+            ":: Geometry '" + node.name + "' Optimize vertices.");
             
     if(node.vertices[0].length > 5000) {
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Geometry '" + node.name + "' Vertices optimization with more than 5000 triangles: May take long time.");
-      if (!Ovoid.opt_disableAlerts) {
-        alert( "OvoiD.JS - COLLADA importation alert.\n\n" 
-        + "DAE_OPTIMIZE_MESH_VERTICES option is enabled and the current mesh has more than 5000 vertices (" +  node.vertices[0].length + "). "
-        + "The operation can take long time and the browser may prompt a 'script not responding' error. "
-        + "You can ignore the browser alert by choosing 'Continue'\n\n"
-        + "Note: You should use OJSON import/export for the next stage. See the Ovoid.Ojson() class documentation at OvoiD.JS documentation's home page.\nhttp://doc.ovoid.org"
-        + "\n\nTo avoid this alert, set the Ovoid.opt_disableAlerts option to true in the config.js file.");
-      }
+      Ovoid._log(2,this._i, '::Collada._procGeo', this.name + 
+            ":: Geometry '" + node.name + "' Vertices optimization with more than 5000 triangles: May take long time.");
     }
     node.optimizeVertices();
   }
@@ -1431,25 +1434,18 @@ Ovoid.Collada.prototype._procGeo = function(dae) {
   /* prepare et optimise les polygones. Opération très couteuse en
    * temps de calcul, n'est utile surtout pour les shadow volums */
   if (this._mask & Ovoid.DAE_OPTIMIZE_MESH_TRIANGLES) {
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-            "Geometry '" + node.name + "' Optimize triangles.");
+    Ovoid._log(3,this._i,'::Collada._procGeo', this.name + 
+            ":: Geometry '" + node.name + "' Optimize triangles.");
+            
     if(node.triangles[0].length > 1000) {
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Geometry '" + node.name + "' Triangles optimization with more than 1000 triangles: May take VERY LONG time.");
-      if (!Ovoid.opt_disableAlerts) {
-        alert( "OvoiD.JS - COLLADA importation alert.\n\n" 
-        + "DAE_OPTIMIZE_MESH_TRIANGLES option is enabled and the current mesh has more than 1000 triangles (" +  node.triangles[0].length + "). "
-        + "The operation can take a VERY long time and the browser may prompt a 'script not responding' error. "
-        + "You can ignore the browser alert by choosing 'Continue'\n\n"
-        + "Note: You should use OJSON import/export for the next stage. See the Ovoid.Ojson() class documentation at OvoiD.JS documentation's home page.\nhttp://doc.ovoid.org"
-        + "\n\nTo avoid this alert, set the Ovoid.opt_disableAlerts option to true in the config.js file.");
-      }
+      Ovoid._log(2,this._i,'::Collada._procGeo', this.name + 
+            ":: Geometry '" + node.name + "' Triangles optimization with more than 1000 triangles: May take VERY LONG time.");
     }
     node.optimizeTriangles();
   }
 
   /* On crée les VBO pour ce mesh */
-  node.createBuffers(svf, Ovoid.BUFFER_STATIC);
+  //node.createBuffers(svf, Ovoid.BUFFER_STATIC);
 
   /* retourne la node configurée */
   return node;
@@ -1502,8 +1498,8 @@ Ovoid.Collada.prototype._procCtr = function(dae) {
        * controllers, et ceci NE FONCTIONNE PAS car le skin est
        * dépendants des bones/joints qui SONT DANS le graph et
        * pas ailleurs */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Skin '" + name + "' not found as instanced: Ignored. ");
+      Ovoid._log(2,this._i, '::Collada._procCtr', this.name +
+          ":: Skin '" + name + "' not found as instanced: Ignored. ");
           
       return null;
     }
@@ -1594,9 +1590,8 @@ Ovoid.Collada.prototype._procCtr = function(dae) {
         VWS['bonesi']['data'] == null)
     {
       /* il manque l'essentiel */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Skin '" + node.name +
-          "' missing <input> informations: Aborting.");
+      Ovoid._log(2,this._i,'::Collada._procCtr', this.name +
+          ":: Skin '" + node.name + "' missing <input> informations: Aborting.");
       return null;
     }
 
@@ -1611,9 +1606,8 @@ Ovoid.Collada.prototype._procCtr = function(dae) {
     var wc = parseInt(vw[0].getAttribute('count'));
     if (wc == 0) {
       /* 0 poids ? est-ce une blague (ça arrive, he oui) */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Skin '" + node.name +
-          "' no weights data found: Aborting.");
+      Ovoid._log(2,this._i,'::Collada._procCtr', this.name + 
+          ":: Skin '" + node.name + "' no weights data found: Aborting.");
       return null;
     }
 
@@ -1763,11 +1757,8 @@ Ovoid.Collada.prototype._procCtr = function(dae) {
     if ((refposa.length / 3) != wc) {
       /* pas le même nombre de vertex-poids et de positions ?
        * on abandonne */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Skin '" + node.name +
-          "' positions/wheights count mismatch (" +
-          (refposa.length / 3) + '/' + wc +
-          '): Aborting.');
+      Ovoid._log(2,this._i,'::Collada._procCtr', this.name +
+          ":: Skin '"+node.name+"' positions/wheights count mismatch ("+(refposa.length/3)+'/'+wc+'): Aborting.');
       return null;
     }
 
@@ -1793,9 +1784,8 @@ Ovoid.Collada.prototype._procCtr = function(dae) {
       /* on ajoute la node à la liste */
       bonesa.push(n);
       /* Mention optionelle dans les logs */
-      Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-          "Skin '" + node.name +
-          "' has influence joint '" + n.name + "'");
+      Ovoid._log(3,this._i,'::Collada._procCtr', this.name +
+          ":: Skin '" + node.name + "' has influence joint '" + n.name + "'");
     }
 
     /* notre futur liste de bind pose matrice inverse des bones */
@@ -1844,9 +1834,8 @@ Ovoid.Collada.prototype._procCtr = function(dae) {
      * bone, si ce n'est pas le cas, c'est problématique. */
     if (bimatrix.length != bonesa.length) {
       /* il manque des matrices bind pose ? on abandonne */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Skin '" + node.name +
-          "' joints list / bind matrices count mismatch. Aborting.");
+      Ovoid._log(2,this._i,'::Collada._procCtr', this.name + 
+          ":: Skin '" + node.name + "' joints list / bind matrices count mismatch. Aborting.");
       return null;
     }
 
@@ -1879,16 +1868,12 @@ Ovoid.Collada.prototype._procCtr = function(dae) {
     var mesh = this._retrieveNode(sk.getAttribute('source').substring(1));
     if (mesh) {
       /* Mention optionelle dans les logs */
-      Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-          "Skin '" + node.name +
-          "' has binded mesh '" + mesh.name + "'");
+      Ovoid._log(3,this._i,'::Collada._procCtr', this.name +
+          ":: Skin '" + node.name + "' has binded mesh '" + mesh.name + "'");
     } else {
       /* on a pas trouvé le mesh ? inutile de continuer */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Skin '" + node.name +
-          "' binded mesh '" +
-          this._pfix + sk.getAttribute('source').substring(1) +
-          "' not found. Aborting.");
+      Ovoid._log(2,this._i,'::Collada._procCtr', this.name +
+          ":: Skin '" + node.name + "' binded mesh '"+this._pfix+sk.getAttribute('source').substring(1)+"' not found. Aborting.");
       return null;
     }
 
@@ -1913,15 +1898,13 @@ Ovoid.Collada.prototype._procCtr = function(dae) {
   /* Recherche un <morph> dans le <controller> */
   if (this._hasChildByTag(daeController, 'morph')) {
     /* le morph n'est pas implémenté */
-    Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-        "controller '" + name +
-        "' <morph> controller not yet supported");
+    Ovoid._log(2,this._i,'::Collada._procCtr', this.name +
+        ":: controller '" + name + "' <morph> controller not yet supported");
     return null;
   } else {
     /* Ni un <skin> ni un <morph> ? Kesako ? */
-    Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-        "controller '" + name +
-        "' unknow controller type");
+    Ovoid._log(2,this._i,'::Collada._procCtr', this.name +
+        ":: controller '" + name + "' unknow controller type");
     return null;
   }
 };
@@ -1984,15 +1967,13 @@ Ovoid.Collada.prototype._procNod = function(dae) {
     if (node) {
       /* On renome la camera d'après nom de la node plutot
        * que de celui du 'shape' */
-      Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-          "'" + node.name + "' is instance camera '" +
-          name + "'");
+      Ovoid._log(3,this._i, '::Collada._procNod', this.name +
+          ":: '" + node.name + "' is instance camera '" + name + "'");
       node.name = name;
     } else {
       /* on a pas retrouvé la camera ? inutile de continuer */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "'" + dn + "' instance camera not found '" +
-          name + "'");
+      Ovoid._log(2,this._i,'::Collada._procNod', this.name +
+          ":: '" + dn + "' instance camera not found '" + name + "'");
       return null;
     }
   }
@@ -2010,15 +1991,13 @@ Ovoid.Collada.prototype._procNod = function(dae) {
     if (node) {
       /* On renome la light d'après nom de la node plutot
        * que de celui du 'shape' */
-      Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-          "'" + node.name + "' is instance light '" +
-          name + "'");
+      Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+          ":: '" + node.name + "' is instance light '" + name + "'");
       node.name = name;
     } else {
       /* on a pas retrouvé la light ? inutile de continuer */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "'" + dn + "' instance light not found '" +
-          name + "'");
+      Ovoid._log(2,this._i,'::Collada._procNod', this.name +
+          ":: '" + dn + "' instance light not found '" + name + "'");
       return null;
     }
   }
@@ -2026,10 +2005,10 @@ Ovoid.Collada.prototype._procNod = function(dae) {
   if (this._hasChildByTag(dae, 'instance_geometry'))
   {
     /* on crée une nouvelle node body */
-    node = new Ovoid.Body(name);
+    node = new Ovoid.Body(name, this._i);
     /* message de log optionnel */
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-        "Body '" + node.name + "' : created");
+    Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+        ":: Body '" + node.name + "' created");
     /* L'élément <instance_geometry> du <node> */
     var di = this._getChildByTag(dae, 'instance_geometry');
     /* récupère le nom de la node, déduit de l'instance <geometry>
@@ -2041,24 +2020,22 @@ Ovoid.Collada.prototype._procNod = function(dae) {
     if (shape) {
       /* on configure le mesh en tant que shape de ce body */
       node.setShape(shape);
-      Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-          "'" + node.name + "' has geometry shape '" +
-          shape.name + "'");
+      Ovoid._log(3,this._i, '::Collada._procNod', this.name +
+          ":: '" + node.name + "' has geometry shape '" + shape.name + "'");
     } else {
       /* on a pas retrouvé la camera ? ça fera un null body */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "'" + node.name +
-          "' geometry shape not found '" + dn + "'");
+      Ovoid._log(2,this._i,'::Collada._procNod', this.name +
+          ":: '" + node.name +"' geometry shape not found '" + dn + "'");
     }
   }
   /* Le <node> a-t-il un element <instance_controller> ? */
   if (this._hasChildByTag(dae, 'instance_controller'))
   {
     /* on crée une nouvelle node body */
-    node = new Ovoid.Body(name);
+    node = new Ovoid.Body(name, this._i);
     /* message de log optionnel */
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-        "Body '" + node.name + "' : created");
+    Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+        ":: Body '" + node.name + "' created");
 
     /* L'élément <instance_controller> du <node> */
     var di = this._getChildByTag(dae, 'instance_controller');
@@ -2074,27 +2051,25 @@ Ovoid.Collada.prototype._procNod = function(dae) {
          * retrouvé via l'attribut url */
         var dn = this._pfix + di[0].getAttribute('url').substring(1) + this._sfix;
         /* On crée une nouvel node skin qui sera traité plus tard */
-        var shape = new Ovoid.Skin(dn);
+        var shape = new Ovoid.Skin(dn, this._i);
         /* on configure le skin d'avance en tant que shape de ce body */
         node.setShape(shape);
         /* on ajoute la node skin à la liste pour que le _procCtr puisse
          *  le retrouver */
-        this._dstsc.insert(shape);
-        Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-            "'" + node.name + "' has shape '" +
-            shape.name + "'");
+        this._dstsc.insNode(shape);
+        Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+            ":: '" + node.name + "' has shape '" + shape.name + "'");
       } else {
         /* Si il n'y a pas d'element <skin>, c'est un <morph> ou
           * inconnu, et c'est non pris en chage */
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "'" + dn + "' unsuported controller type'");
+        Ovoid._log(2,this._i,'::Collada._procNod', this.name +
+            ":: '" + dn + "' unsuported controller type'");
       }
     } else {
       /* Le descripteur <controller> n'a pas été trouvé ? ça fera un
        * null body */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "'" + dn +
-          "' <controller> instance not found.'");
+      Ovoid._log(2,this._i,'::Collada._procNod', this.name +
+          ":: '" + dn + "' <controller> instance not found.'");
     }
   }
 
@@ -2103,10 +2078,10 @@ Ovoid.Collada.prototype._procNod = function(dae) {
     /* Est-ce que le type est JOINT ?*/
     if (dae.getAttribute('type') == 'JOINT') {
       /* on crée une nouvelle node joint/bone */
-      node = new Ovoid.Joint(name);
+      node = new Ovoid.Joint(name, this._i);
       /* message de log optionnel */
-      Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-          "Joint '" + node.name + "' : created");
+      Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+          ":: Joint '" + node.name + "' created");
     }
   }
 
@@ -2115,10 +2090,10 @@ Ovoid.Collada.prototype._procNod = function(dae) {
    * on crée donc un Null transform */
   if (!node) {
     /* On crée une nouvelle node transform */
-    node = new Ovoid.Transform(name);
+    node = new Ovoid.Transform(name, this._i);
     /* message de log optionnel */
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-        "Transform (NULL) '" + node.name + "' : created");
+    Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+        ":: Transform (NULL) '" + node.name + "' created");
   }
 
   /* Retrouve et applique les transformations a la node */
@@ -2219,21 +2194,17 @@ Ovoid.Collada.prototype._procNod = function(dae) {
   node.orientXyz(o[0], o[1], o[2], Ovoid.LOCAL, Ovoid.RELATIVE);
   node.scaleXyz(s[0], s[1], s[2], Ovoid.ABSOLUTE);
   
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-        "Transform '" + node.name + "' move:" 
-        + t[0] + ', ' + t[1] + ', ' + t[2]);
+  Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+        ":: Transform '" + node.name + "' move:" + t[0] + ', ' + t[1] + ', ' + t[2]);
        
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-        "Transform '" + node.name + "' rotate:" 
-        + r[0] + ', ' + r[1] + ', ' + r[2]);
+  Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+        ":: Transform '" + node.name + "' rotate:" + r[0] + ', ' + r[1] + ', ' + r[2]);
         
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-        "Transform '" + node.name + "' orient:" 
-        + o[0] + ', ' + o[1] + ', ' + o[2]);
+  Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+        ":: Transform '" + node.name + "' orient:" + o[0] + ', ' + o[1] + ', ' + o[2]);
 
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-        "Transform '" + node.name + "' scale:" 
-        + s[0] + ', ' + s[1] + ', ' + s[2]);
+  Ovoid._log(3,this._i,'::Collada._procNod', this.name +
+        ":: Transform '" + node.name + "' scale:" + s[0] + ', ' + s[1] + ', ' + s[2]);
   
   /* retourne la node transformée */
   return node;
@@ -2484,9 +2455,8 @@ Ovoid.Collada.prototype._procAni = function(dae) {
      * le moteur ne gère pas l'animation, qui n'aurait par ailleurs
      * aucun intéret */
     if (ACD['xdata'][i].length < 2) {
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "Animation '" + aid +
-          "' has only one keyframe: ignored.");
+      Ovoid._log(2,this._i, '::Collada._procAni', this.name +
+          ":: Animation '" + aid + "' has only one keyframe: ignored.");
       continue; /* on passe au cannal suivant */
     }
 
@@ -2605,9 +2575,8 @@ Ovoid.Collada.prototype._procAni = function(dae) {
           } else {
             /* Le rapport de nombre de tangent et de clé
              * est incohérent ? */
-            Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-                "Animation '" + aid +
-                "' inconsistant tangent/keyframe count ratio");
+            Ovoid._log(3,this._i,'::Collada._procAni', this.name +
+                ":: Animation '" + aid + "' inconsistant tangent/keyframe count ratio");
             /* on ignore l'interpolation, on passe en CSPLINE */
             ACD['xerp'][i] = Ovoid.INTERPOLATION_CSPLINE;
           }
@@ -2632,9 +2601,8 @@ Ovoid.Collada.prototype._procAni = function(dae) {
           } else {
             /* Le rapport de nombre de tangent et de clé est
              * incohérent ? */
-            Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-                "Animation '" + aid +
-                "' wrong tangent/keyframe count ratio");
+            Ovoid._log(2,this._i,'::Collada._procAni', this.name +
+                ":: Animation '" + aid + "' wrong tangent/keyframe count ratio");
             /* on ignore l'interpolation, on passe en CSPLINE */
             ACD['xerp'][i] = Ovoid.INTERPOLATION_CSPLINE;
           }
@@ -2650,23 +2618,23 @@ Ovoid.Collada.prototype._procAni = function(dae) {
     /* Si non on en crée une et on assigne le target */
     if (!node) {
       /* on crée une node animation */
-      node = new Ovoid.Animation(this._pfix + ACD['name'][i] + this._sfix);
+      node = new Ovoid.Animation(this._pfix + ACD['name'][i] + this._sfix, this._i);
       /* il faut insérer la node tout de suite */
-      this._dstsc.insert(node);
+      this._dstsc.insNode(node);
       /* message de log optionnel */
-      Ovoid.log(3, 'Ovoid.Collada ' + this.name, 
-          "Animation '"+node.name+"' : created");
+      Ovoid._log(3,this._i,'::Collada._procAni', this.name + 
+          ":: Animation '"+node.name+"' created");
       /* on retrouve la cible de l'animation */
       var target = this._retrieveNode(ACD['tname'][i]);
       /* Avons nous trouvé la node cible ? */
       if (target) {
         node.setTarget(target);
-        Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-            "Animation '"+node.name+"' has target '"+target.name+"'");
+        Ovoid._log(3,this._i,'::Collada._procAni', this.name +
+            ":: Animation '"+node.name+"' has target '"+target.name+"'");
       } else {
         /* Si on a pas trouvé la node cible, inutile de traiter ce cannal */
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Animation '"+node.name+"' target '"+ACD['tname'][i]+"' not found");
+        Ovoid._log(2,this._i,'::Collada._procAni', this.name +
+            ":: Animation '"+node.name+"' target '"+ACD['tname'][i]+"' not found");
         continue;
       }
     }
@@ -2691,8 +2659,8 @@ Ovoid.Collada.prototype._procAni = function(dae) {
 
     if (this._dae.getElementsByTagName('visual_scene').length == 0) {
       /* Pas d'élément <visual_scene> ? houla ! */
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          'Animation : <visual_scene> not found (Is DAE source corrupted ?).');
+      Ovoid._log(2,this._i,'::Collada._procAni', this.name +
+          ':: Animation : <visual_scene> not found (Is DAE source corrupted ?).');
       return null;
     }
 
@@ -2820,15 +2788,13 @@ Ovoid.Collada.prototype._procAni = function(dae) {
             break;
         }
 
-        Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-            "'" + node.name + "' add curve channels from matrix");
+        Ovoid._log(3,this._i,'::Collada._procAni', this.name +
+            ":: '" + node.name + "' add curve channels from matrix");
             
       } else {
         /* le type de donnée n'est pas float4x4 ? on ne connait pas */
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Animation '" + node.name +
-            "' unsuported matrix data type '" +
-            ACD['ytype'][i] + "': Aborting.");
+        Ovoid._log(2,this._i,'::Collada._procAni', this.name +
+            ":: Animation '" + node.name + "' unsuported matrix data type '" + ACD['ytype'][i] + "': Aborting.");
         continue;
       }
     } else {
@@ -3036,17 +3002,14 @@ Ovoid.Collada.prototype._procAni = function(dae) {
             break;
         }
 
-        Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-            "'" + node.name + "' add curve channel " +
-            ACD['ttsid'][i] + '.' + ACD['ttaxis'][i]);
+        Ovoid._log(3,this._i,'::Collada._procAni', this.name + 
+            ":: '" + node.name + "' add curve channel " + ACD['ttsid'][i] + '.' + ACD['ttaxis'][i]);
 
       } else {
         /* Pas de cannal trouvé ? c'est qu'on ne le gère
          * pas (pas encore) */
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-            "Animation '" + node.name +
-            "' unsuported channel '" +
-            ACD['ttsid'][i] + "'");
+        Ovoid._log(2,this._i,'::Collada._procAni', this.name +
+            ":: Animation '" + node.name + "' unsuported channel '" + ACD['ttsid'][i] + "'");
         continue;
       }
     }
@@ -3057,84 +3020,14 @@ Ovoid.Collada.prototype._procAni = function(dae) {
 
 
 /**
- * Load the specified source file for this instance.<br><br>
- * 
- * Loads the specified external source file and extracts, decodes or parses the 
- * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
- *  
- * The <code>loadSatus</code> member indicates the loading status through an 
- * integer value of 0, 1 or -1. A value of 0 means that the file is not yet 
- * loaded, a value of 1 means that the source was successfully loaded, and a 
- * value of -1 means the loading failed.<br><br>
- *
- * @param {string} url Source file url to load.
- * 
- * @param {bool} async Optionnal asynchronous loading flag. If true or not null
- * the source is loaded in asynchronous way.
- */
-Ovoid.Collada.prototype.loadSource = function(url, async) {
-
-  this.url = url;
-
-  this.loadStatus = 0;
-  var htreq = new XMLHttpRequest();
-
-  /* La définition de onreadystatechange n'est utile qu'en
-   * mode asynchrone */
-  if (async) {
-    htreq.owner = this;
-
-    htreq.onreadystatechange = function()
-    {
-      if (this.readyState == 4) {
-        if (this.status == 200 || this.status == 304) {
-          var parser = new DOMParser();
-          this.owner._dae = parser.parseFromString(this.responseText,
-              'text/xml');
-          this.owner.loadStatus = 1;
-        } else {
-          this.owner.loadStatus = -1;
-          Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-              "unable to load source '" +
-              this.owner.url + "'");
-        }
-      }
-    }
-  }
-
-  var src = this.url;
-  if (Ovoid.opt_debugMode) 
-    src += '?' + Math.random();
-  
-  htreq.open('GET', src, async);
-  htreq.send(null);
-
-  /* Si nous sommes en mode synchrone */
-  if (!async) {
-    if (htreq.status == 200 || htreq.status == 304) {
-      var parser = new DOMParser();
-      this._dae = parser.parseFromString(htreq.responseText,
-          'text/xml');
-      this.loadStatus = 1;
-    } else {
-      this.loadStatus = -1;
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-          "unable to load source '" +
-          this.url + "'");
-    }
-  }
-};
-
-
-/**
  * Import DAE data.<br><br>
  * 
  * Interprets the current parsed COLLADA source and import the result in the
  * given recipient scene according to the specified option bitmask and prefix /
  * suffix renaming rule.
  *
- * @param {bitmask} options Importation options bitmask.
  * @param {Scene} scene Recipient Scene object.
+ * @param {bitmask} options Importation options bitmask.
  * @param {string} prefix Prefix used to name imported nodes or null.
  * @param {string} suffix Suffix used to name imported nodes or null.
  *
@@ -3142,22 +3035,20 @@ Ovoid.Collada.prototype.loadSource = function(url, async) {
  * 
  * @see Ovoid.Scene
  */
-Ovoid.Collada.prototype.importDae = function(options, scene,  
-                              prefix, suffix) {
-
+Ovoid.Collada.prototype._importDae = function(scene, options, prefix, suffix) {
+      
   /* Si le DOM object n'existe on ne peut rien faire */
   if (!this._dae) {
-    Ovoid.log(2, 'Ovoid.Collada', 'no DAE data.');
+    Ovoid._log(2,this._i, '::Collada._importDae', this.name + 
+        ':: no DAE data, you should use loadSource method to load DAE file first.');
     return false;
   }
   
-  Ovoid.log(3, 'Ovoid.Collada', this.url + ' start.');
-  
+  Ovoid._log(3,this._i, '::Collada._importDae', this.name +
+      ":: begin");
+        
   /* Scene de destination */
   this._dstsc = scene;
-  
-  /* détermine le nom du collada d'apres l'url */
-  this.name = Ovoid.extractName(this.url);
   
   /* définie le suffix */
   if (!suffix) {
@@ -3186,42 +3077,44 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
     switch(this._upaxis)
     {
       case 0:
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name, 
-          "Conversion from X-Up axis not supported, data will be imported" 
-          + "without modification.");
+        Ovoid._log(2,this._i,'::Collada._importDae', this.name + 
+            ":: DAE scene is X-Up axis, Conversion from X-Up axis not supported, data will be imported without modification.");
         this._upaxis = 1;
-      break;
+        break;
       case 2:
-        Ovoid.log(2, 'Ovoid.Collada ' + this.name, 
-          "Conversion from Z-Up axis to Y-Up axis");
-      break;
+        Ovoid._log(2,this._i,'::Collada._importDae', this.name + 
+            ":: DAE scene is Z-Up axis, Conversion from Z-Up axis to Y-Up axis");
+        break;
     }
   } else {
     switch(this._upaxis)
     {
       case 0:
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name, 
-        "is X-Up axis, OvoiD.JS usually work in Right-Handed Y-Up.");
+        Ovoid._log(2,this._i,'::Collada._importDae', this.name + 
+            ":: DAE scene is X-Up axis, OvoiD.JS usually work in Right-Handed Y-Up.");
       break;
       case 2:
-      Ovoid.log(2, 'Ovoid.Collada ' + this.name, 
-          "is Z-Up axis, OvoiD.JS usually work in Right-Handed Y-Up." 
-          + "Use option Ovoid.DAE_CONVERT_UPAXIS to convert Z-up to Y-up.");
-      break;
+        Ovoid._log(2,this._i,'::Collada._importDae', this.name + 
+            ":: DAE scene is Z-Up axis, OvoiD.JS usually work in Right-Handed Y-Up. Use option Ovoid.DAE_CONVERT_UPAXIS to convert Z-up to Y-up.");
+        break;
     }
     this._upaxis = 1;
   }
 
   /* Crée un track si demandé */
   if (this._mask & Ovoid.DAE_CREATE_TRACK) {
-    var track = new Ovoid.Track(this.name + "Track");
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name, " Track '" + track.name + "' : created");
+    Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+        ':: Mask option DAE_CREATE_TRACK: creating tracks...');
+    var track = new Ovoid.Track(this.name + "Track", this._i);
+    Ovoid._log(3,this._i, '::Collada._importDae', this.name + 
+        ":: Track '" + track.name + "' created");
   }
 
   var i, l, node;
   if (this._mask & Ovoid.DAE_MATERIALS) {
     
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name, ' DAE_MATERIALS.');
+    Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+        ':: Mask option DAE_MATERIALS: import materials...');
     
     if (this._dae.getElementsByTagName('library_images').length)
     {
@@ -3234,12 +3127,12 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
             node = this._procImg(l[i]);
           } 
           catch (e) {
-            Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-                " _procImg exception: " + e.stack + ". (Is DAE source corrupted ?).");
+            Ovoid._log(2,this._i,'::Collada._importDae', this.name +
+                ":: Collada._procImg exception: " + e.stack + ". (Is DAE source corrupted ?).");
           }
           
           if (node) {
-            this._dstsc.insert(node);
+            this._dstsc.insNode(node);
           }
         }
       }
@@ -3256,12 +3149,12 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
             node = this._procMat(l[i]);
           } 
           catch (e) {
-            Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-                " _procMat exception: " + e.stack + ". (Is DAE source corrupted ?).");
+            Ovoid._log(2,this._i,'::Collada._importDae', this.name +
+                ":: Collada._procMat exception: " + e.stack + ". (Is DAE source corrupted ?).");
           }
           
           if (node) {
-            this._dstsc.insert(node);
+            this._dstsc.insNode(node);
           }
         }
       }
@@ -3270,7 +3163,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
 
   if (this._mask & Ovoid.DAE_CAMERAS)
   {
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name, ' DAE_CAMERAS.');
+    Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+        ':: Mask option DAE_CAMERAS: import cameras...');
     
     if (this._dae.getElementsByTagName('library_cameras').length)
     {
@@ -3283,12 +3177,12 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
             node = this._procCam(l[i]);
           } 
           catch (e) {
-            Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-                " _procCam exception: " + e.stack + ". (Is DAE source corrupted ?).");
+            Ovoid._log(2,this._i,'::Collada._importDae', this.name + 
+                ":: Collada._procCam exception: " + e.stack + ". (Is DAE source corrupted ?).");
           }
           
           if (node) {
-            this._dstsc.insert(node);
+            this._dstsc.insNode(node);
           }
         }
       }
@@ -3297,7 +3191,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
 
   if (this._mask & Ovoid.DAE_LIGHTS)
   {
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name, ' DAE_LIGHTS.');
+    Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+        ':: Mask option DAE_LIGHTS: import lights...');
     
     if (this._dae.getElementsByTagName('library_lights').length)
     {
@@ -3310,12 +3205,12 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
             node = this._procLig(l[i]);
           } 
           catch (e) {
-            Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-                " _procLig exception: " + e.stack + ". (Is DAE source corrupted ?).");
+            Ovoid._log(2,this._i,'::Collada._importDae', this.name +
+                ":: Collada._procLig exception: " + e.stack + ". (Is DAE source corrupted ?).");
           }
           
           if (node) {
-            this._dstsc.insert(node);
+            this._dstsc.insNode(node);
           }
         }
       }
@@ -3324,7 +3219,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
 
   if (this._mask & Ovoid.DAE_MESHS)
   {
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name, ' DAE_MESHS.');
+    Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+        ':: Mask option DAE_MESHS: import meshs...');
     
     if (this._dae.getElementsByTagName('library_geometries').length)
     {
@@ -3337,12 +3233,12 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
             node = this._procGeo(l[i]);
           } 
           catch (e) {
-            Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-                " _procGeo exception: " + e.stack + ". (Is DAE source corrupted ?).");
+            Ovoid._log(2,this._i,'::Collada._importDae', this.name + 
+                ":: Collada._procGeo exception: " + e.stack + ". (Is DAE source corrupted ?).");
           }
 
           if (node) {
-            this._dstsc.insert(node);
+            this._dstsc.insNode(node);
           }
         }
       }
@@ -3351,7 +3247,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
 
   if (this._mask & Ovoid.DAE_TRANSFORMS || this._mask & Ovoid.DAE_BONES)
   {
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name, ' DAE_TRANSFORMS.');
+    Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+        ':: Mask option DAE_TRANSFORMS || DAE_BONES: import transforms nodes...');
     
     if (this._dae.getElementsByTagName('library_visual_scenes').length)
     {
@@ -3385,12 +3282,12 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
           node = this._procNod(dae);
         }
         catch (e) {
-          Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-              " _procNod exception: " + e + ". (Is DAE source corrupted ?).");
+          Ovoid._log(2,this._i,'::Collada._importDae', this.name +
+              ":: Collada._procNod exception: " + e + ". (Is DAE source corrupted ?).");
         }
         /* Si la node n'est pas null on l'ajoute à la liste */
         if (node) {
-          this._dstsc.insert(node);
+          this._dstsc.insNode(node);
           /* On retrouve la node parent de celle-ci via son nom
            * présumé */
           var parent = this._retrieveNode(dae.parentNode.getAttribute('id'));
@@ -3399,14 +3296,12 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
           if (!parent) {
             /* Convertis en Y-up si nécéssaire */
             this._switch2YNode(node);
-            Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-                "'" + node.name +
-                "' in scene root");
+            Ovoid._log(3,this._i,'::Collada._importDae', this.name +
+                ":: '" + node.name + "' in scene root");
           } else {
             node.setParent(parent);
-            Ovoid.log(3, 'Ovoid.Collada ' + this.name,
-                "'" + node.name + "' child of '" +
-                parent.name + "'");
+            Ovoid._log(3,this._i,'::Collada._importDae', this.name +
+                ":: '" + node.name + "' child of '" + parent.name + "'");
           }
           /* cach les transformations */
           node.cachTransform();
@@ -3420,7 +3315,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
 
   if (this._mask & Ovoid.DAE_CONTROLLERS)
   {
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name, ' DAE_CONTROLLERS.');
+    Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+        ':: Mask option DAE_CONTROLLERS: import controlers...');
     
     if (this._dae.getElementsByTagName('library_controllers').length)
     {
@@ -3436,8 +3332,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
             this._procCtr(l[i]);
           }
           catch (e) {
-            Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-                " _procCtr exception: " + e.stack + ". (Is DAE source corrupted ?).");
+            Ovoid._log(2,this._i,'::Collada._importDae', this.name + 
+                ":: Collada._procCtr exception: " + e.stack + ". (Is DAE source corrupted ?).");
           }
         }
       }
@@ -3446,7 +3342,8 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
 
   if (this._mask & Ovoid.DAE_ANIMATIONS)
   {
-    Ovoid.log(3, 'Ovoid.Collada ' + this.name, ' DAE_ANIMATIONS.');
+    Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+        ':: Mask option DAE_ANIMATIONS: import animations...');
     
     if (this._dae.getElementsByTagName('library_animations').length)
     {
@@ -3459,16 +3356,16 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
             node = this._procAni(l[i]);
           }
           catch (e) {
-            Ovoid.log(2, 'Ovoid.Collada ' + this.name,
-                " _procAni exception: " + e.stack + ". (Is DAE source corrupted ?).");
+            Ovoid._log(2,this._i,'::Collada._importDae', this.name + 
+                ":: Collada._procAni exception: " + e.stack + ". (Is DAE source corrupted ?).");
           }
           
           if (node) {
             /* la node est insere en scene durant le process */
             /* Ajoute l'animation au track si demandé */
             if (this._mask & Ovoid.DAE_CREATE_TRACK) {
-              Ovoid.log(3, 'Ovoid.Collada '+this.name,
-                "adding animation '"+node.name+"' to Track '"+track.name+"'");
+              Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+                ":: adding animation '"+node.name+"' to Track '"+track.name+"'");
               track.addAnimation(node);
             }
           }
@@ -3480,13 +3377,99 @@ Ovoid.Collada.prototype.importDae = function(options, scene,
   /* Ajoute le track à la scene des animations ont été importés */
   if (this._mask & Ovoid.DAE_CREATE_TRACK) {
     if (track.animation.length > 0) {
-      Ovoid.log(2, 'Ovoid.Collada '+this.name,
-                "Importation has generated new Animation Track '"+track.name+"'");
-      this._dstsc.insert(track);
+      Ovoid._log(2,this._i,'::Collada._importDae', this.name + 
+                ":: Importation has generated new Animation Track '"+track.name+"'");
+      this._dstsc.insNode(track);
     }
   }
   
   /* c'est fini */
-  Ovoid.log(3, 'Ovoid.Collada ' + this.name, ' end.');
+  Ovoid._log(3,this._i,'::Collada._importDae', this.name + 
+      ':: done');
+
   return true;
 };
+
+
+/**
+ * Load and import Collada/DAE file.<br><br>
+ * 
+ * Loads the specified Collada/DAE file and once the source file is 
+ * successfully loaded, imports data into the specified recipient 
+ * Scene according the importation option bitmask and given arguments.<br><br>
+ *  
+ * The <c>loadSatus</c> member indicates the loading status through an 
+ * integer value of 0, 1 or -1. A value of 0 means that the file is not yet 
+ * loaded, a value of 1 means that the source was successfully loaded, and a 
+ * value of -1 means the loading failed.<br><br>
+ *
+ * @param {string} url Source file url to load.
+ * 
+ * @param {Scene} scene Recipient Scene object.
+ * 
+ * @param {bitmask} options Importation options bitmask.
+ * 
+ * @param {string} prefix Prefix used to name imported nodes or null.
+ * 
+ * @param {string} suffix Suffix used to name imported nodes or null.
+ * 
+ * @param {bool} async Sets synchronous or asynchronous way for data loading. 
+ * If false or null the source is loaded in synchronous way.
+ */
+Ovoid.Collada.prototype.loadSource = function(url, scene, options, prefix, suffix, async) {
+
+  this.loadStatus = 0;
+  this.url = url;
+  this._i = scene._i;
+  
+  /* détermine le nom du collada d'apres l'url */
+  this.name = Ovoid.extractName(this.url);
+  
+  var xhr = new XMLHttpRequest();
+
+  if (async) {
+    xhr.o = this;
+    xhr._i = this._i;
+    xhr.d = scene;
+    xhr.m = options;
+    xhr.p = prefix;
+    xhr.s = suffix;
+    xhr.onreadystatechange = function()
+    {
+      if (this.readyState == 4) {
+        if (this.status == 200 || this.status == 304) {
+          var parser = new DOMParser();
+          this.o._dae = parser.parseFromString(this.responseText,'text/xml');
+          this.o.loadStatus = 1;
+          this.o._importDae(this.d, this.m, this.p, this.s);
+        } else {
+          this.o.loadStatus = -1;
+          Ovoid._log(2,this._i, '::Collada.loadSource', this.o.name +
+              ":: unable to load source '" + this.o.url + "'");
+        }
+      }
+    }
+  }
+  
+  var src = this.url;
+  if (this._i.opt_debugMode) 
+    src += '?' + Math.random();
+  
+  xhr.open('GET', src, async);
+  xhr.send(null);
+  
+  /* Si nous sommes en mode synchrone */
+  if (!async) {
+    if (xhr.status == 200 || xhr.status == 304) {
+      var parser = new DOMParser();
+      this._dae = parser.parseFromString(xhr.responseText,'text/xml');
+      this.loadStatus = 1;
+      this._importDae(scene, options, prefix, suffix);
+    } else {
+      this.loadStatus = -1;
+      Ovoid._log(2,this._i, '::Collada.loadSource', this.name +
+              ":: unable to load source '" + this.url + "'");
+    }
+  }
+};
+

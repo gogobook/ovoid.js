@@ -20,7 +20,7 @@
 
 
 /**
- * Create a 3x3 Matrix object.
+ * Constructor method.
  *
  * @class 3x3 Matrix object.<br><br>
  * 
@@ -309,21 +309,6 @@ Ovoid.Matrix3.prototype.toNormalTransform = function() {
     mag = 1.0 / Math.sqrt(mag2);
     this.m[6] *= mag; this.m[7] *= mag; this.m[8] *= mag;
   }
-};
-
-
-/**
- * Create a new array of Matrix3 objects.
- *
- * @param {int} count Size of the new array.
- *
- * @return {Object[]} Array of matrix3 objects.
- */
-Ovoid.Matrix3.newArray = function(count) {
-
-  var array = new Array;
-  while (count--) array.push(new Ovoid.Matrix3());
-  return array;
 };
 
 

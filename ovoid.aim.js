@@ -20,18 +20,18 @@
 
 
 /**
- * Aim node constructor.
+ * Constructor method.
  * 
  * @class Aim node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Aim node is a Constraint node who apply orientation on  
  * Transform node to aim another one.<br><br> The Aim node can be applied to 
  * several constrained-target nodes.<br><br>
  * 
  * <blockcode>
- * var Aim = scene.create(Ovoid.AIM, "aimToBox1");<br>
+ * var Aim = myOvoid.Scene.newNode(Ovoid.AIM, "aimToBox1");<br>
  * Aim.aimat = Box1;<br>
  * Aim.setTarget(Eye1);<br>
  * Aim.setTarget(Eye2);<br>
@@ -40,8 +40,9 @@
  * @extends Ovoid.Constraint
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Aim = function(name) {
+Ovoid.Aim = function(name, i) {
 
   Ovoid.Constraint.call(this);
   /** node type */
@@ -62,6 +63,10 @@ Ovoid.Aim = function(name) {
   this._y = new Ovoid.Vector();
   this._z = new Ovoid.Vector();
   
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
+  
 };
 Ovoid.Aim.prototype = new Ovoid.Constraint;
 Ovoid.Aim.prototype.constructor = Ovoid.Aim;
@@ -72,7 +77,7 @@ Ovoid.Aim.prototype.constructor = Ovoid.Aim;
  *
  * Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -122,7 +127,7 @@ Ovoid.Aim.prototype.cachAim = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

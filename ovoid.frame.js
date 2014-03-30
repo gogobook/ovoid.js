@@ -19,131 +19,106 @@
 
 
 /**
- * Frame global static class.
+ * Constructor method.
  *
- * @namespace Frame global class.<br><br>
+ * @class Frame Module Class.<br><br>
  * 
- * The Frame class implements a global frame/canvas manager. It is a global 
- * static (namespace) class. The Frame class is typically used to defines or 
- * retrieves frame attributes and define the frame behaviour according to the 
+ * The Frame class implements a global frame/canvas manager. This is what
+ * is called a Module class because used as core module for the 
+ * Ovoid.Instance class. A Module class is a part of Instance class and 
+ * can be used only within the Instance class.<br><br>
+ * 
+ * The Frame class is used to define or retrieve render frame's 
+ * attributes and behaviour according the HTML Canvas and browser 
  * client area.<br><br>
  * 
  * <blockcode>
- * <codecomment>// Set our canvas to follow the full client area</codecomment>
- * Ovoid.Frame.setMode(Ovoid.FRAME_FULL_CLIENT); <br>
- * <codecomment>// Get the horizontal center of our frame in pixels</codecomment>
- * var ScreenX = Ovoid.Frame.size.v[0];<br>
- * var ScreenCenterX = ScreenX * 0.5;<br>
- * </blockcode>
+ * <cc>// Overrides canvas style for manuel resize</cc>
+ * Instance.Frame.setMode(Ovoid.FRAME_MANUAL_SIZE); <br>
+ * <cc>// Resize the canvas/render frame</cc>
+ * Instance.Frame.resize(800,600);
+ * <cc>// Get the horizontal center of the frame in pixels</cc>
+ * var ScreenX = Instance.Frame.size.v[0];<br>
+ * var ScreenCenterX = Instance.Frame.center.v[0];<br>
+ * </blockcode><br><br>
  * 
  * <b>Frame modes</b><br><br>
  * 
- * Frame class allows to override and modify the HTML defined canvas's size and 
- * behaviour.<br><br>
+ * Frame class allows to override and modify the HTML defined canvas's 
+ * size and behaviour by setting its mode. You can set the canvas frame
+ * mode with the Frame.setMode() function. The available modes are the 
+ * following:<br><br>
  * 
- * <li><b>FRAME_FIXED_SIZE</b><br>
- * Fixed size canvas. This frame mode defines a fixed size canvas.</li>
+ * <ul>
+ * <li><b>FRAME_MANUAL_SIZE</b><br>
+ * Manual size canvas. This frame mode overrides canvas style and allow 
+ * to manually define the canvas size.</li>
  * 
- * <li><b>FRAME_FULL_CLIENT</b><br>
- * Full client size canvas. This frame mode defines a variable size canvas 
- * according to the full browser's client area size.</li>
+ * <li><b>FRAME_CLIENT_SIZE</b><br>
+ * Client size canvas. This frame mode allow HTML style and integration 
+ * defining the canvas size.</li>
  * 
  * <li><b>FRAME_FULL_SCREEN</b> (Not yet implemented)<br>
  * Full screen size. This frame mode defines a fixed canvas size according to
  * the full screen size. NOTE: This frame mode is not yet implemented.</li>
  * </ul>
  * 
+ * @param {object} i Instance object to register object to.
+ * 
  */
-Ovoid.Frame = {};
+Ovoid.Frame = function(i) {
+
+  /** Instance parent */
+  this._i = i;
 
 
-/** frame option. Default starting frame mode. */
-Ovoid.Frame.opt_frameMode = 0;
+  /** Current frame mode. */
+  this.mode = 0;
+  
+  
+  /** Canvas handle. */
+  this.canvas = null;
 
 
-/** Canvas handle. */
-Ovoid.Frame.canvas = null;
+  /** Client area handle. */
+  this.page = null;
 
 
-/** Client area handle. */
-Ovoid.Frame.page = null;
+  /** Tnitial frame fixed size. */
+  this.fixed = new Ovoid.Coord(0.0, 0.0, 0.0);
 
 
-/** Tnitial frame fixed size. */
-Ovoid.Frame.fixed = new Ovoid.Coord(0.0, 0.0, 0.0);
+  /** Frame position relative to the screen. */
+  this.position = new Ovoid.Coord(0.0, 0.0, 0.0);
 
 
-/** Frame position relative to the screen. */
-Ovoid.Frame.position = new Ovoid.Coord(0.0, 0.0, 0.0);
+  /** Current frame size. */
+  this.size = new Ovoid.Coord(0.0, 0.0, 0.0);
 
 
-/** Current frame size. */
-Ovoid.Frame.size = new Ovoid.Coord(0.0, 0.0, 0.0);
+  /** Current frame scroll position. */
+  this.scroll = new Ovoid.Coord(0.0, 0.0, 0.0);
+  
+  
+  /** Current frame center. */
+  this.center = new Ovoid.Coord(0.0, 0.0, 0.0);
 
 
-/** Current frame scroll position. */
-Ovoid.Frame.scroll = new Ovoid.Coord(0.0, 0.0, 0.0);
+  /** Current frame screen orthographic projection matrix. */
+  this.matrix = new Ovoid.Matrix4();
 
 
-/** Current frame screen orthographic projection matrix. */
-Ovoid.Frame.matrix = new Ovoid.Matrix4();
+  /** Frame modification flag. */
+  this._changed = false;
+  
+  
+  /** Frame canvas style X padding + border + margin */
+  this._offsetx = 0.0;
 
+  
+  /** Frame canvas style Y padding + border + margin */
+  this._offsety = 0.0;
 
-/** Frame modification flag. */
-Ovoid.Frame.changed = false;
-
-
-/** Current frame mode. */
-Ovoid.Frame.mode = 0;
-
-
-/**
- * Handle window resizing.
- * This function is typically used as class's private member and should not be 
- * called independently.
- */
-Ovoid.Frame._handleResize = function() {
-
-  if (Ovoid.Frame.mode == 1) { /* Ovoid.FRAME_FULL_CLIENT */
-    Ovoid.Frame.canvas.width = Ovoid.Frame.page.clientWidth;
-    Ovoid.Frame.canvas.height = Ovoid.Frame.page.clientHeight;
-    Ovoid.Frame.size.set(Ovoid.Frame.page.clientWidth, 
-        Ovoid.Frame.page.clientHeight, 0.0);
-    
-    Ovoid.Frame.matrix.m[0] = 2.0 / Ovoid.Frame.size.v[0];
-    Ovoid.Frame.matrix.m[5] = 2.0 / -Ovoid.Frame.size.v[1];
-    Ovoid.Frame.matrix.m[10] = 1.0;
-    Ovoid.Frame.matrix.m[3] = 0.0;
-    Ovoid.Frame.matrix.m[7] = 0.0;
-    Ovoid.Frame.matrix.m[11] = 0.0;
-    Ovoid.Frame.matrix.m[12] = -1.0;
-    Ovoid.Frame.matrix.m[13] = 1.0;
-    Ovoid.Frame.matrix.m[14] = 0.0;
-    Ovoid.Frame.matrix.m[15] = 1.0;
-    
-    Ovoid.Frame.changed = true;
-  }
-};
-
-
-/**
- * Handle window scrolling.
- * This function is typically used as class's private member and should not be 
- * called independently.
- */
-Ovoid.Frame._handleScroll = function() {
-
-  var o = Ovoid.Frame.canvas;
-  Ovoid.Frame.position.set(0.0, 0.0, 0.0);
-  while (o.tagName != 'BODY') {
-    Ovoid.Frame.position.v[1] += o.offsetTop;
-    Ovoid.Frame.position.v[0] += o.offsetLeft;
-    o = o.offsetParent;
-  }
-
-  Ovoid.Frame.scroll.set(window.pageXOffset, window.pageYOffset, 0.0);
-
-  Ovoid.Frame.changed = true;
 };
 
 
@@ -152,62 +127,45 @@ Ovoid.Frame._handleScroll = function() {
  * 
  * Global initialization method. This methode is called once during the library 
  * main initalization. It shouldn't be called a second time.
- * 
- * @see Ovoid.init
  *
  * @return {bool} True if initialization succeeds, false otherwise.
  */
-Ovoid.Frame.init = function(canvas) {
+Ovoid.Frame.prototype._init = function(canvas) {
 
-  Ovoid.log(3, 'Ovoid.Frame', 'initialization');
+  this.canvas = canvas;
 
-  Ovoid.Frame.canvas = document.getElementById(canvas);
-  if (Ovoid.Frame.canvas == null)
-  {
-    Ovoid.log(1, 'Ovoid.Frame', "Undable to found canvas '" +
-        canvas + "' in document.");
-    return false;
-  }
-  
-  Ovoid.Frame.page = document.getElementsByTagName('BODY')[0];
+  this.page = document.getElementsByTagName('BODY')[0];
 
-  Ovoid.Frame.mode = Ovoid.Frame.opt_frameMode;
-
-  window.onresize = Ovoid.Frame._handleResize;
-  window.onscroll = Ovoid.Frame._handleScroll;
+  this.mode = this._i.opt_frameMode;
   
   /* on garde la taille d'origine */
-  Ovoid.Frame.fixed.set(Ovoid.Frame.canvas.width, 
-      Ovoid.Frame.canvas.height, 0.0);
-
-  if (Ovoid.Frame.mode == 0) /* Ovoid.FRAME_FIXED_SIZE */
-  {
-    Ovoid.Frame.size.set(Ovoid.Frame.canvas.width, 
-        Ovoid.Frame.canvas.height, 0.0);
-  }
-  else
-  {
-    if (Ovoid.Frame.mode == 1) /* Ovoid.FRAME_FULL_CLIENT */
-    {
-      Ovoid.Frame.canvas.width = Ovoid.Frame.page.clientWidth;
-      Ovoid.Frame.canvas.height = Ovoid.Frame.page.clientHeight;
-      Ovoid.Frame.size.set(Ovoid.Frame.page.clientWidth, 
-          Ovoid.Frame.page.clientHeight, 0.0);
-    }
-  }
-
-  Ovoid.Frame.matrix.m[0] = 2.0 / Ovoid.Frame.size.v[0];
-  Ovoid.Frame.matrix.m[5] = 2.0 / -Ovoid.Frame.size.v[1];
-  Ovoid.Frame.matrix.m[10] = 1.0;
-  Ovoid.Frame.matrix.m[3] = 0.0;
-  Ovoid.Frame.matrix.m[7] = 0.0;
-  Ovoid.Frame.matrix.m[11] = 0.0;
-  Ovoid.Frame.matrix.m[12] = -1.0;
-  Ovoid.Frame.matrix.m[13] = 1.0;
-  Ovoid.Frame.matrix.m[14] = 0.0;
-  Ovoid.Frame.matrix.m[15] = 1.0;
-      
-  Ovoid.Frame.changed = true;
+  this.fixed.set(this.canvas.clientWidth,this.canvas.clientHeight,0.0);
+  
+  /* definit la partie fixe de la matrice */
+  this.matrix.m[10] = 1.0;
+  this.matrix.m[3] = 0.0;
+  this.matrix.m[7] = 0.0;
+  this.matrix.m[11] = 0.0;
+  this.matrix.m[12] = -1.0;
+  this.matrix.m[13] = 1.0;
+  this.matrix.m[14] = 0.0;
+  this.matrix.m[15] = 1.0;
+    
+  /* mise à jour de la taille selon les parametres du mode */
+  this._updatesize();
+  
+  /* Trouve les marges et padding du canvas */
+  this._offsetx += document.body.parentNode.offsetLeft;
+  this._offsetx += parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingLeft'], 10)      || 0;
+  this._offsetx += parseInt(document.defaultView.getComputedStyle(canvas, null)['borderLeftWidth'], 10)  || 0;
+  this._offsety += document.body.parentNode.offsetTop;
+  this._offsety += parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingTop'], 10)       || 0;
+  this._offsety += parseInt(document.defaultView.getComputedStyle(canvas, null)['borderTopWidth'], 10)   || 0;
+  
+  /* mise à jour de la position selon les parametres du mode */
+  this._updatepos();
+  
+  Ovoid._log(3, this._i, '.Frame._init', ' done');
 
   return true;
 };
@@ -220,9 +178,9 @@ Ovoid.Frame.init = function(canvas) {
  * frame during the library main loop and is dedicated to refresh internal data. 
  * It shouldn't be called manually.
  */
-Ovoid.Frame.update = function() {
+Ovoid.Frame.prototype._update = function() {
 
-  Ovoid.Frame.changed = false;
+  this._changed = false;
 };
 
 
@@ -234,42 +192,20 @@ Ovoid.Frame.update = function() {
  *
  * @param {int} mode Frame mode. Can be one of the following symbolic constants:
  * <br>
- * Ovoid.FRAME_FIXED_SIZE,<br>
- * Ovoid.FRAME_FULL_CLIENT,<br>
+ * Ovoid.FRAME_MANUAL_SIZE,<br>
+ * Ovoid.FRAME_CLIENT_SIZE,<br>
  * Ovoid.FRAME_FULL_SCREEN (Not yet implemented)<br>
  */
-Ovoid.Frame.setMode = function(mode) {
+Ovoid.Frame.prototype.setMode = function(mode) {
 
-  Ovoid.Frame.mode = mode;
-  if (Ovoid.Frame.mode == 0) {
-    
-    Ovoid.Frame.resize(Ovoid.Frame.fixed.v[0], Ovoid.Frame.fixed.v[1]);
-  } else {
-    if (Ovoid.Frame.mode == 1) {
-      Ovoid.Frame.canvas.width = Ovoid.Frame.page.clientWidth;
-      Ovoid.Frame.canvas.height = Ovoid.Frame.page.clientHeight;
-      Ovoid.Frame.size.set(Ovoid.Frame.page.clientWidth, 
-          Ovoid.Frame.page.clientHeight, 0.0);
-      /* Pour une raison etrange il faut le faire deux fois pour eviter 
-       * d'avoir des marges à gauche et à droite */
-      Ovoid.Frame.canvas.width = Ovoid.Frame.page.clientWidth;
-      Ovoid.Frame.canvas.height = Ovoid.Frame.page.clientHeight;
-    }
+  this.mode = mode;
+  if (this.mode == 0) {
+    this.resize(this.fixed.v[0], this.fixed.v[1]);
   }
 
-  Ovoid.Frame.matrix.m[0] = 2.0 / Ovoid.Frame.size.v[0];
-  Ovoid.Frame.matrix.m[5] = 2.0 / -Ovoid.Frame.size.v[1];
-  Ovoid.Frame.matrix.m[10] = 1.0;
-  Ovoid.Frame.matrix.m[3] = 0.0;
-  Ovoid.Frame.matrix.m[7] = 0.0;
-  Ovoid.Frame.matrix.m[11] = 0.0;
-  Ovoid.Frame.matrix.m[12] = -1.0;
-  Ovoid.Frame.matrix.m[13] = 1.0;
-  Ovoid.Frame.matrix.m[14] = 0.0;
-  Ovoid.Frame.matrix.m[15] = 1.0;
+  this._updatepos();
   
-  Ovoid.Frame.changed = true;
-  
+  this._changed = true;
 };
 
 
@@ -282,10 +218,64 @@ Ovoid.Frame.setMode = function(mode) {
  * @param {int} width Frame width.
  * @param {int} height Frame height.
  */
-Ovoid.Frame.resize = function(width, height) {
+Ovoid.Frame.prototype.resize = function(width, height) {
+    
+    if(this.mode > 0) {
+      Ovoid._log(3, this._i, '.Frame.resize', ' resizing frame in FRAME_CLIENT_SIZE has no effect');
+    }
+    this.fixed.set(width, height, 0.0);
+    this._updatesize();
+};
 
-    Ovoid.Frame.canvas.width = width;
-    Ovoid.Frame.canvas.height = height;
-    Ovoid.Frame.size.set(width, height, 0.0);
-    Ovoid.Frame.changed = true;
+
+/**
+ * Updating canvas frame position.<br><br>
+ */
+Ovoid.Frame.prototype._updatepos = function() {
+  
+  this.position.set(0.0, 0.0, 0.0);
+  
+  var o = this.canvas;
+  while (o.tagName != 'BODY') {
+    this.position.v[1] += o.offsetTop;
+    this.position.v[0] += o.offsetLeft;
+    o = o.offsetParent;
+  }
+  this.position.v[1] += this._offsety;
+  this.position.v[0] += this._offsetx;
+      
+  this.scroll.set(window.pageXOffset, window.pageYOffset, 0.0);
+  
+  this._changed = true;
+};
+
+
+/**
+ * Updating canvas frame size.<br><br>
+ */
+Ovoid.Frame.prototype._updatesize = function() {
+  
+  switch(this.mode)
+  {
+    case 0: // FRAME_MANUAL_SIZE
+      this.canvas.width = this.fixed.v[0];
+      this.canvas.height = this.fixed.v[1];
+    break;
+    case 1: // FRAME_CLIENT_SIZE
+      this.canvas.width = this.canvas.clientWidth;
+      this.canvas.height = this.canvas.clientHeight;
+    break;
+    case 2: // FRAME_FULL_SCREEN
+
+    break;
+  }
+
+  this.size.set(this.canvas.width,this.canvas.height,0.0);
+  this.center.set(this.size.v[0]*0.5,this.size.v[1]*0.5,0.0);
+  
+  this.matrix.m[0] = 2.0 / this.size.v[0];
+  this.matrix.m[5] = 2.0 / -this.size.v[1];
+  
+  this._changed = true;
+  
 };

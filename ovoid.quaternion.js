@@ -20,7 +20,7 @@
 
 
 /**
- * Create a Quaternion object.
+ * Constructor method.
  *
  * @class Quaternion object.<br><br>
  * 
@@ -719,21 +719,6 @@ Ovoid.Quaternion.prototype.asMat4 = function() {
     r.m[10] = (1.0 - (xx + yy));
     
     return r;
-};
-
-
-/**
- * Create a new Quaternion objects array.
- *
- * @param {int} count Size of the array to create.
- *
- * @return {Quaternion[]} Array of Quaternion objects.
- */
-Ovoid.Quaternion.newArray = function(count) {
-
-  var array = new Array;
-  while (count--) array.push(new Ovoid.Quaternion());
-  return array;
 };
 
 

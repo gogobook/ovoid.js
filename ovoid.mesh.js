@@ -20,11 +20,11 @@
 
 
 /**
- * Mesh node constructor.
+ * Constructor method.
  * 
  * @class Mesh node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Mesh node implements a mesh geometry structure. 
  * is a collection of vertices, edges and faces that defines the shape of a 
@@ -54,19 +54,19 @@
  * <ul>
  * <li><b>Polysets</b></li>
  * The Mesh's polysets consist of a list of polygons (triangle faces) which are 
- * drawn with the same Material. The Mesh node use the <code>Ovoid.Polyset</code> 
+ * drawn with the same Material. The Mesh node use the <c>Ovoid.Polyset</c> 
  * object to store polysets.<br><br>
  * 
  * <li><b>Triangle Faces</b></li>
  * The Triangles consist of a triangular polygon defined by three 
  * vertices who describe a triangular surface. (OvoiD.JS supports only 
- * triangle faces). The Mesh node use the <code>Ovoid.Triangle</code> object to 
+ * triangle faces). The Mesh node use the <c>Ovoid.Triangle</c> object to 
  * store triangles faces.<br><br>
  * 
  * <li><b>Vertices</b></li>
  * The Vertices consist of a position along with other information such 
  * as color, normal vector and texture coordinates.
- * The Mesh node use the <code>Ovoid.Vertex</code> object to store vertices.
+ * The Mesh node use the <c>Ovoid.Vertex</c> object to store vertices.
  * </ul><br><br>
  * 
  * <b>The Vertex Format</b><br><br>
@@ -92,37 +92,37 @@
  * The available vertex format components are the following ones: <br><br>
  * 
  * <ul>
- * <li><code>Ovoid.VERTEX_VEC4_P</code></li>
+ * <li><c>Ovoid.VERTEX_VEC4_P</c></li>
  * Four 32 bits float (x,y,z,w) for position point in space.<br><br>
- * <li><code>Ovoid.VERTEX_VEC3_N</code></li>
+ * <li><c>Ovoid.VERTEX_VEC3_N</c></li>
  * Three 32 bits float (x,y,z) for normal vector.<br><br>
- * <li><code>Ovoid.VERTEX_VEC3_U</code></li>
+ * <li><c>Ovoid.VERTEX_VEC3_U</c></li>
  * Three 32 bits float (u,v,w) for Uv texture coordinate.<br><br>
- * <li><code>Ovoid.VERTEX_VEC3_T</code></li>
+ * <li><c>Ovoid.VERTEX_VEC3_T</c></li>
  * Three 32 bits float (u,v,w) for Tangent space coordinate. (normal mapping)<br><br>
- * <li><code>Ovoid.VERTEX_VEC3_B</code></li>
+ * <li><c>Ovoid.VERTEX_VEC3_B</c></li>
  * Three 32 bits float (u,v,w) for binormal vector. (normal mapping)<br><br>
- * <li><code>Ovoid.VERTEX_VEC4_C</code></li>
+ * <li><c>Ovoid.VERTEX_VEC4_C</c></li>
  * Four 32 bits float (r,g,b,a) for vertex color.<br><br>
- * <li><code>Ovoid.VERTEX_VEC4_I</code></li>
+ * <li><c>Ovoid.VERTEX_VEC4_I</c></li>
  * Four 32 bits float (i,i,i,i) for influence matrix index. (skin deform)<br><br>
- * <li><code>Ovoid.VERTEX_VEC4_W</code></li>
+ * <li><c>Ovoid.VERTEX_VEC4_W</c></li>
  * Four 32 bits float (w,w,w,w) for influence wheight. (skin deform)<br><br>
  * </ul><br><br>
  * 
- * As object, <code>Ovoid.Vertex</code> class contains 
+ * As object, <c>Ovoid.Vertex</c> class contains 
  * all these components that can be filled at your convenience and usage. 
  * The vertex format is used to build and arrange data in Vertex Buffer Objets 
  * (VBO) and describe the GLSL vertex attributes in shaders.<br><br>
  * 
  * For more information about shader, refere to
- * <code>Ovoid.Shader</code> class documentation.<br><br><br>
+ * <c>Ovoid.Shader</c> class documentation.<br><br><br>
  * 
  * 
  * <b>Mesh optimizations</b><br><br>
  * 
- * The mesh can and should be optimized using <code>optimizeVertices</code> and 
- * <code>optimizeTriangles</code>, especialy if you are planning to use the 
+ * The mesh can and should be optimized using <c>optimizeVertices</c> and 
+ * <c>optimizeTriangles</c>, especialy if you are planning to use the 
  * shadow casting rendering.<br><br>
  * 
  * <b>The vertices optimization</b> consists on 
@@ -146,7 +146,7 @@
  * JSON format. You will now import the well optimized mesh directly from OvoiD 
  * JSON, which is significantly faster. <br><br>
  * 
- * See the <code>Ovoid.Ojson</code> class 
+ * See the <c>Ovoid.Ojson</c> class 
  * documentation page for more information about OvoiD JSON.
  * 
  * @see Ovoid.Body
@@ -154,8 +154,9 @@
  * @extends Ovoid.Node
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Mesh = function(name) {
+Ovoid.Mesh = function(name, i) {
 
   Ovoid.Node.call(this);
   /** Node type. */
@@ -167,21 +168,21 @@ Ovoid.Mesh = function(name) {
   /** polyset list.
    * @type Polyset[][] */
   this.polyset = new Array(Ovoid.MAX_MESH_LOD);
-  for (var i = 0; i < Ovoid.MAX_MESH_LOD; i++)
-    this.polyset[i] = new Array();
+  for (var j = 0; j < Ovoid.MAX_MESH_LOD; j++)
+    this.polyset[j] = new Array();
 
   /** Vertices list.
    * @type Vertex[][] */
   this.vertices = new Array(Ovoid.MAX_MESH_LOD);
-  for (var i = 0; i < Ovoid.MAX_MESH_LOD; i++)
-    this.vertices[i] = new Array();
+  for (var j = 0; j < Ovoid.MAX_MESH_LOD; j++)
+    this.vertices[j] = new Array();
 
   /** Triangles list.
    * @type Triangle[][] */
   this.triangles = new Array(Ovoid.MAX_MESH_LOD);
-  for (var i = 0; i < Ovoid.MAX_MESH_LOD; i++)
-    this.triangles[i] = new Array();
-
+  for (var j = 0; j < Ovoid.MAX_MESH_LOD; j++)
+    this.triangles[j] = new Array();
+  
   /** Indices buffer (VBO) list. */
   this._ibuffer = new Array(Ovoid.MAX_MESH_LOD);
   /** Vertices buffer (VBO) list. */
@@ -190,6 +191,19 @@ Ovoid.Mesh = function(name) {
   this._vformat = 0;
   /** Vertex size in bytes. */
   this._vfbytes = 0;
+  
+  /** Current used LOD. */
+  this._lod = 0;
+  
+  /** LOD Threshold list.
+   * @type Triangle[][] */
+  this._lodt = new Array(Ovoid.MAX_MESH_LOD);
+  for (var j = 0; j < Ovoid.MAX_MESH_LOD; j++)
+    this._lodt[j] = -1;
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 
 };
 Ovoid.Mesh.prototype = new Ovoid.Node;
@@ -202,10 +216,45 @@ Ovoid.Mesh.prototype.constructor = Ovoid.Mesh;
  * Add a polyset to the mesh at the specified LOD position 
  * with the given Vertices list and Material.
  * 
- * @param {int} l LOD level (not yet fully implemented).
+ * @param {int} l LOD index.
+ * 
  * @param {Vertex[]} vertices Array of Vertices for the new Polyset.
+ * 
  * @param {Material} material Material for the new Polyset.
- *
+ * 
+ * @param {enum} mode Drawing geometry mode. Can be one of the following 
+ * symbolic constants:<br> 
+ * <c>Ovoid.TRIANGLES</c>,<br>
+ * <c>Ovoid.LINES</c>,<br>
+ * <c>Ovoid.POINTS</c><br>
+ * 
+ * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
+ * following symbolic constants:<br>
+ * Ovoid.VERTEX_VEC4_P,<br>
+ * Ovoid.VERTEX_VEC3_N,<br>
+ * Ovoid.VERTEX_VEC3_U,<br>
+ * Ovoid.VERTEX_VEC3_T,<br>
+ * Ovoid.VERTEX_VEC3_B,<br>
+ * Ovoid.VERTEX_VEC4_C,<br>
+ * Ovoid.VERTEX_VEC4_I,<br>
+ * Ovoid.VERTEX_VEC4_W.<br><br>
+ * 
+ * @param {enum} type VBO Usage pattern, can be one of the 
+ * following symbolic constants:<br>
+ * Ovoid.BUFFER_STATIC,<br> 
+ * Ovoid.BUFFER_DYNAMIC,<br>
+ * Ovoid.BUFFER_STREAM<br>
+ * <br>
+ * The VBO Usage pattern is corresponding to the OpenGL/WebGL specifications:<br><br>
+ * Ovoid.BUFFER_STATIC is GL_STATIC_DRAW :<br>
+ * The data store contents will be modified once and used many times.<br>
+ * <br>
+ * Ovoid.BUFFER_DYNAMIC is GL_DYNAMIC_DRAW :<br>
+ * The data store contents will be modified repeatedly and used many times.<br>
+ * <br>
+ * Ovoid.BUFFER_STREAM is GL_STREAM_DRAW :<br>
+ * The data store contents will be modified once and used at most a few times.<br>
+ * <br>
  * @return {bool} True if succeed, false otherwise.
  * 
  * @see Ovoid.Polyset
@@ -213,90 +262,139 @@ Ovoid.Mesh.prototype.constructor = Ovoid.Mesh;
  * @see Ovoid.Vertex
  * @see Ovoid.Material
  */
-Ovoid.Mesh.prototype.addPolyset = function(l, vertices, material) {
+Ovoid.Mesh.prototype.addPolyset = function(l, vertices, material, mode, format, type) {
 
   if (l >= Ovoid.MAX_MESH_LOD) {
-    Ovoid.log(1, 'Ovoid.Mesh', 
-        "'" + this.name + "' Lod index > MAX_MESH_LOD");
+    Ovoid._log(1,this._i, '::Mesh.addPolyset', this.name + 
+        ":: Lod index > MAX_MESH_LOD");
     return false;
   }
 
   /* probleme de triangulation ? */
-  if ((vertices.length % 3) != 0) {
-    Ovoid.log(1, 'Ovoid.Mesh',
-        "'" + this.name + "' Not multple of 3 vertices count : " +
-        vertices.length);
-    return false;
+  if (mode == 4) { /* TRIANGLES */
+    if ((vertices.length % 3) != 0) {
+      Ovoid._log(1,this._i, '::Mesh.addPolyset', this.name + 
+          ":: wrong vertice count for TRIANGLES mode (not multple of 3) : " +
+          vertices.length);
+      return false;
+    }
   }
 
-  /* ajout des nouveaux vertices */
-  var c = vertices.length;
-  for (var i = 0; i < c; i++)
-    this.vertices[l].push(vertices[i]);
+  /* probleme de (bi)angulation ? */
+  if (mode == 1) { /* LINES */
+    if ((vertices.length % 2) != 0) {
+      Ovoid._log(1,this._i, '::Mesh.addPolyset', this.name + 
+          ":: wrong vertice count for LINES mode (not multple of 2) : " +
+          vertices.length);
+      return false;
+    }
+  }
 
-  /* le nombre actuel d'indice donne le debut
-   * des nouveaux indinces */
-  var vid = this.triangles[l].length * 3;
+  /* On retrouve le nombre total actuel d'indices */
+  var vid = this.vertices[l].length;
 
   /* configuration du polyset */
   var polyset = new Ovoid.Polyset();
-  polyset.ioffset = vid * 2; /* offset en byte, ici Uint16 : 2 bytes */
+  /* offset en byte, ici Uint16 : 2 bytes */
+  polyset.ioffset = vid * 2; 
   polyset.icount = vertices.length;
   polyset.material = material;
-  if (material != null)
+  polyset.mode = mode;
+  if (material != null) 
     this.makeDepend(material);
   /* ajoute ce polyset */
   this.polyset[l].push(polyset);
+  
+  var c;
+  /* ajout des nouveaux vertices */
+  c = vertices.length;
+  for (var i = 0; i < c; i++)
+    this.vertices[l].push(vertices[i]);
+  
+  /* Ajout des lines */
+  if (mode == 1) {
+    /* Petit hack pour ranger les indices de lignes 
+     * dans des triangles. Ca occasionne une ou deux redondance en fin
+     * de liste, ce n'est pas très propre mais on fait avec. */
+    var vmx = vid + vertices.length - 1;
+    var triangle;
+    c = Math.ceil(vertices.length / 3);
+    for (var f = 0; f < c; f++)
+    {
+      triangle = new Ovoid.Triangle();
 
-  /* stuff pour calculer la face normale et le centre */
-  var p0;
-  var p1;
-  var p2;
-  var v0 = new Ovoid.Vector();
-  var v1 = new Ovoid.Vector();
+      p0 = this.vertices[l][vid].p;
+      triangle.index[0] = vid;
+      if(vid < vmx) vid++;
+      
+      p1 = this.vertices[l][vid].p;
+      triangle.index[1] = vid;
+      if(vid < vmx) vid++;
 
-  /* construction des indices, normale et centre pour chaque nouveau
-   * triangle et on configure et poids et influences par defaut */
-  var triangle;
-  var c = vertices.length / 3;
-  for (var f = 0; f < c; f++)
-  {
-    triangle = new Ovoid.Triangle();
-
-    p0 = this.vertices[l][vid].p;
-    triangle.index[0] = vid;
-    vid++;
-
-    p1 = this.vertices[l][vid].p;
-    triangle.index[1] = vid;
-    vid++;
-
-    p2 = this.vertices[l][vid].p;
-    triangle.index[2] = vid;
-    vid++;
-
-    // calcul de la normale
-    v0.subOf(p0, p1);
-    v1.subOf(p0, p2);
-
-    triangle.normal.crossOf(v0, v1);
-    triangle.normal.normalize();
-
-    // calcule du centre
-    triangle.center.set((p0.v[0] + p1.v[0] + p2.v[0]) / 3,
-        (p0.v[1] + p1.v[1] + p2.v[1]) / 3,
-        (p0.v[2] + p1.v[2] + p2.v[2]) / 3,
-        1.0);
-
-    // calcul de l'equation du plan
-    triangle.equation = -(triangle.normal.v[0] * triangle.center.v[0] + 
-        triangle.normal.v[1] * triangle.center.v[1] +
-        triangle.normal.v[2] * triangle.center.v[2]);
-        
-    // on ajoute ce triangle à la liste
-    this.triangles[l].push(triangle);
+      p2 = this.vertices[l][vid].p;
+      triangle.index[2] = vid;
+      if(vid < vmx) vid++;
+      
+      // on ajoute ce triangle à la liste
+      this.triangles[l].push(triangle);
+    }
   }
+    
+  /* Ajout des triangles */
+  if (mode == 4) {
+    
+    /* stuff pour calculer la face normale et le centre */
+    var p0;
+    var p1;
+    var p2;
+    var v0 = new Ovoid.Vector();
+    var v1 = new Ovoid.Vector();
 
+    /* construction des indices, normale et centre pour chaque nouveau
+     * triangle et on configure et poids et influences par defaut */
+    var triangle;
+    c = vertices.length / 3;
+    for (var f = 0; f < c; f++)
+    {
+      triangle = new Ovoid.Triangle();
+
+      p0 = this.vertices[l][vid].p;
+      triangle.index[0] = vid;
+      vid++;
+
+      p1 = this.vertices[l][vid].p;
+      triangle.index[1] = vid;
+      vid++;
+
+      p2 = this.vertices[l][vid].p;
+      triangle.index[2] = vid;
+      vid++;
+
+      // calcul de la normale
+      v0.subOf(p0, p1);
+      v1.subOf(p0, p2);
+
+      triangle.normal.crossOf(v0, v1);
+      triangle.normal.normalize();
+
+      // calcul du centre
+      triangle.center.set((p0.v[0] + p1.v[0] + p2.v[0]) / 3,
+          (p0.v[1] + p1.v[1] + p2.v[1]) / 3,
+          (p0.v[2] + p1.v[2] + p2.v[2]) / 3,
+          1.0);
+
+      // calcul de l'equation du plan
+      triangle.equation = -(triangle.normal.v[0] * triangle.center.v[0] + 
+          triangle.normal.v[1] * triangle.center.v[1] +
+          triangle.normal.v[2] * triangle.center.v[2]);
+          
+      // on ajoute ce triangle à la liste
+      this.triangles[l].push(triangle);
+    }
+  }
+  
+  this._createBuffers(format, type);
+  
   this.unCach(Ovoid.CACH_GEOMETRY);
 
   return true;
@@ -308,7 +406,7 @@ Ovoid.Mesh.prototype.addPolyset = function(l, vertices, material) {
  * 
  * Assigns the specified Material to the specified polyset at the given LOD.
  * 
- * @param {int} l LOD level (not yet fully implemented).
+ * @param {int} l LOD index.
  * @param {int} p Polyset index.
  * @param {Material} material Material to assign.
  *
@@ -328,12 +426,28 @@ Ovoid.Mesh.prototype.setMaterial = function(l, p, material) {
 
 
 /**
+ * Assign threshold distance to LOD.<br><br>
+ * 
+ * Assigns the specified threshold distance to the given LOD.
+ * 
+ * @param {int} l LOD index.
+ * @param {int} d Distance from eye range from where the LOD index is used or -1 to do not use this LOD index.
+ */
+Ovoid.Mesh.prototype.setLod = function(l, d) {
+  
+  if ( l < Ovoid.MAX_MESH_LOD ) {
+    this._lodt[l] = d;
+  }
+}
+
+
+/**
  * Recalculate triangles data.<br><br>
  * 
  * Recalculate triangles's normal, center and plane equation of the specified
  * LOD.
  * 
- * @param {int} l LOD level (not yet fully implemented).
+ * @param {int} l LOD index.
  *
  * @see Ovoid.Polyset
  * @see Ovoid.Triangle
@@ -387,7 +501,7 @@ Ovoid.Mesh.prototype.recalcTriangles = function(l) {
  * Recalculate triangles's normal, center, plane equation and vertices's normal
  * according to vertices's position for the specified LOD.
  * 
- * @param {int} l LOD level (not yet fully implemented).
+ * @param {int} l LOD index.
  *
  * @see Ovoid.Polyset
  * @see Ovoid.Triangle
@@ -479,9 +593,9 @@ Ovoid.Mesh.prototype.recalcGeometry = function(l) {
  * 
  * @See Ovoid.Vertex
  */
-Ovoid.Mesh.prototype.createBuffers = function(format, type) {
+Ovoid.Mesh.prototype._createBuffers = function(format, type) {
 
-  Ovoid._clearGlerror();
+  this._i._clearGlerror();
 
   this._vformat = format;
   this._vfbytes = Ovoid.Vertex.getFormatSize(this._vformat);
@@ -492,29 +606,28 @@ Ovoid.Mesh.prototype.createBuffers = function(format, type) {
     if (this.triangles[l].length == 0)
       continue;
 
-    ibo = Ovoid.gl.createBuffer();
-    vbo = Ovoid.gl.createBuffer();
+    ibo = this._i.gl.createBuffer();
+    vbo = this._i.gl.createBuffer();
 
-    Ovoid.gl.bindBuffer(Ovoid.gl.ARRAY_BUFFER, vbo);
-    Ovoid.gl.bufferData(Ovoid.gl.ARRAY_BUFFER,
+    this._i.gl.bindBuffer(this._i.gl.ARRAY_BUFFER, vbo);
+    this._i.gl.bufferData(this._i.gl.ARRAY_BUFFER,
         Ovoid.Vertex.bufferize(this._vformat,
 			this.vertices[l]),
 			type);
-
-    Ovoid.log(3, "Ovoid.Mesh", "'" + this.name + "' lod#"+l+" Adding VBO " + (this.vertices[l].length * this._vfbytes) + " bytes");
       
-    Ovoid.gl.bindBuffer(Ovoid.gl.ELEMENT_ARRAY_BUFFER, ibo);
-    Ovoid.gl.bufferData(Ovoid.gl.ELEMENT_ARRAY_BUFFER,
+    this._i.gl.bindBuffer(this._i.gl.ELEMENT_ARRAY_BUFFER, ibo);
+    this._i.gl.bufferData(this._i.gl.ELEMENT_ARRAY_BUFFER,
         Ovoid.Triangle.arrayAsIbo(this.triangles[l]),
-		Ovoid.gl.STATIC_DRAW);
+		this._i.gl.STATIC_DRAW);
     
-    Ovoid.log(3, "Ovoid.Mesh", "'" + this.name + "' lod#"+l+" Adding IBO " + (this.triangles[l].length * 3 * 4) + " bytes");
+    Ovoid._log(3,this._i, '::Mesh._createBuffers', this.name + 
+        ":: new buffers created on lod#"+l+" (Vbo:"+(this.vertices[l].length*this._vfbytes)+
+        "B, Ibo:"+(this.triangles[l].length*3*4)+"B)");
 
     this._ibuffer[l] = ibo;
     this._vbuffer[l] = vbo;
     
-    if (Ovoid._logGlerror('Ovoid.Mesh.createBuffers :: ' +
-      this.name))
+    if (this._i._logGlerror('::Mesh._createBuffers::' + this.name))
     {
       return false;
     }
@@ -526,9 +639,9 @@ Ovoid.Mesh.prototype.createBuffers = function(format, type) {
  * Generate a debug box.<br><br>
  * 
  * Generates a box mesh structure polyset and put it at the specified LOD
- * position.
+ * index.
  *
- * @param {int} l LOD level (not yet fully implemented).
+ * @param {int} l LOD index.
  * @param {float} size Box size.
  * @param {int} div Box subdivision count.
  * @param {Material} material Material object for the new polyset.
@@ -899,7 +1012,7 @@ Ovoid.Mesh.prototype.genDebugBox = function(l, size, div, material) {
     }
   }
 
-  this.addPolyset(l, vt, material);
+  this.addPolyset(l, vt, material, 4, Ovoid.VERTEX_VEC4_P|Ovoid.VERTEX_VEC3_N|Ovoid.VERTEX_VEC3_U, Ovoid.BUFFER_STATIC);
 };
 
 
@@ -907,9 +1020,9 @@ Ovoid.Mesh.prototype.genDebugBox = function(l, size, div, material) {
  * Generate a debug grid/plane.<br><br>
  * 
  * Generates a grid/plane mesh structure polyset and put it at the 
- * specified LOD position.
+ * specified LOD index.
  *
- * @param {int} l LOD level (not yet fully implemented).
+ * @param {int} l LOD index.
  * @param {float} size Grid size.
  * @param {int} div Grid subdivision count.
  * @param {Material} material Material object for the new polyset.
@@ -993,7 +1106,7 @@ Ovoid.Mesh.prototype.genDebugGrid = function(l, size, div, material) {
     }
   }
 
-  this.addPolyset(l, vt, material);
+  this.addPolyset(l, vt, material, 4, Ovoid.VERTEX_VEC4_P|Ovoid.VERTEX_VEC3_N|Ovoid.VERTEX_VEC3_U, Ovoid.BUFFER_STATIC);
 };
 
 
@@ -1260,7 +1373,7 @@ Ovoid.Mesh.prototype.optimizeTriangles = function() {
  *
  * Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -1268,7 +1381,7 @@ Ovoid.Mesh.prototype.cachMesh = function() {
 
   /* update bounding box et bounding sphere */
   if (!(this.cach & Ovoid.CACH_GEOMETRY)) {
-
+    
     var min = new Ovoid.Point(Ovoid.FLOAT_MAX,
         Ovoid.FLOAT_MAX,
         Ovoid.FLOAT_MAX,
@@ -1309,7 +1422,7 @@ Ovoid.Mesh.prototype.cachMesh = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.<br><br>
  * 
- * This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -1351,6 +1464,10 @@ Ovoid.Mesh.prototype.toJSON = function() {
     o['mm'] = this.modifier.uid;
   } else {
     o['mm'] = 'null';
+  }
+  o['lt'] = new Array(Ovoid.MAX_MESH_LOD);
+  for(var i = 0; i < Ovoid.MAX_MESH_LOD; i++) {
+    o['lt'][i] = this._lodt[i];
   }
 
   return o;

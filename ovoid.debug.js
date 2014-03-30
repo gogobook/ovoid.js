@@ -24,8 +24,8 @@
  * @namespace Debug namespace
  * <br>
  * <br>
- * Namespace dedicated to debug methods. Debug methods are used to returns
- * objects's informations in formated text.
+ * Namespace dedicated to debug methods. The Debug's methods are used to 
+ * extract objects's pertinent data in readable text.
  */
 Ovoid.Debug = {};
   
@@ -651,32 +651,34 @@ Ovoid.Debug.DependTree = function(o) {
  * <br>
  * Returns Queuer debuging informations in text format.
  * 
+ * @param {Object} inst Ovoid.JS Instance object.
+ * 
  * @return {string} Queuer debuging infos.
  */
-Ovoid.Debug.Queuer = function() {
+Ovoid.Debug.Queuer = function(inst) {
   
   var d = 'Ovoid.Queuer status\n{\n';
   var c;
-  d += '  rcamera:   ' + Ovoid.Queuer._rcamera.name + '\n';
+  d += '  rcamera:   ' + inst.Queuer._rcamera.name + '\n';
   d += '  viewcull:  ';
-  Ovoid.Queuer.opt_viewcull?d += 'on\n':d += 'off\n';
+  inst.Queuer.opt_viewcull?d += 'on\n':d += 'off\n';
   d += '  lightcull: ';
-  Ovoid.Queuer.opt_lightcull?d += 'on\n':d += 'off\n';
-  c = Ovoid.Queuer.qlight.count;
+  inst.Queuer.opt_lightcull?d += 'on\n':d += 'off\n';
+  c = inst.Queuer.qlight.count;
   d += '  qlight: ' + c + ' node(s)\n';
   c = 0;
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++)
-    c +=  Ovoid.Queuer.qsolid[i].count;
+    c +=  inst.Queuer.qsolid[i].count;
   d += '  qsolid: ' + c + ' node(s)\n';
   c = 0;
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++)
-    c +=  Ovoid.Queuer.qalpha[i].count;
+    c +=  inst.Queuer.qalpha[i].count;
   d += '  qalpha: ' + c + ' node(s)\n';
-  c = Ovoid.Queuer.qphycs.count;
+  c = inst.Queuer.qphycs.count;
   d += '  qphycs: ' + c + ' node(s)\n';
-  c = Ovoid.Queuer.qlayer.count;
+  c = inst.Queuer.qlayer.count;
   d += '  qlayer: ' + c + ' node(s)\n';
-  c = Ovoid.Queuer.qtext.count;
+  c = inst.Queuer.qtext.count;
   d += '  qtext:  ' + c + ' node(s)\n';
   d += '}';
   return d;
@@ -689,31 +691,33 @@ Ovoid.Debug.Queuer = function() {
  * <br>
  * Returns Input debuging informations in text format.
  * 
+ * @param {Object} inst Ovoid.JS Instance object.
+ * 
  * @return {string} Input debuging infos.
  */
-Ovoid.Debug.Input = function() {
+Ovoid.Debug.Input = function(inst) {
   
   var d = 'Ovoid.Input status\n{\n';
   d += '   intDn: [';
-  for (var i = 0; i < 256; i++) if(Ovoid.Input.intDn[i]) d += i + ' ';
+  for (var i = 0; i < 256; i++) if(inst.Input.intDn[i]) d += i + ' ';
   d += ']\n';
   d += '   intUp: [';
-  for (var i = 0; i < 256; i++) if(Ovoid.Input.intUp[i]) d += i + ' ';
+  for (var i = 0; i < 256; i++) if(inst.Input.intUp[i]) d += i + ' ';
   d += ']\n';
   d += '   intHl: [';
-  for (var i = 0; i < 256; i++) if(Ovoid.Input.intHl[i]) d += i + ' ';
+  for (var i = 0; i < 256; i++) if(inst.Input.intHl[i]) d += i + ' ';
   d += ']\n';
-  d += '   mousePosition: ' + Ovoid.Input.mousePosition.v[0] + ', ' 
-      + Ovoid.Input.mousePosition.v[1] +'\n';
-  d += '   mouseVelocity: ' + Ovoid.Input.mouseVelocity.v[0] + ', ' 
-      + Ovoid.Input.mouseVelocity.v[1] +'\n';
-  d += '   mouseOverUid:  ' + Ovoid.Input.mouseOverUid + '\n';
-  d += '   mouseEnterUid: ' + Ovoid.Input.mouseEnterUid + '\n';
-  d += '   mouseLeaveUid: ' + Ovoid.Input.mouseLeaveUid + '\n';
+  d += '   mousePosition: ' + inst.Input.mousePosition.v[0] + ', ' 
+      + inst.Input.mousePosition.v[1] +'\n';
+  d += '   mouseVelocity: ' + inst.Input.mouseVelocity.v[0] + ', ' 
+      + inst.Input.mouseVelocity.v[1] +'\n';
+  d += '   mouseOverUid:  ' + inst.Input.mouseOverUid + '\n';
+  d += '   mouseEnterUid: ' + inst.Input.mouseEnterUid + '\n';
+  d += '   mouseLeaveUid: ' + inst.Input.mouseLeaveUid + '\n';
   d += '   mouseCursor: ' 
-  d += Ovoid.frnd(Ovoid.Input.mouseCursor.m[12]) + ', ';
-  d += Ovoid.frnd(Ovoid.Input.mouseCursor.m[13]) + ', ';
-  d += Ovoid.frnd(Ovoid.Input.mouseCursor.m[14]);
+  d += Ovoid.frnd(inst.Input.mouseCursor.m[12]) + ', ';
+  d += Ovoid.frnd(inst.Input.mouseCursor.m[13]) + ', ';
+  d += Ovoid.frnd(inst.Input.mouseCursor.m[14]);
   d += '\n';
   d += '}';
   return d;
@@ -726,24 +730,26 @@ Ovoid.Debug.Input = function() {
  * <br>
  * Returns Drawer debuging informations in text format.
  * 
+ * @param {Object} inst Ovoid.JS Instance object.
+ * 
  * @return {string} Drawer debuging infos.
  */
-Ovoid.Debug.Drawer = function() {
+Ovoid.Debug.Drawer = function(inst) {
     
   var d = 'Ovoid.Drawer status\n{\n';
-  d += '   rp:' + Ovoid.Drawer.opt_pickingMode;
+  d += '   rp:' + inst.Drawer.opt_pickingMode;
   d += ' lp:';
-  Ovoid.Drawer.opt_perLightPass?d += 'yes':d += 'no';
+  inst.Drawer.opt_perLightPass?d += 'yes':d += 'no';
   d += ' zf:';
-  Ovoid.Drawer.opt_shadowCasting?d += 'yes\n':d += 'no\n';
-  d += '   renderpasses:  ' + Ovoid.Drawer._renderpasses + ' call(s)\n';
-  d += '   drawndynamic:  ' + Ovoid.Drawer._drawndynamic + ' call(s)\n';
-  d += '   drawnsprite:   ' + Ovoid.Drawer._drawnsprite + ' call(s)\n';
-  d += '   drawnchar:     ' + Ovoid.Drawer._drawnchar + ' point(s)\n';
-  d += '   drawnsymbolic: ' + Ovoid.Drawer._drawnsymbolic + ' call(s)\n';
-  d += '   drawnpolyset:  ' + Ovoid.Drawer._drawnpolyset + ' call(s)\n';
-  d += '   drawnparticle: ' + Ovoid.Drawer._drawnparticle + ' point(s)\n';
-  d += '   drawnshadow:   ' + Ovoid.Drawer._drawnshadow + ' call(s)\n';
+  inst.Drawer.opt_shadowCasting?d += 'yes\n':d += 'no\n';
+  d += '   renderpasses:  ' + inst.Drawer._renderpasses + ' call(s)\n';
+  d += '   drawndynamic:  ' + inst.Drawer._drawndynamic + ' call(s)\n';
+  d += '   drawnsprite:   ' + inst.Drawer._drawnsprite + ' call(s)\n';
+  d += '   drawnchar:     ' + inst.Drawer._drawnchar + ' point(s)\n';
+  d += '   drawnsymbolic: ' + inst.Drawer._drawnsymbolic + ' call(s)\n';
+  d += '   drawnpolyset:  ' + inst.Drawer._drawnpolyset + ' call(s)\n';
+  d += '   drawnparticle: ' + inst.Drawer._drawnparticle + ' point(s)\n';
+  d += '   drawnshadow:   ' + inst.Drawer._drawnshadow + ' call(s)\n';
   d += '}';
   return d;
 };
@@ -755,13 +761,15 @@ Ovoid.Debug.Drawer = function() {
  * <br>
  * Returns Timer debuging informations in text format.
  * 
+ * @param {Object} inst Ovoid.JS Instance object.
+ * 
  * @return {string} Timer debuging infos.
  */
-Ovoid.Debug.Timer = function() {
+Ovoid.Debug.Timer = function(inst) {
   
   var d = 'Ovoid.Timer status\n{\n';
-  d += '   quantum:   ' + (Math.round(Ovoid.Timer.quantum*10000) / 10000) + '\n';
-  d += '   framerate: ' + Ovoid.Timer.framerate + '\n';
+  d += '   quantum:   ' + (Math.round(inst.Timer.quantum*10000) / 10000) + '\n';
+  d += '   framerate: ' + inst.Timer.framerate + '\n';
   d += '}';
   return d;
 };
@@ -773,14 +781,16 @@ Ovoid.Debug.Timer = function() {
  * <br>
  * Returns Frame debuging informations in text format.
  * 
+ * @param {Object} inst Ovoid.JS Instance object.
+ * 
  * @return {string} Frame debuging infos.
  */
-Ovoid.Debug.Frame = function() {
+Ovoid.Debug.Frame = function(inst) {
   
   var d = 'Ovoid.Frame status\n{\n';
-  d += '   position: ' + Ovoid.Frame.position.v[0] + ', ' + Ovoid.Frame.position.v[1] + '\n';
-  d += '   size:     ' + Ovoid.Frame.size.v[0] + ', ' + Ovoid.Frame.size.v[1] + '\n';
-  d += '   scroll:   ' + Ovoid.Frame.scroll.v[0] + ', ' + Ovoid.Frame.scroll.v[1] + '\n';
+  d += '   position: ' + inst.Frame.position.v[0] + ', ' + inst.Frame.position.v[1] + '\n';
+  d += '   size:     ' + inst.Frame.size.v[0] + ', ' + inst.Frame.size.v[1] + '\n';
+  d += '   scroll:   ' + inst.Frame.scroll.v[0] + ', ' + inst.Frame.scroll.v[1] + '\n';
   d += '}';
   return d;
 };
@@ -904,25 +914,62 @@ Ovoid.Debug.Shader = function(o) {
  * Sumary hud debug.
  * <br><br>Returns debuging sumary informations in text format.
  * 
+ * @param {Object} inst Ovoid.JS Instance object.
+ * 
  * @return {string} Sumary debuging infos.
  */
-Ovoid.Debug.Sumary = function() {
+Ovoid.Debug.Sumary = function(inst) {
 
   var d = '';
-  d = 'Fps:[' + Ovoid.Timer.framerate + ']';
-  d += ' Drawn:[';
-  d += 'polyset:' + Ovoid.Drawer._drawnpolyset;
-  d += ' dynamic:' + Ovoid.Drawer._drawndynamic;
-  d += ' sprite:' + Ovoid.Drawer._drawnsprite;
-  d += ' symbolic:' + Ovoid.Drawer._drawnsymbolic;
-  d += ' particle:' + Ovoid.Drawer._drawnparticle;
-  d += ' shadow:' + Ovoid.Drawer._drawnshadow;
+  d = 'Fps:[' + inst.Timer.framerate + ']';
+  d += ' Drawer:[';
+  d += 'mode:';
+  if(inst.opt_renderPerLightPass) {
+    d += 'LP/';
+    switch(inst.Drawer._pipeLp) 
+    {
+      case 0:
+        d += 'PS';
+      break;
+      case 10:
+        d += 'VL';
+      break;
+      case 13:
+        d += 'LE';
+      break;
+    } 
+  } else {
+    d += ' 1P/';
+    switch(inst.Drawer._pipe1p) 
+    {
+      case 1:
+        d += 'PS';
+      break;
+      case 11:
+        d += 'VL';
+      break;
+      case 14:
+        d += 'LE';
+      break;
+    } 
+  }
+  d += ' set:' + inst.Drawer._drawnpolyset;
+  d += ' dyn:' + inst.Drawer._drawndynamic;
+  d += ' spr:' + inst.Drawer._drawnsprite;
+  d += ' sym:' + inst.Drawer._drawnsymbolic;
+  d += ' prt:' + inst.Drawer._drawnparticle;
+  d += ' sdw:' + inst.Drawer._drawnshadow;
   d += ']';
-  d += ' Mouse:[x' + Ovoid.Input.mousePosition.v[0];
-  d += ' y' +  Ovoid.Input.mousePosition.v[1] + ']';
+  d += ' Mouse:[x' + inst.Input.mousePosition.v[0];
+  d += ' y' +  inst.Input.mousePosition.v[1] + ']';
   d += ' Picking:[';
-  Ovoid.Drawer.opt_enablePicking?d+='on':d+='off';
+  var pm = inst.opt_renderPickingMode;
+  if(pm == 1) d += 'off';
+  if(pm == 1) d += 'O';
+  if(pm == 2) d += 'W';
+  if(pm == 3) d += 'O+W';
   d += ']';
-  d +=' Timeq:[' + (Math.round(Ovoid.Timer.quantum*1000) / 1000) + ']';
+  d +=' Timer:[q:' + (Math.round(inst.Timer.quantum*1000) / 1000);
+  d +=' c:' + (Math.round(inst.Timer.clock*100) / 100) + ']';
   return d;
 };

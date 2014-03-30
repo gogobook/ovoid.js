@@ -20,11 +20,11 @@
 
 
 /**
- * Expression node constructor.
+ * Constructor method.
  * 
  * @class Expression node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Expression node is a Constraint node who apply procedural animation or
  * effect to one other node. Expression are composed of a function dedicated to
@@ -46,7 +46,7 @@
  * &nbsp;&nbsp;node.moveXyz(0.0, Math.cos(l)*0.02, 0.0);<br>
  * }<br>
  * <br>
- * var youpi = scene.create(Ovoid.EXPRESSION, "youpiAnim");<br>
+ * var youpi = myOvoid.Scene.newNode(Ovoid.EXPRESSION, "youpiAnim");<br>
  * youpi.addExpression(exprfunc1);<br>
  * youpi.addExpression(exprfunc2);<br>
  * youpi.setTarget(box);<br>
@@ -56,8 +56,9 @@
  * @extends Ovoid.Constraint
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Expression = function(name) {
+Ovoid.Expression = function(name, i) {
 
   Ovoid.Constraint.call(this);
   /** node type */
@@ -83,6 +84,10 @@ Ovoid.Expression = function(name) {
   /** Expression function array
    * @type Function[] */
   this.exprfunc = new Array();
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Expression.prototype = new Ovoid.Constraint;
 Ovoid.Expression.prototype.constructor = Ovoid.Expression;
@@ -96,7 +101,7 @@ Ovoid.Expression.prototype.constructor = Ovoid.Expression;
  * @param {Function} expr Expression function. The expression function should 
  * takes three arguments where first is the target node and second the time 
  * quantum value and third the time line value:<br>
- * <code>var expr = function(node, timeq, timel) {};</code>
+ * <c>var expr = function(node, timeq, timel) {};</c>
  */
 Ovoid.Expression.prototype.addExpression = function(expr) {
 
@@ -137,7 +142,7 @@ Ovoid.Expression.prototype.play = function(factor) {
  *
  * Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -147,17 +152,22 @@ Ovoid.Expression.prototype.cachExpression = function() {
   {
     if (this.playing)
     {
-      this.timeq = this.factor * Ovoid.Timer.quantum;
+      this.timeq = this.factor * this._i.Timer.quantum;
       this.timel += this.timeq;
       
       var i, j, c;
       
       i = this.target.length;
       c = this.exprfunc.length;
-      while (i--) {
-        for ( j = 0; j < c; j++) {
-          this.exprfunc[j](this.target[i], this.timeq, this.timel);
+      try { /* handle exceptions car des fonctions sont custom */
+        while (i--) {
+          for ( j = 0; j < c; j++) {
+            this.exprfunc[j](this.target[i], this.timeq, this.timel);
+          }
         }
+      } catch(e) {
+          Ovoid._log(0, this._i, '::Expression.cachExpression', this.name + 
+              ':: Custom function exception thrown:\n' + e.stack);
       }
     }
     this.addCach(Ovoid.CACH_EXPRESSION);
@@ -168,7 +178,7 @@ Ovoid.Expression.prototype.cachExpression = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -206,7 +216,7 @@ Ovoid.Expression.prototype.toJSON = function() {
   o['fc'] = this.factor;
   o['ex'] = new Array();
   for (var i = 0; i < this.exprfunc.length; i++)
-    o['ex'][i] = String(this.exprfunc[i]);
+    o['ex'][i] = Ovoid.compact(this.exprfunc[i]);
 
   return o;
 };

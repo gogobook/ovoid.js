@@ -20,7 +20,7 @@
 
 
 /**
- * Create a color object.
+ * Constructor method.
  *
  * @class RGBA color object.<br><br>
  * 

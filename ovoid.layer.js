@@ -20,11 +20,11 @@
 
 
 /**
- * Layer node constructor.
+ * Constructor method.
  *
  * @class Overlay Layer node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Layer node implements a sprite drawn as an 2D overlayed rectangle on the 
  * rendered scene.
@@ -45,8 +45,9 @@
  * @extends Ovoid.Transform
  *
  * @param {string} name Name of the new node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Layer = function(name) {
+Ovoid.Layer = function(name, i) {
 
   Ovoid.Transform.call(this);
   /** node type */
@@ -70,6 +71,10 @@ Ovoid.Layer = function(name) {
   /** Layer transformation matrix.
    * @type Matrix1 */
   this.layerMatrix = new Ovoid.Matrix4();
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 
   this.unCach(Ovoid.CACH_LAYER);
 };
@@ -170,7 +175,7 @@ Ovoid.Layer.prototype.isPointOver = function(coord) {
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -193,7 +198,7 @@ Ovoid.Layer.prototype.cachLayer = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

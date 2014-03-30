@@ -20,11 +20,11 @@
 
 
 /**
- * Light node constructor.
+ * Constructor method.
  * 
  * @class Light node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Light node implements a world light source. Inherited from the 
  * Transform node, it is a world-transformable node, which means it can be moved
@@ -41,7 +41,7 @@
  * 
  * <b>Lights Model</b><br><br>
  * 
- * The light model is defined by the <code>model</code> attribute of the Light 
+ * The light model is defined by the <c>model</c> attribute of the Light 
  * node. Available light model are the following:
  * 
  * <ul>
@@ -64,13 +64,14 @@
  * depending on the used shader program.<br><br>
  * 
  * For more information about how shaders are implemented in OvoiD.JS, see the 
- * <code>Ovoid.Shader</code> class documentation.
+ * <c>Ovoid.Shader</c> class documentation.
  * 
  * @extends Ovoid.Transform
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Light = function(name) {
+Ovoid.Light = function(name, i) {
 
   Ovoid.Transform.call(this);
   /** Node type */
@@ -110,6 +111,10 @@ Ovoid.Light = function(name) {
   /** Light shadow casting flag.
    *  @type bool */
   this.shadowCasting = true;
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 
 };
 Ovoid.Light.prototype = new Ovoid.Transform;
@@ -232,13 +237,13 @@ Ovoid.Light.prototype.isLightening = function(tform) {
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
 Ovoid.Light.prototype.cachLight = function() {
 
-  if(this.model == Ovoid.LIGHT_DIRECTIONAL)
+  if(this.model == 1) /* Ovoid.LIGHT_DIRECTIONAL */
     this.worldPosition.v[3] = 0.0;
       
   if (!(this.cach & Ovoid.CACH_LIGHT))
@@ -252,7 +257,7 @@ Ovoid.Light.prototype.cachLight = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

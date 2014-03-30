@@ -19,73 +19,93 @@
 
 
 /**
- * Queuer global static class.
+ * Constructor method.
  *
- * @namespace Queuer global class.<br><br>
+ * @class Queuer Module Class.<br><br>
  * 
- * The Queuer class implements a per frame global treatment queue. It is a 
- * global static (namespace) class. The Timer class provides the common clock 
- * and times parameter calculated over each frame's refresh. Typically, Queuer 
- * will "read" the current active scene, updates all nodes and dependencies, 
- * and then build a queue (for example) of all objects which must be drawn by 
- * the Drawer, must be treated by the Solver, etc... each frame.<br><br>
+ * The Queuer class implements a per frame global update queue. This is 
+ * what is called a Module class because used as core module for the 
+ * Ovoid.Instance class. A Module class is a part of Instance class and 
+ * can be used only within the Instance class.<br><br>
+ * 
+ * The Queuer is a kind of crossroad between all Modules and Instance 
+ * who proceed to several operations, especially:.<br>
+ * <ul>
+ * <li>Update all Scene's node graph and dependencies.</li>
+ * <li>Select, sort and dispatch nodes to prepare the rendering process.</li>
+ * <li>Update and dispatch interactives events.</li>
+ * </ul><br><br>
+ * 
+ * This Module class does not provide many public data or method since 
+ * it is a very internal and critical Module.<br><br>
  * 
  * <b>Node culling</b><br><br>
  * 
- * Since it is not desirable to include all nodes of the active scene in the 
- * drawer stack, it implements some mecanisms which only includes the needed
- * nodes. This mecanisms is called "Node Culling".<br><br>
+ * Since it is not desirable to include all nodes of the active scene in 
+ * the render stack, the Queuer implements some mecanisms to exclude 
+ * nodes from the render stack according some rules to prevent useless 
+ * data processing.. This mecanisms is called "node culling".<br><br>
  * 
  * <ul>
  * <li><b>View culling</b><br>
- * The view culling mechanism checks whether a node is within the view frustum 
- * of the current active camera. Also named "View frustum culling".<br><br>
+ * The view culling mechanism checks whether a node is within the view 
+ * frustum of the current active camera. Also named 
+ * "View frustum culling".<br><br>
  * 
- * This mechanism can be enabled or disabled by modifying the global option
- * <code>Ovoid.Queuer.opt_viewcull</code>
+ * This mechanism can be enabled or disabled by defining the option
+ * <c>Instance.opt_sceneViewcull</c> to <c>true</c> or 
+ * <c>false</c>.
  * </li><br>
  * 
  * <li><b>Light culling</b><br>
- * The light culling mechanism checks whether a light is needed to draw the 
- * current frame. It excludes all the light that does not illuminate one of 
- * the not culled nodes.<br><br>
+ * The light culling mechanism checks whether a light is needed to 
+ * render the current frame and excludes all lights who does not affect 
+ * any rendered node.<br><br>
  * 
- * This mechanism can be enabled or disabled by modifying the global option 
- * <code>Ovoid.Queuer.opt_lightcull</code>
+ * This mechanism can be enabled or disabled by defining the option 
+ * <c>Instance.opt_sceneLightcull</c> to <c>true</c> or 
+ * <c>false</c>.
  * </li>
  * </ul><br><br>
  * 
  * <b>Body intersection</b><br><br>
  * 
- * For interactivity purpose, the Body node and Queuer is designed to be able 
- * handle intersection of a Body with each others through the bounding sphere.
- * To enable or disable the Body intersection detection in a global way, you can
- * set the <code>Ovoid.Queuer.opt_intersect</code> options to <code>true</code> 
- * or <code>false</code>.<br><br>
+ * For interactivity purpose, the Body node and Queuer is designed to be 
+ * able handle intersection of a Body with each others through the 
+ * bounding sphere. To enable or disable the Body intersection detection 
+ * in a global way, you can set the 
+ * <c>Instance.opt_sceneIntersectDetect</c> options to 
+ * <c>true</c> or <c>false</c>.<br><br>
  * 
  * <b>Queues</b><br><br>
  * 
- * Each frames, the Queuer makes several queues (this is why it is named Queuer) 
- * of nodes which are used by several other global classes. For example, the 
- * Queuer makes some lists of nodes which will be rendered by the Drawer 
- * (Ovoid.Drawer). The Drawer will use the Queuer's queues as a rendering stacks.
+ * Each frames, the Queuer makes several queues (this is why it is named 
+ * Queuer) of nodes which are used by other Modules classes. For 
+ * example, the Queuer makes some lists of nodes which will be rendered 
+ * by the Drawer (Ovoid.Drawer). The Drawer uses the Queuer's queues as 
+ * a rendering stacks.<br><br>
+ * 
+ * These queues are currently public member of this class and can be 
+ * accessed. This can be usefull for experienced developpers to create 
+ * complex alorithms or custom <c>Instance.ondraw()</c> method.
+ * <br><br>
  * 
  * <ul>
  * <li><b>qsolid</b><br>
- * This is the main Body nodes's list which are rendered as "non transparent" 
- * objects by the Drawer.
+ * This is the main Body nodes's list which are rendered as 
+ * "non transparent" objects by the Drawer.
  * </li><br>
  * <li><b>qalpha</b><br>
- * This is the main Body nodes's list which are rendered as "transparent/FX" 
- * objects by the Drawer.
+ * This is the main Body nodes's list which are rendered as 
+ * "transparent/FX" objects by the Drawer.
  * </li><br>
  * <li><b>qtform</b><br>
- * This is the main Transform nodes's list which are used by the Drawer to 
- * render object's helpers (bounding boxes, spheres, axis, etc.)
+ * This is the main Transform nodes's list which are used by the Drawer 
+ * to render object's helpers (bounding boxes, spheres, axis, etc.)
  * </li><br>
  * <li><b>qlight</b><br>
- * This is the main Light nodes's list which are involved in the rendering 
- * process, used to define Lights by the Drawer.
+ * This is the main Light nodes's list which are involved in the 
+ * rendering process, used to define Lights by the Drawer.
  * </li><br>
  * <li><b>qlayer</b><br>
  * This is the main Layer nodes's list which are rendered by the Drawer.
@@ -94,74 +114,56 @@
  * This is the main Text nodes's list which are rendered by the Drawer.
  * </li><br>
  * <li><b>qphycs</b><br>
- * This is the main Physics nodes's list which are tested for collisions by the 
- * Solver (Ovoid.Solver).
+ * This is the main Physics nodes's list which are tested for collisions 
+ * by the Solver (Ovoid.Solver).
  * </li>
  * </ul>
  * 
+ * @param {object} i Instance object to register object to.
+ * 
  */
-Ovoid.Queuer = {};
+Ovoid.Queuer = function(i) {
+  
+  /** Instance parent */
+  this._i = i;
+  
+
+  /** Dag iterator */
+  this._wgit = new Ovoid.WgIterator();
 
 
-/** Enable or disable view culling. */
-Ovoid.Queuer.opt_viewcull = true;
+  /** Solid body stack. */
+  this.qsolid = new Array(Ovoid.MAX_RENDER_LAYER);
 
 
-/** Enable or disable light culling. */
-Ovoid.Queuer.opt_lightcull = true;
+  /** Alpha body stack. */
+  this.qalpha = new Array(Ovoid.MAX_RENDER_LAYER);
 
 
-/** Enable or disable intersection detection. */
-Ovoid.Queuer.opt_intersect = true;
+  /** Transform stack. */
+  this.qtform = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
 
 
-/** Default camera position. */
-Ovoid.Queuer.opt_defaultCameraPos = [0.0, 0.0, 10.0];
+  /** Light stack. */
+  this.qlight = new Ovoid.Stack(Ovoid.MAX_LIGHT_BY_DRAW);
 
 
-/** Default camera rotation. */
-Ovoid.Queuer.opt_defaultCameraRot = [0.0, 0.0, 0.0];
+  /** Layer stack. */
+  this.qlayer = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
 
 
-/** Dag iterator */
-Ovoid.Queuer._wgit = new Ovoid.WgIterator();
+  /** Text stack. */
+  this.qtext = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
 
 
-/** Solid body stack. */
-Ovoid.Queuer.qsolid = new Array(Ovoid.MAX_RENDER_LAYER);
+  /** Physic stack. */
+  this.qphycs = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
 
 
-/** Alpha body stack. */
-Ovoid.Queuer.qalpha = new Array(Ovoid.MAX_RENDER_LAYER);
+  /** Current render camera. */
+  this._rcamera = null;
 
-
-/** Transform stack. */
-Ovoid.Queuer.qtform = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
-
-
-/** Light stack. */
-Ovoid.Queuer.qlight = new Ovoid.Stack(Ovoid.MAX_LIGHT_BY_DRAW);
-
-
-/** Layer stack. */
-Ovoid.Queuer.qlayer = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
-
-
-/** Text stack. */
-Ovoid.Queuer.qtext = new Ovoid.Stack(Ovoid.MAX_LAYER_BY_DRAW);
-
-
-/** Physic stack. */
-Ovoid.Queuer.qphycs = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
-
-
-/** Current render camera. */
-Ovoid.Queuer._rcamera = null;
-
-
-/** Default rendering view camera. */
-Ovoid.Queuer._dcamera = new Ovoid.Camera('defaultCamera');
-
+};
 
 /**
  * Queuer initialization.<br><br>
@@ -173,35 +175,15 @@ Ovoid.Queuer._dcamera = new Ovoid.Camera('defaultCamera');
  *
  * @return {bool} True if initialization succeeds, false otherwise.
  */
-Ovoid.Queuer.init = function() {
-
-  Ovoid.log(3, 'Ovoid.Queuer', 'initialization');
+Ovoid.Queuer.prototype._init = function() {
 
   /* Initialise les stack de body pour les render layers */
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-    Ovoid.Queuer.qsolid[i] = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
-    Ovoid.Queuer.qalpha[i] = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
+    this.qsolid[i] = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
+    this.qalpha[i] = new Ovoid.Stack(Ovoid.MAX_BODY_BY_DRAW);
   }
   
-  /* initialisation de la camera par defaut */
-  Ovoid.Queuer._dcamera.moveXyz(Ovoid.Queuer.opt_defaultCameraPos[0],
-      Ovoid.Queuer.opt_defaultCameraPos[1],
-      Ovoid.Queuer.opt_defaultCameraPos[2],
-      Ovoid.WORLD, Ovoid.ABSOLUTE);
-
-  Ovoid.Queuer._dcamera.rotateXyz(Ovoid.Queuer.opt_defaultCameraRot[0],
-      Ovoid.Queuer.opt_defaultCameraRot[1],
-      Ovoid.Queuer.opt_defaultCameraRot[2],
-      Ovoid.WORLD, Ovoid.RELATIVE);
-
-  Ovoid.Queuer._dcamera.setView(Ovoid.Frame.size.v[0],
-        Ovoid.Frame.size.v[1]);
-        
-  Ovoid.Queuer._dcamera.cachTransform();
-
-  Ovoid.Queuer._dcamera.cachCamera();
-  
-  Ovoid.Queuer._rcamera = Ovoid.Queuer._dcamera;
+  Ovoid._log(3, this._i, '.Queuer._init', ' done');
 
   return true;
 };
@@ -214,7 +196,7 @@ Ovoid.Queuer.init = function() {
  * 
  * @see Ovoid.Node
  */
-Ovoid.Queuer._cachDependencies = function(o) {
+Ovoid.Queuer.prototype._cachDependencies = function(o) {
 
   var i = o.depend.length;
   while (i--) {
@@ -253,17 +235,17 @@ Ovoid.Queuer._cachDependencies = function(o) {
  * @param {Body} o Body object to test light linking.
  * @param {Light[]} l Light object array to test linking.
  */
-Ovoid.Queuer._lightcull = function(o, l) {
+Ovoid.Queuer.prototype._lightcull = function(o, l) {
   
   /* on verifie le link lumier pour ajouter la 
    * ou les lumieres qu'il faut au render queue */
-  if (Ovoid.Queuer.opt_lightcull) {
+  if (this._i.opt_sceneLightcull) {
     i = l.length;
     while (i--) {
       if (l[i].isLightening(o)) {
-        if(!Ovoid.Queuer.qlight.has(l[i])) {
+        if(!this.qlight.has(l[i])) {
           l[i].rendered = true;
-          Ovoid.Queuer.qlight.add(l[i]);
+          this.qlight.add(l[i]);
         }
       }
     }
@@ -278,25 +260,41 @@ Ovoid.Queuer._lightcull = function(o, l) {
  *
  * @return {bool} True if node is added in stack, false otherwise.
  */
-Ovoid.Queuer._viewcull = function(o) {
+Ovoid.Queuer.prototype._viewcull = function(o) {
   
-  if (Ovoid.Queuer.opt_viewcull) {
-    if (Ovoid.Queuer._rcamera.isWatching(o)) {
-
-      o.rendered = true;
-      // Calcul de la distance à la camera
-      if(o.shape.type & Ovoid.EMITTER) { 
-        // Exception pour les particules, toujours dessinées en dernier.
-        o.distFromEye = Ovoid.FLOAT_MIN;
+  if (this._i.opt_sceneViewcull) {
+    if (this._rcamera.isWatching(o)) {
+      
+      if(o.visibleRange >= o.distFromEye || o.visibleRange <= 0.0) {
+        o.rendered = true;
+        
+        // On modifie la distance pour les particules, pour qu'elles soient toujours rendus en dernier.
+        if(o.shape.type & Ovoid.EMITTER) { 
+          o.distFromEye = Ovoid.FLOAT_MIN;
+        }
+      
+        // Calcul du LOD pour le shape
+        if(o.shape) {
+          if(o.shape.type & Ovoid.MESH) {
+            o.shape._lod = 0;
+            for(var l = 0; l < Ovoid.MAX_MESH_LOD; l++) {
+              if(o.shape._lodt[l] < 0)
+                continue;
+              if(o.distFromEye >= o.shape._lodt[l])
+                o.shape._lod = l;
+            }
+          }
+        }
+        
+        if(o.renderAlpha) {
+          this.qalpha[o.renderLayer].add(o);
+        } else {
+          this.qsolid[o.renderLayer].add(o);
+        }
+        return true;
       } else {
-        o.distFromEye = o.worldPosition.dist(Ovoid.Queuer._rcamera.worldPosition) - o.boundingSphere.radius;
+        return false;
       }
-      if(o.renderAlpha) {
-        Ovoid.Queuer.qalpha[o.renderLayer].add(o);
-      } else {
-        Ovoid.Queuer.qsolid[o.renderLayer].add(o);
-      }
-      return true;
     }
   } else {
     o.rendered = true;
@@ -305,12 +303,12 @@ Ovoid.Queuer._viewcull = function(o) {
       // Exception pour les particules, toujours dessinées en dernier.
       o.distFromEye = Ovoid.FLOAT_MIN;
     } else {
-      o.distFromEye = o.worldPosition.dist(Ovoid.Queuer._rcamera.worldPosition) - o.boundingSphere.radius;
+      o.distFromEye = o.worldPosition.dist(this._rcamera.worldPosition) - o.boundingSphere.radius;
     }
     if(o.renderAlpha) {
-      Ovoid.Queuer.qalpha[o.renderLayer].add(o);
+      this.qalpha[o.renderLayer].add(o);
     } else {
-      Ovoid.Queuer.qsolid[o.renderLayer].add(o);
+      this.qsolid[o.renderLayer].add(o);
     }
     return true;
   }
@@ -327,10 +325,10 @@ Ovoid.Queuer._viewcull = function(o) {
  * 
  * @see Ovoid.Physics
  */
-Ovoid.Queuer._physicscull = function(o) {
+Ovoid.Queuer.prototype._physicscull = function(o) {
 
   if(o.visible && o.model < 3) {
-    Ovoid.Queuer.qphycs.add(o);
+    this.qphycs.add(o);
   } 
 };
 
@@ -347,7 +345,7 @@ Ovoid.Queuer._physicscull = function(o) {
  * 
  * @see Ovoid.Body
  */
-Ovoid.Queuer._bodyZSortFunc = function(a, b) {
+Ovoid.Queuer.prototype._bodyZSortFunc = function(a, b) {
   
   return a.distFromEye - b.distFromEye;
   
@@ -359,17 +357,17 @@ Ovoid.Queuer._bodyZSortFunc = function(a, b) {
  * 
  * Clears all stacks and prepare for a new queuing process.
  */
-Ovoid.Queuer.reset = function() {
+Ovoid.Queuer.prototype._reset = function() {
 
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-    Ovoid.Queuer.qsolid[i].empty();
-    Ovoid.Queuer.qalpha[i].empty();
+    this.qsolid[i].empty();
+    this.qalpha[i].empty();
   }
-  Ovoid.Queuer.qlayer.empty();
-  Ovoid.Queuer.qtext.empty();
-  Ovoid.Queuer.qlight.empty();
-  Ovoid.Queuer.qtform.empty();
-  Ovoid.Queuer.qphycs.empty();
+  this.qlayer.empty();
+  this.qtext.empty();
+  this.qlight.empty();
+  this.qtform.empty();
+  this.qphycs.empty();
 };
 
 
@@ -389,35 +387,28 @@ Ovoid.Queuer.reset = function() {
  * @see Ovoid.Drawer
  * @see Ovoid.Solver
  */
-Ovoid.Queuer.queueScene = function(sc) {
+Ovoid.Queuer.prototype._queueScene = function(sc) {
 
   /* quelques variables reutilisables */
   var o, i, j;
 
   /* creation de la queue de rendu */
   /* selection de la camera */
-  if (sc.activeCamera) {
-    Ovoid.Queuer._rcamera = sc.activeCamera;
-  } else {
-    Ovoid.Queuer._dcamera.cachTransform();
-    Ovoid.Queuer._dcamera.cachCamera();
-    Ovoid.Queuer._rcamera = Ovoid.Queuer._dcamera;
-  }
+  this._rcamera = sc.activeCamera;
   
   /* Update/Cach camera si modification de frame */
-  if (Ovoid.Frame.changed) {
-    Ovoid.Queuer._rcamera.setView(Ovoid.Frame.size.v[0],
-        Ovoid.Frame.size.v[1]);
-    Ovoid.Queuer._rcamera.cachCamera();
+  if (this._i.Frame._changed) {
+    this._rcamera.setView(this._i.Frame.size.v[0],this._i.Frame.size.v[1]);
+    this._rcamera.cachCamera();
   }
 
-  Ovoid.Queuer._cachDependencies(Ovoid.Queuer._rcamera);
+  this._cachDependencies(this._rcamera);
   
   /* Update de l'audioListener */
-  if(Ovoid.al.type == 3) { /* Ovoid.WEBKIT_AUDIO_API */
-    var matrix = Ovoid.Queuer._rcamera.worldMatrix;
-    Ovoid.al.listener.setPosition(matrix.m[12], matrix.m[13], matrix.m[14]);
-    Ovoid.al.listener.setOrientation(-matrix.m[8], -matrix.m[9], -matrix.m[10],
+  if(this._i.al.type == 3) { /* Ovoid.WEB_AUDIO_API */
+    var matrix = this._rcamera.worldMatrix;
+    this._i.al.listener.setPosition(matrix.m[12], matrix.m[13], matrix.m[14]);
+    this._i.al.listener.setOrientation(-matrix.m[8], -matrix.m[9], -matrix.m[10],
         matrix.m[4], matrix.m[5], matrix.m[6]);
   }
 
@@ -430,14 +421,14 @@ Ovoid.Queuer.queueScene = function(sc) {
 
   /* Actualise les dependences pour les materiaux */
   i = sc.material.length;
-  while (i--) Ovoid.Queuer._cachDependencies(sc.material[i]);
+  while (i--) this._cachDependencies(sc.material[i]);
 
   /* Actualisation et mise en render queue des bodys */
-  Ovoid.Queuer._wgit.init(sc.world);
-  while (Ovoid.Queuer._wgit.explore())
+  this._wgit.init(sc.world);
+  while (this._wgit.explore())
   {
-    o = Ovoid.Queuer._wgit.current;
-    Ovoid.Queuer._cachDependencies(o);
+    o = this._wgit.current;
+    this._cachDependencies(o);
     
     o.rendered = false;
     if (o.visible) {
@@ -445,8 +436,8 @@ Ovoid.Queuer.queueScene = function(sc) {
         o.cachTransform();
         /* Ajoute en queue transform si le dessins des helpers 
          * est activé */
-        if (Ovoid.Drawer.opt_drawHelpers)
-          Ovoid.Queuer.qtform.add(o);
+        if (this._i.opt_renderDrawHelpers)
+          this.qtform.add(o);
           
         /* Si c'est un body */
         if (o.type & Ovoid.BODY) {
@@ -455,8 +446,8 @@ Ovoid.Queuer.queueScene = function(sc) {
             o.cachBody();
             /* Ajoute au render stack si passe le view culling
              * puis test light link pour le light culling */
-            if (Ovoid.Queuer._viewcull(o))
-              Ovoid.Queuer._lightcull(o, sc.light);
+            if (this._viewcull(o))
+              this._lightcull(o, sc.light);
           }
         }
         
@@ -478,8 +469,8 @@ Ovoid.Queuer.queueScene = function(sc) {
   
         /* Si c'est une camera */
         if (o.type & Ovoid.CAMERA) {
-          if (Ovoid.Frame.changed)
-            o.setView(Ovoid.Frame.size.v[0], Ovoid.Frame.size.v[1]);
+          if (this._i.Frame.changed)
+            o.setView(this._i.Frame.size.v[0], this._i.Frame.size.v[1]);
           o.cachCamera();
           continue;
         }
@@ -494,7 +485,7 @@ Ovoid.Queuer.queueScene = function(sc) {
   }
   
   /* Verifie les intersections des bodys intersectables */
-  if (Ovoid.Queuer.opt_intersect) {
+  if (this._i.opt_sceneIntersectDetect) {
     var a, b;
     /* On stock les intersections, dans un stack */
     var intersect = new Ovoid.Stack(Ovoid.MAX_BODY_INTERSECT);
@@ -541,7 +532,7 @@ Ovoid.Queuer.queueScene = function(sc) {
   /* A optimiser, on ajoute les physics au collider stack 
    * Note à moi-même: A optimiser comment ? Avec un octree ? Bwahaha !! */
   i = sc.physics.length;
-  while (i--) Ovoid.Queuer._physicscull(sc.physics[i]);
+  while (i--) this._physicscull(sc.physics[i]);
 
   /* Cach des tracks d'animation, en toute fin de process pour que 
    * toutes les animations soient à jour */
@@ -550,17 +541,17 @@ Ovoid.Queuer.queueScene = function(sc) {
 
   /* Ordonne les bodys selon la distance à la camera */
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-    Ovoid.Queuer.qalpha[i].sort(Ovoid.Queuer._bodyZSortFunc);
+    this.qalpha[i].sort(this._bodyZSortFunc);
   }
   
 
   /* Si le light-linking est desactivé on ajoute toutes les lumieres */
-  if (!Ovoid.Queuer.opt_lightcull) {
+  if (!this._i.opt_sceneLightcull) {
     i = sc.light.length;
     while (i--) {
-      if(!Ovoid.Queuer.qlight.has(sc.light[i])) {
+      if(!this.qlight.has(sc.light[i])) {
         sc.light[i].rendered = true;
-        Ovoid.Queuer.qlight.add(sc.light[i]);
+        this.qlight.add(sc.light[i]);
       }
     }
   }
@@ -569,32 +560,32 @@ Ovoid.Queuer.queueScene = function(sc) {
   i = 0; /* pour le picking par defaut */
   
   /* Actualisation et mise en render queue des layers */
-  Ovoid.Queuer._wgit.init(sc.overlay);
-  while (Ovoid.Queuer._wgit.explore()) {
-    o = Ovoid.Queuer._wgit.current;
-    Ovoid.Queuer._cachDependencies(o);
+  this._wgit.init(sc.overlay);
+  while (this._wgit.explore()) {
+    o = this._wgit.current;
+    this._cachDependencies(o);
     if (o.visible) {
       o.cachTransform();
       o.cachLayer();
       if (o.type & Ovoid.TEXT) {
-        Ovoid.Queuer.qtext.add(o);
+        this.qtext.add(o);
       } else {
         /* Si le picking est off, picking de substitution */
-        if (Ovoid.Drawer.opt_pickingMode == 0) { 
+        if (this._i.opt_renderPickingMode == 0) { 
           /* verifie si le pointeur est over */
-          if(o.isPointOver(Ovoid.Input.mousePosition)) i = o.uid;
+          if(o.isPointOver(this._i.Input.mousePosition)) i = o.uid;
         }
-        Ovoid.Queuer.qlayer.add(o);
+        this.qlayer.add(o);
       }
     }
   }
   
-  if (Ovoid.Drawer.opt_pickingMode == 0) { 
-    if(i == Ovoid.Input.mouseOverUid) {
-      Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseLeaveUid = 0;
+  if (this._i.opt_renderPickingMode == 0) { 
+    if(i == this._i.Input.mouseOverUid) {
+      this._i.Input.mouseEnterUid = this._i.Input.mouseLeaveUid = 0;
     } else {
-      Ovoid.Input.mouseLeaveUid = Ovoid.Input.mouseOverUid;
-      Ovoid.Input.mouseEnterUid = Ovoid.Input.mouseOverUid = i;
+      this._i.Input.mouseLeaveUid = this._i.Input.mouseOverUid;
+      this._i.Input.mouseEnterUid = this._i.Input.mouseOverUid = i;
     }
   }
   

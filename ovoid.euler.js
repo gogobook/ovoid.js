@@ -20,7 +20,7 @@
 
 
 /**
- * Create an Euler object.
+ * Constructor method.
  *
  * @class Euler angle rotation object.<br><br>
  * 

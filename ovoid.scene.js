@@ -17,104 +17,109 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-/**
- * Create a Scene object.
- *
- * @class World Scene Graph object.<br><br>
+ 
+/** Constructor method.
  * 
- * The scene graph is a structure that arranges the logical and spatial 
- * representation of a graphical scene. The Scene object is the main work space 
- * where nodes are stored. It is designed to store and organize nodes and to 
- * provide an interface to access, search and create nodes.<br><br>
+ * @class Scene graph object.<br><br>
  * 
- * <b>Active Scene</b><br><br>
+ * The Scene contains and manages all nodes of a particular world. It 
+ * is a representation off all nodes that will exist for the Instance. 
+ * Scene is mainly what we called a graph or a tree. Nodes are all 
+ * parents and/or child of another, except the Scene's world root and
+ * overlay root Nodes.<br><br>
  * 
- * In OvoiD.JS, a scene must be assigned to the global pipeline as active one in 
- * order to be treated by the Library mecanism.<br><br>
+ * <b>Creating Nodes</b><br><br>
+ * 
+ * The Scene provides a method to create all kind of Nodes. The 
+ * <c>Scene.newNode()</c> method should be always used to create 
+ * new nodes since it automaticaly registers the newly created node to 
+ * the proper Instance object.<br><br>
  * 
  * <blockcode>
- * var scene = new Ovoid.Scene("Hello");<br>
- * Ovoid.useScene(scene);<br>
+ * var light = Instance.Scene.newNode(Ovoid.LIGHT, "myLight");<br>
+ * var matfx = Instance.Scene.newNode(Ovoid.MATERIAL, "coolMaterial");<br>
  * </blockcode><br><br>
  * 
- * Once a scene is used as active, its graph (nodes) are updated, treated and
- * may be drawn each frames. Several scenes can be created and set as active at 
- * desired time until an other is set as active one. While a scene is not 
- * active, it is left without any change or update.<br><br>
+ * <b>Finding or removing Nodes</b><br><br>
+ * 
+ * The Scene provides several methods to find and or remove a Node or a 
+ * group of Nodes according some rules.<br><br>
+ * 
+ * To find and retrieve a particular Node you can use the 
+ * <c>Scene.findNode()</c> method to search a Node by its name or its 
+ * uid. To find and retrieve several Nodes you can use 
+ * <c>Scene.findMatches()</c> method to search Nodes by name or 
+ * type.<br><br>
+ * 
+ * To find and remove a particular Node you can use the 
+ * <c>Scene.remNode()</c> method to search and remove a Node 
+ * by its name or its uid, or by passing the Node object to remove as 
+ * argument. To find and remove several Nodes you can use 
+ * <c>Scene.remMatches()</c> method to search Nodes by name 
+ * or type.<br><br>
+ * 
+ * Finally The <c>Scene.clean()</c> method removes all unused 
+ * nodes, for example a Material with no references or a Mesh who is 
+ * never used as shape.<br><br>
  * 
  * <b>Active Camera</b><br><br>
  * 
- * Scene active camera is the one used as point of view to draw the scene. It 
- * must be in the scene graph.<br><br>
+ * As a Scene can contain several Camera object, the active camera is 
+ * the only one who is used to render the scene and compute data 
+ * relative to the current context. At the creation, the Scene create 
+ * a new default Camera object who is defined as the active one.<br><br>
+ * 
+ * You can retrieve the current active Camera Node via the 
+ * <c>Scene.activeCamera</c> member.<br><br>
+ * 
+ * If you created or imported a new Camera Node in the Scene, you can 
+ * set it as the active one using the 
+ * <c>Scene.useCamera()</c> method.<br><br>
  * 
  * <blockcode>
- * scene.create(Ovoid.CAMERA, "Camera1");<br>
- * scene.useCamera("Camera1");<br>
+ * Instance.Scene.newNode(Ovoid.CAMERA, "Camera1");<br>
+ * Instance.Scene.useCamera("Camera1");<br>
  * </blockcode><br><br>
- * 
- * If no active camera is declared, an built-in camera is used. A scene can have 
- * several cameras which can be set as active at desired time until an other is 
- * set as active one.
  * 
  * <b>Scene components</b><br><br>
  * 
- * The Scene object is roughly divided in three elements.<br><br>
+ * The Scene object is divided in three elements.<br><br>
  * 
  * <ul>
  * <li><b>The World Graph</b><br>
- * The world graph is the graph tree of transformable nodes who takes place in 
- * the 3D world. World graph have a generic Node object (<code>world</code>) as 
- * root who is the overall parent of all world nodes.</li>
+ * The world graph is the graph tree of transformable nodes who takes 
+ * place in the 3D world. World graph have a generic Node object 
+ * (<c>world</c>) as root who is the overall parent of all 
+ * world nodes.</li>
  * 
  * <li><b>The Overlay Graph</b><br>
- * The overlay graph is the graph tree of transformable nodes who take place in 
- * the 2D overlay screen space. Overlay graph have a generic Node object 
- * (<code>overlay</code>) as root who is the overall parent of all overlay 
- * nodes.</li>
+ * The overlay graph is the graph tree of transformable nodes who take 
+ * place in the 2D overlay screen space. Overlay graph have a generic 
+ * Node object (<c>overlay</c>) as root who is the overall parent 
+ * of all overlay nodes.</li>
  * 
  * <li><b>The Nodes Groups</b><br>
- * For access, performance and design issues, all nodes are stored in groups 
- * (Array) according to their type and / or typical usage.</li>
+ * For access and convenience, all nodes are stored in Array according 
+ * to their type and / or typical usage.</li>
  * </ul><br><br>
- * 
- * 
- * <b>Node search or removing</b><br><br>
- * 
- * The Scene object provides powerful functions to search and/or remove nodes 
- * without side effects. This is especially recommended for node removing which 
- * can produce many undesired side effets as broken links or 
- * lost-in-nowhere nodes.<br><br>
- * 
- * The <code>search</code> method allow to find a particular node by its exact 
- * name (if string) or uid (if number). The <code>searchMatches</code>  method 
- * allow to find all nodes which the name contains the string (if string) or 
- * the type include the bitmask (if bitmask).<br><br>
- * 
- * The <code>remove</code> method allow to remove a particular node directly or
- * by its exact name (if string) or uid (if number). The <code>removeMatches</code>  
- * method allow to removes all nodes which the name contains the string 
- * (if string) or the type include the bitmask (if bitmask).<br><br>
- * 
- * The <code>clean</code> method removes all unused nodes, for example a 
- * Material with no references or a Mesh who is never used as shape.<br><br>
  * 
  * @see Ovoid.Node
  * 
  * @param {string} name Name of the new scene.
+ * @param {object} i Instance object to register object to.
+ * 
  */
-Ovoid.Scene = function(name) {
+Ovoid.Scene = function(name, i) {
 
   /** scene name.
    * @type string */
   this.name = name;
   /** World root node.
    * @type Node */
-  this.world = new Ovoid.Node('world');
+  this.world = new Ovoid.Node('world', i);
   /** Overlays root node.
    * @type Node */
-  this.overlay = new Ovoid.Node('overlay');
+  this.overlay = new Ovoid.Node('overlay', i);
   /** Node list.
    * @type Node[] */
   this.node = new Array();
@@ -168,16 +173,30 @@ Ovoid.Scene = function(name) {
   this._uidn = 1000 + Math.floor(Math.random()*9999);
   /** Active camera.
    * @type Camera */
-  this.activeCamera = null;
+  this.activeCamera = new Ovoid.Camera("defaultView", i);
+  
+  /* Configuration de la camera par defaut */
+  this.camera.push(this.activeCamera);
+  this.transform.push(this.activeCamera);
+  this.activeCamera.setParent(this.world);
+  var p = i.opt_sceneDefaultViewPosition;
+  this.activeCamera.moveXyz(p[0],p[1],p[2],0,1); // Ovoid.WORLD,Ovoid.ABSOLUTE
+  var r = i.opt_sceneDefaultViewRotation;
+  this.activeCamera.rotateXyz(r[0],r[1],r[2],0,0); // Ovoid.WORLD, Ovoid.RELATIVE
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 
 
 /**
  * Create node.<br><br>
  * 
- * Creates a new node of the given type and name, then if specified, 
- * parent it to the given parent node. The node is automatically included
- * in the world or overlay graph and the suitable groups according to its type.
+ * Creates a new Node of the given type and name, then if specified, 
+ * parent it to the specified one. The Node is automatically included
+ * in the world or overlay graph and the suitable groups according to 
+ * its type.
  *
  * @param {int} type Node type to create. Can be one of the followin symbolic 
  * constants: <br>
@@ -209,20 +228,21 @@ Ovoid.Scene = function(name) {
  * the created node is parent to the world root or overlay root node according
  * to its type.
  *
- * @return {Node} The new created node.
+ * @return {Node} The newly created Node.
  * 
  * @see Ovoid.Node
  */
-Ovoid.Scene.prototype.create = function(type, name, parent) {
+Ovoid.Scene.prototype.newNode = function(type, name, parent) {
 
   /* verifie les collisions de nom */
-  if (this.search(name)) {
+  if (this.findNode(name)) {
 
-    Ovoid.log(2, 'Ovoid.Scene.create',"name collision '" + name + "'");
+    Ovoid._log(2,this._i, '::Scene.create', this.name+
+        ":: name collision '" + name + "'");
 
     var ct = 1; var basename = name;
 
-    while (this.search(name)) {
+    while (this.findNode(name)) {
       name = basename + '#' + ct.toString();
       ct++;
     }
@@ -233,98 +253,98 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
   switch (type)
   {
     case Ovoid.TRANSFORM:
-      node = new Ovoid.Transform(name);
+      node = new Ovoid.Transform(name, this._i);
       this.transform.push(node);
       dparent = this.world;
       break;
     case Ovoid.CAMERA:
-      node = new Ovoid.Camera(name);
+      node = new Ovoid.Camera(name, this._i);
       this.camera.push(node);
       this.transform.push(node);
       dparent = this.world;
       break;
     case Ovoid.LIGHT:
-      node = new Ovoid.Light(name);
+      node = new Ovoid.Light(name, this._i);
       this.light.push(node);
       this.transform.push(node);
       dparent = this.world;
       break;
     case Ovoid.BODY:
-      node = new Ovoid.Body(name);
+      node = new Ovoid.Body(name, this._i);
       this.transform.push(node);
       dparent = this.world;
       break;
     case Ovoid.JOINT:
-      node = new Ovoid.Joint(name);
+      node = new Ovoid.Joint(name, this._i);
       this.transform.push(node);
       dparent = this.world;
       break;
     case Ovoid.MESH:
-      node = new Ovoid.Mesh(name);
+      node = new Ovoid.Mesh(name, this._i);
       this.shape.push(node);
       break;
     case Ovoid.MATERIAL:
-      node = new Ovoid.Material(name);
+      node = new Ovoid.Material(name, this._i);
       this.material.push(node);
       break;
     case Ovoid.TEXTURE:
-      node = new Ovoid.Texture(name);
+      node = new Ovoid.Texture(name, this._i);
       this.texture.push(node);
       break;
     case Ovoid.ACTION:
-      node = new Ovoid.Action(name);
+      node = new Ovoid.Action(name, this._i);
       this.action.push(node);
       break;
     case Ovoid.PHYSICS:
-      node = new Ovoid.Physics(name);
+      node = new Ovoid.Physics(name, this._i);
       this.physics.push(node);
       break;
     case Ovoid.ANIMATION:
-      node = new Ovoid.Animation(name);
+      node = new Ovoid.Animation(name, this._i);
       this.animation.push(node);
       break;
     case Ovoid.AIM:
-      node = new Ovoid.Aim(name);
+      node = new Ovoid.Aim(name, this._i);
       this.aim.push(node);
       break;
     case Ovoid.EXPRESSION:
-      node = new Ovoid.Expression(name);
+      node = new Ovoid.Expression(name, this._i);
       this.expression.push(node);
       break;
     case Ovoid.TRACK:
-      node = new Ovoid.Track(name);
+      node = new Ovoid.Track(name, this._i);
       this.track.push(node);
       break;
     case Ovoid.SKIN:
-      node = new Ovoid.Skin(name);
+      node = new Ovoid.Skin(name, this._i);
       this.shape.push(node);
       break;
     case Ovoid.EMITTER:
-      node = new Ovoid.Emitter(name);
+      node = new Ovoid.Emitter(name, this._i);
       this.shape.push(node);
       break;
     case Ovoid.AUDIO:
-      node = new Ovoid.Audio(name);
+      node = new Ovoid.Audio(name, this._i);
       this.audio.push(node);
       break;
     case Ovoid.TEXT:
-      node = new Ovoid.Text(name);
+      node = new Ovoid.Text(name, this._i);
       this.layer.push(node);
       dparent = this.overlay;
       break;
     case Ovoid.LAYER:
-      node = new Ovoid.Layer(name);
+      node = new Ovoid.Layer(name, this._i);
       this.layer.push(node);
       dparent = this.overlay;
       break;
     case Ovoid.SOUND:
-      node = new Ovoid.Sound(name);
+      node = new Ovoid.Sound(name, this._i);
       this.sound.push(node);
       this.transform.push(node);
       dparent = this.world;
       break;
     default:
-      node = new Ovoid.Node(name);
+      node = new Ovoid.Node(name, this._i);
       break;
   }
 
@@ -355,21 +375,21 @@ Ovoid.Scene.prototype.create = function(type, name, parent) {
 /**
  * Remove node.<br><br>
  *
- * Removes the specified node from the scene. The node is automaticaly and 
- * carefully removed from groups and graph. If the node has a child tree, 
+ * Removes the specified Node from the scene. The Node is automaticaly and 
+ * carefully removed from groups and graph. If the Node has a child tree, 
  * the whole child tree is removed too.
  * 
- * @param {Node|String|int} item Node object, node's name or node's Uid to removes.
- * @param {Bool} rdep If possible, removes node's dependencies nodes.
+ * @param {Node|String|int} item Node object, Node's name or Node's Uid to removes.
+ * @param {Bool} rdep If possible, removes Node's dependencies nodes.
  * 
  * @see Ovoid.Node
  */
-Ovoid.Scene.prototype.remove = function(item, rdep) {
+Ovoid.Scene.prototype.remNode = function(item, rdep) {
 
   var i, rmgroup, node;
   
   if(typeof(item) == 'number' || typeof(item) == 'string') {
-    node = this.search(item);
+    node = this.findNode(item);
     if(!node) return;
   } else {
     node = item;
@@ -385,15 +405,18 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
   }
   for (i = 0; i < links.length; i++) {
     links[i].breakDepend(node);
-    Ovoid.log(2, "Ovoid.Scene.remove", "Break link " + links[i].name);
+    Ovoid._log(2,this._i, '::Scene.remove', this.name + 
+        ":: Break link " + links[i].name);
     /* Cas particulier pour les Track */
     if(links[i].type & Ovoid.TRACK) {
-        Ovoid.log(2, "Ovoid.Scene.remove", "Removing animation from " + links[i].name);
+        Ovoid._log(2,this._i, '::Scene.remove', this.name + 
+            ":: Removing animation from " + links[i].name);
         links[i].remAnimation(node);
     }
     /* Cas particulier pour les Skin */
     if(links[i].type & Ovoid.SKIN) {
-      Ovoid.log(2, "Ovoid.Scene.remove", "Removing joint from " + links[i].name);
+      Ovoid._log(2,this._i, '::Scene.remove', this.name + 
+          ":: Removing joint from " + links[i].name);
       links[i].unlinkJoint(node);
     }
   }
@@ -406,11 +429,13 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
   }
   for (i = 0; i < depends.length; i++) {
     node.breakDepend(depends[i]);
-    Ovoid.log(2, "Ovoid.Scene.remove", "Break Dependency " + depends[i].name);
+    Ovoid._log(2,this._i, '::Scene.remove', this.name +  
+        ":: Break Dependency " + depends[i].name);
     // Si il n'ya plus de link, ce noeud était le seul a dependre, on 
     // supprime donc le noeud qui ne sert plus à rien
     if(depends[i].link.length == 0 && rdep) {
-      Ovoid.log(2, "Ovoid.Scene.remove", "Removes unused dependency " + depends[i].name);
+      Ovoid._log(2,this._i, '::Scene.remove', this.name + 
+          ":: Removes unused dependency " + depends[i].name);
       related.push(depends[i]);
     }
   }
@@ -422,7 +447,7 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
   /* Operation recurcive pour tous les noeuds, afin de bien supprimer
    * tout l'arbre de dependence */
   for (i = 0; i < related.length; i++) {
-    this.remove(related[i], rdep);
+    this.remNode(related[i], rdep);
   }
   
   /* Cherche les link et dependences */
@@ -496,18 +521,63 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
 
   node.setParent(null); /* bye bye ! */
   
-  Ovoid.log(2, "Ovoid.Scene.remove", "Removing node " + node.name);
+  Ovoid._log(2,this._i, '::Scene.remove', this.name + 
+      ":: Removing node " + node.name);
+};
+
+
+/**
+ * Remove nodes by matches.<br><br>
+ * 
+ * Search and removes one or more Nodes whose name contains the 
+ * specified string, or Nodes whose type matches with the specified bitmask.
+ *
+ * @param {string|bitmask} item String that matches nodes's name or bitmask
+ * that matches Nodes's type.
+ * 
+ * @param {Bool} rdep If possible, removes Node's dependencies.
+ *
+ * @return {bool} True if at least one Node is removed, false otherwise.
+ */
+Ovoid.Scene.prototype.remMatches = function(item, rdep) {
+
+  var i = this.node.length;
+  var f = false;
+  
+  if(typeof(item) == 'string') {
+    
+    while (i--) {
+      if (this.node[i].name.indexOf(item, 0) != -1) {
+        this.remNode(this.node[i]);
+        f = true;
+      }
+    }
+  } else if (typeof(item) == 'number') {
+    
+    while (i--) {
+      if (this.node[i].type & item) {
+          this.remNode(this.node[i]);
+          f = true;
+      }
+    }
+  }
+  
+  return f;
 };
 
 
 /**
  * Insert node.<br><br>
  * 
- * Inserts a node who was not created using the <code>create</code> method of 
- * this instance.<br><br>
+ * Insert a Node who was not created using the 
+ * <c>Scene.newNode()</c> method of this Scene.<br><br>
  * 
- * The node is automatically included in the world or overlay graph and the 
- * suitable groups according to its type and the given options.
+ * You can use this method if you know exactly what you do since Nodes 
+ * should all be registered to the proper Instance object.<br><br>
+ * 
+ * The inserted Node is automatically included in the world or overlay 
+ * graph and the suitable groups according to its type and the given 
+ * options.
  *
  * @param {Node} node Node to insert.
  * 
@@ -526,7 +596,14 @@ Ovoid.Scene.prototype.remove = function(item, rdep) {
  * 
  * @see Ovoid.Node
  */
-Ovoid.Scene.prototype.insert = function(node, parent, preserveParent, preserveUid) {
+Ovoid.Scene.prototype.insNode = function(node, parent, preserveParent, preserveUid) {
+
+  /* On verifie que la node a la bonne Instance */
+  if (node._i != this._i) {
+      Ovoid._log(2,this._i, '::Scene.insNode', this.name + 
+      ":: node has wrong Instance '" + node.name + "'");
+      return false;
+  }
 
   /* on verifie que la node n'est pas déja
    * inséré */
@@ -534,13 +611,14 @@ Ovoid.Scene.prototype.insert = function(node, parent, preserveParent, preserveUi
     return false;
 
   /* verifie les collisions de nom */
-  if (this.search(node.name)) {
+  if (this.findNode(node.name)) {
 
-    Ovoid.log(2, 'Ovoid.Scene.insert',"name collision '" + name + "'");
+    Ovoid._log(2,this._i, '::Scene.insNode', this.name + 
+        ":: name collision '" + node.name + "'");
 
     var ct = 1; var basename = node.name;
 
-    while (this.search(node.name)) {
+    while (this.findNode(node.name)) {
       node.name = basename + '#' + ct.toString();
       ct++;
     }
@@ -632,51 +710,14 @@ Ovoid.Scene.prototype.insert = function(node, parent, preserveParent, preserveUi
 
 
 /**
- * Parent two nodes.<br><br>
+ * Insert Node's childs tree.<br><br>
  * 
- * Sets a node as parent to another.
+ * Insert the specified Node's childs tree into the Scene including the
+ * dependencies Nodes. The specified root Node is not inserted.
  *
- * @param {Node|string|int} child Node object, name or UID to be child.
- * @param {Node|string|int} parent Node object, name or UID to be parent.
- *
+ * @param {Node} tree Root node of the tree to be inserted.
  */
-Ovoid.Scene.prototype.parent = function(child, parent) {
-  
-  var nchild, nparent;
-  
-  if(typeof(child) === 'string' || typeof(child) === 'number') {
-    nchild = this.search(child);
-    if(!nchild) {
-       Ovoid.log(2, "Ovoid.Scene.parent", "No node matches with name or UID:" + child);
-       return;
-     }
-  } else {
-    nchild = child;
-  }
-  
-  if(typeof(parent) === 'string' || typeof(parent) === 'number') {
-    nparent = this.search(parent);
-    if(!nparent) {
-       Ovoid.log(2, "Ovoid.Scene.parent", "No node matches with name or UID:" + parent);
-       return;
-     }
-  } else {
-    nparent = parent;
-  }
-    
-  nchild.setParent(nparent);
-}
-
-
-/**
- * Transplant tree.<br><br>
- * 
- * Transplants the specified node's child tree into the scene including the
- * dependencies nodes. The specified root node is NOT included.
- *
- * @param {Node} tree Root node of the tree to be transplanted.
- */
-Ovoid.Scene.prototype.transplant = function(tree) {
+Ovoid.Scene.prototype.insTree = function(tree) {
 
   var defaultParent;
   var node;
@@ -691,7 +732,7 @@ Ovoid.Scene.prototype.transplant = function(tree) {
   {
     node = itdag.current;
     /* insert la node sans toucher au parent */
-    this.insert(node, null, true);
+    this.insNode(node, null, true);
 
     /* par cour des dépendants de la node */
     itdg.init(node);
@@ -699,7 +740,7 @@ Ovoid.Scene.prototype.transplant = function(tree) {
     {
       depd = itdg.current;
       /* insert la node sans toucher au parent */
-      this.insert(depd, null, true);
+      this.insNode(depd, null, true);
     }
   }
 
@@ -726,67 +767,54 @@ Ovoid.Scene.prototype.transplant = function(tree) {
 
 
 /**
- * Set active camera.<br><br>
+ * Parent two nodes.<br><br>
  * 
- * Sets the specified Camera node as active camera. It must be 
- * in the scene.
+ * Sets a Node as parent to another.
  *
- * @param {Camera|string|int} node Camera object, name or UID to be active.
+ * @param {Node|string|int} child Node object, name or UID to be child.
+ * @param {Node|string|int} parent Node object, name or UID to be parent.
  *
  */
-Ovoid.Scene.prototype.useCamera = function(camera) {
+Ovoid.Scene.prototype.parentNode = function(child, parent) {
   
-  if(typeof(camera) === 'object') {
-    if (camera != null) {
-      if (this.ownsNode(camera))
-        this.activeCamera = camera;
-    } else {
-      this.activeCamera = null;
-    }
+  var nchild, nparent;
+  
+  if(typeof(child) === 'string' || typeof(child) === 'number') {
+    nchild = this.findNode(child);
+    if(!nchild) {
+       Ovoid._log(2,this._i, '::Scene.parent', this.name + 
+          ":: No node matches with name or UID:" + child);
+       return;
+     }
   } else {
-    this.activeCamera = this.search(camera);
+    nchild = child;
   }
   
-  if(this.activeCamera) {
-    this.activeCamera.setView(Ovoid.Frame.size.v[0],
-        Ovoid.Frame.size.v[1]);
-    this.activeCamera.cachTransform();
-    this.activeCamera.cachCamera();
+  if(typeof(parent) === 'string' || typeof(parent) === 'number') {
+    nparent = this.findNode(parent);
+    if(!nparent) {
+       Ovoid._log(2,this._i, '::Scene.parent', this.name + 
+          ":: No node matches with name or UID:" + parent);
+       return;
+     }
+  } else {
+    nparent = parent;
   }
-  
-};
-
-
-/**
- * Check whether has node.<br><br>
- * 
- * Checks whether the scene owns the specified node.
- *
- * @param {Object} node Node to search.
- *
- * @return {bool} True if the node is found, false otherwise.
- */
-Ovoid.Scene.prototype.ownsNode = function(node) {
-
-  var i = this.node.length;
-  while (i--)
-    if (this.node[i] === node)
-      return true;
-
-  return false;
-};
+    
+  nchild.setParent(nparent);
+}
 
 
 /**
  * Search node.<br><br>
  * 
- * Search and returns the node with the specified name or UID.
+ * Search and returns the Node with the specified name or UID.
  *
- * @param {string|int} item Name or UID of the Node to search.
+ * @param {string|int} item Name or UID of the Node to find.
  *
- * @return {Node} The found node, or null if none is found.
+ * @return {Node} The found Node, or null if none is found.
  */
-Ovoid.Scene.prototype.search = function(item) {
+Ovoid.Scene.prototype.findNode = function(item) {
 
   var i = this.node.length;
 
@@ -809,14 +837,15 @@ Ovoid.Scene.prototype.search = function(item) {
  * Search nodes by matches.<br><br>
  * 
  * Search and returns one or more nodes whose name contains the 
- * specified string, or nodes whose type matches with the specified bitmask.
+ * specified string, or nodes whose type matches with the specified 
+ * bitmask.
  *
- * @param {string|bitmask} item String that matches nodes's name or bitmask
- * that matches nodes's type.
+ * @param {string|bitmask} item String that matches Nodes's name or 
+ * bitmask that matches Nodes's type.
  *
- * @return {Node[]} Array of found nodes, empty Array if none is found.
+ * @return {Node[]} Array of found Nodes, empty Array if none is found.
  */
-Ovoid.Scene.prototype.searchMatches = function(item) {
+Ovoid.Scene.prototype.findMatches = function(item) {
 
   var list = new Array();
   var i = this.node.length;
@@ -839,53 +868,66 @@ Ovoid.Scene.prototype.searchMatches = function(item) {
 
 
 /**
- * Remove nodes by matches.<br><br>
+ * Check whether has node.<br><br>
  * 
- * Search and removes one or more nodes whose name contains the 
- * specified string, or nodes whose type matches with the specified bitmask.
+ * Checks whether the Scene owns the specified node.
  *
- * @param {string|bitmask} item String that matches nodes's name or bitmask
- * that matches nodes's type.
- * 
- * @param {Bool} rdep If possible, removes node's dependencies.
+ * @param {Object} node Node to test.
  *
- * @return {bool} True if a node is removed, false otherwise.
+ * @return {bool} True if the node is found, false otherwise.
  */
-Ovoid.Scene.prototype.removeMatches = function(item, rdep) {
+Ovoid.Scene.prototype.ownsNode = function(node) {
 
   var i = this.node.length;
-  var f = false;
+  while (i--)
+    if (this.node[i] === node)
+      return true;
+
+  return false;
+};
+
+
+/**
+ * Set active camera.<br><br>
+ * 
+ * Sets the specified Camera node as active camera. It must be 
+ * in the Scene.
+ *
+ * @param {Camera|string|int} node Camera object, name or UID to be active.
+ *
+ */
+Ovoid.Scene.prototype.useCamera = function(camera) {
   
-  if(typeof(item) == 'string') {
-    
-    while (i--) {
-      if (this.node[i].name.indexOf(item, 0) != -1) {
-        this.remove(this.node[i]);
-        f = true;
-      }
+  if(typeof(camera) === 'object') {
+    if (camera != null) {
+      if (this.ownsNode(camera))
+        this.activeCamera = camera;
+    } else {
+      this.activeCamera = null;
     }
-  } else if (typeof(item) == 'number') {
-    
-    while (i--) {
-      if (this.node[i].type & item) {
-          this.remove(this.node[i]);
-          f = true;
-      }
-    }
+  } else {
+    this.activeCamera = this.findNode(camera);
   }
   
-  return f;
+  if(this.activeCamera) {
+    this.activeCamera.setView(this._i.Frame.size.v[0],
+        this._i.Frame.size.v[1]);
+    this.activeCamera.cachTransform();
+    this.activeCamera.cachCamera();
+  }
+  
 };
 
 
 /**
  * Clean the scene.<br><br>
  * 
- * Search and removes all unlinked/uninstancied nodes of this current scene.
+ * Find and removes all unlinked and uninstancied Nodes of the Scene.
  */
 Ovoid.Scene.prototype.clean = function() {
   
-  Ovoid.log(3, "Ovoid.Scene.clean", "start scene cleaning");
+  Ovoid._log(3,this._i, '::Scene.clean', this.name + 
+      ":: start scene cleaning");
   var i;
   /* Since arrays indexing will change while removing nodes, we create a local one */
   var array = new Array();
@@ -909,17 +951,18 @@ Ovoid.Scene.prototype.clean = function() {
     /* node has some links ? */
     if(!array[i].link.length) {
       /* no, then we remove it */
-      this.remove(array[i], true);
+      this.remNode(array[i], true);
     }
   }
-  Ovoid.log(3, "Ovoid.Scene.clean", "scene cleaning finished");
+  Ovoid._log(3,this._i, '::Scene.clean', this.name + 
+      ":: scene cleaning finished");
 };
 
 
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -935,3 +978,4 @@ Ovoid.Scene.prototype.toJSON = function() {
   o['nl'] = this.node;
   return o;
 };
+

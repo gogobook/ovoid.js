@@ -20,12 +20,12 @@
 
 
 /**
- * Physics node constructor.
+ * Constructor method.
  * 
  * @class Physics node object.
  * <br>
  * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.
  * <br>
  * <br>
  * The Physics node implements an abstract object subjected to the laws of 
@@ -74,20 +74,20 @@
  * the physics simulation includes a "sleep" mechanism who stop the simulation 
  * of  the Physics node until something awake it. The "sleep" mechanism uses a 
  * quantity of motion to evaluate when the simulation should stop. The quantiy 
- * of motion threshold is defined by the <code>sleeping</code> attribute 
+ * of motion threshold is defined by the <c>sleeping</c> attribute 
  * (default = 1.0).<br><br>
  * 
  * <b>Contact/Collision handling</b><br><br>
  * 
  * For interactivity purpose, the physics engine is designed to make able to 
- * handle rigid body collision events. The <code>oncontact</code> trigger 
+ * handle rigid body collision events. The <c>oncontact</c> trigger 
  * function member is called each time a collision of the Physics node with 
  * another one happen. So you can override this function to handle the collision 
  * and create some interactive effects. The function should take three argument 
  * which are the other Physics node involved in the contact, the contact point 
  * in world coordinates, and the contact normal in world coordinates. If the 
  * other involved Physics node of the collision is a RIGID_LANDSCAPE model, 
- * the first argument will be <code>null</code>.<br><br>
+ * the first argument will be <c>null</c>.<br><br>
  * 
  * <blockcode>
  * var shoot = function(node, point, normal) {<br>
@@ -102,8 +102,9 @@
  * @extends Ovoid.Constraint
  *
  * @param {string} name Name of the new node.
+ * @param {object} i Instance object to register object to.
 */
-Ovoid.Physics = function(name) {
+Ovoid.Physics = function(name, i) {
 
   Ovoid.Constraint.call(this);
   /** Node type.
@@ -161,7 +162,7 @@ Ovoid.Physics = function(name) {
    * the passed parameter as node will be null.<br><br>
    * 
    * <blockcode>
-   * physics.oncontact = function (node, point, normal) { <codecomment>// do something</codecomment> };<br>
+   * physics.oncontact = function (node, point, normal) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field
    * @type Function
@@ -187,6 +188,10 @@ Ovoid.Physics = function(name) {
   
   /** Motion factor. */
   this._motion = Ovoid.PHYSICS_MOTION_EPSILON * 10.0;
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 
 };
 Ovoid.Physics.prototype = new Ovoid.Constraint;
@@ -446,7 +451,7 @@ Ovoid.Physics.prototype.getMotion = function() {
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -539,9 +544,9 @@ Ovoid.Physics.prototype.cachPhysics = function() {
           RI[8] * this.target[0].worldMatrix.m[10];
           
       /* applique la gravité */
-      this.linearInfluence.v[0] += mass * Ovoid.opt_gravity[0];
-      this.linearInfluence.v[1] += mass * Ovoid.opt_gravity[1];
-      this.linearInfluence.v[2] += mass * Ovoid.opt_gravity[2];
+      this.linearInfluence.v[0] += mass * this._i.opt_gravity[0];
+      this.linearInfluence.v[1] += mass * this._i.opt_gravity[1];
+      this.linearInfluence.v[2] += mass * this._i.opt_gravity[2];
       this.unCach(Ovoid.CACH_INFLUENCES);
     }
     
@@ -551,8 +556,8 @@ Ovoid.Physics.prototype.cachPhysics = function() {
       this.linearInfluence.scaleBy(this.imass);
       this.torqueInfluence.transform3(this.itensor);
       /* par le delta temporel */
-      this.linearInfluence.scaleBy(Ovoid.Timer.quantum);
-      this.torqueInfluence.scaleBy(Ovoid.Timer.quantum);
+      this.linearInfluence.scaleBy(this._i.Timer.quantum);
+      this.torqueInfluence.scaleBy(this._i.Timer.quantum);
       /* ajoute de la velocité */
       this.linearVelocity.addBy(this.linearInfluence);
       this.angularVelocity.addBy(this.torqueInfluence);
@@ -568,23 +573,23 @@ Ovoid.Physics.prototype.cachPhysics = function() {
     }
     
     /* attenuation */
-    this.linearVelocity.scaleBy(Math.pow(this.linearDamping, Ovoid.Timer.quantum));
-    this.angularVelocity.scaleBy(Math.pow(this.angularDamping, Ovoid.Timer.quantum));
+    this.linearVelocity.scaleBy(Math.pow(this.linearDamping, this._i.Timer.quantum));
+    this.angularVelocity.scaleBy(Math.pow(this.angularDamping, this._i.Timer.quantum));
     
     /* ajoute a la transformation */
     this._scaledLinear.copy(this.linearVelocity);
-    this._scaledLinear.scaleBy(Ovoid.Timer.quantum);
+    this._scaledLinear.scaleBy(this._i.Timer.quantum);
     this.target[0].translation.addBy(this._scaledLinear);
 
     /* ajoute la rotation */
     this._scaledTorque.copy(this.angularVelocity);
-    this._scaledTorque.scaleBy(Ovoid.Timer.quantum);
+    this._scaledTorque.scaleBy(this._i.Timer.quantum);
     this.target[0].rotation.vectorRotateBy(this._scaledTorque);
     this.target[0].rotation.normalize();
     
     /* Mise en someil du node physique si ses mouvements sont 
      * stables depuis un certain temps */;
-    var d = Math.pow(0.1, Ovoid.Timer.quantum);
+    var d = Math.pow(0.1, this._i.Timer.quantum);
     this._motion = d*this._motion + (1-d)*(this.linearVelocity.size()+this.angularVelocity.size());
     
     if (this._motion < this.sleeping) {
@@ -602,7 +607,7 @@ Ovoid.Physics.prototype.cachPhysics = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -642,7 +647,7 @@ Ovoid.Physics.prototype.toJSON = function() {
   o['dm'] = this.damping;
   o['uf'] = this.useFriction;
   o['re'] = this.restitution;
-  o['oc'] = String(this.oncontact);
+  o['oc'] = Ovoid.compact(this.oncontact);
   
   return o;
 };

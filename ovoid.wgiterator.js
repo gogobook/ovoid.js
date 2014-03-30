@@ -19,7 +19,7 @@
 
 
 /**
- * Create new world graph iterator.
+ * Constructor method.
  *
  * @class World Graph depth-first iterator.<br><br>
  *
@@ -41,9 +41,9 @@
  * }<br>
  * </blockcode><br><br>
  * 
- * The Node class implement this relationship through its <code>parent</code> and 
- * <code>child</code> member fields, and the relationship is created using the 
- * <code>setParent</code> method. One node can only have one parent, and an 
+ * The Node class implement this relationship through its <c>parent</c> and 
+ * <c>child</c> member fields, and the relationship is created using the 
+ * <c>setParent</c> method. One node can only have one parent, and an 
  * limitless amount of children.<br><br>
  * 
  * @see Ovoid.Node

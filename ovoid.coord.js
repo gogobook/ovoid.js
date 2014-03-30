@@ -20,7 +20,7 @@
 
 
 /**
- * Create a Coord object.
+ * Constructor method.
  *
  * @class Coord object.<br><br>
  * 
@@ -175,21 +175,6 @@ Ovoid.Coord.prototype.transform = function(mat4) {
   this.v[0] = xx;
   this.v[1] = yy;
   this.v[2] = zz;
-};
-
-
-/**
- * Create a new array of coord objects.
- *
- * @param {int} count Size of the new array.
- *
- * @return {Array} Array of coord objects.
- */
-Ovoid.Coord.newArray = function(count) {
-
-  var array = new Array;
-  while (count--) array.push(new Ovoid.Coord());
-  return array;
 };
 
 

@@ -19,60 +19,60 @@
 
 
 /**
- * Timer global static class.
+ * Constructor method.
  *
- * @namespace Timer global class.<br><br>
+ * @class Timer Module Class.<br><br>
  * 
- * The Timer class implements a global time/timing manager. It is a global 
- * static (namespace) class. The Timer class provides the common clock and times 
- * parameter calculated over each frame's refresh.<br><br>
+ * The Timer class implements a global time/timing manager. This is what
+ * is called a Module class because used as core module for the 
+ * Ovoid.Instance class. A Module class is a part of Instance class and 
+ * can be used only within the Instance class.<br><br>
+ * 
+ * The Timer class is used to provide a global time reference and tools 
+ * for the whole Instance.<br><br>
  * 
  * <blockcode>
- * <codecomment>// Get the elapsed time since the last frame in seconds</codecomment>
- * var qt = Ovoid.Timer.quantum;<br>
- * <codecomment>// Get current framerate</codecomment>
- * var fps = Ovoid.Timer.framerate;<br>
- * <codecomment>// Get current global clock</codecomment>
- * var clock = Ovoid.Timer.clock;<br>
+ * <cc>// Get the elapsed time since the last frame in seconds</cc>
+ * var qt = Instance.Timer.quantum;<br>
+ * <cc>// Get current framerate</cc>
+ * var fps = Instance.Timer.framerate;<br>
+ * <cc>// Get current global clock</cc>
+ * var clock = Instance.Timer.clock;<br>
  * </blockcode>
+ * 
+ * @param {object} i Instance object to register object to.
+ * 
  */
-Ovoid.Timer = {};
+Ovoid.Timer = function(i) {
+
+  /** Instance parent */
+  this._i = i;
 
 
-/** Current time. */
-Ovoid.Timer.clock = 0;
+  /** Current time. */
+  this.clock = 0;
 
 
-/** Time delta since the last update. */
-Ovoid.Timer.quantum = 0;
+  /** Time delta since the last update. */
+  this.quantum = 0;
+  
 
-/** Average pre-seconds timer's update. */
-Ovoid.Timer.framerate = 0;
+  /** Average pre-seconds timer's update. */
+  this.framerate = 0;
 
+  
+  /** Time counter array */
+  this._ttime = [0.0, 0.0];
+  
+  
+  /** Frame rate clock */
+  this._fclock = 0.0;
+  
+  
+  /** Frame rate counter */
+  this._fcount = 0;
 
-/** Current time. */
-Ovoid.Timer._timecurr = 0;
-
-
-/** Time of the last update. */
-Ovoid.Timer._timelast = 0;
-
-
-/** Time of the last update. */
-Ovoid.Timer._timeq = 0;
-
-
-/** Frame counter for framerate. */
-Ovoid.Timer._fcount = 0;
-
-
-/** Time cumulator for framerate. */
-Ovoid.Timer._fcumul = 0.0;
-
-
-/** Level of performance fps counter. */
-Ovoid.Timer._lopfps = 0;
-
+};
 
 /**
  * Timer initialization.<br><br>
@@ -84,10 +84,10 @@ Ovoid.Timer._lopfps = 0;
  *
  * @return {bool} True if initialization succeeds, false otherwise.
  */
-Ovoid.Timer.init = function() {
+Ovoid.Timer.prototype._init = function() {
 
-  Ovoid.log(3, 'Ovoid.Timer', 'initialization');
-  Ovoid.Timer._timecurr = Ovoid.Timer._timelast = new Date().getTime();
+  this._reset();
+  Ovoid._log(3, this._i, '.Timer._init', ' done');
   return true;
 };
 
@@ -99,49 +99,34 @@ Ovoid.Timer.init = function() {
  * frame during the library main loop and is dedicated to refresh internal data. 
  * It shouldn't be called manually.
  */
-Ovoid.Timer.update = function() {
+Ovoid.Timer.prototype._update = function() {
 
-  Ovoid.Timer.clock = new Date().getTime();
+  this._ttime[0] = new Date().getTime();
+  this.quantum = (this._ttime[0] - this._ttime[1]) * 0.001;
+  this._ttime[1] = this._ttime[0];
+  this.clock += this.quantum;
   
-  Ovoid.Timer._timecurr = Ovoid.Timer.clock;
-  Ovoid.Timer._timeq = (Ovoid.Timer._timecurr - Ovoid.Timer._timelast) * 0.001;
-  Ovoid.Timer._timelast = Ovoid.Timer.clock;
-
-  if(Ovoid.Timer._timeq > 0.5) Ovoid.Timer._timeq = 0.01;
-  
-  Ovoid.Timer._fcount++;
-  Ovoid.Timer._fcumul+=Ovoid.Timer._timeq;
-  
-  if(Ovoid.Timer._fcumul > 0.5) {
-    Ovoid.Timer.framerate = Math.floor(Ovoid.Timer._fcount / Ovoid.Timer._fcumul);
-    Ovoid.Timer.quantum = Ovoid.Timer._fcumul / Ovoid.Timer._fcount;
-    Ovoid.Timer._lopfps = Ovoid.Timer.framerate;
-    Ovoid.Timer._fcount = 0;
-    Ovoid.Timer._fcumul = 0.0;
+  /* calcul le framerate tous les 0.1 secondes */
+  this._fclock+=this.quantum;
+  if(this._fclock > 0.1) {
+    this.framerate = Math.floor(this._fcount / this._fclock);
+    this._fcount = 0;
+    this._fclock = 0.0;
   }
+  this._fcount++;
 };
 
 
 /**
- * Wait a moment.<br><br>
+ * Timer reset.<br><br>
  * 
- * Waits according the the specified duration. This freezes the global 
- * execution.
- *
- * @param {float} s Duration in seconds.
+ * Reset timer.
  */
-Ovoid.Timer.wait = function(s) {
+Ovoid.Timer.prototype._reset = function() {
 
-  var a = 0.0;
-  var t = new Date().getTime();
-  var l = t;
-
-  while (a < s) {
-    t = new Date().getTime();
-    a += (t - l) * 0.001;
-    l = t;
-  }
+  this._ttime[0] = this._ttime[1] = new Date().getTime();
+  this.quantum = 0.010;
+  this.clock = 0;
 };
-
 
 

@@ -20,7 +20,7 @@
 
 
 /**
- * Create a new hermite curve object.
+ * Constructor method.
  *
  * @class Hermite Interpolated curve object.<br><br>
  * 

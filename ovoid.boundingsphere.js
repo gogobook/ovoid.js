@@ -20,7 +20,7 @@
 
 
 /**
- * Bounding sphere object constructor.
+ * Constructor method.
  *
  * @class Bounding sphere object.<br><br>
  * 

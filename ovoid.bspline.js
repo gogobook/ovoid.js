@@ -20,7 +20,7 @@
 
 
 /**
- * Create a new bezier curve object.
+ * Constructor method.
  *
  * @class Bezier Interpolated curve object.<br><br>
  * 

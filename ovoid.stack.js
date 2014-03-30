@@ -20,7 +20,7 @@
 
 
 /**
- * Create a Stack object.
+ * Constructor method.
  *
  * @class Stack object.
  * 

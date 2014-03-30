@@ -20,7 +20,7 @@
 
 
 /**
- * Node object constructor.
+ * Constructor method.
  * 
  * @class Generic Node object.<br><br>
  * 
@@ -47,9 +47,9 @@
  * node0.setParent(node1);<br>
  * </blockcode><br><br>
  * 
- * The Node class implement this relationship through its <code>parent</code> and 
- * <code>child</code> member fields, and the relationship is created using the 
- * <code>setParent</code> method. One node can only have one parent, and an 
+ * The Node class implement this relationship through its <c>parent</c> and 
+ * <c>child</c> member fields, and the relationship is created using the 
+ * <c>setParent</c> method. One node can only have one parent, and an 
  * limitless amount of children.<br><br>
  * 
  * <b>Nodes dependency graph</b><br><br>
@@ -65,9 +65,9 @@
  * node0.makeDepend(node1);<br>
  * </blockcode><br><br>
  * 
- * The Node class implement this relationship through its <code>depend</code> and 
- * <code>link</code> member fields, and the relationship is created or 
- * destroyed using the <code>makeDepend</code> and <code>breakDepend</code> 
+ * The Node class implement this relationship through its <c>depend</c> and 
+ * <c>link</c> member fields, and the relationship is created or 
+ * destroyed using the <c>makeDepend</c> and <c>breakDepend</c> 
  * methods. One node can have an limitless amount of linked and depend nodes.<br><br> 
  * 
  * @see Ovoid.Scene
@@ -75,8 +75,9 @@
  * @see Ovoid.DgIterator
  * 
  * @param {string} name Name of the new node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Node = function(name) {
+Ovoid.Node = function(name, i) {
 
   /** Node type.
    * @type bitmask */
@@ -115,6 +116,10 @@ Ovoid.Node = function(name) {
   /** Node bounding sphere.
    * @type Boundingsphere */
   this.boundingSphere = new Ovoid.Boundingsphere();
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 
 
@@ -257,7 +262,7 @@ Ovoid.Node.prototype.setTreeVisible = function(v) {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

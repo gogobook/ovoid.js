@@ -20,11 +20,11 @@
 
 
 /**
- * Camera node constructor.
+ * Constructor method.
  * 
  * @class Camera node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Camera node implements a perspective or orthographic projection frustum 
  * located and oriented in space to draw a scene from a specific point a view.
@@ -32,15 +32,16 @@
  * means it can be moved, rotated, scaled...<br><br>
  * 
  * <blockcode>
- * camera = scene.create(Ovoid.CAMERA, "MyEye");<br>
- * scene.useCamera(camera);<br>
+ * camera = myOvoid.Scene.newNode(Ovoid.CAMERA, "MyEye");<br>
+ * myOvoid.useCamera(camera);<br>
  * </blockcode>
  * 
  * @extends Ovoid.Transform
  *
  * @param {string} name Name of the new node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Camera = function(name) {
+Ovoid.Camera = function(name, i) {
 
   Ovoid.Transform.call(this);
   /** Node type */
@@ -85,7 +86,11 @@ Ovoid.Camera = function(name) {
   /** Frustum plans list */
   this._fstum = Ovoid.Point.newArray(6);
 
-  this.unCach(Ovoid.CACH_VIEWPROJ);
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
+  
+  this.setView(i.Frame.size.v[0], i.Frame.size.v[1]);
 };
 Ovoid.Camera.prototype = new Ovoid.Transform;
 Ovoid.Camera.prototype.constructor = Ovoid.Camera;
@@ -102,7 +107,8 @@ Ovoid.Camera.prototype.constructor = Ovoid.Camera;
  */
 Ovoid.Camera.prototype.setView = function(width, height) {
 
-  this.viewX = width; this.viewY = height;
+  this.viewX = width; 
+  this.viewY = height;
   this.aspect = width / height;
   this.unCach(Ovoid.CACH_VIEWPROJ);
 };
@@ -145,24 +151,26 @@ Ovoid.Camera.prototype.setCliping = function(n, f) {
  * Checks whether an Transform node is within the view frustum planes of this 
  * instance.
  * 
- * @param {Transform} transform Transform node to check.
+ * @param {Transform} t Transform node to check.
  *
  * @return {bool} True if this instance watches the specified node, false 
  * otherwise.
  * 
  * @see Ovoid.Transform
  */
-Ovoid.Camera.prototype.isWatching = function(transform) {
+Ovoid.Camera.prototype.isWatching = function(t) {
 
-  if(transform.worldPosition.dist(this.worldPosition) < transform.boundingSphere.radius) 
+  t.distFromEye = t.worldPosition.dist(this.worldPosition) - t.boundingSphere.radius;
+  
+  if(t.distFromEye <= 0.0) 
     return true;
 
   var i = 5; // On ignore near et far clip plane
   while (i--) {
-    if ( (this._fstum[i].v[0] * transform.boundingSphere.worldCenter.v[0] + 
-        this._fstum[i].v[1] * transform.boundingSphere.worldCenter.v[1] + 
-        this._fstum[i].v[2] * transform.boundingSphere.worldCenter.v[2] + 
-        this._fstum[i].v[3]) <= -transform.boundingSphere.radius )
+    if ( (this._fstum[i].v[0] * t.boundingSphere.worldCenter.v[0] + 
+        this._fstum[i].v[1] * t.boundingSphere.worldCenter.v[1] + 
+        this._fstum[i].v[2] * t.boundingSphere.worldCenter.v[2] + 
+        this._fstum[i].v[3]) <= -t.boundingSphere.radius )
     {
       return false;
     }
@@ -239,7 +247,7 @@ Ovoid.Camera.prototype.unproject = function(x, y, z, out) {
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -267,7 +275,7 @@ Ovoid.Camera.prototype.cachCamera = function() {
     /* si inferieur  ou egal à zero, la projection est calculé différament avec 
      * un far_clip infini. c'est utile pour le rendu stencil des ombres 
      * volumétriques */
-    if(Ovoid.Drawer.opt_shadowCasting) {
+    if(this._i.opt_shadowCasting) {
       var zfact = 1.0 / (this.clipNear - -1.0);
       this.perspective.m[10] = 0.0;
       this.perspective.m[14] = (2.0 * -1.0 * this.clipNear) * zfact;
@@ -379,7 +387,7 @@ Ovoid.Camera.prototype.cachCamera = function() {
     this.eyeview.multOf(this.lookat, this.perspective);
 
     /* extraction des plans du frustum */
-    if(Ovoid.Queuer.opt_viewcull) {
+    if(this._i.opt_viewcull) {
       var p = 0;
       for (i = 0; i < 3; i++)
       {
@@ -419,7 +427,7 @@ Ovoid.Camera.prototype.cachCamera = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

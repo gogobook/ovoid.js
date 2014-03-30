@@ -20,11 +20,11 @@
 
 
 /** 
- * Action node constructor.
+ * Constructor method.
  * 
  * @class Action node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Action node is an interaction trigger. Action node is used to assign 
  * custom functions to some predefined events which occure on the target node. 
@@ -35,10 +35,10 @@
  * 
  * <blockcode>
  * function catastrophe(node) {<br>
- * &nbsp;&nbsp;<codecomment>// Do some funny stuff</codecomment><br>
+ * &nbsp;&nbsp;<cc>// Do some funny stuff</cc><br>
  * };<br>
  * <br>
- * var action = scene.create(Ovoid.ACTION, "myAction");<br>
+ * var action = myOvoid.Scene.newNode(Ovoid.ACTION, "myAction");<br>
  * action.onLmbDn = catastrophe;<br>
  * action.linkNode(mybox);<br>
  * </blockcode><br><br>
@@ -68,20 +68,20 @@
  * 
  * <blockcode>
  * function grabnode(node) {<br>
- * &nbsp;&nbsp;Ovoid.grabNode(node)<br>
+ * &nbsp;&nbsp;myOvoid.grabNode(node)<br>
  * };<br>
  * <br>
  * function rotate(node) {<br>
- * &nbsp;&nbsp;<codecomment>// Ovoid.Input.intUp is an array of "key-up" input signals</codecomment><br>
- * &nbsp;&nbsp;if (Ovoid.Input.intUp[Ovoid.MB_LEFT]) {<br>
- * &nbsp;&nbsp;&nbsp;&nbsp;Ovoid.grabRelease();<br>
+ * &nbsp;&nbsp;<cc>// myOvoid.Input.intUp is an array of "key-up" input signals</cc><br>
+ * &nbsp;&nbsp;if (myOvoid.Input.intUp[Ovoid.MB_LEFT]) {<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;myOvoid.grabRelease();<br>
  * &nbsp;&nbsp;} else {<br>
- * &nbsp;&nbsp;&nbsp;&nbsp;<codecomment>// Ovoid.Input.mouseVelocity is a Vector object</codecomment><br>
- * &nbsp;&nbsp;&nbsp;&nbsp;node.rotate(Ovoid.Input.mouseVelocity);<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;<cc>// myOvoid.Input.mouseVelocity is a Vector object</cc><br>
+ * &nbsp;&nbsp;&nbsp;&nbsp;node.rotate(myOvoid.Input.mouseVelocity);<br>
  * &nbsp;&nbsp;}<br>
  * };<br>
  * <br>
- * var action = scene.create(Ovoid.ACTION, "myAction");<br>
+ * var action = myOvoid.Scene.newNode(Ovoid.ACTION, "myAction");<br>
  * action.setTrigger(Ovoid.MOUSE_OVER_LEFT_DOWN, grabnode);<br>
  * action.setTrigger(Ovoid.ON_GRABBED, rotate);<br>
  * action.linkNode(mybox);<br>
@@ -97,7 +97,7 @@
  * 
  * The Action node can also handle node intersection related events. 
  * Intersection events are based on Body's bounding spheres. If a two 
- * Body node are set as <code>intersectable</code>, all intersection between 
+ * Body node are set as <c>intersectable</c>, all intersection between 
  * them will generate events.<br><br>
  * 
  * Action node can handle three kind of intersection events, intersect, enter 
@@ -117,10 +117,10 @@
  * &nbsp;&nbsp;alert(node.name "now enter in" enternode.name);
  * }<br>
  * <br>
- * var action = scene.create(Ovoid.ACTION, "myAction");<br>
- * <codecomment>// Trigger function when enter mybox2</codecomment><br>
+ * var action = myOvoid.Scene.newNode(Ovoid.ACTION, "myAction");<br>
+ * <cc>// Trigger function when enter mybox2</cc><br>
  * action.setTrigger(Ovoid.ON_INTERSECT_ENTER, enter, mybox2);<br>
- * <codecomment>// Link this action to mybox1</codecomment><br>
+ * <cc>// Link this action to mybox1</cc><br>
  * action.linkNode(mybox1);<br>
  * </blockcode>
  * 
@@ -134,15 +134,15 @@
  * &nbsp;&nbsp;alert(enternode.name "now enter in" node.name);
  * }<br>
  * <br>
- * var action = scene.create(Ovoid.ACTION, "myAction");<br>
- * <codecomment>// Trigger function when any Body enter (third argument is null)</codecomment><br>
+ * var action = myOvoid.Scene.newNode(Ovoid.ACTION, "myAction");<br>
+ * <cc>// Trigger function when any Body enter (third argument is null)</cc><br>
  * action.setTrigger(Ovoid.ON_INTERSECT_ENTER, enter);<br>
- * <codecomment>// Link this action to mybox1</codecomment><br>
+ * <cc>// Link this action to mybox1</cc><br>
  * action.linkNode(mybox1);<br>
  * </blockcode>
  * 
  * In the above example, the event will be triggered once mybox1 and any 
- * Body will intersect. <i>The body must be set as <code>intersectable</code></i><br><br>
+ * Body will intersect. <i>The body must be set as <c>intersectable</c></i><br><br>
  * 
  * <b>Handled envets</b><br><br>
  * <ul>
@@ -214,8 +214,9 @@
  * @extends Ovoid.Node
  * 
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Action = function(name) {
+Ovoid.Action = function(name, i) {
 
   Ovoid.Node.call(this);
   /** Node type
@@ -231,7 +232,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onEnter = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onEnter = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -243,7 +244,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onLeave = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onLeave = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -255,7 +256,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onOver = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onOver = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -268,7 +269,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onLmbDn = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onLmbDn = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -281,7 +282,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onLmbUp = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onLmbUp = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -294,7 +295,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onLmbHl = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onLmbHl = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -307,7 +308,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onMmbDn = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onMmbDn = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -320,7 +321,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onMmbUp = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onMmbUp = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -333,7 +334,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onMmbHl = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onMmbHl = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -346,7 +347,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onRmbDn = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onRmbDn = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -359,7 +360,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onRmbUp = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onRmbUp = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -372,7 +373,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onRmbHl = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onRmbHl = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -384,7 +385,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onGrabd = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onGrabd = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -396,7 +397,7 @@ Ovoid.Action = function(name) {
    * The function accepts one parameter which is the event's involved node.<br><br>
    * 
    * <blockcode>
-   * action.onUgrabd = function (node) { <codecomment>// do something</codecomment> };<br>
+   * action.onUgrabd = function (node) { <cc>// do something</cc> };<br>
    * </blockcode>
    * @field 
    * @type Function
@@ -411,6 +412,10 @@ Ovoid.Action = function(name) {
   /** Intersect leave event trigger node/function.<br><br>
    * @type Array */
   this.onIntersectLeave = [new Array(), new Array()];
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Action.prototype = new Ovoid.Node;
 Ovoid.Action.prototype.constructor = Ovoid.Action;
@@ -433,10 +438,18 @@ Ovoid.Action.prototype.linkNode = function(node) {
         return;
     }
     node.pickable = true;
+    if(!this._i.opt_renderPickingMode) {
+      Ovoid._log(2,this._i,'::Action.linkNode', this.name +
+          ":: linked node '"+node.name+"' set as pickable but render picking mode is disabled, that will not work.");
+    }
     if(this.onIntersect.length || 
         this.onIntersectEnter.length || 
         this.onIntersectLeave.length) {
       node.intersectable = true;
+      if(!this._i.opt_sceneIntersectDetect) {
+        Ovoid._log(2,this._i,'::Action.linkNode', this.name +
+            ":: linked node '"+node.name+"' set as intersectable but intersect detection is disabled, that will not work.");
+      }
     }
     node.makeDepend(this);
 };
@@ -565,7 +578,7 @@ Ovoid.Action.prototype.setTrigger = function(e, f, item) {
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -574,121 +587,127 @@ Ovoid.Action.prototype.cachAction = function() {
   if (!(this.cach & Ovoid.CACH_ACTION))
   {
     var i;
-
-    /* parcours des nodes linkés à cet event */
-    i = this.link.length;
-    while (i--)
-    {
+    var c = this._i.Input;
+    try { /* handle exceptions car des fonctions sont custom */
       
-      if (this.link[i].uid == Ovoid.Input.mouseLeaveUid) {
-        this.onLeave(this.link[i]);
-        document.body.style.cursor = 'default';
-      }
-      
-      if (this.link[i].uid == Ovoid.Input.mouseEnterUid) {
-        this.onEnter(this.link[i]);
-        Ovoid.Input.mouseOverNode = this.link[i];
-      }
+      /* parcours des nodes linkés à cet Action */
+      i = this.link.length;
+      while (i--)
+      {
         
-      /* le pickId est-il dans le background ? */
-      if (Ovoid.Input.mouseOverUid == 0) {
-          Ovoid.Input.mouseOverNode = null;
-      } else {
-        /* La node est-elle sous la souris ? */
-        if (this.link[i].uid == Ovoid.Input.mouseOverUid) {
-          document.body.style.cursor = 'pointer';
-          this.onOver(this.link[i]);
-          /* y'a-t-il une node grabbed ? */
-          if (!Ovoid.Input.grabbedNode) {
-            /* si non on test tous les evenements */
-            if (Ovoid.Input.intDn[0]) this.onLmbDn(this.link[i]);
-            if (Ovoid.Input.intUp[0]) this.onLmbUp(this.link[i]);
-            if (Ovoid.Input.intHl[0]) this.onLmbHl(this.link[i]);
-            if (Ovoid.Input.intDn[1]) this.onMmbDn(this.link[i]);
-            if (Ovoid.Input.intUp[1]) this.onMmbUp(this.link[i]);
-            if (Ovoid.Input.intHl[1]) this.onMmbHl(this.link[i]);
-            if (Ovoid.Input.intDn[2]) this.onRmbDn(this.link[i]);
-            if (Ovoid.Input.intUp[2]) this.onRmbUp(this.link[i]);
-            if (Ovoid.Input.intHl[2]) this.onRmbHl(this.link[i]);
+        if (this.link[i].uid == c.mouseLeaveUid) {
+          this.onLeave(this.link[i]);
+          document.body.style.cursor = 'default';
+        }
+        
+        if (this.link[i].uid == c.mouseEnterUid) {
+          this.onEnter(this.link[i]);
+          c.mouseOverNode = this.link[i];
+        }
+          
+        /* le pickId est-il dans le background ? */
+        if (c.mouseOverUid == 0) {
+            c.mouseOverNode = null;
+        } else {
+          /* La node est-elle sous la souris ? */
+          if (this.link[i].uid == c.mouseOverUid) {
+            document.body.style.cursor = 'pointer';
+            this.onOver(this.link[i]);
+            /* y'a-t-il une node grabbed ? */
+            if (!c.grabbedNode) {
+              /* si non on test tous les evenements */
+              if (c.intDn[0]) this.onLmbDn(this.link[i]);
+              if (c.intUp[0]) this.onLmbUp(this.link[i]);
+              if (c.intHl[0]) this.onLmbHl(this.link[i]);
+              if (c.intDn[1]) this.onMmbDn(this.link[i]);
+              if (c.intUp[1]) this.onMmbUp(this.link[i]);
+              if (c.intHl[1]) this.onMmbHl(this.link[i]);
+              if (c.intDn[2]) this.onRmbDn(this.link[i]);
+              if (c.intUp[2]) this.onRmbUp(this.link[i]);
+              if (c.intHl[2]) this.onRmbHl(this.link[i]);
+            }
           }
         }
-      }
 
-      /* cette node est-elle la grabbed one ? */
-      if (this.link[i] == Ovoid.Input.grabbedNode) {
-        /* modifie le curseur */
-        document.body.style.cursor = 'crosshair';
-        this.onGrabd(this.link[i]);
-        /* on test tous les évements */
-        if (Ovoid.Input.intDn[0]) this.onLmbDn(this.link[i]);
-        if (Ovoid.Input.intUp[0]) this.onLmbUp(this.link[i]);
-        if (Ovoid.Input.intHl[0]) this.onLmbHl(this.link[i]);
-        if (Ovoid.Input.intDn[1]) this.onMmbDn(this.link[i]);
-        if (Ovoid.Input.intUp[1]) this.onMmbUp(this.link[i]);
-        if (Ovoid.Input.intHl[1]) this.onMmbHl(this.link[i]);
-        if (Ovoid.Input.intDn[2]) this.onRmbDn(this.link[i]);
-        if (Ovoid.Input.intUp[2]) this.onRmbUp(this.link[i]);
-        if (Ovoid.Input.intHl[2]) this.onRmbHl(this.link[i]);
-      } else {
-        this.onUgrabd(this.link[i]);
-      }
-      
-      /* intersections ? */
-      if(this.onIntersect[0].length) {
-        var j = this.link[i].intersect.count;
-        var k = this.onIntersect[0].length;
-        while (k --) {
-          // Si l'argument est null, on applique à toutes les nodes
-          if(this.onIntersect[0][k] == null) {
-            while (j--) {
-              this.onIntersect[1][k](this.link[i], this.link[i].intersect[j]);
-            }
-          } else {
-            while (j--) {
-              if(this.link[i].intersect[j] === this.onIntersect[0][k])
+        /* cette node est-elle la grabbed one ? */
+        if (this.link[i] == c.grabbedNode) {
+          /* modifie le curseur */
+          document.body.style.cursor = 'crosshair';
+          this.onGrabd(this.link[i]);
+          /* on test tous les évements */
+          if (c.intDn[0]) this.onLmbDn(this.link[i]);
+          if (c.intUp[0]) this.onLmbUp(this.link[i]);
+          if (c.intHl[0]) this.onLmbHl(this.link[i]);
+          if (c.intDn[1]) this.onMmbDn(this.link[i]);
+          if (c.intUp[1]) this.onMmbUp(this.link[i]);
+          if (c.intHl[1]) this.onMmbHl(this.link[i]);
+          if (c.intDn[2]) this.onRmbDn(this.link[i]);
+          if (c.intUp[2]) this.onRmbUp(this.link[i]);
+          if (c.intHl[2]) this.onRmbHl(this.link[i]);
+        } else {
+          this.onUgrabd(this.link[i]);
+        }
+        
+        /* intersections ? */
+        if(this.onIntersect[0].length) {
+          var j = this.link[i].intersect.count;
+          var k = this.onIntersect[0].length;
+          while (k --) {
+            // Si l'argument est null, on applique à toutes les nodes
+            if(this.onIntersect[0][k] == null) {
+              while (j--) {
                 this.onIntersect[1][k](this.link[i], this.link[i].intersect[j]);
+              }
+            } else {
+              while (j--) {
+                if(this.link[i].intersect[j] === this.onIntersect[0][k])
+                  this.onIntersect[1][k](this.link[i], this.link[i].intersect[j]);
+              }
             }
           }
         }
-      }
-      
-      /* intersections enter ? */
-      if(this.onIntersectEnter[0].length) {
-        var j = this.link[i].enter.count;
-        var k = this.onIntersectEnter[0].length;
-        while (k --) {
-          // Si l'argument est null, on applique à toutes les nodes
-          if(this.onIntersectEnter[0][k] == null) {
-            while (j--) {
-              this.onIntersectEnter[1][k](this.link[i], this.link[i].enter[j]);
-            }
-          } else {
-            while (j--) {
-              if(this.link[i].enter[j] === this.onIntersectEnter[0][k])
+        
+        /* intersections enter ? */
+        if(this.onIntersectEnter[0].length) {
+          var j = this.link[i].enter.count;
+          var k = this.onIntersectEnter[0].length;
+          while (k --) {
+            // Si l'argument est null, on applique à toutes les nodes
+            if(this.onIntersectEnter[0][k] == null) {
+              while (j--) {
                 this.onIntersectEnter[1][k](this.link[i], this.link[i].enter[j]);
+              }
+            } else {
+              while (j--) {
+                if(this.link[i].enter[j] === this.onIntersectEnter[0][k])
+                  this.onIntersectEnter[1][k](this.link[i], this.link[i].enter[j]);
+              }
             }
           }
         }
-      }
-      
-      /* intersections Leave ? */
-      if(this.onIntersectLeave[0].length) {
-        var j = this.link[i].leave.count;
-        var k = this.onIntersectLeave[0].length;
-        while (k --) {
-          // Si l'argument est null, on applique à toutes les nodes
-          if(this.onIntersectLeave[0][k] == null) {
-            while (j--) {
-              this.onIntersectLeave[1][k](this.link[i], this.link[i].leave[j]);
-            }
-          } else {
-            while (j--) {
-              if(this.link[i].leave[j] === this.onIntersectLeave[0][k])
+        
+        /* intersections Leave ? */
+        if(this.onIntersectLeave[0].length) {
+          var j = this.link[i].leave.count;
+          var k = this.onIntersectLeave[0].length;
+          while (k --) {
+            // Si l'argument est null, on applique à toutes les nodes
+            if(this.onIntersectLeave[0][k] == null) {
+              while (j--) {
                 this.onIntersectLeave[1][k](this.link[i], this.link[i].leave[j]);
+              }
+            } else {
+              while (j--) {
+                if(this.link[i].leave[j] === this.onIntersectLeave[0][k])
+                  this.onIntersectLeave[1][k](this.link[i], this.link[i].leave[j]);
+              }
             }
           }
         }
       }
+    } catch(e) {
+      Ovoid._log(0, this._i, '::Action.cachAction', this.name + 
+          ':: Custom function exception thrown:\n' + e.stack);
     }
     this.addCach(Ovoid.CACH_ACTION);
   }
@@ -698,7 +717,7 @@ Ovoid.Action.prototype.cachAction = function() {
 /** 
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -728,34 +747,34 @@ Ovoid.Action.prototype.toJSON = function() {
   o['bmx'] = this.boundingBox.max;
   o['brd'] = this.boundingSphere.radius;
   /* Ovoid.Action */
-  o['onEnter'] = String(this.onEnter);
-  o['onLeave'] = String(this.onLeave);
-  o['onOver'] = String(this.onOver);
-  o['onLmbDn'] = String(this.onLmbDn);
-  o['onLmbUp'] = String(this.onLmbUp);
-  o['onLmbHl'] = String(this.onLmbHl);
-  o['onMmbDn'] = String(this.onMmbDn);
-  o['onMmbUp'] = String(this.onMmbUp);
-  o['onMmbHl'] = String(this.onMmbHl);
-  o['onRmbDn'] = String(this.onRmbDn);
-  o['onRmbUp'] = String(this.onRmbUp);
-  o['onRmbHl'] = String(this.onRmbHl);
-  o['onGrabd'] = String(this.onGrabd);
-  o['onUgrabd'] = String(this.onUgrabd);
+  o['onEnter'] = Ovoid.compact(this.onEnter);
+  o['onLeave'] = Ovoid.compact(this.onLeave);
+  o['onOver'] = Ovoid.compact(this.onOver);
+  o['onLmbDn'] = Ovoid.compact(this.onLmbDn);
+  o['onLmbUp'] = Ovoid.compact(this.onLmbUp);
+  o['onLmbHl'] = Ovoid.compact(this.onLmbHl);
+  o['onMmbDn'] = Ovoid.compact(this.onMmbDn);
+  o['onMmbUp'] = Ovoid.compact(this.onMmbUp);
+  o['onMmbHl'] = Ovoid.compact(this.onMmbHl);
+  o['onRmbDn'] = Ovoid.compact(this.onRmbDn);
+  o['onRmbUp'] = Ovoid.compact(this.onRmbUp);
+  o['onRmbHl'] = Ovoid.compact(this.onRmbHl);
+  o['onGrabd'] = Ovoid.compact(this.onGrabd);
+  o['onUgrabd'] = Ovoid.compact(this.onUgrabd);
   o['onIntersect'] = [new Array(), new Array()];
   for(var i = 0; i < this.onIntersect[0].length; i++) {
     o['onIntersect'][0][i] = this.onIntersect[0][i].uid;
-    o['onIntersect'][1][i] = String(this.onIntersect[1][i]);
+    o['onIntersect'][1][i] = Ovoid.compact(this.onIntersect[1][i]);
   }
   o['onIntersectEnter'] = [new Array(), new Array()];
   for(var i = 0; i < this.onIntersectEnter[0].length; i++) {
     o['onIntersectEnter'][0][i] = this.onIntersectEnter[0][i].uid;
-    o['onIntersectEnter'][1][i] = String(this.onIntersectEnter[1][i]);
+    o['onIntersectEnter'][1][i] = Ovoid.compact(this.onIntersectEnter[1][i]);
   }
   o['onIntersectLeave'] = [new Array(), new Array()];
   for(var i = 0; i < this.onIntersectLeave[0].length; i++) {
     o['onIntersectLeave'][0][i] = this.onIntersectLeave[0][i].uid;
-    o['onIntersectLeave'][1][i] = String(this.onIntersectLeave[1][i]);
+    o['onIntersectLeave'][1][i] = Ovoid.compact(this.onIntersectLeave[1][i]);
   }
   return o;
 };

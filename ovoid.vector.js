@@ -20,7 +20,7 @@
 
 
 /**
- * Create a Vector object.
+ * Constructor method.
  *
  * @class Vector object.<br><br>
  * 

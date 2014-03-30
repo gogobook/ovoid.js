@@ -20,7 +20,7 @@
 
 
 /**
- * Contact object constructor.
+ * Constructor method.
  *
  * @class Contact object.<br><br>
  * 

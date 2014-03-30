@@ -20,11 +20,11 @@
 
 
 /**
- * Body node constructor.
+ * Constructor method.
  *
  * @class Body node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Body node is the main representative world object. Inherited from the 
  * Transform node, it is a world-transformable node, which means it can be moved
@@ -44,7 +44,7 @@
  * shapes with different transformations (rotation, position, etc...).<br><br>
  * 
  * <blockcode>
- * &nbsp;&nbsp;var mesh = scene.create(Ovoid.MESH, "box1");<br>
+ * &nbsp;&nbsp;var mesh = myOvoid.Scene.newNode(Ovoid.MESH, "box1");<br>
  * &nbsp;&nbsp;body1.setShape(mesh);<br>
  * &nbsp;&nbsp;body2.setShape(mesh);<br>
  * </blockcode><br><br>
@@ -53,49 +53,50 @@
  * 
  * For interactivity purpose, the Body node is designed to be able detect 
  * intersections with each others through the bounding sphere. To enable this 
- * functionnaly you must set the <code>intersectable</code> attribute to true. 
+ * functionnaly you must set the <c>intersectable</c> attribute to true. 
  * The intersection is detected only if both body are set as "intersectable". 
  * Each Body keeps its list of Body in intersection with him in the 
- * <code>intersect</code> member, while the list of Body just enterd and just 
+ * <c>intersect</c> member, while the list of Body just enterd and just 
  * leaved in/from intersection are stored (during ONE frame) in the 
- * <code>enter</code> and <code>leave</code> member.<br><br>
+ * <c>enter</c> and <c>leave</c> member.<br><br>
  * 
  * For more information about intesection usage and handling you should refer to
- * the <a href="Ovoid.Action.php"><code>Ovoid.Action</code></a> node 
+ * the <a href="Ovoid.Action.php"><c>Ovoid.Action</c></a> node 
  * documentation.<br><br>
  * 
  * <b>Render Layer and Alpha</b><br><br>
  * 
  * For rendering purposes, a Body can be placed in a particular render layer. 
- * You can set the render layer of the body through the <code>renderLayer</code> 
- * attribute member. The <code>renderLayer</code> value must be an integer 
- * between 0 to  <code>Ovoid.MAX_RENDER_LAYER</code> (8). You also can define 
+ * You can set the render layer of the body through the <c>renderLayer</c> 
+ * attribute member. The <c>renderLayer</c> value must be an integer 
+ * between 0 to  <c>Ovoid.MAX_RENDER_LAYER</c> (8). You also can define 
  * the Body as an Alpha (Transparent/FX) object through the 
- * <code>renderAlpha</code> attribute member. If your object is dedicated to be 
+ * <c>renderAlpha</c> attribute member. If your object is dedicated to be 
  * transparent or a particle emitter, you should set this attribute to 
- * <code>true</code>.<br><br>
+ * <c>true</c>.<br><br>
  * 
  * For more informations about render layers and alpha you should refer to the
- * <a href="Ovoid.Drawer.php"><code>Ovoid.Drawer</code></a> global class  
+ * <a href="Ovoid.Drawer.php"><c>Ovoid.Drawer</c></a> global class  
  * documentation.<br><br>
  * 
  * <b>Shadow casting</b><br><br>
  * 
  * You can include or exclude a Body node of the shadow casting process through 
- * the <code>shadowCasting</code> attribute member. If set to <code>true</code> 
+ * the <c>shadowCasting</c> attribute member. If set to <c>true</c> 
  * (default) and the Body's shape is a Mesh while the cast shadow rendering is 
  * enabled, the shadow volum of the mesh will be computed and rendered, 
  * otherwise the Mesh's shadow computation is jumped.
  * 
  * For more informations about cast shadows you should refer to the
- * <a href="Ovoid.Drawer.php"><code>Ovoid.Drawer</code></a> global class  
+ * <a href="Ovoid.Drawer.php"><c>Ovoid.Drawer</c></a> global class  
  * documentation.<br><br>
  * 
  * @extends Ovoid.Transform
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
 */
-Ovoid.Body = function(name) {
+Ovoid.Body = function(name, i) {
 
   Ovoid.Transform.call(this);
   /** Node type */
@@ -109,6 +110,9 @@ Ovoid.Body = function(name) {
   /** Distance from the current render camera.
    * @type float */
   this.distFromEye = 0.0;
+  /** Visibility range from distance from eye.
+   * @type float */
+  this.visibleRange = 0.0;
   /** Body shadow casting flag.
    * @type bool */
   this.shadowCasting = true;
@@ -130,6 +134,10 @@ Ovoid.Body = function(name) {
   /** Render alpha flag.
    * @type int */
   this.renderAlpha = false;
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Body.prototype = new Ovoid.Transform;
 Ovoid.Body.prototype.constructor = Ovoid.Body;
@@ -163,7 +171,7 @@ Ovoid.Body.prototype.setShape = function(shape) {
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -191,7 +199,7 @@ Ovoid.Body.prototype.cachBody = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -231,6 +239,7 @@ Ovoid.Body.prototype.toJSON = function() {
   o['bc'] = this.shadowCasting;
   o['bl'] = this.renderLayer;
   o['ba'] = this.renderAlpha;
+  o['vr'] = this.visibleRange;
   return o;
 };
 

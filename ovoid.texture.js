@@ -20,11 +20,11 @@
 
 
 /**
- * Texture node constructor.
+ * Constructor method.
  * 
  * @class Texture node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Texture node implement a generic texture image. It is a 
  * dependency node and does not takes place directly in the 3D world.<br><br>
@@ -37,8 +37,9 @@
  * @extends Ovoid.Node
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Texture = function(name) {
+Ovoid.Texture = function(name, i) {
 
   Ovoid.Node.call(this);
   /** node type.
@@ -55,7 +56,7 @@ Ovoid.Texture = function(name) {
   this.handle = null;
   /** Gl Target.
    * @type enum */
-  this.target = 0;
+  this.target = 0x0DE1;
   /** Texture width.
    * @type float */
   this.width;
@@ -74,59 +75,23 @@ Ovoid.Texture = function(name) {
   /** Pixmap object.
    * @type Pixmap */
   this.pixmap = null;
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Texture.prototype = new Ovoid.Node;
 Ovoid.Texture.prototype.constructor = Ovoid.Texture;
 
 
 /**
- * Handle texture loading.
- *
- * @return {bool} True if successfull texture creation, false otherwise.
+ * Bind texture.<br><br>
+ * 
+ * Bind the texture handle to the current sampler.
  */
-Ovoid.Texture.prototype._handleLoad = function() {
+Ovoid.Texture.prototype.bind = function() {
 
-  Ovoid._clearGlerror();
-
-  this.o.width = this.width;
-  this.o.height = this.height;
-  Ovoid.gl.bindTexture(this.o.target, this.o.handle);
-  Ovoid.gl.texImage2D(this.o.target,0,0x1908,0x1908,0x1401,this);
-  
-  if (Ovoid.isPowerOfTwo(this.width) && Ovoid.isPowerOfTwo(this.height)) {
-    Ovoid.gl.generateMipmap(this.o.target);
-    Ovoid.log(2, 'Ovoid.Texture', "'" + this.o.name
-        +"' is NPO2, unable to create mipmaps.");
-  }
-  
-  this.o.setFilter(this.o.filter);
-  
-  /* unbind la texture */
-  Ovoid.gl.bindTexture(this.o.target, null);
-
-  if (Ovoid._logGlerror('Ovoid.Texture._handleLoad :: ' +
-      this.o.url))
-  {
-    return false;
-  }
-
-  this.o.loadStatus = 1;
-  
-  Ovoid.log(3, 'Ovoid.Texture', "'" + this.o.name +"' loaded");
-      
-  return true;
-};
-
-
-/**
- * Handle texture loading error.
- */
-Ovoid.Texture.prototype._handleError = function() {
-
-  Ovoid.log(2, 'Ovoid.Texture', "'" + this.o.name +
-      "' unable to load '" + this.o.url + "'");
-
-  this.o.loadStatus = -1;
+  this._i.gl.bindTexture(this.target, this.handle);
 };
 
 
@@ -140,34 +105,176 @@ Ovoid.Texture.prototype._handleError = function() {
  */
 Ovoid.Texture.prototype.setFilter = function(filter) {
 
-  Ovoid._clearGlerror();
+  this._i._clearGlerror();
 
   this.filter = filter;
-  Ovoid.gl.bindTexture(this.target, this.handle);
+  this._i.gl.bindTexture(this.target, this.handle);
   if (filter) {
     
     if (Ovoid.isPowerOfTwo(this.width) && Ovoid.isPowerOfTwo(this.height))
     {
-      Ovoid.gl.texParameteri(this.target,0x2800,0x2601);
-      Ovoid.gl.texParameteri(this.target,0x2801,0x2703);
+      this._i.gl.texParameteri(this.target,0x2800,0x2601);
+      this._i.gl.texParameteri(this.target,0x2801,0x2703);
     } else {
-      Ovoid.log(2, 'Ovoid.Texture', "'" + this.name 
-            +"' is NPO2, unable to set filtering.");
-      Ovoid.gl.texParameteri(this.target,0x2802,0x812F);
-      Ovoid.gl.texParameteri(this.target,0x2803,0x812F);
-      Ovoid.gl.texParameteri(this.target,0x2800,0x2601);
-      Ovoid.gl.texParameteri(this.target,0x2801,0x2601);
+      Ovoid._log(2,this._i, '::Texture.setFilter', this.name +
+            ":: is NPO2, unable to set filtering.");
+      this._i.gl.texParameteri(this.target,0x2802,0x812F);
+      this._i.gl.texParameteri(this.target,0x2803,0x812F);
+      this._i.gl.texParameteri(this.target,0x2800,0x2601);
+      this._i.gl.texParameteri(this.target,0x2801,0x2601);
     }
   } else {
-    Ovoid.gl.texParameteri(this.target,0x2800,0x2600);
-    Ovoid.gl.texParameteri(this.target,0x2801,0x2600);
-    Ovoid.gl.texParameteri(this.target,0x2802,0x812F);
-    Ovoid.gl.texParameteri(this.target,0x2803,0x812F);
+    this._i.gl.texParameteri(this.target,0x2800,0x2600);
+    this._i.gl.texParameteri(this.target,0x2801,0x2600);
+    this._i.gl.texParameteri(this.target,0x2802,0x812F);
+    this._i.gl.texParameteri(this.target,0x2803,0x812F);
   }
 
-  Ovoid.gl.bindTexture(this.target, null);
+  this._i.gl.bindTexture(this.target, null);
 
-  Ovoid._logGlerror('Ovoid.Texture.setFilter :: ' + this.url);
+  this._i._logGlerror('::Texture.setFilter::' + this.name);
+};
+
+
+/**
+ * Create texture 2D from raw texel data.<br><br>
+ * 
+ * Creates a 2D texture according to the specified parameters with the 
+ * given raw texels data.<br><br>
+ *  
+ * @param {enum} format WebGL texture pixel format.
+ * @param {int} width Texel image data width.
+ * @param {int} height Texel image data height.
+ * @param {Uint8Array} data Image pixels data.
+ * 
+ * @return {bool} True if succes, false otherwise
+ */
+Ovoid.Texture.prototype.create2dFromRaw = function(format, w, h, data) {
+  
+  this._i._clearGlerror();
+
+  this.width = w;
+  this.height = h;  
+  this.handle = this._i.gl.createTexture();
+  this.target = 0x0DE1; //this._i.gl.TEXTURE_2D;
+
+  this._i.gl.bindTexture(this.target, this.handle);
+  this._i.gl.texImage2D(this.target,0,format,w,h,0,format,0x1401,data);
+  if (Ovoid.isPowerOfTwo(this.width) && Ovoid.isPowerOfTwo(this.height)) {
+    this._i.gl.generateMipmap(this.target);
+  } else {
+    Ovoid._log(2,this._i, '::Texture.create2dFromRaw', this.name +
+        ":: is NPO2, unable to create mipmaps.");
+  }
+  
+  this.setFilter(this.filter);
+  
+  /* unbind la texture */
+  this._i.gl.bindTexture(this.target, null);
+
+  if(this._i._logGlerror('::Texture.create2dFromRaw::' + this.name)) {
+    return false;
+  }
+  
+  Ovoid._log(3,this._i, '::Texture.create2dFromRaw', this.name +
+      ":: created");
+  this.loadStatus = 1;
+
+  return true;
+};
+
+
+/**
+ * Create texture 2D from HTML Canvas or Image.<br><br>
+ * 
+ * Creates a 2D texture according to the specified parameters from an
+ * HTML Canvas or Image object.<br><br>
+ *  
+ * @param {enum} format WebGL texture pixel format.
+ * @param {Object} image HTML Image or Canvas object.
+ * 
+ * @return {bool} True if succes, false otherwise
+ */
+Ovoid.Texture.prototype.create2dFromImg = function(format, image) {
+  
+  this._i._clearGlerror();
+  
+  this.width = image.width;
+  this.height = image.height;
+  this.handle = this._i.gl.createTexture();
+  this.target = 0x0DE1; //this._i.gl.TEXTURE_2D;
+
+  this._i.gl.bindTexture(this.target, this.handle);
+  this._i.gl.texImage2D(this.target,0,format,format,0x1401,image);
+  if (Ovoid.isPowerOfTwo(this.width) && Ovoid.isPowerOfTwo(this.height)) {
+    this._i.gl.generateMipmap(this.target);
+  } else {
+    Ovoid._log(2,this._i, '::Texture.create2dFromImg', this.name +
+        ":: is NPO2, unable to create mipmaps.");
+  }
+  
+  this.setFilter(this.filter);
+  
+  /* unbind la texture */
+  this._i.gl.bindTexture(this.target, null);
+  
+  if(this._i._logGlerror('::Texture.create2dFromImg::' + this.name)) {
+    return false;
+  }
+  
+  Ovoid._log(3,this._i, '::Texture.create2dFromImg', this.name + 
+      ":: created");
+  this.loadStatus = 1;
+      
+  return true;
+};
+
+
+/**
+ * Handle texture loading.
+ *
+ */
+Ovoid.Texture.prototype._handleLoad = function() {
+
+  this._i._clearGlerror();
+
+  this.o.handle = this._i.gl.createTexture();
+  this.o.width = this.width;
+  this.o.height = this.height;
+  this._i.gl.bindTexture(this.o.target, this.o.handle);
+  this._i.gl.texImage2D(this.o.target,0,0x1908,0x1908,0x1401,this);
+  
+  if (Ovoid.isPowerOfTwo(this.width) && Ovoid.isPowerOfTwo(this.height)) {
+    this._i.gl.generateMipmap(this.o.target);
+  } else {
+    Ovoid._log(2,this._i, '::Texture.loadSource', this.o.name +
+        ":: is NPO2, unable to create mipmaps.");
+  }
+  
+  this.o.setFilter(this.o.filter);
+  
+  /* unbind la texture */
+  this._i.gl.bindTexture(this.o.target, null);
+
+  if(this._i._logGlerror('::Texture.loadSource::' + this.o.name)) {
+    return;
+  }
+  
+  Ovoid._log(3,this._i, '::Texture.loadSource', this.o.name + 
+      ":: loaded");
+  this.o.loadStatus = 1;
+};
+
+
+/**
+ * Handle texture loading error.
+ */
+Ovoid.Texture.prototype._handleError = function() {
+
+  Ovoid._log(2,this._i, '::Texture.loadSource', this.o.name +
+      ":: unable to load '" + this.o.url + "'");
+
+  this.o.loadStatus = -1;
 };
 
 
@@ -177,7 +284,7 @@ Ovoid.Texture.prototype.setFilter = function(filter) {
  * Loads the specified external source file and extracts, decodes or parses the 
  * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
  *  
- * The <code>loadSatus</code> member indicates the loading status through an 
+ * The <c>loadSatus</c> member indicates the loading status through an 
  * integer value of 0, 1 or -1. A value of 0 means that the file is not yet 
  * loaded, a value of 1 means that the source was successfully loaded, and a 
  * value of -1 means the loading failed.<br><br>
@@ -190,94 +297,32 @@ Ovoid.Texture.prototype.setFilter = function(filter) {
  */
 Ovoid.Texture.prototype.loadSource = function(url, filter) {
 
+  this.loadStatus = 0;
+    
   this.url = url;
   
   var src = this.url;
-  if (Ovoid.opt_debugMode) 
+  if (this._i.opt_debugMode) 
     src += '?' + Math.random();
   
-  this.handle = Ovoid.gl.createTexture();
-  this.target = 0x0DE1;
+  this.target = 0x0DE1; //this._i.gl.TEXTURE_2D;
 
   this.filter = filter;
 
   this.pixmap = new Image();
   this.pixmap.o = this;
+  this.pixmap._i = this._i;
   this.pixmap.onload = this._handleLoad;
   this.pixmap.onerror = this._handleError;
-  /*this.pixmap.addEventListener('error', this._handleError, false);*/
   this.pixmap.src = src;
 };
 
 
 
 /**
- * Create texture.<br><br>
- * 
- * Creates a 2D texture according to the specified parameters with the given 
- * texels data.<br><br>
- *  
- *
- * @param {enum} format WebGL texture pixel format.
- * 
- * @param {int} width Texel image data width.
- * 
- * @param {int} height Texel image data height.
- * 
- * @param {Uint8Array} data Image pixels data.
- */
-Ovoid.Texture.prototype.create2d = function(format, width, height, data) {
-  
-  Ovoid._clearGlerror();
-  
-  this.handle = Ovoid.gl.createTexture();
-  this.target = Ovoid.gl.TEXTURE_2D;
-
-  Ovoid.gl.bindTexture(this.target, this.handle);
-
-  Ovoid.gl.texImage2D(Ovoid.gl.TEXTURE_2D,
-                      0, format,
-                      width, height, 0,
-                      format,
-                      Ovoid.gl.UNSIGNED_BYTE, data);
-                      
-  Ovoid.gl.bindTexture(this.target, null);
-  
-  Ovoid._logGlerror('Ovoid.Texture.create2d :: ' + this.name);
-                      
-};
-
-
-/**
- * Bind texture.<br><br>
- * 
- * Bind the texture handle to the current sampler.
- */
-Ovoid.Texture.prototype.bind = function() {
-
-  Ovoid.gl.bindTexture(this.target, this.handle);
-};
-
-
-/**
- * Create a new array of Texture nodes.
- *
- * @param {int} count Size of the new array.
- * 
- * @return {Texture[]} Array of texture objects.
- */
-Ovoid.Texture.newArray = function(count) {
-
-  var array = new Array;
-  while (count--) array.push(new Ovoid.Texture());
-  return array;
-};
-
-
-/**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

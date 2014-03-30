@@ -20,7 +20,7 @@
 
 
 /**
- * Create a 4x4 Matrix object.
+ * Constructor method.
  *
  * @class 4x4 Matrix object.<br><br>
  * 
@@ -419,21 +419,6 @@ Ovoid.Matrix4.prototype.toInverseTransform = function() {
   this.m[12] = x * this.m[0] + y * this.m[4] + z * this.m[8];
   this.m[13] = x * this.m[1] + y * this.m[5] + z * this.m[9];
   this.m[14] = x * this.m[2] + y * this.m[6] + z * this.m[10];
-};
-
-
-/**
- * Create a new array of Matrix4 objets.
- *
- * @param {int} count Size of the new array.
- *
- * @return {Object[]} Array of matrix4 objects.
- */
-Ovoid.Matrix4.newArray = function(count) {
-
-  var array = new Array;
-  while (count--) array.push(new Ovoid.Matrix4());
-  return array;
 };
 
 

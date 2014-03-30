@@ -20,12 +20,12 @@
 
 
 /**
- * Material node constructor.
+ * Constructor method.
  * 
  * @class Material node object.
  * <br>
  * <br>
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.
  * <br>
  * <br>
  * The Material node is used to describe shaded surfaces properties. The 
@@ -42,27 +42,27 @@
  * The Material's components/slots are the followings:
  * 
  * <ul>
- * <li><code>Ovoid.AMBIENT</code></li>
+ * <li><c>Ovoid.AMBIENT</c></li>
  * The ambient component defines how ambient light act on the surface. It can 
  * be a simple flat color or a Texture.<br><br>
  * 
- * <li><code>Ovoid.DIFFUSE</code></li>
+ * <li><c>Ovoid.DIFFUSE</c></li>
  * The diffuse component defines how normal light sources act on the surface. It 
  * can be a simple flat color or a Texture.<br><br>
  * 
- * <li><code>Ovoid.SPECULAR</code></li>
+ * <li><c>Ovoid.SPECULAR</c></li>
  * The specular component defines the (simulated) direct light specular 
  * reflection of the surface. It can be a simple flat color or a Texture.<br><br>
  * 
- * <li><code>Ovoid.EMISSIVE</code></li>
+ * <li><c>Ovoid.EMISSIVE</c></li>
  * The emissive component defines how the surface emits its own color without
  * light interaction. It can be a simple flat color or a Texture.<br><br>
  * 
- * <li><code>Ovoid.REFLECT</code></li>
+ * <li><c>Ovoid.REFLECT</c></li>
  * The reflect component defines how the surface reflect its environement. It 
  * can be a simple flat color or (more interesting) a Texture.<br><br>
  * 
- * <li><code>Ovoid.NORMAL</code></li>
+ * <li><c>Ovoid.NORMAL</c></li>
  * The normal component defines the normal map for this material. It 
  * must be a (normal map) Texture. (Not yet implemented in the default supplied 
  * shaders)<br><br>
@@ -86,13 +86,14 @@
  * depending on the used shader program.<br><br>
  * 
  * For more information about how shaders are implemented in OvoiD.JS, 
- * refere to <code>Ovoid.Shader</code> class documentation.
+ * refere to <c>Ovoid.Shader</c> class documentation.
  * 
  * @extends Ovoid.Node
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Material = function(name) {
+Ovoid.Material = function(name, i) {
 
   Ovoid.Node.call(this);
   /** node type */
@@ -105,7 +106,7 @@ Ovoid.Material = function(name) {
   this.color = Ovoid.Color.newArray(5);
 
   this.color[0].set(1.0, 1.0, 1.0, 1.0);
-  this.color[1].set(0.0, 1.0, 0.0, 1.0);
+  this.color[1].set(1.0, 1.0, 1.0, 1.0);
   this.color[2].set(1.0, 1.0, 1.0, 1.0);
   this.color[3].set(0.0, 0.0, 0.0, 1.0);
   this.color[4].set(1.0, 1.0, 1.0, 1.0);
@@ -113,8 +114,8 @@ Ovoid.Material = function(name) {
   /** Materia components texture array.
    * @type Texture[] */
   this.texture = new Array(6);
-  var i = 6;
-  while (i--) { this.texture[i] = null; }
+  var j = 6;
+  while (j--) { this.texture[j] = null; }
 
   /** Materia shininess.
    * @type float */
@@ -125,6 +126,10 @@ Ovoid.Material = function(name) {
   /** Materia opacity factor.
    * @type float */
   this.opacity = 1.0;
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Material.prototype = new Ovoid.Node;
 Ovoid.Material.prototype.constructor = Ovoid.Material;
@@ -212,7 +217,7 @@ Ovoid.Material.prototype.setColorv = function(slot, a) {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

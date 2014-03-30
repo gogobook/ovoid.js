@@ -20,11 +20,11 @@
 
 
 /**
- * Audio node constructor.
+ * Constructor method.
  * 
  * @class Audio node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Audio node implements a cross-platform source audio buffer. It is used to
  * load, decode and store external audio files source. An external audio file 
@@ -34,10 +34,10 @@
  * the 3D world. The Audio node is typically assigned to one or more Sound node.<br><br>
  * 
  * <blockcode>
- * var vroum = scene.create(Ovoid.AUDIO, "vroum");<br>
+ * var vroum = myOvoid.Scene.newNode(Ovoid.AUDIO, "vroum");<br>
  * vroum.loadSource("vroum.ogg");<br>
  * <br>
- * var sound = scene.create(Ovoid.SOUND, "engineSound");<br>
+ * var sound = myOvoid.Scene.newNode(Ovoid.SOUND, "engineSound");<br>
  * sound.setAudio(vroum);<br>
  * sound.spatialize(true);<br>
  * </blockcode><br><br>
@@ -47,8 +47,9 @@
  * @see Ovoid.Sound
  * 
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Audio = function(name) {
+Ovoid.Audio = function(name, i) {
 
   Ovoid.Node.call(this);
   /** node type */
@@ -57,7 +58,7 @@ Ovoid.Audio = function(name) {
    * @type string */
   this.name = name;
   /** Audio source file name.
-   * Keep in mind that the <code>Ovoid.opt_audioPath</code> option will be used 
+   * Keep in mind that the <c>Ovoid.opt_audioPath</c> option will be used 
    * to retrieve the file.
    * @type string */
   this.url = '';
@@ -80,18 +81,14 @@ Ovoid.Audio = function(name) {
    * @type int */
   this.loadStatus = 0;
   /** Audio Layer buffer */
-  switch(Ovoid.al.type)
-  {
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-      // inutilise
-    break;
-    case 3: /* Ovoid.WEB_AUDIO_API */
-      this._albuffer = Ovoid.al.createBuffer(1, 1, 22050);
-    break;
-    default: /* Ovoid.HTML5_AUDIO */
-      this._albuffer = null;
-    break;
+  if(i.al) {
+    this._albuffer = inst.al.createBuffer(1, 1, 22050);
+  } else {
+    this._albuffer = null;
   }
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Audio.prototype = new Ovoid.Node;
 Ovoid.Audio.prototype.constructor = Ovoid.Audio;
@@ -102,40 +99,15 @@ Ovoid.Audio.prototype.constructor = Ovoid.Audio;
  */
 Ovoid.Audio.prototype._handleLoad = function(e) {
   
-  switch(Ovoid.al.type)
-  {
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-      // inutilise
-    break;
-    case 3: /* Ovoid.WEB_AUDIO_API */
-	  // Deprecated version Webkit Audio API
-	  /*
-      if(this.response.byteLength > 311) {
-        this.owner._albuffer = Ovoid.al.createBuffer(this.response, false);
-        this.owner.loadStatus = 1;
-      } else {
-        Ovoid.log(2, 'Ovoid.Audio', "'" + this.owner.name +
-          "' unable to load '" + this.owner.src + "'");
-        this.owner.loadStatus = -1;
-      } */
-      // Update to standard Web Audio API
-	  var owner = this.owner;
-      Ovoid.al.decodeAudioData(this.response,
-	                           function(buffer){ 
-	                             owner._albuffer = buffer; 
-                                 owner.loadStatus = 1; },
-                               function(){
-                                 Ovoid.log(2, 'Ovoid.Audio', "'" + owner.name +
-                                 "' unable to load '" + owner.src + "'");
-                                 owner.loadStatus = -1;
-                               });
-    break;
-    default: /* Ovoid.HTML5_AUDIO */
-      this.owner.loadStatus = 1;
-      this.owner.duration = this.duration;   
-    break;
+  if(this.o.i.al) {
+    var o = this.o;
+    var i = this._i;
+    this.o.i.al.decodeAudioData(
+          this.response,
+          function(b){Ovoid._log(2,i,'::Audio.loadSource',o.name+":: loaded");o._albuffer=b;o.loadStatus=1;},
+          function(){Ovoid._log(2,i,'::Audio.loadSource',o.name+":: unable to decode audio '"+o.src+"'");o.loadStatus=-1;}
+          );
   }
-  
 };
 
 
@@ -144,9 +116,9 @@ Ovoid.Audio.prototype._handleLoad = function(e) {
  */
 Ovoid.Audio.prototype._handleError = function() {
 
-  Ovoid.log(2, 'Ovoid.Audio', "'" + this.owner.name +
-      "' unable to load '" + this.owner.src + "'");
-  this.owner.loadStatus = -1;
+  Ovoid._log(2,this._i,'::Audio.loadSource', this.o.name +
+      ":: ' unable to load '" + this.o.src + "'");
+  this.o.loadStatus = -1;
 };
 
 
@@ -156,66 +128,40 @@ Ovoid.Audio.prototype._handleError = function() {
  * Loads the specified external source file and extracts, decodes or parses the 
  * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
  *  
- * The <code>loadSatus</code> member indicates the loading status through an 
+ * The <c>loadSatus</c> member indicates the loading status through an 
  * integer value of 0, 1 or -1. A value of 0 means that the file is not yet 
  * loaded, a value of 1 means that the source was successfully loaded, and a 
  * value of -1 means the loading failed.<br><br>
  *
  * @param {string} url Source file name/url to load. 
- * 
  */
 Ovoid.Audio.prototype.loadSource = function(url) {
 
+  this.loadStatus = 0;
+    
   this.url = url;
   
   var src = this.url;
-  if (Ovoid.opt_debugMode) 
+  if (this._i.opt_debugMode) 
     src += '?' + Math.random();
   
-  switch(Ovoid.al.type)
-  {
-    case 2: /* Ovoid.MOZ_AUDIO_API */
-      // inutilise
-    break;
-    case 3: /* Ovoid.WEB_AUDIO_API */
-      var xhr = new XMLHttpRequest();
-      xhr.owner = this;
-      xhr.onload = this._handleLoad;
-      xhr.open("GET", src, true);
-      xhr.responseType = "arraybuffer";
-      xhr.send();
-    break;
-    default: /* Ovoid.HTML5_AUDIO */
-      this._albuffer = new Audio();
-      this._albuffer.owner = this;
-      this._albuffer.addEventListener('canplaythrough', this._handleLoad, false);
-      this._albuffer.addEventListener('error', this._handleError, false);
-      this._albuffer.src = src;
-      this._albuffer.load();    
-    break;
+  if(this._i.al) {
+    var xhr = new XMLHttpRequest();
+    xhr.o = this;
+    xhr._i = this._i;
+    xhr.onload = this._handleLoad;
+    xhr.onerror = this._handleError;
+    xhr.open("GET", src, true);
+    xhr.responseType = "arraybuffer";
+    xhr.send();
   }
-};
-
-
-/**
- * Create a new array of Audio nodes.
- *
- * @param {int} count Size of the new array.
- *
- * @return {Object[]} Array of Audio node.
- */
-Ovoid.Audio.newArray = function(count) {
-
-  var array = new Array;
-  while (count--) array.push(new Ovoid.Audio());
-  return array;
 };
 
 
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

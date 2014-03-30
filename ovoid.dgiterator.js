@@ -19,7 +19,7 @@
 
 
 /**
- * Create new dependency graph iterator.
+ * Constructor method.
  *
  * @class Dependency Graph depth-first iterator.<br><br>
  * 
@@ -40,9 +40,9 @@
  * }<br>
  * </blockcode><br><br>
  * 
- * The Node class implement this relationship through its <code>depend</code> and 
- * <code>link</code> member fields, and the relationship is created or 
- * destroyed using the <code>makeDepend</code> and <code>breakDepend</code> 
+ * The Node class implement this relationship through its <c>depend</c> and 
+ * <c>link</c> member fields, and the relationship is created or 
+ * destroyed using the <c>makeDepend</c> and <c>breakDepend</c> 
  * methods. One node can have an limitless amount of linked and depend nodes.<br><br> 
  * 
  * @see Ovoid.Node

@@ -20,7 +20,7 @@
 
 
 /**
- * Create a Triangle object.
+ * Constructor method.
  *
  * @class Triangle face object.<br><br>
  * 
@@ -106,7 +106,7 @@ Ovoid.Triangle.arrayAsIbo = function(triangles) {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -123,19 +123,5 @@ Ovoid.Triangle.prototype.toJSON = function() {
   o[4] = this.adjacent[1];
   o[5] = this.adjacent[2];
   
-  /*
-  o = new Object();
-  o['i'] = new Array(3);
-  for(var i = 0; i < 3; i++)
-    o['i'][i] = this.index[i];
-  
-  o['n'] = this.normal;
-  o['c'] = this.center;
-  o['a'] = new Array(3);
-  for(var i = 0; i < 3; i++)
-    o['a'][i] = this.adjacent[i];
-    
-  o['e'] = this.equation;
-  */
   return o;
 };

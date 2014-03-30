@@ -16,7 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
+/** @global Symbolic constants.
+ * 
+ * This is a test documentation fpr Symbolic constants.
+ * 
+ * */
+
+/** Default library url
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Skin */
+Ovoid.LIBRARY_URL = 'http://www.ovoid.org/js/src/2.0/ovoid.js/';
+
+
+/** Default Fontmap image url
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Skin */
+Ovoid.DEFAULT_FONT_MAP = 'normal 9pt monospace';
 
 
 /** Maximum influence/matrix count by skin
@@ -91,7 +109,7 @@ Ovoid.MAX_CONTACT_BY_CYCLE = 128;
  * @constant 
  * @memberOf _global_
   @see Ovoid.Mesh */
-Ovoid.MAX_MESH_LOD = 4;
+Ovoid.MAX_MESH_LOD = 3;
 
 
 /** Maximum particles count by emitter.
@@ -1199,14 +1217,14 @@ Ovoid.DAE_CONVERT_UPAXIS = Ovoid.BIT18;
  * @constant
  * @memberOf _global_
  * @see Ovoid.Frame */
-Ovoid.FRAME_FIXED_SIZE = 0;
+Ovoid.FRAME_MANUAL_SIZE = 0;
 
 
 /** Symbolic constant for frame mode.
  * @constant
  * @memberOf _global_
  * @see Ovoid.Frame */
-Ovoid.FRAME_FULL_CLIENT = 1;
+Ovoid.FRAME_CLIENT_SIZE = 1;
 
 
 /** Symbolic constant for frame mode.
@@ -1967,6 +1985,27 @@ Ovoid.BUFFER_WRITE = 0x88B9; /* GL_WRITE_ONLY */
  * @memberOf _global_
  * @see Ovoid.Mesh */
 Ovoid.BUFFER_READ_WRTIE = 0x88BA; /* GL_READ_WRITE */
+
+
+/** Symbolic constant for OpenGL compatible geometry mode
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Mesh */
+Ovoid.POINTS = 0; /* GL_POINTS */
+
+
+/** Symbolic constant for OpenGL compatible geometry mode
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Mesh */
+Ovoid.LINES = 1; /* GL_LINES */
+
+
+/** Symbolic constant for OpenGL compatible geometry mode
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Mesh */
+Ovoid.TRIANGLES = 4; /* GL_TRIANGLES */
 
 
 /** Symbolic constant for texture filtering
@@ -2849,13 +2888,13 @@ Ovoid.GLSL_PNUIW_HYBRID_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute ve
 /** Default built-in Glsl vertex shader string.
  * @constant
  * @memberOf _global_ */
-Ovoid.GLSL_VL_PNUIW_HYBRID_LP_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec4 i;attribute vec4 w;uniform bool ENd;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];uniform mat3 MNR[MA];uniform vec4 Ep;uniform vec4 Lp;uniform vec3 Ld;uniform vec4 Lc;uniform float Li;uniform float Lr;uniform float Lf;uniform float La;uniform float My;uniform float Mi;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;varying vec4 Cd;varying vec4 Cs;vec3 LV, R, EV;float LT, Fw;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;}else{Vp=MXF[0]*p;Vn=MNR[0]*n;}Vu=u.xy;gl_Position=MEV*Vp;Cd=vec4(0.0,0.0,0.0,0.0);Cs=vec4(0.0,0.0,0.0,0.0);if(ENd){EV=normalize(Ep-Vp).xyz;if(Lp.w==1.0){LV=normalize(Lp-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf),0.0,1.0);}else{LV=Ld;LT=max(dot(Vn,LV),0.0);Fw=1.0;}Cd+=(Lc*Li*LT)*Fw;R=normalize(reflect(-LV,Vn));Cs+=Lc*Li*(pow(max(dot(R,EV),0.0),Mi))*Fw;}}';
+Ovoid.GLSL_VL_PNUIW_HYBRID_LP_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec4 i;attribute vec4 w;uniform bool ENd;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];uniform mat3 MNR[MA];uniform vec4 Ep;uniform vec4 Lp;uniform vec3 Ld;uniform vec4 Lc;uniform float Li;uniform float Lr;uniform float Lf;uniform float La;uniform float My;uniform float Mi;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;varying vec4 Cd;varying vec4 Cs;vec3 LV, R, EV;float LT, Fw;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;}else{Vp=MXF[0]*p;Vn=MNR[0]*n;}Vu=u.xy;gl_Position=MEV*Vp;Cd=vec4(0.0,0.0,0.0,0.0);Cs=vec4(0.0,0.0,0.0,0.0);if(ENd){EV=normalize(Ep-Vp).xyz;if(Lp.w==1.0){LV=normalize(Lp-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf),0.0,1.0);}else{LV=Ld*-1.0;LT=max(dot(Vn,LV),0.0);Fw=1.0;}Cd+=(Lc*Li*LT)*Fw;R=normalize(reflect(-LV,Vn));Cs+=Lc*Li*(pow(max(dot(R,EV),0.0),Mi))*Fw;}}';
 
 
 /** Default built-in Glsl vertex shader string.
  * @constant
  * @memberOf _global_ */
-Ovoid.GLSL_VL_PNUIW_HYBRID_1P_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\n#define ML '+Ovoid.MAX_LIGHT_BY_DRAW+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec4 i;attribute vec4 w;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];uniform mat3 MNR[MA];uniform vec4 Ep;uniform vec4 Lp[ML];uniform vec3 Ld[ML];uniform vec4 Lc[ML];uniform float Li[ML];uniform float Lr[ML];uniform float Lf[ML];uniform float La[ML];uniform bool Le[ML];uniform float My;uniform float Mi;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;varying vec4 Cd;varying vec4 Cs;vec3 LV, R, EV;float LT, Fw;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;}else{Vp=MXF[0]*p;Vn=MNR[0]*n;}Vu=u.xy;gl_Position=MEV*Vp;Cd=vec4(0.0,0.0,0.0,0.0);Cs=vec4(0.0,0.0,0.0,0.0);EV=normalize(Ep-Vp).xyz;for(int i=0;i<ML;i++){if(Le[i]){if(Lp[i].w==1.0){LV=normalize(Lp[i]-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld[i])-(cos(La[i])))/(Lf[i]), 0.0, 1.0);}else{LV=Ld[i];LT=max(dot(Vn,LV),0.0);Fw=1.0;}Cd+=(Lc[i]*Li[i]*LT)*Fw;R=normalize(reflect(-LV,Vn));Cs+=Lc[i]*Li[i]*(pow(max(dot(R,EV),0.0),Mi))*Fw;}}}';
+Ovoid.GLSL_VL_PNUIW_HYBRID_1P_VS='#define MA '+Ovoid.MAX_JOINT_BY_SKIN+'\n#define ML '+Ovoid.MAX_LIGHT_BY_DRAW+'\nattribute vec4 p;attribute vec3 n;attribute vec3 u;attribute vec4 i;attribute vec4 w;uniform bool ENw;uniform mat4 MEV;uniform mat4 MXF[MA];uniform mat3 MNR[MA];uniform vec4 Ep;uniform vec4 Lp[ML];uniform vec3 Ld[ML];uniform vec4 Lc[ML];uniform float Li[ML];uniform float Lr[ML];uniform float Lf[ML];uniform float La[ML];uniform bool Le[ML];uniform float My;uniform float Mi;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;varying vec4 Cd;varying vec4 Cs;vec3 LV, R, EV;float LT, Fw;void main(void){if(ENw){Vp=vec4(0.0,0.0,0.0,0.0);Vn=vec3(0.0,0.0,0.0);Vp+=(MXF[int(i.x)]*p)*w.x;Vn+=(MNR[int(i.x)]*n)*w.x;Vp+=(MXF[int(i.y)]*p)*w.y;Vn+=(MNR[int(i.y)]*n)*w.y;Vp+=(MXF[int(i.z)]*p)*w.z;Vn+=(MNR[int(i.z)]*n)*w.z;Vp+=(MXF[int(i.w)]*p)*w.w;Vn+=(MNR[int(i.w)]*n)*w.w;}else{Vp=MXF[0]*p;Vn=MNR[0]*n;}Vu=u.xy;gl_Position=MEV*Vp;Cd=vec4(0.0,0.0,0.0,0.0);Cs=vec4(0.0,0.0,0.0,0.0);EV=normalize(Ep-Vp).xyz;for(int i=0;i<ML;i++){if(Le[i]){if(Lp[i].w==1.0){LV=normalize(Lp[i]-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld[i])-(cos(La[i])))/(Lf[i]), 0.0, 1.0);}else{LV=Ld[i]*-1.0;LT=max(dot(Vn,LV),0.0);Fw=1.0;}Cd+=(Lc[i]*Li[i]*LT)*Fw;R=normalize(reflect(-LV,Vn));Cs+=Lc[i]*Li[i]*(pow(max(dot(R,EV),0.0),Mi))*Fw;}}}';
 
 
 /** Default built-in Glsl fragment shader string.
@@ -2915,13 +2954,13 @@ Ovoid.GLSL_VL_AERDS_FULLTEX_FS='precision highp float;uniform vec4 Ac;uniform sa
 /** Default built-in Glsl fragment shader string.
  * @constant
  * @memberOf _global_ */
-Ovoid.GLSL_AERDS_FULLTEX_LP_FS='precision highp float;uniform bool ENd;uniform bool ENa;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp;uniform vec3 Ld;uniform vec4 Lc;uniform float Li;uniform float Lr;uniform float Lf;uniform float La;uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sa;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;uniform vec4 Fc;uniform float Fd;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;vec4 Td;float LT, Fw, Dw, Sw, Fz, Ff;vec3 EV, R, LV;vec2 Ru;void main(void){EV=normalize(Ep-Vp).xyz;gl_FragColor=vec4(0.0,0.0,0.0,0.0);Td=texture2D(Sd,Vu);if(ENa){gl_FragColor=(Ma*Md*Td)*Ac;gl_FragColor+=(Me*texture2D(Se,Vu));if(My!=0.0){R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}gl_FragColor.a=Td.a*Mo;}if(ENd){if(Lp.w==1.0){LV=normalize(Lp-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf),0.0,1.0);}else{LV=Ld;LT=max(dot(Vn,LV),0.0);Fw=1.0;}Dw=LT*Li*Fw;R=normalize(reflect(-LV,Vn));Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Md*Td)*((Lc*Li)*Dw);gl_FragColor.a=Td.a*Mo;gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc*Li)*Sw);if(Fd>0.0){Fz=gl_FragCoord.z/gl_FragCoord.w;Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);gl_FragColor=mix(Fc,gl_FragColor,Ff);}}}';
+Ovoid.GLSL_AERDS_FULLTEX_LP_FS='precision highp float;uniform bool ENd;uniform bool ENa;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp;uniform vec3 Ld;uniform vec4 Lc;uniform float Li;uniform float Lr;uniform float Lf;uniform float La;uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sa;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;uniform vec4 Fc;uniform float Fd;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;vec4 Td;float LT, Fw, Dw, Sw, Fz, Ff;vec3 EV, R, LV;vec2 Ru;void main(void){EV=normalize(Ep-Vp).xyz;gl_FragColor=vec4(0.0,0.0,0.0,0.0);Td=texture2D(Sd,Vu);if(ENa){gl_FragColor=(Ma*Md*Td)*Ac;gl_FragColor+=(Me*texture2D(Se,Vu));if(My!=0.0){R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}gl_FragColor.a=Td.a*Mo;}if(ENd){if(Lp.w==1.0){LV=normalize(Lp-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld)-(cos(La)))/(Lf),0.0,1.0);}else{LV=Ld*-1.0;LT=max(dot(Vn,LV),0.0);Fw=1.0;}Dw=LT*Li*Fw;R=normalize(reflect(-LV,Vn));Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Md*Td)*((Lc*Li)*Dw);gl_FragColor.a=Td.a*Mo;gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc*Li)*Sw);if(Fd>0.0){Fz=gl_FragCoord.z/gl_FragCoord.w;Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);gl_FragColor=mix(Fc,gl_FragColor,Ff);}}}';
 
 
 /** Default built-in Glsl fragment shader string.
  * @constant
  * @memberOf _global_ */
-Ovoid.GLSL_AERDS_FULLTEX_1P_FS='#define ML '+Ovoid.MAX_LIGHT_BY_DRAW+'\nprecision highp float;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp[ML];uniform vec3 Ld[ML];uniform vec4 Lc[ML];uniform float Li[ML];uniform float Lr[ML];uniform float Lf[ML];uniform float La[ML];uniform bool Le[ML];uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sa;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;uniform vec4 Fc;uniform float Fd;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;vec4 Td;float LT, Fw, Dw, Sw, Fz, Ff;vec3 EV, R, LV;vec2 Ru;void main(void){EV=normalize(Ep-Vp).xyz;Td=texture2D(Sd,Vu);gl_FragColor=(Ma*Md*Td)*Ac;gl_FragColor+=(Me*texture2D(Se,Vu));if(My!=0.0){R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}for(int i=0;i<ML;i++){if(Le[i]){if(Lp[i].w==1.0){LV=normalize(Lp[i]-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld[i])-(cos(La[i])))/(Lf[i]),0.0,1.0);}else{LV=Ld[i];LT=max(dot(Vn,LV),0.0);Fw=1.0;}Dw=LT*Li[i]*Fw;R=normalize(reflect(-LV,Vn));Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Md*Td)*((Lc[i]*Li[i])*Dw);gl_FragColor.a=Td.a*Mo;gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc[i]*Li[i])*Sw);}}if(Fd>0.0){Fz=gl_FragCoord.z/gl_FragCoord.w;Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);gl_FragColor=mix(Fc,gl_FragColor,Ff);}}';
+Ovoid.GLSL_AERDS_FULLTEX_1P_FS='#define ML '+Ovoid.MAX_LIGHT_BY_DRAW+'\nprecision highp float;uniform vec4 Ep;uniform vec4 Ac;uniform vec4 Lp[ML];uniform vec3 Ld[ML];uniform vec4 Lc[ML];uniform float Li[ML];uniform float Lr[ML];uniform float Lf[ML];uniform float La[ML];uniform bool Le[ML];uniform vec4 Md;uniform vec4 Ma;uniform vec4 Ms;uniform vec4 Me;uniform vec4 Mr;uniform float Mi;uniform float My;uniform float Mo;uniform sampler2D Sa;uniform sampler2D Sd;uniform sampler2D Ss;uniform sampler2D Se;uniform sampler2D Sr;uniform vec4 Fc;uniform float Fd;varying vec4 Vp;varying vec3 Vn;varying vec2 Vu;vec4 Td;float LT, Fw, Dw, Sw, Fz, Ff;vec3 EV, R, LV;vec2 Ru;void main(void){EV=normalize(Ep-Vp).xyz;Td=texture2D(Sd,Vu);gl_FragColor=(Ma*Md*Td)*Ac;gl_FragColor+=(Me*texture2D(Se,Vu));if(My!=0.0){R=normalize(reflect(EV,Vn));Ru=(R.xy/(2.0*(1.0+abs(R.z))))+0.5;gl_FragColor+=(Mr*texture2D(Sr,Ru))*My;}for(int i=0;i<ML;i++){if(Le[i]){if(Lp[i].w==1.0){LV=normalize(Lp[i]-Vp).xyz;LT=max(dot(Vn,LV),0.0);Fw=clamp((-dot(LV,Ld[i])-(cos(La[i])))/(Lf[i]),0.0,1.0);}else{LV=Ld[i]*-1.0;LT=max(dot(Vn,LV),0.0);Fw=1.0;}Dw=LT*Li[i]*Fw;R=normalize(reflect(-LV,Vn));Sw=(pow(max(dot(R,EV),0.0),Mi))*Fw;gl_FragColor+=(Md*Td)*((Lc[i]*Li[i])*Dw);gl_FragColor.a=Td.a*Mo;gl_FragColor+=(Ms*texture2D(Ss,Vu))*((Lc[i]*Li[i])*Sw);}}if(Fd>0.0){Fz=gl_FragCoord.z/gl_FragCoord.w;Ff=clamp(exp2(-Fd*Fd*Fz*Fz*1.442695),0.0,1.0);gl_FragColor=mix(Fc,gl_FragColor,Ff);}}';
 
 
 /** 
@@ -2929,17 +2968,18 @@ Ovoid.GLSL_AERDS_FULLTEX_1P_FS='#define ML '+Ovoid.MAX_LIGHT_BY_DRAW+'\nprecisio
  * @constant
  * @memberOf _global_
  */
-Ovoid.OVOIDJS_VERSION = '1.1';
+Ovoid.VERSION = '2.0';
 
 
-/** OvoiD.JS Library first-build date.
+/** In memory of the first Ovoid.JS version.
  * @constant
  * @memberOf _global_
  */
-Ovoid.OVOIDJS_FIRSTBUILD_DATE = '16-07-2012';
+Ovoid.FIRSTBUILD_DATE = '16-07-2012';
 
-/** OvoiD.JS Library release date.
+
+/** OvoiD.JS Library current version release date.
  * @constant
  * @memberOf _global_
  */
-Ovoid.OVOIDJS_RELEASE_DATE = 'XX-XX-2012';
+Ovoid.RELEASE_DATE = '16-04-2014';

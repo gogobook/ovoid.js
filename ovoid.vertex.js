@@ -20,7 +20,7 @@
 
 
 /**
- * Create a Vertex object.
+ * Constructor method.
  *
  * @class Vertex object.<br><br>
  * 
@@ -106,116 +106,6 @@ Ovoid.Vertex.prototype.equal = function(other) {
     }
   }
   return false;
-};
-
-
-/**
- * Component assigment from Float32Array.<br><br>
- * 
- * Sets the values of the vertex components using the given 
- * Float32Array and the specified Vertex format.
- *
- * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
- * following symbolic constants:<br>
- * Ovoid.VERTEX_VEC4_P,<br>
- * Ovoid.VERTEX_VEC3_N,<br>
- * Ovoid.VERTEX_VEC3_U,<br>
- * Ovoid.VERTEX_VEC3_T,<br>
- * Ovoid.VERTEX_VEC3_B,<br>
- * Ovoid.VERTEX_VEC4_C,<br>
- * Ovoid.VERTEX_VEC4_I,<br>
- * Ovoid.VERTEX_VEC4_W.<br><br>
- * 
- * @param {Float32Array} floatArray Float32Array with components values.
- */
-Ovoid.Vertex.prototype.fromFloat32Array = function(format, floatArray) {
-
-  stride = 0;
-  if (format & Ovoid.VERTEX_VEC4_P) {
-    this.p.setv(floatArray.subarray(stride, stride + 4)); stride += 4;
-  }
-  if (format & Ovoid.VERTEX_VEC3_N) {
-    this.n.setv(floatArray.subarray(stride, stride + 3)); stride += 3;
-  }
-  if (format & Ovoid.VERTEX_VEC3_U) {
-    this.u.setv(floatArray.subarray(stride, stride + 3)); stride += 3;
-  }
-  if (format & Ovoid.VERTEX_VEC3_T) {
-    this.t.setv(floatArray.subarray(stride, stride + 3)); stride += 3;
-  }
-  if (format & Ovoid.VERTEX_VEC3_B) {
-    this.b.setv(floatArray.subarray(stride, stride + 3)); stride += 3;
-  }
-  if (format & Ovoid.VERTEX_VEC4_C) {
-    this.c.setv(floatArray.subarray(stride, stride + 4)); stride += 4;
-  }
-  if (format & Ovoid.VERTEX_VEC4_I) {
-    this.i.setv(floatArray.subarray(stride, stride + 4)); stride += 4;
-  }
-  if (format & Ovoid.VERTEX_VEC4_W) {
-    this.w.setv(floatArray.subarray(stride, stride + 4)); stride += 4;
-  }
-};
-
-
-/**
- * Component conversion to Float32Array.<br><br>
- *
- * Convert the vertex components into an Float32Array according to the
- * specified vertex format.
- * 
- * @param {bitmask} format Vertex Format bitmask. Can be any combinaison of 
- * following symbolic constants:<br>
- * Ovoid.VERTEX_VEC4_P,<br>
- * Ovoid.VERTEX_VEC3_N,<br>
- * Ovoid.VERTEX_VEC3_U,<br>
- * Ovoid.VERTEX_VEC3_T,<br>
- * Ovoid.VERTEX_VEC3_B,<br>
- * Ovoid.VERTEX_VEC4_C,<br>
- * Ovoid.VERTEX_VEC4_I,<br>
- * Ovoid.VERTEX_VEC4_W.<br><br>
- *
- * @return {Float32Array} Float32Array buffer of vertex components.
- */
-Ovoid.Vertex.prototype.asFloat32Array = function(format) {
-
-  var stride = 0;
-  if (format & Ovoid.VERTEX_VEC4_P) stride += 4;
-  if (format & Ovoid.VERTEX_VEC3_N) stride += 3;
-  if (format & Ovoid.VERTEX_VEC3_U) stride += 3;
-  if (format & Ovoid.VERTEX_VEC3_T) stride += 3;
-  if (format & Ovoid.VERTEX_VEC3_B) stride += 3;
-  if (format & Ovoid.VERTEX_VEC4_C) stride += 4;
-  if (format & Ovoid.VERTEX_VEC4_I) stride += 4;
-  if (format & Ovoid.VERTEX_VEC4_W) stride += 4;
-
-  var floatArray = new Float32Array(stride);
-  var offset = 0;
-  if (format & Ovoid.VERTEX_VEC4_P) {
-    floatArray.set(this.p.v, offset); offset += 4;
-  }
-  if (format & Ovoid.VERTEX_VEC3_N) {
-    floatArray.set(this.n.v, offset); offset += 3;
-  }
-  if (format & Ovoid.VERTEX_VEC3_U) {
-    floatArray.set(this.u.v, offset); offset += 3;
-  }
-  if (format & Ovoid.VERTEX_VEC3_T) {
-    floatArray.set(this.t.v, offset); offset += 3;
-  }
-  if (format & Ovoid.VERTEX_VEC3_B) {
-    floatArray.set(this.b.v, offset); offset += 3;
-  }
-  if (format & Ovoid.VERTEX_VEC4_C) {
-    floatArray.set(this.c.v, offset); offset += 4;
-  }
-  if (format & Ovoid.VERTEX_VEC4_I) {
-    floatArray.set(this.i.v, offset); offset += 4;
-  }
-  if (format & Ovoid.VERTEX_VEC4_W) {
-    floatArray.set(this.w.v, offset); offset += 4;
-  }
-  return floatArray;
 };
 
 
@@ -531,7 +421,7 @@ Ovoid.Vertex.newArray = function(count) {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -547,7 +437,7 @@ Ovoid.Vertex.prototype.toJSON = function() {
   o[3] = this.t;
   o[4] = this.b;
   o[5] = this.c;
-  o[6] = this.i;
+  o[6] = this._i;
   o[7] = this.w;
   return o;
 };

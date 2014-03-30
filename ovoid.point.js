@@ -20,7 +20,7 @@
 
 
 /**
- * Create a Point object.
+ * Constructor method.
  *
  * @class Point object.<br><br>
  * 

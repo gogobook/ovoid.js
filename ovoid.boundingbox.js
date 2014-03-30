@@ -19,7 +19,7 @@
 
 
 /**
- * Bounding box object constructor.
+ * Constructor method.
  *
  * @class Bounding box object.<br><br>
  * 

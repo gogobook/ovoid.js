@@ -20,11 +20,11 @@
 
 
 /**
- * Layer node constructor.
+ * Constructor method.
  *
  * @class Overlay Text node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Text node implements an 2D text string overlayed on the 
  * rendered scene. It uses the texture mapped font technic to draw characters as 
@@ -48,8 +48,9 @@
  * @extends Ovoid.Layer
  *
  * @param {string} name Name of the new node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Text = function(name) {
+Ovoid.Text = function(name, i) {
 
   Ovoid.Layer.call(this);
   /** node type.
@@ -67,6 +68,10 @@ Ovoid.Text = function(name) {
   /** Text parameters.
    * @type Coord */
   this.param = new Ovoid.Coord(16.0, 0.5, 1.0);
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Text.prototype = new Ovoid.Layer;
 Ovoid.Text.prototype.constructor = Ovoid.Text;
@@ -134,7 +139,7 @@ Ovoid.Text.prototype.getWidth = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

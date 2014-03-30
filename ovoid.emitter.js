@@ -20,11 +20,11 @@
 
 
 /**
- * Particle emitter node constructor.
+ * Constructor method.
  * 
  * @class Particle emitter node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Emitter node implements a point-sprite particles emitter. 
  * The Emitter node is a dependency node and does not takes place directly in 
@@ -32,7 +32,7 @@
  * (multiple assignation is allowed but with unpredictable results).<br><br>
  * 
  * <blockcode>
- * emitter = scene.create(Ovoid.EMITTER, "particles");<br>
+ * emitter = myOvoid.Scene.newNode(Ovoid.EMITTER, "particles");<br>
  * body.setShape(emitter);<br>
  * emitter.setSprite(glowTexture);<br>
  * emitter.setSizes(5.0, 20.0);<br>
@@ -53,8 +53,8 @@
  * 
  * <b>Point-Sprite or Billboard</b><br><br>
  * 
- * By setting the <code>billboard</code> member variable to <code>true</code> or 
- * <code>false</code> you can choose the particle rendering technique. 
+ * By setting the <c>billboard</c> member variable to <c>true</c> or 
+ * <c>false</c> you can choose the particle rendering technique. 
  * The Point-sprite technique use the hardware accelerated point-sprite which 
  * offer serious performance gain but has the inconvenience of some limitations 
  * and inconsistance depending the hardware, drivers and operating systems 
@@ -69,8 +69,9 @@
  * @extends Ovoid.Node
  * 
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Emitter = function(name) {
+Ovoid.Emitter = function(name, i) {
 
   Ovoid.Node.call(this);
   /** Node type. */
@@ -88,8 +89,8 @@ Ovoid.Emitter = function(name) {
    * @type float */
   this.life = 1.0;
   /** Particles birth rate (born per seconds).
-   * @type float */
-  this.rate = 100.0;
+   * @type int */
+  this.rate = 100;
   /** Velocity for new emitted particles.
    * @type float */
   this.velocity = 5.0;
@@ -135,6 +136,10 @@ Ovoid.Emitter = function(name) {
   this._particles = Ovoid.Particle.newArray(Ovoid.MAX_EMITTER_PARTICLES);
   /** Vertices Float Array buffer list. */
   this._fbuffer = new Float32Array(Ovoid.MAX_EMITTER_PARTICLES * 11);
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Emitter.prototype = new Ovoid.Node;
 Ovoid.Emitter.prototype.constructor = Ovoid.Emitter;
@@ -242,22 +247,24 @@ Ovoid.Emitter.prototype.getAlives = function() {
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
-Ovoid.Emitter.prototype.cachEmitter = function() {
+Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
   
   if(!this.link[0]) 
     return;
-  
+    
+ 
+  var NB = 0;  /* Nombre de particule à faire naitre durant cette passe */
+      
   if (this.emits || this._alives != 0) {
 
-    /* Nombre de particule à faire naitre durant cette passe */
-    var NB;
-    this._ctdown -= Ovoid.Timer.quantum;
+    /* Calcul du nombre de naissance */
+    this._ctdown -= this._i.Timer.quantum;
     if(this._ctdown <= 0.0) {
-      NB = Math.floor(this.rate*Ovoid.Timer.quantum);
+      NB = Math.round(this.rate*this._i.Timer.quantum);
       if(NB < 1) NB = 1;
       this._ctdown = 1.0/this.rate;
     }
@@ -269,7 +276,6 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
           body = this.link[i];
       }
     }
-    var n;
   }
   
   if (this._alives != 0 || NB != 0) {
@@ -296,13 +302,13 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
     var WP = new Ovoid.Point();
     
     /* Influence gravite */
-    var g = new Ovoid.Vector(this.mass * Ovoid.opt_gravity[0], 
-        this.mass * Ovoid.opt_gravity[1], 
-        this.mass * Ovoid.opt_gravity[2]);
-    g.scaleBy(Ovoid.Timer.quantum);
+    var g = new Ovoid.Vector(this.mass * this._i.opt_gravity[0], 
+        this.mass * this._i.opt_gravity[1], 
+        this.mass * this._i.opt_gravity[2]);
+    g.scaleBy(this._i.Timer.quantum);
     
     /* facteur de damping */
-    var d = Math.pow(this.damping, Ovoid.Timer.quantum);
+    var d = Math.pow(this.damping, this._i.Timer.quantum);
   }
   
   if (this._alives != 0 || this.emits) {
@@ -311,7 +317,7 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
     while(i--) {
       if(this._particles[i].l > 0.0) {
         
-        this._particles[i].l -= Ovoid.Timer.quantum;
+        this._particles[i].l -= this._i.Timer.quantum;
         L = this._particles[i].l / this.life;
         
         P = this._particles[i].p;
@@ -322,7 +328,7 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         /* calcul pour le bounding volum */
         //FIXME : Cette partie fonctionne, mais est-ce bien utile de faire tous
         // ces calculs pour une amélioration si minime ?
-        if(i % 50 == 0) {
+        if(i % (this.rate/10) == 0) {
           WP.copy(P);
           WP.transform4Inverse(body.worldMatrix);
 
@@ -336,9 +342,9 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         }
         
         /* ajustement de la position par la velocité */
-        P.v[0] += (V.v[0] * Ovoid.Timer.quantum);
-        P.v[1] += (V.v[1] * Ovoid.Timer.quantum);
-        P.v[2] += (V.v[2] * Ovoid.Timer.quantum);
+        P.v[0] += (V.v[0] * this._i.Timer.quantum);
+        P.v[1] += (V.v[1] * this._i.Timer.quantum);
+        P.v[2] += (V.v[2] * this._i.Timer.quantum);
             
         V.addBy(g);
         V.scaleBy(d);
@@ -362,6 +368,7 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         
         if(this.emits) {
           if(NB > 0) {
+
             P = this._particles[i].p;
             V = this._particles[i].v;
             C = this._particles[i].c;
@@ -454,7 +461,7 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -495,7 +502,7 @@ Ovoid.Emitter.prototype.toJSON = function() {
   o['cl'] = this.color;
   o['sz'] = this.size;
   o['em'] = this.emits;
-  o['tx'] = this.texture;
+  o['tx'] = this.texture.uid;
   o['bb'] = this.billboard;
   return o;
 

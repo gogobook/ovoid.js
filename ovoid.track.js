@@ -20,11 +20,11 @@
 
 
 /**
- * Track node object constructor.
+ * Constructor method.
  *
  * @class Track node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Track node is an Animation grouping node. The Track node purpose is to 
  * provide a more maniable way to play, stop or rewind several Animation nodes 
@@ -57,7 +57,7 @@
  * <b>Track handling</b><br><br>
  * 
  * For interactivity purpose, the Track node is designed to make able to 
- * handle the track end through a trigger function. The <code>onended</code> 
+ * handle the track end through a trigger function. The <c>onended</c> 
  * trigger function member is called each time all Track's animations ends. So 
  * you can override this function to handle the Track ends and create some 
  * interactive or scripts effects. The function should take one argument who 
@@ -72,8 +72,9 @@
  * </blockcode><br><br>
  * 
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Track = function(name) {
+Ovoid.Track = function(name, i) {
 
   Ovoid.Node.call(this);
   /** node type */
@@ -99,6 +100,10 @@ Ovoid.Track = function(name) {
   this.onended = function(node) {};
   /** Track playing time */
   this._time = 0.0;
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 };
 Ovoid.Track.prototype = new Ovoid.Node;
 Ovoid.Track.prototype.constructor = Ovoid.Track;
@@ -251,7 +256,7 @@ Ovoid.Track.prototype.time = function() {
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -273,7 +278,12 @@ Ovoid.Track.prototype.cachTrack = function() {
   
     /* Controle d'animation play/end/loop */
     if (!this.playing) {
-      this.onended(this);
+      try { /* handle exceptions car des fonctions sont custom */
+        this.onended(this);
+      } catch(e) {
+        Ovoid._log(0, this._i, '::Track.cachTrack', this.name + 
+              ':: Custom onended() function exception thrown:\n' + e.stack);
+      }
       if (this.loop) {
         var i = this.animation.length;
         while (i--) { 
@@ -295,7 +305,7 @@ Ovoid.Track.prototype.cachTrack = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.
@@ -331,6 +341,6 @@ Ovoid.Track.prototype.toJSON = function() {
   o['an'] = new Array();
   for (var i = 0; i < this.animation.length; i++)
     o['an'][i] = this.animation[i].uid;
-  o['oe'] = String(this.onended);
+  o['oe'] = Ovoid.compact(this.onended);
   return o;
 };

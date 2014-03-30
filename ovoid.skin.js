@@ -20,11 +20,11 @@
 
 
 /**
- * Skin controler node constructor.
+ * Constructor method.
  * 
  * @class Skin controler node object.<br><br>
  * 
- * This class is a Node object inherited from <code>Ovoid.Node</code> class.<br><br>
+ * This class is a Node object inherited from <c>Ovoid.Node</c> class.<br><br>
  * 
  * The Skin node implements a mesh skinning deformer.
  * The Skin node is a dependency node and does not takes place directly in 
@@ -54,13 +54,14 @@
  * performances.<br><br>
  * 
  * The Local Data Mirroring can be enabled or disabled through the 
- * <code>Ovoid.opt_localSkinData</code> global option.
+ * <c>Ovoid.opt_localSkinData</c> global option.
  * 
  * @extends Ovoid.Node
  *
  * @param {string} name Name of the node.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Skin = function(name) {
+Ovoid.Skin = function(name, i) {
 
   Ovoid.Node.call(this);
   /** node type */
@@ -102,6 +103,10 @@ Ovoid.Skin = function(name) {
   /** Local mirror triangles list.
    * @type Triangle[][] */
   this.triangles = new Array(Ovoid.MAX_MESH_LOD);
+  
+  /** Ovoid.JS parent instance
+   * @type Object */
+  this._i = i;
 
 };
 Ovoid.Skin.prototype = new Ovoid.Node;
@@ -206,34 +211,36 @@ Ovoid.Skin.prototype.bindSkin = function(mesh, mbindshape, mbindjoint,
   
   /* on ajoute ensuite les weights et les ijoint aux nouveau
    * tableau de vertices */
-  var l = 0; /* lod 0 par defaut */
-  var v, i, j, p;
-  i = this.mesh.vertices[l].length;
-  while (i--) {
-    j = refpos.length / 3;
-    while (j--) {
+  for (var l = 0; l < Ovoid.MAX_MESH_LOD; l++) {
+      
+    var v, i, j, p;
+    i = this.mesh.vertices[l].length;
+    while (i--) {
+      j = refpos.length / 3;
+      while (j--) {
 
-      p = this.mesh.vertices[l][i].p;
-      /* si la position du vertice du shape correspond a la
-       * position reference on ajoute les weights et les ijoint
-       * au vertex */
+        p = this.mesh.vertices[l][i].p;
+        /* si la position du vertice du shape correspond a la
+         * position reference on ajoute les weights et les ijoint
+         * au vertex */
 
-      /* TODO: on peut envisager une tolérence de position pour
-       * un skining des lods inférieurs... */
-      if (p.v[0] == refpos[(j * 3) + 0] &&
-          p.v[1] == refpos[(j * 3) + 1] &&
-          p.v[2] == refpos[(j * 3) + 2])
-      {
-        v = j * 4;
-        this.mesh.vertices[l][i].i.setv(
-            jointid.subarray(v, v + 4));
+        /* TODO: on peut envisager une tolérence de position pour
+         * un skining des lods inférieurs... */
+        if (p.v[0] == refpos[(j * 3) + 0] &&
+            p.v[1] == refpos[(j * 3) + 1] &&
+            p.v[2] == refpos[(j * 3) + 2])
+        {
+          v = j * 4;
+          this.mesh.vertices[l][i].i.setv(
+              jointid.subarray(v, v + 4));
 
-        this.mesh.vertices[l][i].w.setv(
-            weigth.subarray(v, v + 4));
+          this.mesh.vertices[l][i].w.setv(
+              weigth.subarray(v, v + 4));
+        }
       }
     }
   }
-
+  
   /* On definie les bindpose pour chaque joint. Il faut la matrice
    * monde de l'objet et de chaque joint au moment du bind (c'est un
    * instantané du bind). On multiplie ensuite l'inverse de chaque
@@ -263,7 +270,7 @@ Ovoid.Skin.prototype.bindSkin = function(mesh, mbindshape, mbindjoint,
  *
  * <br><br>Ovoid implements a node's caching system to prevent useless data computing, 
  * and so optimize global performances. This function is used internally by the
- * <code>Ovoid.Queuer</code> global class and should not be called independently.
+ * <c>Ovoid.Queuer</c> global class and should not be called independently.
  * 
  * @private
  */
@@ -286,7 +293,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
     }
     
     // Mirroring des weighted vertices
-    if (Ovoid.opt_localSkinData && this.mesh) {
+    if (this._i.opt_localSkinData && this.mesh) {
         
       // Pour le calcul du bounding volum
       var min = new Ovoid.Point(Ovoid.FLOAT_MAX,
@@ -301,7 +308,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
           
       var mv, sv, p0, p1, p2;
       
-      var l = 0; /* Lod */
+      var l = mesh._lod;
       var c = this.mesh.vertices[l].length;
       for (var i = 0; i < c; i++) {
         sv = this.vertices[l][i];
@@ -331,7 +338,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
         if (sv.p.v[2] < min.v[2]) min.v[2] = sv.p.v[2];
       }
       // On met a jour les infos triangles si le shadow-volum est enabled
-      if (Ovoid.Drawer.opt_shadowCasting) {
+      if (this._i.opt_shadowCasting) {
         // pour la maj des triangles
         var v0 = new Ovoid.Vector();
         var v1 = new Ovoid.Vector();
@@ -372,7 +379,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
 /**
  * JavaScript Object Notation (JSON) serialization method.
  * 
- * <br><br>This method is commonly used by the <code>Ovoid.Ojson</code> class
+ * <br><br>This method is commonly used by the <c>Ovoid.Ojson</c> class
  * to stringify and export scene.
  *  
  * @return {Object} The JSON object version of this node.

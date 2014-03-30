@@ -19,33 +19,72 @@
 
 
 /**
- * Input global static class.
+ * Constructor method.
  *
- * @namespace Input global class.<br><br>
+ * @class Input Module Class..<br><br>
  * 
- * The Input class implements a global user inputs manager. It is a global 
- * static (namespace) class. The Input class is typically both used to query 
- * user input data and bind keys or buttons event to custom functions.<br><br>
+ * The Input class implements a global user inputs manager. This is what
+ * is called a Module class because used as core module for the 
+ * Ovoid.Instance class. A Module class is a part of Instance class and 
+ * can be used only within the Instance class.<br><br>
  * 
- * <blockcode> <codecomment>// Check whether the keycode 14 is held</codecomment><br>
- * if(Ovoid.Input.intHl[14]) {<br>
- * &nbsp;&nbsp;&nbsp;&nbsp; <codecomment>// Do something</codecomment><br>
+ * The Timer class is used to provide a global user inputs data and 
+ * tools for the whole Instance.<br><br>
+ * 
+ * <blockcode> <cc>// Check whether the keycode 14 is held</cc><br>
+ * if(Instance.Input.intHl[14]) {<br>
+ * &nbsp;&nbsp;&nbsp;&nbsp; <cc>// Do something</cc><br>
  * }<br>
- * <codecomment>// Creates some key-binding </codecomment><br>
- * <codecomment>// A function to rotate our camera in -X</codecomment><br>
+ * <cc>// Creates some key-binding </cc><br>
+ * <cc>// A function to rotate our camera in -X</cc><br>
  * function lookright() {<br>
- * &nbsp;&nbsp;Ovoid.Node("camera").rotateXyz(0.0, -0.05, 0.0);<br>
+ * &nbsp;&nbsp;Instance.Scene.activeCamera.rotateXyz(-0.1,0.0,0.0,Ovoid.LOCAL);<br>
  * };<br><br>
  * 
- * <codecomment>// A function to rotate our camera in X</codecomment><br>
+ * <cc>// A function to rotate our camera in X</cc><br>
  * function lookleft() {<br>
- * &nbsp;&nbsp;Ovoid.Node("camera").rotateXyz(0.0, 0.05, 0.0);<br>
+ * &nbsp;&nbsp;Instance.Scene.activeCamera.rotateXyz(0.1,0.0,0.0,Ovoid.LOCAL);<br>
  * };<br><br>
  * 
- * <codecomment>// Define the input trigger to call lookright and lookleft functions</codecomment><br>
- * Ovoid.Input.trigger(Ovoid.CTR_HELD, 39, Ovoid.HELD, lookright);<br>
- * Ovoid.Input.trigger(Ovoid.CTR_HELD, Ovoid.KB_LARROW, Ovoid.HELD, lookleft);<br>
- * </blockcode><br>
+ * <cc>// Define the input trigger to call lookright and lookleft functions</cc><br>
+ * Instance.Input.setTrigger(Ovoid.CTR_HELD, 39, Ovoid.HELD, lookright);<br>
+ * Instance.Input.setTrigger(Ovoid.CTR_HELD, Ovoid.KB_LARROW, Ovoid.HELD, lookleft);<br>
+ * </blockcode><br><br>
+ * 
+ * <b>Keyboard events</b><br><br>
+ * 
+ * Keyboard events are collected and stored in three arrays of 256 
+ * integers who describes pressed, released or helded state of the keys.
+ * <c>intDn</c> collect all the key-down (pressed) events, 
+ * <c>intUp</c> collect all the key-up (released) events and
+ * <c>intHl</c> collect all the key-held events. A value of 1 at 
+ * the index array matching the key code number means that the 
+ * event is detected for this key.<br><br>
+ * 
+ * <b>Mouse behaviours and 3D cursor</b><br><br>
+ * 
+ * All the mouse behaviours and cursor screen position are stored in the 
+ * <c>mouseWheelDelta</c>, <c>mousePosition</c> and 
+ * <c>mouseVelocity</c> members. These members describes the standard 
+ * mouse parameters collected through the browser.<br><br>
+ * 
+ * The <c>mouseCursor</c>
+ * member is a 4x4 transformation matrix (Ovoid.Matrix4) who describes the mouse
+ * cursor position in 3D space in the current 3D world through an unprojection 
+ * mechanism. This parameter is valid ONLY if the mouse picking system is 
+ * enabled.<br><br>
+ * 
+ * For more information about Picking mode you should refer to the
+ * <a href="Ovoid.Drawer.php"><c>Ovoid.Drawer</c></a> Module class  
+ * documentation.<br><br>
+ * 
+ * <b>Input triggers</b><br><br>
+ * 
+ * Input class provide mecanism to bind key or mouse buttons combots to 
+ * any user defined function. When the defined key or mouse buttons 
+ * combots is detected Input class will automaticaly call the 
+ * user defined function. This mecanism is called an input trigger and 
+ * can be defined via the <c>setTrigger()</c> method.<br><br>
  * 
  * <b>Node Grabbing</b><br><br>
  * 
@@ -62,245 +101,100 @@
  * the grabbed node while ignoring the others. You also must release the grabbed 
  * node to return in the normal interaction behaviour.<br><br>
  * 
- * The node grabbing dedicated functions are <code>grabNode</code> 
- * and <code>grabRelease</code>.<br><br>
+ * The node grabbing dedicated functions are <c>grabNode</c> 
+ * and <c>grabRelease</c>.<br><br>
  * 
  * For more information about node-grabbing usage, see the 
- * <code>Ovoid.Action</code> node documentation page.
+ * <a href="Ovoid.Action.php>Ovoid.Action</a> node documentation page.
  * 
- * <b>Mouse behaviours and 3D cursor</b><br><br>
- * 
- * All the mouse behaviours and cursor screen position are stored in the 
- * <code>mouseWheelDelta</code>, <code>mousePosition</code> and 
- * <code>mouseVelocity</code> members. These members describes the standard 
- * mouse parameters collected through the browser.<br><br>
- * 
- * The <code>mouseCursor</code>
- * member is a 4x4 transformation matrix (Ovoid.Matrix4) who describes the mouse
- * cursor position in 3D space in the current 3D world through an unprojection 
- * mechanism. This parameter is valid ONLY if the mouse picking system is 
- * enabled.
- * 
- * For more information about Picking mode you should refer to the
- * <a href="Ovoid.Drawer.php"><code>Ovoid.Drawer</code></a> global class  
- * documentation.<br><br>
+ * @param {object} i Instance object to register object to.
  * 
  */
-Ovoid.Input = {};
-
-
-/** Input signal mouse wheel Detla */
-Ovoid.Input.mouseWheel = new Array(3);
-
-
-/** Current mouse wheel Position */
-Ovoid.Input.mouseWheelDelta = 0;
-
-
-/** Current mouse position */
-Ovoid.Input.mousePosition = new Ovoid.Coord(0.0, 0.0, 0.0);
-
-
-/** Current mouse velocity */
-Ovoid.Input.mouseVelocity = new Ovoid.Vector(0.0, 0.0, 0.0);
-
-
-/** Current mouse unprojected cursor world matrix */
-Ovoid.Input.mouseCursor = new Ovoid.Matrix4();
-
-
-/** Current grabbed node */
-Ovoid.Input.grabbedNode = null;
-
-
-/** Current UID of the node who is under the mouse pointer */
-Ovoid.Input.mouseOverUid = 0;
-
-
-/** Current UID of the node who the mouse pointer enter */
-Ovoid.Input.mouseEnterUid = 0;
-
-
-/** Current UID of the node who the mouse pointer leave */
-Ovoid.Input.mouseLeaveUid = 0;
-
-
-/** Current node who is under the mouse pointer */
-Ovoid.Input.mouseOverNode = null;
-
-
-/** Input signal Key/button Down array */
-Ovoid.Input.intDn = new Uint8Array(256);
-
-
-/** Input signal Key/button Up array */
-Ovoid.Input.intUp = new Uint8Array(256);
-
-
-/** Input signal Key/button Held array */
-Ovoid.Input.intHl = new Uint8Array(256);
-
-
-/** Input GamePad axis */
-Ovoid.Input.gpAxis = new Ovoid.Point(0.0, 0.0, 0.0, 0.0);
-
-
-/** Input On Key/button triggers array */
-Ovoid.Input.onInt = [new Array(), new Array(), new Array()];
-
-
-/** Input On Control-Key/button triggers array */
-Ovoid.Input.onCTRInt = [new Array(), new Array(), new Array()];
-
-
-/** Input On Alt-Key/button triggers array */
-Ovoid.Input.onALTInt = [new Array(), new Array(), new Array()];
-
-
-/** Input On Shift-Key/button triggers array */
-Ovoid.Input.onSHFInt = [new Array(), new Array(), new Array()];
-
-
-/** Input On Left Super-Key/button triggers array */
-Ovoid.Input.onLSUInt = [new Array(), new Array(), new Array()];
-
-
-/** Input On Right Super-Key/button triggers array */
-Ovoid.Input.onRSUInt = [new Array(), new Array(), new Array()];
-
-
-/**
- * Handle Mouse button down.
- * This function is typically used as class's private member and should not be 
- * called independently.
- * 
- * @param {Object} e DOM Event object.
- */
-Ovoid.Input._eventMouseDn = function(e) {
-
-  Ovoid.Input.intDn[e.button] = true;
-  Ovoid.Input.intUp[e.button] = false;
-  Ovoid.Input.intHl[e.button] = true;
-
-};
-
-
-/**
- * Handle Mouse button up.
- * This function is typically used as class's private member and should not be 
- * called independently.
- * 
- * @param {Object} e DOM Event object.
- */
-Ovoid.Input._eventMouseUp = function(e) {
-
-  Ovoid.Input.intDn[e.button] = false;
-  Ovoid.Input.intUp[e.button] = true;
-  Ovoid.Input.intHl[e.button] = false;
-};
-
-
-/**
- * Handle Mouse move.
- * This function is typically used as class's private member and should not be 
- * called independently.
- * 
- * @param {Object} e DOM Event object.
- */
-Ovoid.Input._eventMouseMove = function(e) {
-
-  /* calcul de la position relative de la souris */
-  var x = e.clientX - Ovoid.Frame.position.v[0] + Ovoid.Frame.scroll.v[0];
-  var y = e.clientY - Ovoid.Frame.position.v[1] + Ovoid.Frame.scroll.v[1];
-
-  Ovoid.Input.mouseVelocity.set(Ovoid.Input.mousePosition.v[0] - x, 
-      Ovoid.Input.mousePosition.v[1] - y,
-      0.0);
-      
-  Ovoid.Input.mousePosition.set(x, y, 0.0);
-};
-
-
-/**
- * Handle Mouse wheel.
- * This function is typically used as class's private member and should not be 
- * called independently.
- * 
- * @param {Object} e DOM Event object.
- */
-Ovoid.Input._eventMouseWheel = function(e) {
-
-  if (!e) /* IE */
-    e = window.event;
+Ovoid.Input = function(i) {
   
-  var w;
-  if (e.wheelDelta) { /* IE/Opera */
-    w = e.wheelDelta/120;
-  } else if (e.detail) { /* Mozilla */
-    w = -e.detail/3;
-  }
-
-  if (w > 0) {
-    Ovoid.Input.intUp[7] = true;
-  } else if (w < 0) {
-    Ovoid.Input.intDn[7] = true;
-  }
-  Ovoid.Input.mouseWheelDelta = w;
-}
+    /** Instance parent */
+  this._i = i;
 
 
-/**
- * Handle key down.
- * This function is typically used as class's private member and should not be 
- * called independently.
- * 
- * @param {Object} e DOM Event object.
- */
-Ovoid.Input._eventKeyDn = function(e) {
-
-  Ovoid.Input.intDn[e.keyCode] = true;
-  Ovoid.Input.intHl[e.keyCode] = true;
-};
+  /** Input signal mouse wheel Detla */
+  this.mouseWheel = new Array(3);
 
 
-/**
- * Handle key up.
- * This function is typically used as class's private member and should not be 
- * called independently.
- * 
- * @param {Object} e DOM Event object.
- */
-Ovoid.Input._eventKeyUp = function(e) {
-
-  Ovoid.Input.intUp[e.keyCode] = true;
-  Ovoid.Input.intHl[e.keyCode] = false;
-};
+  /** Current mouse wheel Position */
+  this.mouseWheelDelta = 0;
 
 
-/**
- * Handle GamePad Axis.
- * This function is typically used as class's private member and should not be 
- * called independently.
- * 
- * @param {Object} e DOM Event object.
- */
-Ovoid.Input._eventGpAxis = function(e) {
+  /** Current mouse position */
+  this.mousePosition = new Ovoid.Coord(0.0, 0.0, 0.0);
 
- // Ne fonctionne pas pour le moment
- 
-};
 
-/**
- * Handle GamePad Connect.
- * This function is typically used as class's private member and should not be 
- * called independently.
- * 
- * @param {Object} e DOM Event object.
- */
-Ovoid.Input._eventGpConnect = function(e) {
+  /** Current mouse velocity */
+  this.mouseVelocity = new Ovoid.Vector(0.0, 0.0, 0.0);
 
- // Ne fonctionne pas pour le moment
- 
+
+  /** Current mouse unprojected cursor world matrix */
+  this.mouseCursor = new Ovoid.Matrix4();
+
+
+  /** Current grabbed node */
+  this.grabbedNode = null;
+
+
+  /** Current UID of the node who is under the mouse pointer */
+  this.mouseOverUid = 0;
+
+
+  /** Current UID of the node who the mouse pointer enter */
+  this.mouseEnterUid = 0;
+
+
+  /** Current UID of the node who the mouse pointer leave */
+  this.mouseLeaveUid = 0;
+
+
+  /** Current node who is under the mouse pointer */
+  this.mouseOverNode = null;
+
+
+  /** Input signal Key/button Down array */
+  this.intDn = new Uint8Array(256);
+
+
+  /** Input signal Key/button Up array */
+  this.intUp = new Uint8Array(256);
+
+
+  /** Input signal Key/button Held array */
+  this.intHl = new Uint8Array(256);
+
+
+  /** Input GamePad axis */
+  this.gpAxis = new Ovoid.Point(0.0, 0.0, 0.0, 0.0);
+
+
+  /** Input On Key/button triggers array */
+  this._onInt = [new Array(), new Array(), new Array()];
+
+
+  /** Input On Control-Key/button triggers array */
+  this._onCTRInt = [new Array(), new Array(), new Array()];
+
+
+  /** Input On Alt-Key/button triggers array */
+  this._onALTInt = [new Array(), new Array(), new Array()];
+
+
+  /** Input On Shift-Key/button triggers array */
+  this._onSHFInt = [new Array(), new Array(), new Array()];
+
+
+  /** Input On Left Super-Key/button triggers array */
+  this._onLSUInt = [new Array(), new Array(), new Array()];
+
+
+  /** Input On Right Super-Key/button triggers array */
+  this._onRSUInt = [new Array(), new Array(), new Array()];
+
 };
 
 
@@ -314,26 +208,10 @@ Ovoid.Input._eventGpConnect = function(e) {
  *
  * @return {bool} True if initialization succeeds, false otherwise.
  */
-Ovoid.Input.init = function() {
+Ovoid.Input.prototype._init = function() {
 
-  Ovoid.log(3, 'Ovoid.Input', 'initialization');
-
-  window.onmousedown = Ovoid.Input._eventMouseDn;
-  window.onmouseup = Ovoid.Input._eventMouseUp;
-  window.onmousemove = Ovoid.Input._eventMouseMove;
-  window.onmousewheel = Ovoid.Input._eventMouseWheel;
-  
-  window.addEventListener('DOMMouseScroll', 
-      Ovoid.Input._eventMouseWheel, 
-      false);
-  
-  document.onkeydown = Ovoid.Input._eventKeyDn;
-  document.onkeyup = Ovoid.Input._eventKeyUp;
-
-  // Inutiles, aucun browser standard compatible pour le moment
-  window.addEventListener("MozGamepadConnected", Ovoid.Input._eventGpConnect, false);
-  window.addEventListener("MozGamepadAxisMove", Ovoid.Input._eventGpAxis, false);
-
+/* Ici tout a été déménagé en zone globale, voir ovoid.js */
+  Ovoid._log(3, this._i, '.Input._init', ' done');
   return true;
 };
 
@@ -345,53 +223,58 @@ Ovoid.Input.init = function() {
  * frame during the library main loop and is dedicated to refresh internal data. 
  * It shouldn't be called manually.
  */
-Ovoid.Input.update = function() {
+Ovoid.Input.prototype._update = function() {
 
   /* target array */
-  var tary = Ovoid.Input.onInt;
+  var tary = this._onInt;
   
   /* Shift held */
-  if (Ovoid.Input.intHl[16])
-    tary = Ovoid.Input.onSHFInt;
+  if (this.intHl[16])
+    tary = this._onSHFInt;
   /* Ctrl held */
-  if (Ovoid.Input.intHl[17])
-    tary = Ovoid.Input.onCTRInt;
+  if (this.intHl[17])
+    tary = this._onCTRInt;
   /* Alt held */
-  if (Ovoid.Input.intHl[18])
-    tary = Ovoid.Input.onALTInt;
+  if (this.intHl[18])
+    tary = this._onALTInt;
   /* Left super */
-  if (Ovoid.Input.intHl[91])
-    tary = Ovoid.Input.onLSUInt;
+  if (this.intHl[91])
+    tary = this._onLSUInt;
   /* Right super */
-  if (Ovoid.Input.intHl[92])
-    tary = Ovoid.Input.onRSUInt;
-
-  var j;
-  /* Triggers key up */
-  j = tary[0].length;
-  while (j--) {
-   if (Ovoid.Input.intUp[tary[0][j][0]])
-      tary[0][j][1]();
+  if (this.intHl[92])
+    tary = this._onRSUInt;
+    
+  try { /* handle exceptions car des fonctions sont custom */
+      
+    var j;
+    /* Triggers key up */
+    j = tary[0].length;
+    while (j--) {
+     if (this.intUp[tary[0][j][0]])
+        tary[0][j][1]();
+    }
+    /* Triggers key down */
+    j = tary[1].length;
+    while (j--) {
+     if (this.intDn[tary[1][j][0]])
+        tary[1][j][1]();
+    }
+    /* Triggers key held */
+    j = tary[2].length;
+    while (j--) {
+     if (this.intHl[tary[2][j][0]])
+        tary[2][j][1]();
+    }
+  } catch(e) {
+    Ovoid._log(0, this._i, '.Input._update',
+          ' custom trigger function exception thrown:\n' + e.stack);
   }
-  /* Triggers key down */
-  j = tary[1].length;
-  while (j--) {
-   if (Ovoid.Input.intDn[tary[1][j][0]])
-      tary[1][j][1]();
-  }
-  /* Triggers key held */
-  j = tary[2].length;
-  while (j--) {
-   if (Ovoid.Input.intHl[tary[2][j][0]])
-      tary[2][j][1]();
-  }
-
-  Ovoid.Input.mouseVelocity.set(0.0, 0.0, 0.0);
-  Ovoid.Input.mouseWheelDelta = 0;
+  this.mouseVelocity.set(0.0, 0.0, 0.0);
+  this.mouseWheelDelta = 0;
   
   for (var i = 0; i < 255; i++) {
-    Ovoid.Input.intDn[i] = false;
-    Ovoid.Input.intUp[i] = false;
+    this.intDn[i] = false;
+    this.intUp[i] = false;
   }
 };
 
@@ -400,7 +283,20 @@ Ovoid.Input.update = function() {
  * Set or modify an input trigger.<br><br>
  * 
  * Sets or modifies an input combinaison who trigger a custom function. The 
- * specified function will be called each time the input combinaison occur.
+ * specified function will be called each time the input combinaison occur.<br><br>
+ * 
+ * <blockcode>
+ * function lookright() {<br>
+ * &nbsp;&nbsp;myObject.rotateXyz(0.0, -0.05, 0.0);<br>
+ * };<br>
+ * <br>
+ * function lookleft() {<br>
+ * &nbsp;&nbsp;myObject.rotateXyz(0.0, 0.05, 0.0);<br>
+ * };<br>
+ * <br>
+ * myOvoid.Input.setTrigger(Ovoid.CTR_HELD, 39, Ovoid.HELD, lookright);<br>
+ * myOvoid.Input.setTrigger(Ovoid.CTR_HELD, Ovoid.KB_LARROW, Ovoid.HELD, lookleft);<br>
+ * </blockcode><br><br>
  * 
  * @param {enum} m Special Held key modifier, can be null or one of the 
  * following symbolic constants:<br>
@@ -425,20 +321,20 @@ Ovoid.Input.update = function() {
  * @see Ovoid.Input
  * @see _global_
  */
-Ovoid.Input.trigger = function(m, s, k, f) {
+Ovoid.Input.prototype.setTrigger = function(m, k, s, f) {
 
   if (s > 2) {
-    Ovoid.log(2, "Ovoid.Input.trigger", "Invalid key status code.");
+    Ovoid._log(2, this._i, ".Input.setTrigger", " invalid key status code.");
     return;
   }
   
   if (k > 255) {
-    Ovoid.log(2, "Ovoid.Input.trigger", "Invalid key code.");
+    Ovoid._log(2, this._i, ".Input.setTrigger", " invalid key code.");
     return;
   }
   
   if (!(f instanceof Function)) {
-    Ovoid.log(2, "Ovoid.Input.trigger", "Non-Function instance given as trigger function");
+    Ovoid._log(2, this._i, ".Input.setTrigger", " non-Function instance given as trigger function");
     return;
   }
 
@@ -446,28 +342,39 @@ Ovoid.Input.trigger = function(m, s, k, f) {
   trigger[0] = k;
   trigger[1] = f;
   
+  /* Pour chaque modifeur CTR, ALT SHF ou autre :
+   * 
+   * Trigger Array = Keystate [u] ->  [nT] -> [key] 
+   *                                       -> [fonction]
+   *                          [h] ->  [nT] -> [key] 
+   *                                       -> [fonction]
+   *                          [d] ->  [nT] -> [key] 
+   *                                       -> [fonction]
+   * 
+   * */
+  
   /* target array */
   var tary;
   
   switch (m)
   {
     case 1: /* CTR_HELD */
-      tary = Ovoid.Input.onCTRInt
+      tary = this._onCTRInt
     break;
     case 2: /* ALT_HELD */
-      tary = Ovoid.Input.onALTInt
+      tary = this._onALTInt
     break;
     case 3: /* SHF_HELD */
-      tary = Ovoid.Input.onSHFInt
+      tary = this._onSHFInt
     break;
     case 4: /* LSU_HELD */
-      tary = Ovoid.Input.onLSUInt
+      tary = this._onLSUInt
     break;
     case 5: /* RSU_HELD */
-      tary = Ovoid.Input.onRSUInt
+      tary = this._onRSUInt
     break;
     default: /* No modifier */
-      tary = Ovoid.Input.onInt
+      tary = this._onInt
     break;
   }
   
@@ -506,13 +413,13 @@ Ovoid.Input.trigger = function(m, s, k, f) {
  * node to return in the normal interaction behaviour.<br><br>
  * 
  * For more information about node-grabbing usage, see the 
- * <code>Ovoid.Action</code> node documentation page.
+ * <c>Ovoid.Action</c> node documentation page.
  * 
  * @param {Node} node Node object to be grabbed.
 */
-Ovoid.Input.grabNode = function(node) {
+Ovoid.Input.prototype.grabNode = function(node) {
   
-  Ovoid.Input.grabbedNode = node;
+  this.grabbedNode = node;
 };
 
 /**
@@ -536,9 +443,9 @@ Ovoid.Input.grabNode = function(node) {
  * node to return in the normal interaction behaviour.<br><br>
  * 
  * For more information about node-grabbing usage, see the 
- * <code>Ovoid.Action</code> node documentation page.
+ * <c>Ovoid.Action</c> node documentation page.
  */
-Ovoid.Input.grabRelease = function() {
+Ovoid.Input.prototype.grabRelease = function() {
 
-  Ovoid.Input.grabbedNode = null;
+  this.grabbedNode = null;
 };

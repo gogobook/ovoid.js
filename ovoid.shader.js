@@ -20,47 +20,49 @@
 
 
 /**
- * Create a Shader object.
+ * Constructor method.
  * 
  * @class Shader program object.<br><br>
  * 
- * The Shader object is a wrapper interface class for accessing and interact
- * with GLSL shaders. It is used to load GLSL shader sources then compile, 
- * link and wrap.<br><br>
+ * The Shader object is a wrapping interface to access and interact
+ * with a GLSL shader program.<br><br>
  * 
  * <blockcode>
  * var phong = new Ovoid.Shader();<br>
- * phong.loadSource("phong.vs", "phong.fs", "custom.xml")<br>
- * phong.linkWrap();<br>
+ * phong.loadSource("phong.vs", "phong.fs", "custom.xml", true)<br>
  * </blockcode><br><br>
  * 
- * <b>Why Wrapping Shader Programs</b><br><br>
+ * <b>Why wrapping shader programs</b><br><br>
  * 
  * Work with shaders by interacting with uniforms or attributes using the WebGL 
- * built-in functions quickly becomes confusing depending on the shader's 
+ * built-in functions quickly becomes intricate depending on the shader's 
  * complexity. The usual way consist on hard-coding the variables assignation 
  * which creates a rigid program where shaders must always have the same 
  * variables names to fit with the hard-coded assignation. Wrapping shader 
  * allow an unified access to the variables of any custom shader without 
  * rewriting the core rendering process.<br><br>
  * 
- * <b>Wrap Map Concept</b><br><br>
+ * <b>Wrapping Map Concept</b><br><br>
  * 
- * The wrap map is an XML or JSON file that indicate to which slot/role the 
- * shader's variables are assigned. OvoiD.JS provide an hard-coded wrap map 
- * for default mapping, but  allows to use custom wrap maps.<br><br>
+ * The wrapping map is an XML or JSON file that indicate to which 
+ * slot/role the shader's variables (uniforms, attributes) are assigned.
+ * It's a kind of template to assign variables's names to 
+ * attributes and uniforms's id.
+ * OvoiD.JS provide an hard-coded wrapping map for default mapping, but 
+ * allows to use custom wrapping maps.<br><br>
  * 
- * In GLSL, the shader's variables and attributes can be retrieved by their 
- * names. The wrapper must know which variable or attribute's name corresponds 
- * to which role in the rendering pipeline. For example if you have an uniform 
- * matrix called "MvMtx", the wrapper must know that this uniform "MvMtx" is 
- * dedicated to be the main Modelview matrix to fill and update its data during 
- * the rendering process. The wrap map provides a mecanism to automatize this 
- * translation between the shader's variable names and the OvoiD.JS Drawing 
- * process.<br><br>
+ * The wrapper must know what variable's name matches with the 
+ * appropriate role in the rendering process to set the proper 
+ * attribute/uniform's id to call when needed. For example if you have 
+ * an uniform matrix called "MvMtx" in you vertex shader source, the 
+ * wrapper must know that  this uniform "MvMtx" is dedicated to be the 
+ * main Modelview matrix in order to fill and update its data during 
+ * the rendering process. The wrapping map provides a mecanism to 
+ * automatize this translation.<br><br>
  * 
- * The XML or JSON wrap map file simply consists of a list of translation 
- * parameters. Here is an XML sample:<br><br>
+ * The wrapping map file simply consists of a list of assignement 
+ * parameters, writed in XML or JSON format. Here is an XML 
+ * sample:<br><br>
  * 
  * <blockcode>
  * &lt;uniformMatrix&gt;<br>
@@ -68,74 +70,486 @@
  * &nbsp;&nbsp;&lt;s symbol="UNIFORM_MATRIX_NORMAL_MAT3" id="1"&gt;MNR&lt;/s&gt;<br>
  * </blockcode><br><br>
  * 
- * In the above sample, we can identify "symbol" and "id" attributes which are 
- * the internal OvoiD.JS symbolic constants and their integer values. These XML 
- * attributes must not be modified (note: the "symbol" attribute is here for 
- * readibility, the wrapping process ignores this attribute, which can 
- * in fact stay empty). The "MXF" and "MNR" are the uniformMatrix variables's 
- * names in the shader which should be assigned to the corresponding slot/id. 
- * Here, the "MXF" uniform is plugged to the "UNIFORM_MATRIX_TRANSFORM_MAT4" 
- * role/slot and the "MNR" uniform is plugged to the 
- * "UNIFORM_MATRIX_NORMAL_MAT3" role/slot.<br><br>
+ * In the above sample, we can see two &lt;s&gt; tags with 'symbol' and 'id' 
+ * attributes. The 'symbol' attribute matches the Ovoid.JS's constant
+ * symbolic <c>Ovoid.UNIFORM_MATRIX_TRANSFORM_MAT4</c>. The 'symbol' 
+ * attribute si here for readability and convenience: the parser 
+ * will only take care about the 'id' attribute. What you have to 
+ * modify here to match your shader program are the 
+ * two values MXF and MNR which are the variables names to be identified 
+ * in the shader program.<br><br>
  * 
- * The shader must not necessarly use ALL the available wrap slots. The 
- * unfound shader's variables are simply ignored and not wrapped.<br><br>
+ * A shader does not have to use ALL the available wrap slots, the 
+ * unfound shader variables are simply ignored and not wrapped.<br><br>
  * 
- * Full filled XML and JSON wrap map examples are provided in OvoiD.JS source
- * packages.<br><br>
+ * Full filled XML and JSON wrapping map examples are provided in OvoiD.JS 
+ * source packages.<br><br>
+ * 
+ * <b>The default wrapping map</b><br><br>
+ * 
+ * If you don't want to use your own wrapping map you can let the 
+ * Shader object use the built-in default wrapping map. If you choose 
+ * this option, you however have to write your shader with the 
+ * variable's names according to the default wrapping rules. Here is 
+ * the default wrapping map rules:<br><br>
+ * 
+ * <table id=thintb>
+ * <tr>
+ * <td><b>Ovoid.JS Symbolic Constant</b></td>
+ * <td><b>GLSL Variable type</b></td>
+ * <td><b>GLSL Variable name</b></td>
+ * <td><b>Description</b></td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.VERTEX_VEC4_P</td>
+ * <td>attribute vec4</td>
+ * <td>p</td>
+ * <td>Vertex Position</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.VERTEX_VEC3_N</td>
+ * <td>attribute vec3</td>
+ * <td>n</td>
+ * <td>Vertex Normal vector</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.VERTEX_VEC3_U</td>
+ * <td>attribute vec3</td>
+ * <td>u</td>
+ * <td>Vertex Texture coordinates</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.VERTEX_VEC3_T</td>
+ * <td>attribute vec3</td>
+ * <td>t</td>
+ * <td>Vertex Tangent vector</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.VERTEX_VEC3_B</td>
+ * <td>attribute vec3</td>
+ * <td>b</td>
+ * <td>Vertex Binormal vector</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.VERTEX_VEC4_C</td>
+ * <td>attribute vec4</td>
+ * <td>c</td>
+ * <td>Vertex Color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.VERTEX_VEC4_I</td>
+ * <td>attribute vec4</td>
+ * <td>i</td>
+ * <td>Vertex skin/deform Influence Index</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.VERTEX_VEC4_W</td>
+ * <td>attribute vec4</td>
+ * <td>w</td>
+ * <td>Vertex skin/deform Influence Weight</td>
+ * </tr>
+ * </table>
+ * <table id=thintb>
+ * <tr>
+ * <td><b>Ovoid.JS Symbolic Constant</b></td>
+ * <td><b>GLSL Variable type</b></td>
+ * <td><b>GLSL Variable name</b></td>
+ * <td><b>Description</b></td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_ENABLE_DIFFUSE_LIGHTING_BOOL</td>
+ * <td>uniform bool</td>
+ * <td>ENd</td>
+ * <td>Diffuse lighting enabled flag</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_ENABLE_AMBIENT_LIGHTING_BOOL</td>
+ * <td>uniform bool</td>
+ * <td>ENa</td>
+ * <td>Ambient lighting enabled flag</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_ENABLE_SPECULAR_BOOL</td>
+ * <td>uniform bool</td>
+ * <td>ENs</td>
+ * <td>Specular enabled flag</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_ENABLE_REFLECT_BOOL</td>
+ * <td>uniform bool</td>
+ * <td>ENr</td>
+ * <td>Reflexion enabled flag</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_ENABLE_PARALAX_BOOL</td>
+ * <td>uniform bool</td>
+ * <td>ENp</td>
+ * <td>Paralax mapping enabled flag</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_ENABLE_MATERIAL_BOOL</td>
+ * <td>uniform bool</td>
+ * <td>ENm</td>
+ * <td>Material shading enabled flag</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_ENABLE_VERTEX_WEIGHT_BOOL</td>
+ * <td>uniform bool</td>
+ * <td>ENw</td>
+ * <td>Vertex Weight enabled flag</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_ENABLE_COMPUT_TANGENT_BOOL</td>
+ * <td>uniform bool</td>
+ * <td>ENt</td>
+ * <td>Compute Vertex Tangent space enabled flag</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_ZOFFSET_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Z</td>
+ * <td>Z-Offset value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_COLOR_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>C</td>
+ * <td>Render color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATERIAL_AMBIENT_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Ma</td>
+ * <td>Material Ambient Color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATERIAL_DIFFUSE_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Md</td>
+ * <td>Material Diffuse Color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATERIAL_SPECULAR_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Ms</td>
+ * <td>Material Specular Color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATERIAL_EMISSIVE_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Me</td>
+ * <td>Material Emissive Color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATERIAL_REFLECT_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Mr</td>
+ * <td>Material Reflection Color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATERIAL_SHININESS_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Mi</td>
+ * <td>Material shininess factor value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATERIAL_OPACITY_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Mo</td>
+ * <td>Material Opacity value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATERIAL_REFLECTIVITY_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>My</td>
+ * <td>Material Reflectivity factor value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATERIAL_BUMPINESS_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Mb</td>
+ * <td>Material bumpiness factor value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_AMBIENT_COLOR_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Ac</td>
+ * <td>Ambient lighting color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_ENABLED_BOOL</td>
+ * <td>uniform bool</td>
+ * <td>Le</td>
+ * <td>Light(s) Enabled flag</td>
+ * </tr>
+ * <tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_POSITION_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Lp</td>
+ * <td>Light(s) Position</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_DIRECTION_VEC3</td>
+ * <td>uniform vec3</td>
+ * <td>Ld</td>
+ * <td>Light(s) Direction vector</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_COLOR_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Lc</td>
+ * <td>Light(s) Color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_INTENSITY_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Li</td>
+ * <td>Light(s) Intensity value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_CONSTANT_ATTENUATION_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Lac</td>
+ * <td>Light(s) Constant attenuation value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_LINEAR_ATTENUATION_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Lal</td>
+ * <td>Light(s) Linear Attenuation value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_QUADRIC_ATTENUATION_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Laq</td>
+ * <td>Light(s) Quadratic Attenuation value</td>
+ * </tr>
+ * <td>Ovoid.UNIFORM_LIGHT_RANGE_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Lr</td>
+ * <td>Light(s) Range value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_FALLOFF_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Lf</td>
+ * <td>Light(s) Falloff value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LIGHT_SPOTANGLE_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>La</td>
+ * <td>Light(s) Spot Angle value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_EYE_POSITION_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Ep</td>
+ * <td>Camera/Eye Position</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_EYE_DIRECTION_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Ed</td>
+ * <td>Camera/Eye Direction</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_EYE_VIEWSIZE_VEC3</td>
+ * <td>uniform vec3</td>
+ * <td>Es</td>
+ * <td>Camera/Eye View Size</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_FOG_COLOR_VEC4</td>
+ * <td>uniform vec4</td>
+ * <td>Fc</td>
+ * <td>Fog color</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_FOG_DENSITY_FLOAT</td>
+ * <td>uniform float</td>
+ * <td>Fd</td>
+ * <td>Fog density value</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_LAYER_SIZE_VEC3</td>
+ * <td>uniform vec3</td>
+ * <td>Ls</td>
+ * <td>Layer Size</td>
+ * </tr>
+ * </table>
+ * <table id=thintb>
+ * <tr>
+ * <td><b>Ovoid.JS Symbolic Constant</b></td>
+ * <td><b>GLSL Variable type</b></td>
+ * <td><b>GLSL Variable name</b></td>
+ * <td><b>Description</b></td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATRIX_TRANSFORM_MAT4</td>
+ * <td>uniform matrix4</td>
+ * <td>MXF</td>
+ * <td>Body Transformation World Matrix</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATRIX_NORMAL_MAT3</td>
+ * <td>uniform matrix3</td>
+ * <td>MNR</td>
+ * <td>Body Transformation Normal Matrix</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATRIX_MODELVIEW_MAT4</td>
+ * <td>uniform matrix4</td>
+ * <td>MMV</td>
+ * <td>Model-View Matrix</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATRIX_EYEVIEW_MAT4</td>
+ * <td>uniform matrix4</td>
+ * <td>MEV</td>
+ * <td>Eye-View Matrix</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATRIX_PROJECTION_MAT4</td>
+ * <td>uniform matrix4</td>
+ * <td>MPJ</td>
+ * <td>Projection Matrix</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATRIX_LOOKAT_MAT4</td>
+ * <td>uniform matrix4</td>
+ * <td>MLA</td>
+ * <td>Look-at Matrix</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.UNIFORM_MATRIX_JOINTS_MAT4</td>
+ * <td>uniform matrix4</td>
+ * <td>MJT</td>
+ * <td>Skin Bones/Joint Influence transformation matrix</td>
+ * </tr>
+ * </table>
+ * <table id=thintb>
+ * <tr>
+ * <td><b>Ovoid.JS Symbolic Constant</b></td>
+ * <td><b>GLSL Variable type</b></td>
+ * <td><b>GLSL Variable name</b></td>
+ * <td><b>Description</b></td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.SAMPLER_DEFAULT</td>
+ * <td>uniform sampler2D</td>
+ * <td>Sd</td>
+ * <td>Default Texture Sampler</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.SAMPLER_AMBIENT</td>
+ * <td>uniform sampler2D</td>
+ * <td>Sa</td>
+ * <td>Ambient color Texture Sampler</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.SAMPLER_DIFFUSE</td>
+ * <td>uniform sampler2D</td>
+ * <td>Sd</td>
+ * <td>Diffuse color Texture Sampler</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.SAMPLER_SPECULAR</td>
+ * <td>uniform sampler2D</td>
+ * <td>Ss</td>
+ * <td>Specular color Texture Sampler</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.SAMPLER_EMISSIVE</td>
+ * <td>uniform sampler2D</td>
+ * <td>Se</td>
+ * <td>Emissive color Texture Sampler</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.SAMPLER_REFLECT</td>
+ * <td>uniform sampler2D</td>
+ * <td>Sr</td>
+ * <td>Reflection Texture Sampler</td>
+ * </tr>
+ * <tr>
+ * <td>Ovoid.SAMPLER_NORMAL</td>
+ * <td>uniform sampler2D</td>
+ * <td>Sn</td>
+ * <td>Normal map Texture Sampler</td>
+ * </tr>
+ * </table><br><br>
+ * 
+ * Here is an example of a very simple vertex shader source 
+ * compatible with the default wrapping map. This is the current 
+ * Ovoid.JS's built-in vertex shader used to draw plain colored vertex 
+ * without lighting:<br><br>
+ * 
+ * <blockcode>
+ * <cc>// OvoiD.JS - Built-in vertex shader - PC</cc><br>
+ * <cc>// Main vertex shader for colored vertex.</cc><br>
+ * <br>
+ * attribute vec4 p;<br>
+ * attribute vec4 c;<br>
+ * uniform mat4 MEV;<br>
+ * uniform mat4 MXF;<br>
+ * varying vec4 Vc;<br>
+ * <br>
+ * void main(void) {<br>
+ * &nbsp;&nbsp;Vc = c;<br>
+ * &nbsp;&nbsp;gl_Position = MEV * (MXF * p);<br>
+ * }<br>
+ * </blockcode><br><br>
+ * 
  * 
  * <b>The Vertex Format</b><br><br>
  * 
- * The Vertex Format describes of which properties vertices of a list are 
- * composed and how the vertices's data should be arranged in Vertex Buffer
- * Objets (VBO).  The simplest vertex has only one property: its position in 
- * space defined by a point. But a vertices can have other properties such as 
- * normal, texture coordinates, color, etc...<br><br>
+ * The Vertex Format is an easy way to define vertex's components of a 
+ * mesh, then automatically enable or disables the vertex attributes 
+ * pointers during Mesh drawing. This is why the Vertex Format is used 
+ * by the Mesh Node, it define what components (position, normal, 
+ * color, textures coordinates, etc...) will be used to render the 
+ * mesh. This vertex format is then passed to the Shader object to 
+ * setup attributes pointers.<br><br>
  * 
- * In the OvoiD.JS Library, the Vertex Format is defined using an bitmask 
- * integer value that can be defined with symbolic constants:<br><br>
+ * A vertex format is defined by a bitmask using symbolic 
+ * constants:<br><br>
  * 
  * <blockcode>
  * var format = Ovoid.Ovoid.VERTEX_VEC4_P | Ovoid.VERTEX_VEC3_N | Ovoid.VERTEX_VEC4_C;
  * </blockcode><br><br>
  * 
- * In the above example, the resulting vertices of the specified format will 
- * include four float values for position in space, three float values for 
- * normal vector and four float values for color that give an eleven 32 
- * bits floats vertex.<br><br>
+ * The above example define a vertex format with [x,y,z,w] Position 
+ * (vec4 float), [x,y,z] Normal vector (vec3 float) and [r,g,b,a] Color 
+ * (vec4 float). This is typical vertex with color instead of texture
+ * coordinates.<br><br>
  * 
- * The available vertex format components are the following ones: <br><br>
+ * The available components and symbolic constants to define a Vertex 
+ * Format are the followings: <br><br>
  * 
  * <ul>
- * <li><code>Ovoid.VERTEX_VEC4_P</code></li>
+ * <li><c>Ovoid.VERTEX_VEC4_P</c></li>
  * Four 32 bits float (x,y,z,w) for position point in space.<br><br>
- * <li><code>Ovoid.VERTEX_VEC3_N</code></li>
+ * <li><c>Ovoid.VERTEX_VEC3_N</c></li>
  * Three 32 bits float (x,y,z) for normal vector.<br><br>
- * <li><code>Ovoid.VERTEX_VEC3_U</code></li>
+ * <li><c>Ovoid.VERTEX_VEC3_U</c></li>
  * Three 32 bits float (u,v,w) for Uv texture coordinate.<br><br>
- * <li><code>Ovoid.VERTEX_VEC3_T</code></li>
+ * <li><c>Ovoid.VERTEX_VEC3_T</c></li>
  * Three 32 bits float (u,v,w) for Tangent space coordinate. (normal mapping)<br><br>
- * <li><code>Ovoid.VERTEX_VEC3_B</code></li>
+ * <li><c>Ovoid.VERTEX_VEC3_B</c></li>
  * Three 32 bits float (u,v,w) for binormal vector. (normal mapping)<br><br>
- * <li><code>Ovoid.VERTEX_VEC4_C</code></li>
+ * <li><c>Ovoid.VERTEX_VEC4_C</c></li>
  * Four 32 bits float (r,g,b,a) for vertex color.<br><br>
- * <li><code>Ovoid.VERTEX_VEC4_I</code></li>
+ * <li><c>Ovoid.VERTEX_VEC4_I</c></li>
  * Four 32 bits float (i,i,i,i) for influence matrix index. (skin deform)<br><br>
- * <li><code>Ovoid.VERTEX_VEC4_W</code></li>
+ * <li><c>Ovoid.VERTEX_VEC4_W</c></li>
  * Four 32 bits float (w,w,w,w) for influence wheight. (skin deform)<br><br>
  * </ul><br><br>
  * 
- * As object, <code>Ovoid.Vertex</code> class contains 
- * all these components that can be filled at your convenience and usage. 
- * The vertex format is used to build and arrange data in Vertex Buffer Objets 
- * (VBO) and describe the GLSL vertex attributes in shaders.<br><br>
- * 
- * The Shader object use the vertex format to automaticaly bind shader 
- * attributes and enable or disable the suitable vertex attribs arrays.
- * 
  * @param {string} name Indicative name for this shader.
+ * @param {object} i Instance object to register object to.
  */
-Ovoid.Shader = function(name) {
+Ovoid.Shader = function(name, i) {
 
   /** Shader indicative name 
    * @type string */
@@ -157,7 +571,7 @@ Ovoid.Shader = function(name) {
   this.fragsource = '';
   /** wrap map XML or JSON source.
    * @type string */
-  this.wrapsource = '';
+  this.wrapsource = Ovoid.GLSL_WRAPMAP;
   /** Vertex program compilation status.
    * @type string */
   this.vertstat = '';
@@ -184,32 +598,32 @@ Ovoid.Shader = function(name) {
   /** Vertex attribute slots list.
    * @type int[] */
   this.attribute = new Array(Ovoid.MAX_VERTEX_ATTRIB);
-  for (var i = 0; i < Ovoid.MAX_VERTEX_ATTRIB; i++)
-    this.attribute[i] = -1;
+  for (var j = 0; j < Ovoid.MAX_VERTEX_ATTRIB; j++)
+    this.attribute[j] = -1;
 
   this.attrsize = new Uint16Array(Ovoid.MAX_VERTEX_ATTRIB);
 
   /** Uniform slots list.
    * @type int[] */
   this.uniform = new Array(Ovoid.MAX_UNIFORM);
-  for (var i = 0; i < Ovoid.MAX_UNIFORM; i++)
-    this.uniform[i] = -1;
+  for (var j = 0; j < Ovoid.MAX_UNIFORM; j++)
+    this.uniform[j] = -1;
 
   /** Uniform Matrix slots list.
    * @type int[] */
   this.uniformMatrix = new Array(Ovoid.MAX_UNIFORM_MATRIX);
-  for (var i = 0; i < Ovoid.MAX_UNIFORM_MATRIX; i++)
-    this.uniformMatrix[i] = -1;
+  for (var j = 0; j < Ovoid.MAX_UNIFORM_MATRIX; j++)
+    this.uniformMatrix[j] = -1;
 
   /** Uniform Sampler slots list.
    * @type int[] */
   this.uniformSampler = new Array(Ovoid.MAX_UNIFORM_SAMPLER);
-  for (var i = 0; i < Ovoid.MAX_UNIFORM_SAMPLER; i++)
-    this.uniformSampler[i] = -1;
+  for (var j = 0; j < Ovoid.MAX_UNIFORM_SAMPLER; j++)
+    this.uniformSampler[j] = -1;
 
   this.outFragment = new Array(Ovoid.MAX_OUT_FRAGMENT);
-  for (var i = 0; i < Ovoid.MAX_OUT_FRAGMENT; i++)
-    this.outFragment[i] = -1;
+  for (var j = 0; j < Ovoid.MAX_OUT_FRAGMENT; j++)
+    this.outFragment[j] = -1;
 
   /** Sahder source files loading status.<br><br>
    * A value of 0 means that one or more file is not yet loaded, a value of 1 
@@ -224,42 +638,9 @@ Ovoid.Shader = function(name) {
   this._fslstatus = 0;
   /** wrapmap source load status */
   this._wmlstatus = 0;
+  /** pointer to attached Ovoid.JS instance */
+  this._i = i;
   
-};
-
-/**
- * Handle sound loading.
- *
- * @return {bool} True if successfull sound loading, false otherwise.
- */
-Ovoid.Shader.prototype._handleLoad = function(event) {
-  
-  if (Ovoid.al) {
-    if(this.response.byteLength > 311) {
-      this.owner._albuffer = Ovoid.al.createBuffer(this.response, false);
-      this.owner.loadStatus = 1;
-    } else {
-      Ovoid.log(2, 'Ovoid.Shader', "'" + this.owner.name +
-        "' unable to load '" + this.owner.src + "'");
-      /* buffer vide par defaut */
-      this.owner._albuffer = Ovoid.al.createBuffer(1, 1, 22050);
-      this.owner.loadStatus = -1;
-    }
-  } else {
-    this.owner.loadStatus = 1;
-  }
-    
-};
-
-
-/**
- * Handle sound loading error.
- */
-Ovoid.Shader.prototype._handleError = function() {
-
-  Ovoid.log(2, 'Ovoid.Shader', "'" + this.owner.name +
-      "' unable to load '" + this.owner.src + "'");
-  this.owner.loadStatus = -1;
 };
 
 
@@ -269,7 +650,7 @@ Ovoid.Shader.prototype._handleError = function() {
  * Loads the specified external source files and store the 
  * loaded data. If not specified, the loading is made in the asynchronous way.<br><br>
  *  
- * The <code>loadSatus</code> member indicates the loading status through an 
+ * The <c>loadSatus</c> member indicates the loading status through an 
  * integer value of 0, 1 or -1. A value of 0 means that one or more file is not 
  * yet loaded, a value of 1 means that all the sources was successfully loaded, 
  * and a value of -1 means the loading failed.<br><br>
@@ -278,7 +659,7 @@ Ovoid.Shader.prototype._handleError = function() {
  * 
  * @param {string} fs Fragment program shader source file url.
  * 
- * @param {string} wm XML or JSON wrap map file url.
+ * @param {string} wm XML or JSON wrap map file url or null to use default.
  * 
  * @param {bool} async Optionnal asynchronous loading flag. If true or not null
  * the source is loaded in asynchronous way.
@@ -289,32 +670,43 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, async) {
   this.verturl = vs;
   this.fragurl = fs;
   this.wrapurl = wm;
+  if (wm == undefined || wm == null || wm == "") {
+    wm = null;
+    this._wmlstatus = 1;
+  }
   
   var fsrc, vsrc, wsrc;
   
   var fsrc = fs;
-  if (Ovoid.opt_debugMode) 
+  if (this._i.opt_debugMode) 
     fsrc += '?' + Math.random();
   
   var vsrc = vs;
-  if (Ovoid.opt_debugMode) 
+  if (this._i.opt_debugMode) 
     vsrc += '?' + Math.random();
-    
-  var wsrc = wm;
-  if (Ovoid.opt_debugMode) 
-    wsrc += '?' + Math.random();
+  
+  if (wm) {
+    var wsrc = wm;
+    if (this._i.opt_debugMode) 
+      wsrc += '?' + Math.random();
+  }
     
   var vxhr = new XMLHttpRequest();
   vxhr.id = 0;
-  vxhr.owner = this;
+  vxhr.o = this;
+  vxhr._i = this._i;
   
   var fxhr = new XMLHttpRequest();
   fxhr.id = 1;
-  fxhr.owner = this;
+  fxhr.o = this;
+  fxhr._i = this._i;
   
-  var wxhr = new XMLHttpRequest();
-  wxhr.id = 2;
-  wxhr.owner = this;
+  if (wm) {
+    var wxhr = new XMLHttpRequest();
+    wxhr.id = 2;
+    wxhr.o = this;
+    wxhr._i = this._i;
+  }
   
   /* La définition de onreadystatechange n'est utile qu'en
    * mode asynchrone */
@@ -326,45 +718,44 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, async) {
           switch(this.id)
           {
             case 0:
-              this.owner.vertsource = this.responseText;
-                this.owner._vslstatus = 1;
+              this.o.vertsource = this.responseText;
+                this.o._vslstatus = 1;
             break;
             case 1:
-              this.owner.fragsource = this.responseText;
-                this.owner._fslstatus = 1;
+              this.o.fragsource = this.responseText;
+                this.o._fslstatus = 1;
             break;
             case 2:
-              this.owner.wrapsource = this.responseText;
-                this.owner._wmlstatus = 1;
+              this.o.wrapsource = this.responseText;
+                this.o._wmlstatus = 1;
             break;
           }
           
-          if( (this.owner._vslstatus + this.owner._fslstatus + this.owner._wmlstatus) == 3)
-            this.owner.loadStatus = 1;
+          if( (this.o._vslstatus + this.o._fslstatus + this.o._wmlstatus) == 3) {
+            this.o.loadStatus = 1;
+            this.o._linkWrap()
+          }
           
         } else {
           switch(this.id)
           {
             case 0:
-              Ovoid.log(2, 'Ovoid.Shader ' + this.owner.name,
-                "unable to load source '" +
-                this.owner.verturl + "'");
-                this.owner._vslstatus = -1;
-                this.owner.loadStatus = -1;
+              Ovoid._log(2,this._i,' Shader.loadSource', this.o.name +
+                ":: unable to load source '" + this.o.verturl + "'");
+                this.o._vslstatus = -1;
+                this.o.loadStatus = -1;
             break;
             case 1:
-              Ovoid.log(2, 'Ovoid.Shader ' + this.owner.name,
-                "unable to load source '" +
-                this.owner.fragurl + "'");
-                this.owner._fslstatus = -1;
-                this.owner.loadStatus = -1;
+              Ovoid._log(2,this._i,' Shader.loadSource', this.o.name +
+                ":: unable to load source '" + this.o.fragurl + "'");
+                this.o._fslstatus = -1;
+                this.o.loadStatus = -1;
             break;
             case 2:
-              Ovoid.log(2, 'Ovoid.Shader ' + this.owner.name,
-                "unable to load source '" +
-                this.owner.wrapurl + "'");
-                this.owner._wmlstatus = -1;
-                this.owner.loadStatus = -1;
+              Ovoid._log(2,this._i, ' Shader.loadSource', this.o.name +
+                ":: unable to load source '" + this.o.wrapurl + "'");
+                this.o._wmlstatus = -1;
+                this.o.loadStatus = -1;
             break;
           }
         }
@@ -374,9 +765,11 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, async) {
     fxhr.onreadystatechange = hthndfunc;
     wxhr.onreadystatechange = hthndfunc;
   }
-
-  wxhr.open("GET", wsrc, async);
-  wxhr.send();
+  
+  if (wm) {
+    wxhr.open("GET", wsrc, async);
+    wxhr.send();
+  }
   fxhr.open("GET", fsrc, async);
   fxhr.send();
   vxhr.open("GET", vsrc, async);
@@ -384,15 +777,19 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, async) {
   
   // Si nous sommes en mode synchrone
   if (!async) {
-    if (wxhr.status == 200 || wxhr.status == 304) {
-      this.wrapsource = wxhr.responseText;
-      this._wmlstatus = 1;
+    if(wm) {
+      if (wxhr.status == 200 || wxhr.status == 304) {
+        this.wrapsource = wxhr.responseText;
+        this._wmlstatus = 1;
+      } else {
+        this._wmlstatus = -1;
+        this.loadStatus = -1;
+        Ovoid._log(2,this._i,' Shader.loadSource', this.name +
+            ":: unable to load source '" +
+            this.wrapurl + "'");
+      }
     } else {
-      this._wmlstatus = -1;
-      this.loadStatus = -1;
-      Ovoid.log(2, 'Ovoid.Shader ' + this.name,
-          "unable to load source '" +
-          this.wrapurl + "'");
+      this._wmlstatus = 1;
     }
     if (fxhr.status == 200 || fxhr.status == 304) {
       this.fragsource = fxhr.responseText;
@@ -400,8 +797,8 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, async) {
     } else {
       this._fslstatus = -1;
       this.loadStatus = -1;
-      Ovoid.log(2, 'Ovoid.Shader ' + this.name,
-          "unable to load source '" +
+      Ovoid._log(2,this._i,' Shader.loadSource', this.name +
+          ":: unable to load source '" +
           this.fragurl + "'");
     }
     if (vxhr.status == 200 || vxhr.status == 304) {
@@ -410,12 +807,14 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, async) {
     } else {
       this._vslstatus = -1;
       this.loadStatus = -1;
-      Ovoid.log(2, 'Ovoid.Shader ' + this.name,
-          "unable to load source '" +
+      Ovoid._log(2,this._i,' Shader.loadSource', this.name +
+          ":: unable to load source '" +
           this.verturl + "'");
     }
-    if( (this._vslstatus + this._fslstatus + this._wmlstatus) == 3)
-        this.loadStatus = 1;
+    if( (this._vslstatus + this._fslstatus + this._wmlstatus) == 3) {
+      this.loadStatus = 1;
+      this._linkWrap()
+    }
   }
 };
 
@@ -430,90 +829,95 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, async) {
  * 
  * @param {string} fs Fragment program shader source string.
  * 
- * @param {string} wm XML or JSON wrap map string.
+ * @param {string} wm XML or JSON wrap map string or null to use default.
  */
 Ovoid.Shader.prototype.setSources = function(vs, fs, wm) {
   
-  this.wrapsource = wm;
+  if (wm != undefined && wm != null && wm != "") {
+    this.wrapsource = wm;
+  }
   this.fragsource = fs;
   this.vertsource = vs;
   this.loadStatus = 1;
+  return this._linkWrap();
 }
 
 /**
  * Link & wrap shader sources.<br><br>
  * 
  * Compiles, links and then wraps the current shader's sources. Source strings 
- * must be loaded or defined using the <code>loadSource</code> or 
- * <code>setSources</code> method.
+ * must be loaded or defined using the <c>loadSource</c> or 
+ * <c>setSources</c> method.
  * 
  * @return {bool} True if operations suceeds, false otherwise.
  */
-Ovoid.Shader.prototype.linkWrap = function() {
-
+Ovoid.Shader.prototype._linkWrap = function() {
+  
   if (this.loadStatus != 1) {
-    Ovoid.log(2, "Ovoid.Shader", this.name + 
-        " link/compil error, sources not loaded.");
+    Ovoid._log(2,this._i, ' Shader.linkWrap', this.name + 
+        ":: link/compil error, sources not loaded.");
     return false;
   }
 
-  this.verthandle = Ovoid.gl.createShader(Ovoid.gl.VERTEX_SHADER);
-  this.fraghandle = Ovoid.gl.createShader(Ovoid.gl.FRAGMENT_SHADER);
+  this.verthandle = this._i.gl.createShader(this._i.gl.VERTEX_SHADER);
+  this.fraghandle = this._i.gl.createShader(this._i.gl.FRAGMENT_SHADER);
 
-  Ovoid.gl.shaderSource(this.verthandle, this.vertsource);
-  Ovoid.gl.compileShader(this.verthandle);
-  this.vertstat = Ovoid.gl.getShaderInfoLog(this.verthandle);
+  this._i.gl.shaderSource(this.verthandle, this.vertsource);
+  this._i.gl.compileShader(this.verthandle);
+  this.vertstat = this._i.gl.getShaderInfoLog(this.verthandle);
 
-  if (! Ovoid.gl.getShaderParameter(this.verthandle,
-      Ovoid.gl.COMPILE_STATUS))
+  if (! this._i.gl.getShaderParameter(this.verthandle,
+      this._i.gl.COMPILE_STATUS))
   {
     this.clear();
-    Ovoid.log(2, 'Ovoid.Shader', 
-        this.name +  " '" + this.verturl + "' compil error: " + this.vertstat);
+    Ovoid._log(2,this._i, ' Shader.linkWrap', this.name + 
+        ":: '" + this.verturl + "' compil error: " + this.vertstat);
     return false;
   }
 
-  Ovoid.gl.shaderSource(this.fraghandle, this.fragsource);
-  Ovoid.gl.compileShader(this.fraghandle);
-  this.fragstat = Ovoid.gl.getShaderInfoLog(this.fraghandle);
+  this._i.gl.shaderSource(this.fraghandle, this.fragsource);
+  this._i.gl.compileShader(this.fraghandle);
+  this.fragstat = this._i.gl.getShaderInfoLog(this.fraghandle);
 
-  if (!Ovoid.gl.getShaderParameter(this.fraghandle,
-      Ovoid.gl.COMPILE_STATUS))
+  if (!this._i.gl.getShaderParameter(this.fraghandle,
+      this._i.gl.COMPILE_STATUS))
   {
     this.clear();
-    Ovoid.log(2, 'Ovoid.Shader', 
-        this.name +  " '" + this.fragurl + "' compil error: " + this.fragstat);
+    Ovoid._log(2,this._i, ' Shader.linkWrap', this.name + 
+        ":: '" + this.fragurl + "' compil error: " + this.fragstat);
     return false;
   }
 
-  this.proghandle = Ovoid.gl.createProgram();
-  Ovoid.gl.attachShader(this.proghandle, this.verthandle);
-  Ovoid.gl.attachShader(this.proghandle, this.fraghandle);
-  Ovoid.gl.linkProgram(this.proghandle);
+  this.proghandle = this._i.gl.createProgram();
+  this._i.gl.attachShader(this.proghandle, this.verthandle);
+  this._i.gl.attachShader(this.proghandle, this.fraghandle);
+  this._i.gl.linkProgram(this.proghandle);
 
-  this.progstat = Ovoid.gl.getProgramInfoLog(this.proghandle);
+  this.progstat = this._i.gl.getProgramInfoLog(this.proghandle);
 
-  if (!Ovoid.gl.getProgramParameter(this.proghandle,
-      Ovoid.gl.LINK_STATUS))
+  if (!this._i.gl.getProgramParameter(this.proghandle,
+      this._i.gl.LINK_STATUS))
   {
     this.clear();
-    Ovoid.log(2, 'Ovoid.Shader', 
-        this.name + " link error: " + this.progstat);
+    Ovoid._log(2,this._i, ' Shader.linkWrap', this.name + 
+        ":: link error: " + this.progstat);
     return false;
   }
   
-  Ovoid._logGlerror('Ovoid.Shader.linkWrap :: ' + this.name);
+  this._i._logGlerror(' Shader.linkWrap::' + this.name);
 
   /* retrouve le type de fichier */
   var ext = Ovoid.extractExt(this.wrapurl).toUpperCase();
   if (ext == "XML") {
     if (!this._wrapXml()) {
-      Ovoid.log(2, 'Ovoid.Shader', "program wrap error.");
+      Ovoid._log(2,this._i, ' Shader.linkWrap', this.name + 
+          ":: program wrap error.");
       return false;
     }
   } else {
     if (!this._wrapJson()) {
-      Ovoid.log(2, 'Ovoid.Shader', "program wrap error.");
+      Ovoid._log(2,this._i, ' Shader.linkWrap', this.name + 
+          ":: program wrap error.");
       return false;
     }
   }
@@ -537,27 +941,27 @@ Ovoid.Shader.prototype._wrapJson = function() {
   var ojson = JSON.parse(this.wrapsource);
       
   if (ojson == null) {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "unable to load Json wrap map '" + wm + "'");
+    Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+        ":: unable to load Json wrap map '"+wm+"'");
     return false;
   }
   
   /* Verifie le format JSON */
   if(!ojson.OJSON) {
-    Ovoid.log(2, "Ovoid.Shader '" + wm,
-          "' is not a valid Ovoid JSON format");
+    Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+        ":: '"+wm+"' is not a valid Ovoid JSON format");
     return false;
   }
   
   if(ojson.type != "glslmap") {
-    Ovoid.log(2, "Ovoid.Shader '" + wm,
-          "' is not a valid Ovoid JSON glslmap");
+    Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+        ":: '"+wm+"' is not a valid Ovoid JSON glslmap");
     return false;
   }
   
   if(!ojson.wrapmap) {
-    Ovoid.log(2, "Ovoid.Shader '" + wm,
-          "' no wrapmap object found in Ovoid JSON");
+    Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+        ":: '"+wm+"' no wrapmap object found in Ovoid JSON");
     return false;
   }
   
@@ -570,14 +974,12 @@ Ovoid.Shader.prototype._wrapJson = function() {
         this.plugVertexAttrib(map.attribute[i].id, map.attribute[i].name);
       }
     } else {
-      Ovoid.log(2, 'Ovoid.Shader',
-          "'" + wm +
-          "' wrap : no attribute slot.");
+      Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+          ":: '"+wm+"' wrap : no attribute slot.");
     }
   } else {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "'" + wm +
-        "' wrap : missing attribute map.");
+    Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+        ":: '"+wm+"' wrap : missing attribute map.");
     return false;
   }
   
@@ -588,14 +990,12 @@ Ovoid.Shader.prototype._wrapJson = function() {
         this.plugUniform(map.uniform[i].id, map.uniform[i].name);
       }
     } else {
-      Ovoid.log(2, 'Ovoid.Shader',
-          "'" + wm +
-          "' wrap : no uniform slot.");
+      Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+          ":: '"+wm+"' wrap : no uniform slot.");
     }
   } else {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "'" + wm +
-        "' wrap : missing uniform map.");
+    Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+        ":: '"+wm+"' wrap : missing uniform map.");
     return false;
   }
   
@@ -606,14 +1006,12 @@ Ovoid.Shader.prototype._wrapJson = function() {
         this.plugUniformMatrix(map.uniformMatrix[i].id, map.uniformMatrix[i].name);
       }
     } else {
-      Ovoid.log(2, 'Ovoid.Shader',
-          "'" + wm +
-          "' wrap : no uniformMatrix slot.");
+      Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+          ":: '"+wm+"' wrap : no uniformMatrix slot.");
     }
   } else {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "'" + wm +
-        "' wrap : missing uniformMatrix map.");
+    Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+        ":: '"+wm+"' wrap : missing uniformMatrix map.");
     return false;
   }
   
@@ -624,14 +1022,12 @@ Ovoid.Shader.prototype._wrapJson = function() {
         this.plugUniformSampler(map.uniformSampler[i].id, map.uniformSampler[i].name);
       }
     } else {
-      Ovoid.log(2, 'Ovoid.Shader',
-          "'" + wm +
-          "' wrap : no uniformSampler slot.");
+      Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+          ":: '"+wm+"' wrap : no uniformSampler slot.");
     }
   } else {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "'" + wm +
-        "' wrap : missing uniformSampler map.");
+    Ovoid._log(2,this._i,' Shader._wrapJson', this.name + 
+        ":: '"+wm+"' wrap : missing uniformSampler map.");
     return false;
   }
 
@@ -647,13 +1043,13 @@ Ovoid.Shader.prototype._wrapJson = function() {
  * @return {bool} True if wrap suceeds, false otherwise.
  */
 Ovoid.Shader.prototype._wrapXml = function() {
-
+  
   var parser = new DOMParser();
   var xmlWrapmap = parser.parseFromString(this.wrapsource,'text/xml');
 
   if (xmlWrapmap == null) {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "unable to load Xml wrap map '" + wm + "'");
+    Ovoid._log(2,this._i, ' Shader._wrapXml', this.name + 
+        ":: unable to load Xml wrap map '"+wm+"'");
     return false;
   }
 
@@ -677,14 +1073,12 @@ Ovoid.Shader.prototype._wrapXml = function() {
         this.plugVertexAttrib(id, map);
       }
     } else {
-      Ovoid.log(2, 'Ovoid.Shader',
-          "'" + wm +
-          "' wrap : no attribute slot.");
+      Ovoid._log(2,this._i,' Shader._wrapXml', this.name + 
+          ":: '"+wm+"' wrap : no attribute slot.");
     }
   } else {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "'" + wm +
-        "' wrap : missing attribute map.");
+    Ovoid._log(2,this._i,' Shader._wrapXml', this.name + 
+        ":: '"+wm+"' wrap : missing attribute map.");
     return false;
   }
 
@@ -702,14 +1096,12 @@ Ovoid.Shader.prototype._wrapXml = function() {
         this.plugUniform(id, map);
       }
     } else {
-      Ovoid.log(2, 'Ovoid.Shader',
-          "'" + wm +
-          "' wrap : no uniform slot.");
+      Ovoid._log(2,this._i, ' Shader._wrapXml', this.name + 
+          ":: '"+wm+"' wrap : no uniform slot.");
     }
   } else {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "'" + wm +
-        "' wrap : missing uniform map.");
+    Ovoid._log(2,this._i, ' Shader._wrapXml', this.name + 
+        ":: '"+wm+"' wrap : missing uniform map.");
     return false;
   }
 
@@ -727,14 +1119,12 @@ Ovoid.Shader.prototype._wrapXml = function() {
         this.plugUniformMatrix(id, map);
       }
     } else {
-      Ovoid.log(2, 'Ovoid.Shader',
-          "'" + wm +
-          "' wrap : no uniformMatrix slot.");
+      Ovoid._log(2,this._i,' Shader._wrapXml', this.name + 
+          ":: '"+wm+"' wrap : no uniformMatrix slot.");
     }
   } else {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "'" + wm +
-        "' wrap : missing uniformMatrix map.");
+    Ovoid._log(2,this._i,' Shader._wrapXml', this.name + 
+        ":: '"+wm+"' wrap : missing uniformMatrix map.");
     return false;
   }
 
@@ -752,14 +1142,12 @@ Ovoid.Shader.prototype._wrapXml = function() {
         this.plugUniformSampler(id, map);
       }
     } else {
-      Ovoid.log(2, 'Ovoid.Shader',
-          "'" + wm +
-          "' wrap : no uniformSampler slot.");
+      Ovoid._log(2,this._i,' Shader._wrapXml', this.name + 
+          ":: '"+wm+"' wrap : no uniformSampler slot.");
     }
   } else {
-    Ovoid.log(2, 'Ovoid.Shader',
-        "'" + wm +
-        "' wrap : missing uniformSampler map.");
+    Ovoid._log(2,this._i,' Shader._wrapXml', this.name + 
+        ":: '"+wm+"' wrap : missing uniformSampler map.");
     return false;
   }
   
@@ -771,12 +1159,12 @@ Ovoid.Shader.prototype._wrapXml = function() {
  * Use shader.
  * 
  * <br><br>Tells to GL API to uses this shader for rendering pipeline. This is 
- * a shurtcut for <code>gl.useProgram()</code> funtion.
+ * a shurtcut for <c>gl.useProgram()</c> funtion.
  * 
  */
 Ovoid.Shader.prototype.use = function() {
 
-  Ovoid.gl.useProgram(this.proghandle);
+  this._i.gl.useProgram(this.proghandle);
 };
 
 
@@ -802,7 +1190,7 @@ Ovoid.Shader.prototype.use = function() {
  */
 Ovoid.Shader.prototype.plugVertexAttrib = function(slot, attr) {
 
-  var id = Ovoid.gl.getAttribLocation(this.proghandle, attr);
+  var id = this._i.gl.getAttribLocation(this.proghandle, attr);
   switch (slot)
   {
     case Ovoid.VERTEX_VEC4_P:
@@ -891,7 +1279,7 @@ Ovoid.Shader.prototype.plugVertexAttrib = function(slot, attr) {
  */
 Ovoid.Shader.prototype.plugUniform = function(slot, name) {
 
-  var id = Ovoid.gl.getUniformLocation(this.proghandle, name);
+  var id = this._i.gl.getUniformLocation(this.proghandle, name);
   if (id) {
     this.uniform[slot] = id; return id;
   } else {
@@ -921,7 +1309,7 @@ Ovoid.Shader.prototype.plugUniform = function(slot, name) {
  */
 Ovoid.Shader.prototype.plugUniformMatrix = function(slot, name) {
 
-  var id = Ovoid.gl.getUniformLocation(this.proghandle, name);
+  var id = this._i.gl.getUniformLocation(this.proghandle, name);
   if (id) {
     this.uniformMatrix[slot] = id; return id;
   } else {
@@ -951,7 +1339,7 @@ Ovoid.Shader.prototype.plugUniformMatrix = function(slot, name) {
  */
 Ovoid.Shader.prototype.plugUniformSampler = function(slot, name) {
 
-  var id = Ovoid.gl.getUniformLocation(this.proghandle, name);
+  var id = this._i.gl.getUniformLocation(this.proghandle, name);
   if (id) {
     this.uniformSampler[slot] = id; return id;
   } else {
@@ -968,7 +1356,7 @@ Ovoid.Shader.prototype.plugUniformSampler = function(slot, name) {
  */
 Ovoid.Shader.prototype.setUniform1f = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform1f(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform1f(this.uniform[s], v);
 };
 
 
@@ -980,7 +1368,7 @@ Ovoid.Shader.prototype.setUniform1f = function(s, v) {
  */
 Ovoid.Shader.prototype.setUniform1fv = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform1fv(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform1fv(this.uniform[s], v);
 };
 
 
@@ -992,7 +1380,7 @@ Ovoid.Shader.prototype.setUniform1fv = function(s, v) {
  */
 Ovoid.Shader.prototype.setUniform2fv = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform2fv(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform2fv(this.uniform[s], v);
 };
 
 
@@ -1004,7 +1392,7 @@ Ovoid.Shader.prototype.setUniform2fv = function(s, v) {
  */
 Ovoid.Shader.prototype.setUniform3fv = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform3fv(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform3fv(this.uniform[s], v);
 };
 
 
@@ -1016,7 +1404,7 @@ Ovoid.Shader.prototype.setUniform3fv = function(s, v) {
  */
 Ovoid.Shader.prototype.setUniform4fv = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform4fv(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform4fv(this.uniform[s], v);
 };
 
 
@@ -1028,7 +1416,7 @@ Ovoid.Shader.prototype.setUniform4fv = function(s, v) {
  */
 Ovoid.Shader.prototype.setUniform1i = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform1i(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform1i(this.uniform[s], v);
 };
 
 
@@ -1040,7 +1428,7 @@ Ovoid.Shader.prototype.setUniform1i = function(s, v) {
  */
 Ovoid.Shader.prototype.setUniform1iv = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform1iv(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform1iv(this.uniform[s], v);
 };
 
 
@@ -1052,7 +1440,7 @@ Ovoid.Shader.prototype.setUniform1iv = function(s, v) {
  */
 Ovoid.Shader.prototype.setUniform2iv = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform2iv(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform2iv(this.uniform[s], v);
 };
 
 
@@ -1064,7 +1452,7 @@ Ovoid.Shader.prototype.setUniform2iv = function(s, v) {
  */
 Ovoid.Shader.prototype.setUniform3iv = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform3iv(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform3iv(this.uniform[s], v);
 };
 
 
@@ -1076,7 +1464,7 @@ Ovoid.Shader.prototype.setUniform3iv = function(s, v) {
  */
 Ovoid.Shader.prototype.setUniform4iv = function(s, v) {
 
-  if (this.uniform[s] != -1) Ovoid.gl.uniform4iv(this.uniform[s], v);
+  if (this.uniform[s] != -1) this._i.gl.uniform4iv(this.uniform[s], v);
 };
 
 
@@ -1089,7 +1477,7 @@ Ovoid.Shader.prototype.setUniform4iv = function(s, v) {
 Ovoid.Shader.prototype.setUniformMatrix3fv = function(s, v) {
 
   if (this.uniformMatrix[s] != -1)
-    Ovoid.gl.uniformMatrix3fv(this.uniformMatrix[s], 0, v);
+    this._i.gl.uniformMatrix3fv(this.uniformMatrix[s], 0, v);
 };
 
 
@@ -1102,7 +1490,7 @@ Ovoid.Shader.prototype.setUniformMatrix3fv = function(s, v) {
 Ovoid.Shader.prototype.setUniformMatrix4fv = function(s, v) {
 
   if (this.uniformMatrix[s] != -1)
-    Ovoid.gl.uniformMatrix4fv(this.uniformMatrix[s], 0, v);
+    this._i.gl.uniformMatrix4fv(this.uniformMatrix[s], 0, v);
 };
 
 
@@ -1114,7 +1502,7 @@ Ovoid.Shader.prototype.setUniformMatrix4fv = function(s, v) {
 Ovoid.Shader.prototype.setUniformSampler = function(s) {
 
   if (this.uniformSampler[s] != -1)
-    Ovoid.gl.uniform1i(this.uniformSampler[s], s);
+    this._i.gl.uniform1i(this.uniformSampler[s], s);
 };
 
 
@@ -1136,14 +1524,14 @@ Ovoid.Shader.prototype.setVertexAttribPointers = function(vformat, vfbytes) {
 
       if (-1 != this.attribute[i]) {
 
-        Ovoid.gl.vertexAttribPointer(this.attribute[i],
+        this._i.gl.vertexAttribPointer(this.attribute[i],
             this.attrsize[i],
-            Ovoid.gl.FLOAT,
+            this._i.gl.FLOAT,
             false,
             vfbytes,
             P);
 
-        Ovoid.gl.enableVertexAttribArray(this.attribute[i]);
+        this._i.gl.enableVertexAttribArray(this.attribute[i]);
       }
 
       P += (this.attrsize[i] * 4);
@@ -1151,7 +1539,7 @@ Ovoid.Shader.prototype.setVertexAttribPointers = function(vformat, vfbytes) {
     } else { /* disable vertex attrib */
 
       if (-1 != this.attribute[i])
-        Ovoid.gl.disableVertexAttribArray(this.attribute[i]);
+        this._i.gl.disableVertexAttribArray(this.attribute[i]);
     }
   }
 };
@@ -1226,13 +1614,13 @@ Ovoid.Shader.prototype.clear = function() {
 
   if (this.verthandle != -1)
   {
-    Ovoid.gl.deleteShader(this.verthandle);
+    this._i.gl.deleteShader(this.verthandle);
     this.verthandle = -1;
   }
 
   if (this.fraghandle != -1)
   {
-    Ovoid.gl.deleteShader(this.fraghandle);
+    this._i.gl.deleteShader(this.fraghandle);
     this.fraghandle = -1;
   }
 
@@ -1247,3 +1635,24 @@ Ovoid.Shader.prototype.clear = function() {
   this.clearUniformMatrices();
   this.clearUniformSamplers();
 };
+
+
+/**
+ * JavaScript Object Notation (JSON) serialization method.<br><br>
+ * 
+ * This method is commonly used by the <c>Ovoid.Ojson</c> class
+ * to stringify and export scene.
+ *  
+ * @return {Object} The JSON object version of this node.
+ * 
+ * @private
+ */
+Ovoid.Shader.prototype.toJSON = function() {
+  var o = new Object();
+  /* Ovoid.Node */
+  o['n'] = this.name;
+  o['vs'] = this.vertsource;
+  o['fs'] = this.fragsource;
+  o['ws'] = this.wrapsource;
+  return o;
+}
