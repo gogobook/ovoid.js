@@ -264,7 +264,7 @@
  * <li>It is highly recommanded to recalculate bones's roll before animating your
  * characters. Not recalculated bones can produce some unpredictable rotation's 
  * artifacts once exported in COLLADA.</li>
- * <li>You must bake your rig animations. <a href="http://wiki.blender.org/index.php/User:Phabtar/Full_COLLADA_Animation_Support_for_Blender">
+ * <li>You must bake your rig animations. <a href="http://wiki.blender.org/index.html/User:Phabtar/Full_COLLADA_Animation_Support_for_Blender">
  * You can read some best practices here.</a></li>
  * <li>Textures are linked to materials only if they are in "UV" mapping.</li>
  * <li>Blender uses a Gamma corrections which deceives the RGB values's visual 

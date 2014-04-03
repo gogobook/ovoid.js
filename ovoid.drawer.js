@@ -189,7 +189,7 @@
  * 
  * Here is some example to show how to use render Layers, pipelines, and
  * user defined GLSL shaders. (For more details about creating custom
- * shaders, see the <a href="Ovoid.Shader.php">Ovoid.Shader</a> reference
+ * shaders, see the <a href="Ovoid.Shader.html">Ovoid.Shader</a> reference
  * documentation)<br><br>
  * 
  * Adding and plug shader by including them to loading stacks:<br>
@@ -1171,8 +1171,6 @@ Ovoid.Drawer.prototype.restoreDepth = function() {
  */
 Ovoid.Drawer.prototype.setCull = function(id) {
 
-  this._swdepth[0] = this._swdepth[1];
-  this._swdepth[1] = id;
   switch(id)
   {
     case 0: 
@@ -2416,7 +2414,7 @@ Ovoid.Drawer.prototype.drawQueueRP = function() {
       for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
         this.switchPipe(20,0); //PIPE_RP_GEOMETRY
         this.persp(this._i.Queuer._rcamera);
-        this.setCull(1); // cull back
+        this.setCull(this.opt_renderCullFace);
         this.bodyStack(this._i.Queuer.qsolid[i], 0, true);
         this.setCull(0); // no cull
         this.bodyStack(this._i.Queuer.qalpha[i], 0, true);
@@ -2488,7 +2486,7 @@ Ovoid.Drawer.prototype.drawQueueHL = function() {
  */
 Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
   
-  this.setCull(1); // cull back
+  this.setCull(this.opt_renderCullFace);
   this.switchBlend(3); // blending substracting alpha
   this.switchDepth(1); // depth mask on, test less
   
@@ -2518,6 +2516,8 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
         if(!this._i.Queuer.qsolid[i].count) continue;
         this.zfailStack(this._i.Queuer.qlight[l], this._i.Queuer.qsolid[i]);
       }
+      // retour au culling par default
+      this.setCull(this.opt_renderCullFace);
       this.restoreBlend(); // one, one
       this.restoreDepth(); 
     }
@@ -2546,7 +2546,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
  */
 Ovoid.Drawer.prototype.drawQueue1P = function(pipe) {
 
-  this.setCull(1); // cull back
+  this.setCull(this.opt_renderCullFace);
   this.switchBlend(3); // blending disabled
   this.switchDepth(1); // depth mask on, test less
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {

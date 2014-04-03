@@ -43,7 +43,7 @@
  * 
  * First of all, you should not create an Instance ex-nihilo, which 
  * simply results of an not registered Instance object which will never 
- * starts. you should use the global <c><a href="Ovoid.php#.newInstance">Ovoid.newInstance()</a></c> 
+ * starts. you should use the global <c><a href="Ovoid.html#.newInstance">Ovoid.newInstance()</a></c> 
  * function to create a new Ovoid.JS Instance, check if creation and 
  * registration does not failed, and then define and do what you have to 
  * do before starting the instance via the <c><a href="#start">start()</a></c> 
@@ -135,12 +135,12 @@
  * 
  * Here is the list of Modules classes:<br>
  * <ul>
- * <li><a href="Ovoid.Frame.php"><c>Ovoid.Frame</c></a> (Frame and Canvas management Module)</li>
- * <li><a href="Ovoid.Timer.php"><c>Ovoid.Timer</c></a> (Time management Module)</li>
- * <li><a href="Ovoid.Input.php"><c>Ovoid.Input</c></a> (User inputs management Module)</li>
- * <li><a href="Ovoid.Queuer.php"><c>Ovoid.Queuer</c></a> (Nodes's dispatcher and interactive data controler Module)</li>
- * <li><a href="Ovoid.Drawer.php"><c>Ovoid.Drawer</c></a> (Rendering engine Module)</li>
- * <li><a href="Ovoid.Solver.php"><c>Ovoid.Solver</c></a> (Physics engine Module)</li>
+ * <li><a href="Ovoid.Frame.html"><c>Ovoid.Frame</c></a> (Frame and Canvas management Module)</li>
+ * <li><a href="Ovoid.Timer.html"><c>Ovoid.Timer</c></a> (Time management Module)</li>
+ * <li><a href="Ovoid.Input.html"><c>Ovoid.Input</c></a> (User inputs management Module)</li>
+ * <li><a href="Ovoid.Queuer.html"><c>Ovoid.Queuer</c></a> (Nodes's dispatcher and interactive data controler Module)</li>
+ * <li><a href="Ovoid.Drawer.html"><c>Ovoid.Drawer</c></a> (Rendering engine Module)</li>
+ * <li><a href="Ovoid.Solver.html"><c>Ovoid.Solver</c></a> (Physics engine Module)</li>
  * </ul><br><br>
  * 
  * <b>Instance's active Scene</b><br><br>
@@ -166,7 +166,7 @@
  * method.<br><br>
  * 
  * For more details about Scene, see the 
- * <a href="Ovoid.Scene.php">Ovoid.Scene</a>
+ * <a href="Ovoid.Scene.html">Ovoid.Scene</a>
  * class reference documentation.<br><br>
  * 
  * <b>User defined contextual functions</b><br><br>
@@ -278,7 +278,7 @@
  * runtime loop.<br><br>
  * 
  * <blockcode>
- * <cc>// Our application entry, called via '<body onload="main()">' in our HTML code</cc><br>
+ * <cc>// Our application entry, called via 'onload="main()"' in our HTML code</cc><br>
  * function main() {
  * <cc>// Creating a new Ovoid.JS instance </cc><br>
  * &nbsp;&nbsp;var myConf = Ovoid.newConfig();<br>
@@ -333,8 +333,8 @@
  * because they use the internal context of the Instance. They are only 
  * two, but they are major complex objects:<br>
  * <ul>
- * <li><a href="Ovoid.Scene.php">Ovoid.Scene</a></li>
- * <li><a href="Ovoid.Shader.php">Ovoid.Shader</a></li>
+ * <li><a href="Ovoid.Scene.html">Ovoid.Scene</a></li>
+ * <li><a href="Ovoid.Shader.html">Ovoid.Shader</a></li>
  * </ul>
  * 
  * Because these classes must be registered, the Insance provides 
@@ -353,25 +353,25 @@
  * The <b><c>setAction()</cc></b> method is used to create and 
  * link a new Action Node to one or several others. For more information
  * about the Action Node, see the 
- * <a href="Ovoid.Action.php">Ovoid.Action</a> 
+ * <a href="Ovoid.Action.html">Ovoid.Action</a> 
  * Node reference documentation.
  * 
  * The <b><c>setConstraint()</cc></b> method is used to create 
  * and link a new Constraint Node to one or several others. For more 
  * information about the Constraints Node, see the 
- * <a href="Ovoid.Constraints.php">Ovoid.Constraints</a> 
+ * <a href="Ovoid.Constraints.html">Ovoid.Constraints</a> 
  * Node reference documentation.
  * 
  * The <b><c>setPhysics()</cc></b> method is used to create and 
  * link a new Physics Node to one or several others. For more 
  * information about the Physics Node, see the 
- * <a href="Ovoid.Physics.php">Ovoid.Physics</a> 
+ * <a href="Ovoid.Physics.html">Ovoid.Physics</a> 
  * Node reference documentation.
  * 
  * The <b><c>setExpression()</cc></b> method is used to create 
  * and link a new Expression Node to one or several others. For more 
  * information about the Expression Node, see the 
- * <a href="Ovoid.Expression.php">Ovoid.Expression</a> 
+ * <a href="Ovoid.Expression.html">Ovoid.Expression</a> 
  * Node reference documentation.
  */
 Ovoid.Instance = function(name) {
@@ -632,6 +632,22 @@ Ovoid.Instance = function(name) {
   this.opt_renderPickingMode = Ovoid.RP_WORLD|Ovoid.RP_OVERLAY;
 
 
+  /** Default face culling.<br><br>
+   * 
+   * Defines the default face culling parameter to render geometry.
+   * can be:<br>
+   * <c>0</c> : Disable face culling.<br>
+   * <c>1</c> : Back face culling.<br>
+   * <c>2</c> : Front face culling.<br>
+   * <br><br>
+   * 
+   * Default value is <c>1</c> for back-face culling
+   * 
+   * @type bool
+   *  */
+  this.opt_renderCullFace = 1;
+  
+
   /** Render level of performance.<br><br>
    * 
    * Defines the render level of performance. The level of performance 
@@ -674,7 +690,7 @@ Ovoid.Instance = function(name) {
    * @type int
    *  */
   this.opt_renderAdaptLopThreshold = 45;
-
+  
 
   /** Enable per-light pass rendering (required for shadow casting).<br><br>
    * 
@@ -1125,6 +1141,7 @@ Ovoid.Instance.prototype._setoptions = function(opt) {
   this.opt_renderFogColor = opt.opt_renderFogColor;
   this.opt_renderFogDensity = opt.opt_renderFogDensity;
   this.opt_renderPickingMode = opt.opt_renderPickingMode;
+  this.opt_renderCullFace = opt.opt_renderCullFace;
   this.opt_renderLopLevel = opt.opt_renderLopLevel;
   this.opt_renderAdaptLop = opt.opt_renderAdaptLop;
   this.opt_renderAdaptLopThreshold = opt.opt_renderAdaptLopThreshold;
@@ -2160,7 +2177,7 @@ Ovoid.Instance.prototype.pause = function() {
  * </blockcode><br><br>
  * 
  * For more information about OvoiD.JSON importation see the
- * <a href="Ovoid.Ojson.php">Ovoid.Ojson</a> class reference documentation.
+ * <a href="Ovoid.Ojson.html">Ovoid.Ojson</a> class reference documentation.
  * 
  * @see Ovoid.Ojson
  * 
@@ -2201,7 +2218,7 @@ Ovoid.Instance.prototype.includeOjson= function(url, scene) {
  * This method allows specify a Collada options importation bitmask and 
  * renaming prefix and/or suffix for the imported Nodes. 
  * For more information about Collada/DAE importation see the 
- * <a href="Ovoid.Collad.php">Ovoid.Collada</a> 
+ * <a href="Ovoid.Collad.html">Ovoid.Collada</a> 
  * class reference documentation.<br><br>
  * 
  * Note: If the mask argument is not specified or null, a default 
@@ -2270,7 +2287,7 @@ Ovoid.Instance.prototype.includeDaeScene = function(url, mask, prefix, suffix, s
  * This method allows specify 
  * renaming prefix and/or suffix for the imported Nodes. 
  * For more information about Collada/DAE importation see the 
- * <a href="Ovoid.Collad.php">Ovoid.Collada</a> 
+ * <a href="Ovoid.Collad.html">Ovoid.Collada</a> 
  * class reference documentation.<br><br>
  * 
  * Note: The predefined importation option bitmask used is defined as 
@@ -2282,9 +2299,9 @@ Ovoid.Instance.prototype.includeDaeScene = function(url, mask, prefix, suffix, s
  * Ovoid.DAE_CONVERT_UPAXIS</c><br><br>
  * 
  * For more information about Animation and Track see the 
- * <a href="Ovoid.Animation.php">Ovoid.Animation</a> 
+ * <a href="Ovoid.Animation.html">Ovoid.Animation</a> 
  * and
- * <a href="Ovoid.Track.php">Ovoid.Track</a> 
+ * <a href="Ovoid.Track.html">Ovoid.Track</a> 
  * classes reference documentation.<br><br>
  * 
  * @param {string} url DAE/COLLADA file url.
@@ -2330,7 +2347,7 @@ Ovoid.Instance.prototype.includeDaeAnimation = function(url, prefix, suffix, sce
  * This method allows specify 
  * renaming prefix and/or suffix for the imported Nodes. 
  * For more information about Collada/DAE importation see the 
- * <a href="Ovoid.Collad.php">Ovoid.Collada</a> 
+ * <a href="Ovoid.Collad.html">Ovoid.Collada</a> 
  * class reference documentation.<br><br>
  * 
  * Note: The predefined importation option bitmask used is defined as 
@@ -2342,7 +2359,7 @@ Ovoid.Instance.prototype.includeDaeAnimation = function(url, prefix, suffix, sce
  * Ovoid.DAE_CONVERT_UPAXIS</c><br><br>
  * 
  * For more information about Mesh and geometry data see the 
- * <a href="Ovoid.Mesh.php">Ovoid.Mesh</a> 
+ * <a href="Ovoid.Mesh.html">Ovoid.Mesh</a> 
  * classes reference documentation.<br><br>
  * 
  * @see Ovoid.Collada
@@ -2383,7 +2400,7 @@ Ovoid.Instance.prototype.includeDaeMesh = function(url, prefix, suffix, scene) {
  * in the current Instance's active Scene.<br><br>
  * 
  * For more information about Texture see the 
- * <a href="Ovoid.Texture.php">Ovoid.Texture</a> 
+ * <a href="Ovoid.Texture.html">Ovoid.Texture</a> 
  * classes reference documentation.<br><br>
  *
  * @param {string} name Texture name.
@@ -2421,7 +2438,7 @@ Ovoid.Instance.prototype.includeTexture = function(name, url, filter, scene) {
  * in the current Instance's active Scene.<br><br>
  * 
  * For more information about Audio see the 
- * <a href="Ovoid.Audio.php">Ovoid.Audio</a> 
+ * <a href="Ovoid.Audio.html">Ovoid.Audio</a> 
  * classes reference documentation.<br><br>
  *
  * @param {string} name Audio name.
@@ -3145,6 +3162,8 @@ Ovoid.Instance.prototype.toJSON = function() {
   /* Options du solver */
   o['o'][39] = this.opt_physicsIterativeSolver;
   o['o'][40] = this.opt_physicsContactItFactor;
+  /* Options de derniere minute */
+  o['o'][41] = this.opt_renderCullFace;
   
   return o;
 };

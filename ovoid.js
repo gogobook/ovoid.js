@@ -67,7 +67,7 @@
  * </blockcode><br><br>
  * 
  * For more details and documentations about Ovoid.JS Instance, see the 
- * <a href="Ovoid.Instance.php">Ovoid.Instance</a> 
+ * <a href="Ovoid.Instance.html">Ovoid.Instance</a> 
  * class reference documentation.<br><br>
  * 
  * <b>Utilities methods</b><br><br>
@@ -334,7 +334,7 @@ Ovoid.newConfig = function() {
  * Create and initialize a new Ovoid.JS Instance.<br><br>
  * 
  * For more details about Ovoid.JS Instance see the 
- * <a href="Ovoid.Instance.php">Ovoid.Instance</a> class 
+ * <a href="Ovoid.Instance.html">Ovoid.Instance</a> class 
  * documentation reference.
  * 
  * @param {string} name Indicative name of the new Instance.

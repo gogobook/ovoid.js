@@ -75,7 +75,7 @@
  * enabled.<br><br>
  * 
  * For more information about Picking mode you should refer to the
- * <a href="Ovoid.Drawer.php"><c>Ovoid.Drawer</c></a> Module class  
+ * <a href="Ovoid.Drawer.html"><c>Ovoid.Drawer</c></a> Module class  
  * documentation.<br><br>
  * 
  * <b>Input triggers</b><br><br>
@@ -105,7 +105,7 @@
  * and <c>grabRelease</c>.<br><br>
  * 
  * For more information about node-grabbing usage, see the 
- * <a href="Ovoid.Action.php>Ovoid.Action</a> node documentation page.
+ * <a href="Ovoid.Action.html>Ovoid.Action</a> node documentation page.
  * 
  * @param {object} i Instance object to register object to.
  * 

@@ -36,7 +36,7 @@
  * way to control anything.<br><br>
  * 
  * For more details about rigid body, collision control and interactions
- * see the <a href="Ovoid.Physics.php">Ovoid.Physics</a> node 
+ * see the <a href="Ovoid.Physics.html">Ovoid.Physics</a> node 
  * documentation reference.
  * 
  * <b>Gravity</b><br><br>

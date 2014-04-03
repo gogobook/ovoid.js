@@ -299,6 +299,22 @@ Ovoid.Config = function() {
   this.opt_renderPickingMode = Ovoid.RP_WORLD|Ovoid.RP_OVERLAY;
 
 
+  /** Default face culling.<br><br>
+   * 
+   * Defines the default face culling parameter to render geometry.
+   * can be:<br>
+   * <c>0</c> : Disable face culling.<br>
+   * <c>1</c> : Back face culling.<br>
+   * <c>2</c> : Front face culling.<br>
+   * <br><br>
+   * 
+   * Default value is <c>1</c> for back-face culling
+   * 
+   * @type bool
+   *  */
+  this.opt_renderCullFace = 1;
+  
+  
   /** Render level of performance.<br><br>
    * 
    * Defines the render level of performance. The level of performance 

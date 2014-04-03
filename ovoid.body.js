@@ -61,7 +61,7 @@
  * <c>enter</c> and <c>leave</c> member.<br><br>
  * 
  * For more information about intesection usage and handling you should refer to
- * the <a href="Ovoid.Action.php"><c>Ovoid.Action</c></a> node 
+ * the <a href="Ovoid.Action.html"><c>Ovoid.Action</c></a> node 
  * documentation.<br><br>
  * 
  * <b>Render Layer and Alpha</b><br><br>
@@ -76,7 +76,7 @@
  * <c>true</c>.<br><br>
  * 
  * For more informations about render layers and alpha you should refer to the
- * <a href="Ovoid.Drawer.php"><c>Ovoid.Drawer</c></a> global class  
+ * <a href="Ovoid.Drawer.html"><c>Ovoid.Drawer</c></a> global class  
  * documentation.<br><br>
  * 
  * <b>Shadow casting</b><br><br>
@@ -88,7 +88,7 @@
  * otherwise the Mesh's shadow computation is jumped.
  * 
  * For more informations about cast shadows you should refer to the
- * <a href="Ovoid.Drawer.php"><c>Ovoid.Drawer</c></a> global class  
+ * <a href="Ovoid.Drawer.html"><c>Ovoid.Drawer</c></a> global class  
  * documentation.<br><br>
  * 
  * @extends Ovoid.Transform
