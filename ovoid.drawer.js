@@ -464,6 +464,25 @@ Ovoid.Drawer = function(i) {
   this._rpdepth = new Float32Array(1);
 
 
+  /** Temp buffer for shadow volum vertices : 100 000 faces max. */
+  this._dV = new Float32Array(1200000);
+  
+  /** Temp buffers for light array */
+  this._lp = new Float32Array(4*Ovoid.MAX_LIGHT_BY_DRAW);
+  this._ld = new Float32Array(3*Ovoid.MAX_LIGHT_BY_DRAW);
+  this._lc = new Float32Array(4*Ovoid.MAX_LIGHT_BY_DRAW);
+  this._li = new Float32Array(Ovoid.MAX_LIGHT_BY_DRAW);
+  this._lr = new Float32Array(Ovoid.MAX_LIGHT_BY_DRAW);
+  this._lf = new Float32Array(Ovoid.MAX_LIGHT_BY_DRAW);
+  this._la = new Float32Array(Ovoid.MAX_LIGHT_BY_DRAW);
+  this._le = new Int32Array(Ovoid.MAX_LIGHT_BY_DRAW);
+    
+  /** Temp matrix 4x4 */
+  this._tM = new Float32Array(16);
+  
+  /** Matrix 4x4 identity pattern */
+  this._tMi = new Float32Array(16);
+    
   /** Level of performance for geometry drawing. */
   this._lop = 2;
   
@@ -673,7 +692,8 @@ Ovoid.Drawer.prototype._init = function() {
   /* Cree le buffer dynamique temporaire */  
   this._bdynamic = this.gl.createBuffer();
   this.gl.bindBuffer(0x8892, this._bdynamic);
-  this.gl.bufferData(0x8892,new Float32Array(50000),0x88E8);
+  // 4 800 000 octect = 100 000 faces
+  this.gl.bufferData(0x8892,4800000,0x88E8); // DYNAMIC_DRAW
   
   if (this._i._logGlerror('.Drawer._init:: Dynamic buffer creation'))
     return false;
@@ -1269,7 +1289,6 @@ Ovoid.Drawer.prototype.beginDraw = function() {
 	  this._pipe1p = 1;
     break;
   }
-  
 };
 
 
@@ -1347,41 +1366,32 @@ Ovoid.Drawer.prototype.endRpDraw = function() {
 Ovoid.Drawer.prototype.light = function(light) {
   
   if (light.count) { /* stack ? */
-    var c = Ovoid.MAX_LIGHT_BY_DRAW;
-    /* A priori recréer les array à chaque frame a un impact negligable
-     * sur les performances, surtout vu la taille des arrays */
-    var lp = new Float32Array(4*c);
-    var ld = new Float32Array(3*c);
-    var lc = new Float32Array(4*c);
-    var li = new Float32Array(c);
-    var lr = new Float32Array(c);
-    var lf = new Float32Array(c);
-    var la = new Float32Array(c);
-    var le = new Int32Array(c);
-    
+
+    /* obligé d'utiliser des array créé à l'avance, si non: 
+     * memory leak! */
     for (var i = 0; i < Ovoid.MAX_LIGHT_BY_DRAW; i++) {
       if (i < light.count) {
-        lp.set(light[i].worldPosition.v, i*4);
-        ld.set(light[i].worldDirection.v, i*3); 
-        lc.set(light[i].color.v, i*4);
-        li[i] = light[i].intensity;
-        lr[i] = light[i].range;
-        lf[i] = light[i].falloff;
-        la[i] = light[i].spotAngle;
-        le[i] = 1; /*enabled*/
+        this._lp.set(light[i].worldPosition.v, i*4);
+        this._ld.set(light[i].worldDirection.v, i*3); 
+        this._lc.set(light[i].color.v, i*4);
+        this._li[i] = light[i].intensity;
+        this._lr[i] = light[i].range;
+        this._lf[i] = light[i].falloff;
+        this._la[i] = light[i].spotAngle;
+        this._le[i] = 1; /*enabled*/
       } else {
-        le[i] = 0; /*enabled*/
+        this._le[i] = 0; /*enabled*/
       }
     }
     
-    this.sp.setUniform4fv(20, lp); /*position*/
-    this.sp.setUniform3fv(21, ld); /*direction*/
-    this.sp.setUniform4fv(22, lc); /*color*/
-    this.sp.setUniform1fv(23, li); /*intensity*/
-    this.sp.setUniform1fv(24, lr); /*range*/
-    this.sp.setUniform1fv(25, lf); /*falloff*/
-    this.sp.setUniform1fv(26, la); /*spotangle*/
-    this.sp.setUniform1iv(28, le); /*enabled*/
+    this.sp.setUniform4fv(20, this._lp); /*position*/
+    this.sp.setUniform3fv(21, this._ld); /*direction*/
+    this.sp.setUniform4fv(22, this._lc); /*color*/
+    this.sp.setUniform1fv(23, this._li); /*intensity*/
+    this.sp.setUniform1fv(24, this._lr); /*range*/
+    this.sp.setUniform1fv(25, this._lf); /*falloff*/
+    this.sp.setUniform1fv(26, this._la); /*spotangle*/
+    this.sp.setUniform1iv(28, this._le); /*enabled*/
     
   } else {
     if (light.type) {
@@ -1633,7 +1643,7 @@ Ovoid.Drawer.prototype.symStar = function(color) {
  */
 Ovoid.Drawer.prototype.string = function(w, r, s, string) {
   
-  var data = new Float32Array(string.length*4);
+  var data = this._dV;
   var v = 0; /* pointeur */
   var a, b; /* char, old char */
   var u = 0; /* colone */
@@ -1660,7 +1670,7 @@ Ovoid.Drawer.prototype.string = function(w, r, s, string) {
     u++;
   }
   this.gl.bindBuffer(0x8892,this._bdynamic);
-  this.gl.bufferData(0x8892,data,0x88E8);
+  this.gl.bufferSubData(0x8892,0,data.subarray(0,v));
   this.sp.setVertexAttribPointers(1,16); /* VEC4_P == 1 */
   this.gl.drawArrays(0,0,v/4);
   this._drawnchar+=v/4;
@@ -1692,7 +1702,7 @@ Ovoid.Drawer.prototype.string = function(w, r, s, string) {
 Ovoid.Drawer.prototype.raw = function(format, stride, type, count, data) {
   
   this.gl.bindBuffer(0x8892,this._bdynamic);
-  this.gl.bufferData(0x8892,data,0x88E8);
+  this.gl.bufferSubData(0x8892,0,data);
   this.sp.setVertexAttribPointers(format,stride);
   this.gl.drawArrays(type,0,count);
   this._drawndynamic++;
@@ -1836,7 +1846,8 @@ Ovoid.Drawer.prototype.emitter = function(emitter, layer, color) {
       this.gl.bindBuffer(0x8892,this._bprimitive[6]); // Buffer spirte billboard
       this.sp.setVertexAttribPointers(5,28); // VEC4_P|VEC3_U == 5 
       var m, s, i;
-      m = new Float32Array(16); // Matrice temporaire
+      m = this._tM; // Matrice temporaire
+      m.set(this._tMi); // Copie l'identity
       i = emitter._particles.length;
       while(i--) {
         s = emitter._particles[i];
@@ -1850,7 +1861,8 @@ Ovoid.Drawer.prototype.emitter = function(emitter, layer, color) {
       }
     } else {
       // Ovoid.VERTEX_PARTICLE, stride, gl.POINTS,
-      this.raw(Ovoid.VERTEX_PARTICLE, 44, 0, emitter._alives, emitter._fbuffer);
+      var n = emitter._alives;
+      this.raw(Ovoid.VERTEX_PARTICLE, 44, 0, n, emitter._fbuffer.subarray(0,n*11));
       this._drawnparticle+=emitter._alives;
     }
   } else {
@@ -1881,7 +1893,8 @@ Ovoid.Drawer.prototype.emitter = function(emitter, layer, color) {
       this.gl.bindBuffer(0x8892,this._bprimitive[6]); // Buffer spirte billboard
       this.sp.setVertexAttribPointers(5,28); // VEC4_P|VEC3_U == 5
       var m, s, i;
-      m = new Float32Array(16);
+      m = this._tM; // Matrice temporaire
+      m.set(this._tMi); // Copie l'identity
       i = emitter._particles.length;
       while(i--) {
         s = emitter._particles[i];
@@ -1896,7 +1909,8 @@ Ovoid.Drawer.prototype.emitter = function(emitter, layer, color) {
       }
     } else {
       // Ovoid.VERTEX_PARTICLE, stride, gl.POINTS,
-      this.raw(Ovoid.VERTEX_PARTICLE, 44, 0, emitter._alives, emitter._fbuffer);
+      var n = emitter._alives;
+      this.raw(Ovoid.VERTEX_PARTICLE, 44, 0, n, emitter._fbuffer.subarray(0,n*11));
       this._drawnparticle+=emitter._alives;
     }
   }
@@ -1946,33 +1960,39 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
   P[4] = new Ovoid.Point();
   P[5] = new Ovoid.Point();
   var LP = new Ovoid.Point();
-  var LD = new Ovoid.Vector();
-  // 4 float par vertex, 3 vertex par face = 12 float par face
-  var V = new Float32Array((c*12)*4); // On quadruple la mise... 
+  var LV = new Ovoid.Vector();  /* Light vector, rayons par rapport à la normale */
+  
+  // 4 float par vertex, 3 vertex par face = 12 float par face et on double la mise
+  if(((c*12)*2) > this._dV.length)
+    return;
+     
+  var V = this._dV;
 
   // position de la lumiere en coordonnée locale à l'objet 
-  if(light.model == Ovoid.LIGHT_DIRECTIONAL) {
-    LD.copy(light.worldDirection);
+  if(light.model == 1) { /* Ovoid.LIGHT_DIRECTIONAL */
+    LV.copy(light.worldDirection);
     /* les vertices sont déja transformmé en coordonnée monde, pas besoin
        * de transformer le modelview pour le skin */
-    if (body.shape.type & Ovoid.MESH) LD.transform4Inverse(body.worldMatrix);
-    LP.copy(LD);
-    LP.scaleBy(-1.0);
+    if (body.shape.type & Ovoid.MESH) 
+        LV.transform4Inverse(body.worldMatrix);
+    LP.copy(LV);
+    LV.scaleBy(-1.0);
   } else {
     LP.copy(light.worldPosition);
     /* les vertices sont déja transformmé en coordonnée monde, pas besoin
        * de transformer le modelview pour le skin */
-    if (body.shape.type & Ovoid.MESH) LP.transform4Inverse(body.worldMatrix);
+    if (body.shape.type & Ovoid.MESH) 
+        LP.transform4Inverse(body.worldMatrix);
   }
   
   // on parcour la liste de triangles pour creer le vertex buffer du shadow volum
   var n = 0;
   for (var i = 0; i < c; i++)
   {
-    if(light.model != Ovoid.LIGHT_DIRECTIONAL)
-      LD.subOf(LP, body.shape.triangles[l][i].center);
+    if(light.model != 1) /* Ovoid.LIGHT_DIRECTIONAL */
+      LV.subOf(LP, body.shape.triangles[l][i].center);
       
-    if (LD.dot(body.shape.triangles[l][i].normal) > 0.0)
+    if (LV.dot(body.shape.triangles[l][i].normal) > 0.0)
     {
       // triangles face lumiere 
       P[0] = body.shape.vertices[l][body.shape.triangles[l][i].index[0]].p;
@@ -1980,7 +2000,7 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
       P[2] = body.shape.vertices[l][body.shape.triangles[l][i].index[2]].p;
       // triangle extrudé à l'infini lumiere 
       
-      if(light.model == Ovoid.LIGHT_DIRECTIONAL) {
+      if(light.model == 1) { /* Ovoid.LIGHT_DIRECTIONAL */
         P[3].copy(LP);
         P[4].copy(LP);
         P[5].copy(LP);
@@ -2005,17 +2025,17 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
         a = body.shape.triangles[l][i].adjacent[j];
         if (a != -1.0)
         {
-          if(light.model != Ovoid.LIGHT_DIRECTIONAL)
-            LD.subOf(LP, body.shape.triangles[l][a].center);
+          if(light.model != 1) /* Ovoid.LIGHT_DIRECTIONAL */
+            LV.subOf(LP, body.shape.triangles[l][a].center);
             
-          if (LD.dot(body.shape.triangles[l][a].normal) <= 0.0)
+          if (LV.dot(body.shape.triangles[l][a].normal) <= 0.0)
           {
             /* le premier triangle du "ring", l'index des vertices
              * est trouvé car l'ordre des edges est 01-12-20 le second
              * peut donc être trouvé grace à un modulo :
              * (0+1)%3 = 1, (1+1)%3 = 2, (1+2)%3 = 0*/
             k = (j + 1) % 3;
-            if(light.model == Ovoid.LIGHT_DIRECTIONAL) {
+            if(light.model == 1) { /* Ovoid.LIGHT_DIRECTIONAL */
               P[3].copy(LP);
               P[4].copy(LP);
             } else {
@@ -2035,7 +2055,7 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
           // si pas de face adjacente c'est un face de bordure on extrude les bords
           k = (j + 1) % 3;
           
-          if(light.model == Ovoid.LIGHT_DIRECTIONAL) {
+          if(light.model == 1) { /* Ovoid.LIGHT_DIRECTIONAL */
             P[3].copy(LP);
             P[4].copy(LP);
           } else {
@@ -2055,11 +2075,12 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
     }
   }
   
+  //console.log(n);
+    
   // buffer dynamique
   this.gl.bindBuffer(0x8892,this._bdynamic);
-  this.gl.bufferData(0x8892,V,0x88E8);
+  this.gl.bufferSubData(0x8892,0,V.subarray(0,n));
   this.sp.setVertexAttribPointers(1,16);
-
   
   // dessins des faces arrieres, incremente le stencil 
   this.gl.cullFace(0x0404); // FRONT
@@ -2072,7 +2093,7 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
   this.gl.stencilOp(0x1E00, 0x1E03, 0x1E00); // KEEP, DECR, KEEP
   this.gl.drawArrays(4, 0, (n/4));
   this._drawndynamic++;
-
+  
   this._drawnshadow++;
 };
 
@@ -2095,7 +2116,7 @@ Ovoid.Drawer.prototype.normals = function(body, scale) {
   this.model(body.worldMatrix.m);
   triangles = body.shape.triangles[l];
 
-  var V = new Float32Array(triangles.length*2*8);
+  var V = this._dV;
   var C, N;
   var n = 0;
   for (var t = 0; t < triangles.length; t++) {
@@ -2120,7 +2141,7 @@ Ovoid.Drawer.prototype.normals = function(body, scale) {
   }
   
   this.sp.setUniform4fv(9, this._tcolor[10].v);
-  this.raw(33, 32, 1, n/8, V);
+  this.raw(33, 32, 1, n/8, V.subarray(0,n));
 };
 
 
@@ -2134,6 +2155,9 @@ Ovoid.Drawer.prototype.normals = function(body, scale) {
 Ovoid.Drawer.prototype.helpers = function(tform) {
 
   this.model(tform.worldMatrix.m);
+  
+  var m = this._tM; // Matrice temporaire
+      
   if (this._i.opt_renderDrawAxis) {
     this.symAxis(this._tcolor[0]);
   }
@@ -2147,7 +2171,7 @@ Ovoid.Drawer.prototype.helpers = function(tform) {
   }
   
   if ((tform.type & Ovoid.JOINT) && this._i.opt_renderDrawJoints) {
-    var m = new Float32Array(tform.worldMatrix.m);
+    m.set(tform.worldMatrix.m); // Copie 
     var s = this._i.opt_renderJointSize * tform.size;
     m[0] *= s; m[1] *= s; m[2] *= s;
     m[4] *= s; m[5] *= s; m[6] *= s;
@@ -2157,9 +2181,8 @@ Ovoid.Drawer.prototype.helpers = function(tform) {
   }
   
   if(tform.type & Ovoid.BODY) {
-    
     if (this._i.opt_renderDrawBoundingBox) {
-      var m = new Float32Array(tform.worldMatrix.m);
+      m.set(tform.worldMatrix.m); // Copie 
       var sx = tform.boundingBox.hsize.v[0] * 2.0;
       var sy = tform.boundingBox.hsize.v[1] * 2.0;
       var sz = tform.boundingBox.hsize.v[2] * 2.0;
@@ -2183,7 +2206,7 @@ Ovoid.Drawer.prototype.helpers = function(tform) {
                         
     }
     if (this._i.opt_renderDrawBoundingSphere) {
-      var m = new Float32Array(tform.worldMatrix.m);
+      m.set(tform.worldMatrix.m); // Copie 
       var s = tform.boundingSphere.radius;
       var cx = tform.boundingSphere.center.v[0];
       var cy = tform.boundingSphere.center.v[1];

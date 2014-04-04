@@ -1200,7 +1200,6 @@ Ovoid.Collada.prototype._procPset = function(node, dae, gs, pl, gt) {
       /* les elements <p> du polyset */
       var p = pl[i].getElementsByTagName('p');
       /* la future liste d'indices unsigned short */
-      //var indices = new Uint16Array((stc * 3) * pli.length);
       if(gt == 1) var indices = new Uint16Array((stc * 2) * pli.length);
       if(gt == 4) var indices = new Uint16Array((stc * 3) * pli.length);
       
