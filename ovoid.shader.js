@@ -763,17 +763,17 @@ Ovoid.Shader.prototype.loadSource = function(vs, fs, wm, async) {
     }
     vxhr.onreadystatechange = hthndfunc;
     fxhr.onreadystatechange = hthndfunc;
-    wxhr.onreadystatechange = hthndfunc;
+    if (wm) wxhr.onreadystatechange = hthndfunc;
   }
   
-  if (wm) {
-    wxhr.open("GET", wsrc, async);
-    wxhr.send();
-  }
   fxhr.open("GET", fsrc, async);
   fxhr.send();
   vxhr.open("GET", vsrc, async);
   vxhr.send();
+  if (wm) {
+    wxhr.open("GET", wsrc, async);
+    wxhr.send();
+  }
   
   // Si nous sommes en mode synchrone
   if (!async) {
@@ -907,12 +907,20 @@ Ovoid.Shader.prototype._linkWrap = function() {
   this._i._logGlerror(' Shader.linkWrap::' + this.name);
 
   /* retrouve le type de fichier */
-  var ext = Ovoid.extractExt(this.wrapurl).toUpperCase();
-  if (ext == "XML") {
-    if (!this._wrapXml()) {
-      Ovoid._log(2,this._i, ' Shader.linkWrap', this.name + 
-          ":: program wrap error.");
-      return false;
+  if(this.wrapurl) {
+    var ext = Ovoid.extractExt(this.wrapurl).toUpperCase();
+    if (ext == "XML") {
+      if (!this._wrapXml()) {
+        Ovoid._log(2,this._i, ' Shader.linkWrap', this.name + 
+            ":: program wrap error.");
+        return false;
+      }
+    } else {
+      if (!this._wrapJson()) {
+        Ovoid._log(2,this._i, ' Shader.linkWrap', this.name + 
+            ":: program wrap error.");
+        return false;
+      }
     }
   } else {
     if (!this._wrapJson()) {

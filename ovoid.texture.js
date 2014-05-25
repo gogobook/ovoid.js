@@ -63,7 +63,7 @@ Ovoid.Texture = function(name, i) {
   /** Texture height.
    * @type float */
   this.height;
-  /** Filtering level.
+  /** Filtering flag.
    * @type bool */
   this.filter = false;
   /** Source image loading status.<br><br>

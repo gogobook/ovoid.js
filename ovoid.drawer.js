@@ -1998,8 +1998,8 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
       P[0] = body.shape.vertices[l][body.shape.triangles[l][i].index[0]].p;
       P[1] = body.shape.vertices[l][body.shape.triangles[l][i].index[1]].p;
       P[2] = body.shape.vertices[l][body.shape.triangles[l][i].index[2]].p;
-      // triangle extrudé à l'infini lumiere 
       
+      // triangle extrudé à l'infini lumiere 
       if(light.model == 1) { /* Ovoid.LIGHT_DIRECTIONAL */
         P[3].copy(LP);
         P[4].copy(LP);
@@ -2074,8 +2074,6 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
       }
     }
   }
-  
-  //console.log(n);
     
   // buffer dynamique
   this.gl.bindBuffer(0x8892,this._bdynamic);

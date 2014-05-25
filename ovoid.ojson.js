@@ -1186,45 +1186,62 @@ Ovoid.Ojson.prototype._procAction = function(n, j) {
  */
 Ovoid.Ojson.prototype.save = function(recp) {
   
-  this._json = new Object();
-  this._json['OJSN'] = Ovoid.VERSION;
+  this.name = recp.name;
+  var jdata = new Object();
+  jdata['OJSN'] = Ovoid.VERSION;
   var ext;
       
   if(recp instanceof Ovoid.Scene) {
-    /* Entête d'objet */
+    Ovoid._log(3,this._i,'::Ojson.save', this.name + ":: Scene data export.");
     this._i = recp._i;
-    this._json['TYPE'] = "SCN";
-    this._json['SCENE'] = recp;
+    /* Entête d'objet */
+    jdata['TYPE'] = "SCN";
+    jdata['SCENE'] = recp;
     ext = ".ojs";
   } else {
     if(recp instanceof Ovoid.Instance) {
+      Ovoid._log(3,this._i,'::Ojson.save', this.name + ":: Instance's env data export.");
       this._i = recp;
-      this._json['TYPE'] = "ENV";
-      this._json['INENV'] = recp;
+      /* Entête d'objet */
+      jdata['TYPE'] = "ENV";
+      jdata['INENV'] = recp;
       ext = ".oje";
     } else {
-      Ovoid._log(1,this._i,'::Ojson.export', this.name + 
+      Ovoid._log(1,this._i,'::Ojson.save', this.name + 
       ":: invalid object type to export, expected Scene or Instance.");
-      delete this._json;
       return null;
     }
   }
   
   /* Export des données */
-  var Ojson = JSON.stringify(this._json);
+  Ovoid._log(3,this._i,'::Ojson.save', this.name + ":: stringify data.");
+  try {
+    this._json = JSON.stringify(jdata);
+    delete jdata;
+    Ovoid._log(3,this._i,'::Ojson.save', this.name + ":: " + Math.round((this._json.length * 8) / 1000) + " Ko of JSON data created.");
+  } catch (e) {
+    Ovoid._log(1,this._i,'::Ojson.save', this.name + ":: stringify exception thrown: " + e);
+    return null;
+  }
 
   var dl = document.createElement('a');
   if(dl) {
-    dl.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(Ojson));
-    dl.setAttribute('download', recp.name + ext);
-    dl.click();
+    try {
+      // Ca ne fonctionne pas lorsqu'il y'a trop de data, apparemment.
+      //dl.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this._json));
+      dl.setAttribute('href', 'data:application/octet-stream,' + this._json);
+      dl.setAttribute('download', this.name + ext);
+      dl.click();
+    } catch (e) {
+      Ovoid._log(1,this._i,'::Ojson.save', this.name + ":: download exception thrown: " + e);
+    }
   } else {
     Ovoid._log(1,this._i,'::Ojson.export', this.name + 
       ":: unable to create download link");
     alert("Ovoid :: Ojson.exportScene :: unable to create download link.");
   }
   
-  return Ojson;
+  return this._json;
 };
 
 

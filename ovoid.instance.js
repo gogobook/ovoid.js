@@ -1937,8 +1937,8 @@ Ovoid.Instance.prototype._loadstep = function() {
               this._loaditem.f,
               this._loaditem.w, true);
               
-          this._loadel[57].string = Ovoid.extractName(this._loadobj.url, true).toUpperCase();
-          Ovoid._log(3, this, '._loadstep', " start loading Shader '"+this._loadobj.url+"'");
+          this._loadel[57].string = this._loadobj.name;
+          Ovoid._log(3, this, '._loadstep', " start loading Shader '"+this._loadobj.name+"'");
         }
       }
     }
@@ -2010,7 +2010,7 @@ Ovoid.Instance.prototype._loadstep = function() {
               this._loadstktex.unshift(new Object);
               this._loadstktex[0].o = this._loaditem.d.texture[i];
               this._loadstktex[0].u = this._loaditem.d.texture[i].url;
-              this._loadstktex[0].f = this._loaditem.d.texture[i].filter;
+              this._loadstktex[0].f = true;
               this._loadtotal++;
               this._loadremains[1]++;
             }
