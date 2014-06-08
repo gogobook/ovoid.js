@@ -17,7 +17,7 @@
  * along with this program.  If not, see <link url="http://www.gnu.org/licenses/">.
  */
 
-
+"use strict";
 /** Ovoid.JS root namespace.
  * 
  * @namespace Ovoid.JS global methods and members.
@@ -90,7 +90,6 @@
  * 
  */
 var Ovoid = {};
-
 
 /** Ovoid.JS Instance objects array. */
 Ovoid._inst = new Array();
@@ -260,7 +259,7 @@ Ovoid._log = function(level, instance, scope, message) {
     }
     
     /* assemblage */
-    log = tstm+' '+type+' @'+root+scope+'::'+message+'\n';
+    log = tstm+' '+type+' @'+root+scope+'::'+message;
     /* on balance sur la console */
     console.log(log);
     /* ajoute aux logs instance */
@@ -279,6 +278,7 @@ Ovoid._log = function(level, instance, scope, message) {
  * Main library start and loop function.<br><br>
  */
 Ovoid._run = function() {
+
   var i = Ovoid._inst.length;
   while(i--) {
     switch(Ovoid._inst[i]._runstat)
@@ -310,8 +310,10 @@ Ovoid._run = function() {
       break;
     }
   }
-  // C'est ce qui fonctionne le mieux partout...
-  window.setTimeout(Ovoid._run,0);
+  // Le plus rapide, mais moins stable..
+  //window.setTimeout(Ovoid._run,0);
+  // Moins rapide mais plus stable...
+  window.requestAnimationFrame(Ovoid._run);
 };
 
 
@@ -840,6 +842,7 @@ Ovoid._handleScroll = function() {
   }
 };
 
+
 /* ----------------- Opération globales préliminaire ---------------- */
 
 // Detection du navigateur
@@ -857,9 +860,7 @@ window.onmouseup = Ovoid._eventMouseUp;
 window.onmousemove = Ovoid._eventMouseMove;
 window.onmousewheel = Ovoid._eventMouseWheel;
 
-window.addEventListener('DOMMouseScroll', 
-    Ovoid._eventMouseWheel, 
-    false);
+window.addEventListener('DOMMouseScroll', Ovoid._eventMouseWheel, false);
 
 document.onkeydown = Ovoid._eventKeyDn;
 document.onkeyup = Ovoid._eventKeyUp;

@@ -82,7 +82,7 @@ Ovoid.Audio = function(name, i) {
   this.loadStatus = 0;
   /** Audio Layer buffer */
   if(i.al) {
-    this._albuffer = inst.al.createBuffer(1, 1, 22050);
+    this._albuffer = i.al.createBuffer(1, 1, 22050);
   } else {
     this._albuffer = null;
   }
@@ -99,10 +99,10 @@ Ovoid.Audio.prototype.constructor = Ovoid.Audio;
  */
 Ovoid.Audio.prototype._handleLoad = function(e) {
   
-  if(this.o.i.al) {
+  if(this.i.al) {
     var o = this.o;
-    var i = this._i;
-    this.o.i.al.decodeAudioData(
+    var i = this.i;
+    this.i.al.decodeAudioData(
           this.response,
           function(b){Ovoid._log(2,i,'::Audio.loadSource',o.name+":: loaded");o._albuffer=b;o.loadStatus=1;},
           function(){Ovoid._log(2,i,'::Audio.loadSource',o.name+":: unable to decode audio '"+o.src+"'");o.loadStatus=-1;}
@@ -148,7 +148,7 @@ Ovoid.Audio.prototype.loadSource = function(url) {
   if(this._i.al) {
     var xhr = new XMLHttpRequest();
     xhr.o = this;
-    xhr._i = this._i;
+    xhr.i = this._i;
     xhr.onload = this._handleLoad;
     xhr.onerror = this._handleError;
     xhr.open("GET", src, true);

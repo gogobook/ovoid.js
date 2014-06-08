@@ -140,6 +140,8 @@ Ovoid.Emitter = function(name, i) {
   /** Ovoid.JS parent instance
    * @type Object */
   this._i = i;
+  
+  this.addCach(Ovoid.CACH_GEOMETRY);
 };
 Ovoid.Emitter.prototype = new Ovoid.Node;
 Ovoid.Emitter.prototype.constructor = Ovoid.Emitter;
@@ -255,11 +257,10 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
   
   if(!this.link[0]) 
     return;
-    
- 
+  
   var NB = 0;  /* Nombre de particule à faire naitre durant cette passe */
       
-  if (this.emits || this._alives != 0) {
+  if (this.emits) {
 
     /* Calcul du nombre de naissance */
     this._ctdown -= this._i.Timer.quantum;
@@ -268,17 +269,20 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
       if(NB < 1) NB = 1;
       this._ctdown = 1.0/this.rate;
     }
+  }
 
-    var body;
+  if (this._alives != 0 || NB != 0) {
+    
+    this.unCach(Ovoid.CACH_GEOMETRY);
+    
     /* Retrouve le body pour le bounding volum */
+    var body;
     for (var i = 0; i < this.link.length; i++) {
       if(this.link[i].type & Ovoid.BODY) {
           body = this.link[i];
       }
     }
-  }
-  
-  if (this._alives != 0 || NB != 0) {
+    
     /* stuff pour le bounding volum */
     var min = new Ovoid.Point(Ovoid.FLOAT_MAX,
         Ovoid.FLOAT_MAX,
@@ -288,14 +292,6 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
         Ovoid.FLOAT_MIN,
         Ovoid.FLOAT_MIN,
         1.0);
-
-    var P;
-    var V;
-    var C;
-    var U;
-    var L;
-    
-    this.unCach(Ovoid.CACH_GEOMETRY);
     
     /* Point pour les coordonnées du particule relatif au body 
      * pour construire le bounding volum */
@@ -312,6 +308,7 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
   }
   
   if (this._alives != 0 || this.emits) {
+    var L, P, V, C, U;
     this._alives = 0;
     var i = this._particles.length;
     while(i--) {
@@ -449,6 +446,10 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
   if (!(this.cach & Ovoid.CACH_GEOMETRY)) {
     this.boundingBox.setBound(min, max);
     this.boundingSphere.setBound(min, max);
+    delete min;
+    delete max;
+    delete g;
+    delete WP;
     /* propage l'uncach du shape */
     for (var i = 0; i < this.link.length; i++) {
         this.link[i].unCach(Ovoid.CACH_BOUNDING_SHAPE);

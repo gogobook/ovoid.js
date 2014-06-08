@@ -191,6 +191,8 @@ Ovoid.Mesh = function(name, i) {
   this._vformat = 0;
   /** Vertex size in bytes. */
   this._vfbytes = 0;
+    /** VBO type. */
+  this._vbotype = Ovoid.BUFFER_STATIC;
   
   /** Current used LOD. */
   this._lod = 0;
@@ -599,7 +601,8 @@ Ovoid.Mesh.prototype._createBuffers = function(format, type) {
 
   this._vformat = format;
   this._vfbytes = Ovoid.Vertex.getFormatSize(this._vformat);
-
+  this._vbotype = type;
+  
   var ibo, vbo;
   for (var l = 0; l < Ovoid.MAX_MESH_LOD; l++)
   {
@@ -613,7 +616,7 @@ Ovoid.Mesh.prototype._createBuffers = function(format, type) {
     this._i.gl.bufferData(this._i.gl.ARRAY_BUFFER,
         Ovoid.Vertex.bufferize(this._vformat,
 			this.vertices[l]),
-			type);
+			this._vbotype);
       
     this._i.gl.bindBuffer(this._i.gl.ELEMENT_ARRAY_BUFFER, ibo);
     this._i.gl.bufferData(this._i.gl.ELEMENT_ARRAY_BUFFER,
@@ -1183,6 +1186,10 @@ Ovoid.Mesh.prototype.optimizeVertices = function() {
     /* on remplace la liste de vertice */
     this.vertices[l] = new_vertex;
   }
+  
+  /* recree les buffers */
+  this._createBuffers(this._vformat, this._vbotype);
+  
 };
 
 
@@ -1410,6 +1417,9 @@ Ovoid.Mesh.prototype.cachMesh = function() {
     this.boundingBox.setBound(min, max);
     this.boundingSphere.setBound(min, max);
 
+    delete min;
+    delete max;
+    
     /* propage l'uncach du shape */
     for (var i = 0; i < this.link.length; i++)
       this.link[i].unCach(Ovoid.CACH_BOUNDING_SHAPE);

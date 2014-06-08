@@ -564,6 +564,16 @@ Ovoid.Config = function() {
    * 
    * @type int */
   this.opt_physicsContactItFactor = 4;
+  
+  /* Options audio ---------------------------------------------------*/
+  
+  /** Audio Listener Doppler Factor.<br><br>
+   * 
+   * Defines the Web Audio API Listener Doppler Factor.
+   * Default value is <c>1.0</c>.
+   * 
+   * @type float */
+  this.opt_audioDopplerFactor = 1.0;
 
 };
 

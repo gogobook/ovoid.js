@@ -1426,6 +1426,8 @@ Ovoid.Ojson.prototype._importEnv = function(inst) {
     this._i.opt_physicsContactItFactor = env.o[40];
     /* Options de derniere minute */
     this._i.opt_renderCullFace = env.o[41];
+    /* Options audio */
+    this._i.opt_audioDopplerFactor = env.o[42];
   
   } catch (e) {
     Ovoid._log(1,this._i,'::Ojson._importEnv', this.name +

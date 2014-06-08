@@ -155,13 +155,11 @@ Ovoid.Expression.prototype.cachExpression = function() {
       this.timeq = this.factor * this._i.Timer.quantum;
       this.timel += this.timeq;
       
-      var i, j, c;
-      
-      i = this.target.length;
-      c = this.exprfunc.length;
+      var i = this.target.length;
+      var c = this.exprfunc.length;
       try { /* handle exceptions car des fonctions sont custom */
         while (i--) {
-          for ( j = 0; j < c; j++) {
+          for (var j = 0; j < c; j++) {
             this.exprfunc[j](this.target[i], this.timeq, this.timel);
           }
         }

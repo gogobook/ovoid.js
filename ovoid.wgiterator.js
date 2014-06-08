@@ -54,8 +54,10 @@ Ovoid.WgIterator = function(root) {
 
   this.root = root;
   this.current = root;
+  this.queue = new Array(128);
+  var i = 128;
+  while (i--) { this.queue[i] = 0; }
   this.depth = 0;
-  this.queue = new Uint16Array(128);
   this.completed = false;
 };
 
@@ -70,12 +72,12 @@ Ovoid.WgIterator = function(root) {
  */
 Ovoid.WgIterator.prototype.init = function(root) {
 
-  this.root = root;
-  this.current = root;
-  var i = 128;
-  while (i--) { this.queue[i] = 0.0; }
-  this.depth = 0;
-  this.completed = false;
+    this.root = root;
+    this.current = root;
+    var i = 128;
+    while (i--) { this.queue[i] = 0; }
+    this.depth = 0;
+    this.completed = false;
 };
 
 

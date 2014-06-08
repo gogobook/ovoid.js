@@ -503,7 +503,7 @@ Ovoid.Physics.prototype.cachPhysics = function() {
        * [Iw] = [R] * [I] * [R'] */
       
       /* Premiere etape: [RI] = [R] * [I] */
-      var RI = new Float32Array(9);
+      var RI = new Array(9);
       RI[0] = this.target[0].worldMatrix.m[0] * Ix;
       RI[1] = this.target[0].worldMatrix.m[1] * Iy;
       RI[2] = this.target[0].worldMatrix.m[2] * Iz;
@@ -542,7 +542,9 @@ Ovoid.Physics.prototype.cachPhysics = function() {
       this.itensor.m[8] = RI[6] * this.target[0].worldMatrix.m[8] + 
           RI[7] * this.target[0].worldMatrix.m[9] + 
           RI[8] * this.target[0].worldMatrix.m[10];
-          
+      
+      delete RI;
+      
       /* applique la gravité */
       this.linearInfluence.v[0] += mass * this._i.opt_gravity[0];
       this.linearInfluence.v[1] += mass * this._i.opt_gravity[1];

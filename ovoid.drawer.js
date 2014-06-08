@@ -518,6 +518,8 @@ Ovoid.Drawer.prototype._init = function() {
   
   this.gl = this._i.gl;
   
+  var i;
+    
   this._i._clearGlerror();
   
   /* performance counter */
@@ -551,7 +553,7 @@ Ovoid.Drawer.prototype._init = function() {
   /* Nouvelle texture blank */
   this._tblank = new Ovoid.Texture("Drawer.blank_texture", this._i);
   var px = new Uint8Array(256); /* (8 * 8 * RGBA) */
-  for (var i = 0; i < 256; i++) px[i] = 255;
+  for (i = 0; i < 256; i++) px[i] = 255;
   if(!this._tblank.create2dFromRaw(this.gl.RGBA, 8, 8, px))
     return false;
   
@@ -618,7 +620,7 @@ Ovoid.Drawer.prototype._init = function() {
   var ix, iy, iz;
 
   var j = 0;
-  for (var i = 0; i < 24 * 2; i += 2)
+  for (i = 0; i < 24 * 2; i += 2)
   {
     sinI = Math.sin((Ovoid._2PI) * (j / sd));
     cosI = Math.cos((Ovoid._2PI) * (j / sd));
@@ -732,7 +734,7 @@ Ovoid.Drawer.prototype._init = function() {
     return false;
 
   /* Construit le tableau de pipeline */
-  for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+  for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     this._sppipe[i] = new Array();
   }
   /* Ajout des shaders par défaut */
@@ -1218,7 +1220,7 @@ Ovoid.Drawer.prototype.beginDraw = function() {
   /* performance counter */
   this._pc = (new Date().getTime());
   
-  if (this._i.Frame._changed) {
+  if (this._i.Frame.changed) {
     this.gl.viewport(0,0,this._i.Frame.size.v[0],this._i.Frame.size.v[1]);
   }
   
@@ -1986,8 +1988,9 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
   }
   
   // on parcour la liste de triangles pour creer le vertex buffer du shadow volum
+  var i, j, k, a;
   var n = 0;
-  for (var i = 0; i < c; i++)
+  for (i = 0; i < c; i++)
   {
     if(light.model != 1) /* Ovoid.LIGHT_DIRECTIONAL */
       LV.subOf(LP, body.shape.triangles[l][i].center);
@@ -2074,7 +2077,14 @@ Ovoid.Drawer.prototype.shadow = function(light, body) {
       }
     }
   }
-    
+  
+  delete P[3];
+  delete P[4];
+  delete P[5];
+  delete P;
+  delete LP;
+  delete LV;
+  
   // buffer dynamique
   this.gl.bindBuffer(0x8892,this._bdynamic);
   this.gl.bufferSubData(0x8892,0,V.subarray(0,n));
@@ -2304,10 +2314,11 @@ Ovoid.Drawer.prototype.bodyStack = function(stack, layer, rp) {
  */
 Ovoid.Drawer.prototype.layerStack = function(stack, rp) {
 
+  var i;
   var c = stack.count;
   if (rp) {
     var color = new Ovoid.Color();
-    for (var i = 0; i < c; i++) {
+    for (i = 0; i < c; i++) {
       if(stack[i].pickable) {
         color.fromInt(stack[i].uid);
         this.model(stack[i].layerMatrix.m);
@@ -2316,7 +2327,7 @@ Ovoid.Drawer.prototype.layerStack = function(stack, rp) {
       }
     }
   } else {
-    for (var i = 0; i < c; i++) {
+    for (i = 0; i < c; i++) {
       this.model(stack[i].layerMatrix.m);
       this.layer(stack[i], color);
       stack[i].addCach(Ovoid.CACH_WORLD);
@@ -2336,6 +2347,7 @@ Ovoid.Drawer.prototype.layerStack = function(stack, rp) {
  */
 Ovoid.Drawer.prototype.textStack = function(stack, rp) {
 
+  var i;
   var c = stack.count;
   if (rp) {
     var color = new Ovoid.Color();
@@ -2507,6 +2519,7 @@ Ovoid.Drawer.prototype.drawQueueHL = function() {
  */
 Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
   
+  var i;
   this.setCull(this.opt_renderCullFace);
   this.switchBlend(3); // blending substracting alpha
   this.switchDepth(1); // depth mask on, test less
@@ -2514,7 +2527,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
   // initialize projection pour les shadow volume
   this.switchPipe(6,0); // PIPE_SHADOW_VOLUME
   this.persp(this._i.Queuer._rcamera);
-  for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+  for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     if(!this._i.Queuer.qsolid[i].count) continue;
     this.switchPipe(pipe,i); // [VL_,LE_]PIPE_L2_GEOMETRY_LP
     this.persp(this._i.Queuer._rcamera);
@@ -2533,7 +2546,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
       this.switchPipe(6,0); // PIPE_SHADOW_VOLUME
       this.switchBlend(0); // blend off
       this.switchDepth(2); // mask off, test less
-      for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+      for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
         if(!this._i.Queuer.qsolid[i].count) continue;
         this.zfailStack(this._i.Queuer.qlight[l], this._i.Queuer.qsolid[i]);
       }
@@ -2543,7 +2556,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
       this.restoreDepth(); 
     }
     
-    for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+    for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
       if(!this._i.Queuer.qsolid[i].count) continue;
       this.switchPipe(pipe,i); // [VL_,LE_]PIPE_L2_GEOMETRY_LP
       this.ambient(); // set scene ambiant parameters

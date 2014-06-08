@@ -521,6 +521,8 @@ Ovoid.Scene.prototype.remNode = function(item, rdep) {
 
   node.setParent(null); /* bye bye ! */
   
+  delete node;
+  
   Ovoid._log(2,this._i, '::Scene.remove', this.name + 
       ":: Removing node " + node.name);
 };
@@ -950,6 +952,8 @@ Ovoid.Scene.prototype.clean = function() {
   while(i--) {
     /* node has some links ? */
     if(!array[i].link.length) {
+      Ovoid._log(3,this._i, '::Scene.clean', this.name + 
+      ":: found unreferenced node '" +array[i].name+ "'");
       /* no, then we remove it */
       this.remNode(array[i], true);
     }

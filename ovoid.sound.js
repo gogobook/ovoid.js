@@ -90,11 +90,20 @@ Ovoid.Sound = function(name, i) {
   this._algain = null;
   /** Audio Layer panner node */
   this._alpanner = null;
+  /** Loop playing flag.
+   * @type bool **/
+  this._loop = false;
+  /** Pitch/rate playing flag.
+   * @type bool **/
+  this._rate = 1.0;
+  /** Is playing flag.
+   * @type bool **/
+  this._playing = false;
   
   /* init les nodes Audio API */
   if(i.al) { 
     /* Ovoid.WEB_AUDIO_API */
-    this._alsource = i.al.createBufferSource();
+    this._alsource = null;
     this._algain = i.al.createGain(); /* was Ovoid.al.createGainNode() (deprecated) */
     this._alpanner = i.al.createPanner();
     this._alpanner.distanceModel = "inverse";
@@ -106,7 +115,9 @@ Ovoid.Sound = function(name, i) {
     this._algain = null;
     this._alpanner = null;
   }
-  
+
+  /** Last sound position to comput velocity */
+  this._lastwp = [0.0,0.0,0.0];
   /** Ovoid.JS parent instance
    * @type Object */
   this._i = i;
@@ -115,6 +126,27 @@ Ovoid.Sound = function(name, i) {
 };
 Ovoid.Sound.prototype = new Ovoid.Transform;
 Ovoid.Sound.prototype.constructor = Ovoid.Sound;
+
+
+/**
+ * Reset Buffer Source.<br><br>
+ * 
+ * Reset/create new Buffer source and connect Audio buffer and ALnodes. 
+ */
+Ovoid.Sound.prototype._resetSrc = function() {
+  
+  this._alsource = this._i.al.createBufferSource();
+  this._alsource.o = this;
+  this._alsource.buffer = this.audio._albuffer;
+  this._alsource.loop = this._loop;
+  this._alsource.playbackRate.value = this._rate;
+  this._alsource.onended = function(){this.o._playing=false;};
+  if(this.flat) 
+    this._alsource.connect(this._algain);
+  else
+    this._alsource.connect(this._alpanner);
+};
+
 
 /**
  * Set sound spatialization.<br><br>
@@ -136,6 +168,7 @@ Ovoid.Sound.prototype.spatialize = function(e) {
       this._alpanner.connect(this._algain);
       this._algain.connect(this._i.al.destination);
       this.flat = false;
+      this.unCach(Ovoid.CACH_SOUND);
     }
   } else {
     this.flat = true;
@@ -158,6 +191,7 @@ Ovoid.Sound.prototype.setPannerCone = function(iangle, oangle, ogain) {
     this.innerCone = iangle;
     this.outerCone = oangle;
     this.outerGain = ogain;
+    this.unCach(Ovoid.CACH_SOUND);
 };
 
 
@@ -176,6 +210,7 @@ Ovoid.Sound.prototype.setPannerDist = function(ref, max, rolloff) {
     this.refDistance = ref;
     this.maxDistance = max;
     this.rolloffFactor = rolloff;
+    this.unCach(Ovoid.CACH_SOUND);
 };
 
 
@@ -209,6 +244,7 @@ Ovoid.Sound.prototype.setAudio = function(audio) {
  */
 Ovoid.Sound.prototype.setLoop = function(e) {
   
+  this._loop = e;
   if(this._alsource) this._alsource.loop = e;
 };
 
@@ -220,15 +256,10 @@ Ovoid.Sound.prototype.setLoop = function(e) {
  */
 Ovoid.Sound.prototype.play = function() {
   
-  if(this._alsource) {
-    /* He bien oui, il faut refaire tout ça pour rejouer un son... */
-      this._alsource = this._i.al.createBufferSource();
-      this._alsource.buffer = this.audio._albuffer;
-      if(this.flat) 
-        this._alsource.connect(this._algain);
-      else
-        this._alsource.connect(this._alpanner);
-      this._alsource.start(0);
+  if(!this._playing) {
+    this._resetSrc();
+    this._alsource.start(0);
+    this._playing = true;
   }
 };
 
@@ -240,7 +271,10 @@ Ovoid.Sound.prototype.play = function() {
  */
 Ovoid.Sound.prototype.stop = function() {
   
-  if(this._alsource) this._alsource.stop(0);
+  if(this._playing) {
+    this._alsource.stop(0);
+    this._playing = false;
+  }
 };
 
 
@@ -255,6 +289,21 @@ Ovoid.Sound.prototype.volum = function(gain) {
   
   if(this._algain) this._algain.gain.value = gain;
 };
+
+
+/**
+ * Sound pitch.<br><br>
+ * 
+ * Sets the Sound pitch.
+ *
+ * @param {float} rate Pitch rate.
+ */
+Ovoid.Sound.prototype.pitch = function(rate) {
+  
+  this._rate = rate;
+  if(this._alsource) this._alsource.playbackRate.value = rate;
+};
+
 
 /**
  * Node's caching function.
@@ -290,11 +339,16 @@ Ovoid.Sound.prototype.cachSound = function() {
           
       this._alpanner.setOrientation(-this.worldMatrix.m[8], 
           -this.worldMatrix.m[9], 
-          -this.worldMatrix.m[10],
-          this.worldMatrix.m[4], 
-          this.worldMatrix.m[5], 
-          this.worldMatrix.m[6]);
+          -this.worldMatrix.m[10]);
           
+      this._alpanner.setVelocity(this.worldMatrix.m[12] - this._lastwp[0], 
+          this.worldMatrix.m[13] - this._lastwp[1],
+          this.worldMatrix.m[14] - this._lastwp[2] );
+      
+      this._lastwp[0] = this.worldMatrix.m[12];
+      this._lastwp[1] = this.worldMatrix.m[13];
+      this._lastwp[2] = this.worldMatrix.m[14];
+      
       this.addCach(Ovoid.CACH_WORLD);
     }
   }

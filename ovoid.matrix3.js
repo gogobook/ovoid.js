@@ -86,7 +86,7 @@ Ovoid.Matrix3.prototype.copy = function(mat) {
  */
 Ovoid.Matrix3.prototype.multBy = function(mat) {
 
-  var result = new Float32Array(9);
+  var result = new Array(9);
 
   result[0] = this.m[0] * mat.m[0] +
               this.m[1] * mat.m[3] +
@@ -230,7 +230,7 @@ Ovoid.Matrix3.prototype.toInverse = function() {
                     this.m[2] *
                     (this.m[3] * this.m[7] - this.m[6] * this.m[4]));
 
-  var result = new Float32Array(9);
+  var result = new Array(9);
 
   result[0] = (this.m[4] * this.m[8] - this.m[7] * this.m[5]) * fdet;
   result[1] = -(this.m[1] * this.m[8] - this.m[7] * this.m[2]) * fdet;

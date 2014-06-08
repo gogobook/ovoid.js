@@ -334,6 +334,7 @@ Ovoid.Solver.prototype._getContactB2L = function (a, b) {
         }
       }
     }
+        
     if(nC) { 
       if(nC > 1) {
         N.normalize();
@@ -344,9 +345,13 @@ Ovoid.Solver.prototype._getContactB2L = function (a, b) {
         C.v[3] = 1.0;
       }
       this._addContact(a, null, C, N, nD*1.5);
+      delete nN;
+      delete nP;
       return;
     }
   }
+  delete nN;
+  delete nP;
 };
 
 
@@ -559,6 +564,7 @@ Ovoid.Solver.prototype._getContactB2S = function (a, b) {
  */
 Ovoid.Solver.prototype._getContactB2B = function (a, b) {
 
+  var i;
   /* Les boundingBox des deux bodys */
   var Ba = a.target[0].boundingBox;
   var Bb = b.target[0].boundingBox;
@@ -603,7 +609,7 @@ Ovoid.Solver.prototype._getContactB2B = function (a, b) {
   /* best axis index */
   var ap = -1;
   var ma = -1;
-  for (var i = 0; i < 15; i++) {
+  for (i = 0; i < 15; i++) {
 
     /* projection des boxes selon les différents axes. 
      * 
@@ -944,9 +950,10 @@ Ovoid.Solver.prototype._solveContactsHr = function() {
   var adjust = new Ovoid.Vector();
   var ci;
   var cc;
+  var it;
   
   // resoud les interpenetration iterativement par ordre de severité 
-  var it = 0;
+  it = 0;
   while(it < m)
   {
     // trouve la plus grand penetration parmi tous les contacts 
@@ -995,7 +1002,7 @@ Ovoid.Solver.prototype._solveContactsHr = function() {
   }
 
   // resoud les interpenetration iterativement par ordre de severité 
-  var it = 0;
+  it = 0;
   while(it < m) {
     // trouve la plus grande magnitude d'influence parmi tous les contacts 
     d = 0.0;

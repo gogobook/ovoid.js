@@ -899,6 +899,17 @@ Ovoid.Instance = function(name) {
   this.opt_physicsContactItFactor = 4;
 
 
+  /* Options audio ---------------------------------------------------*/
+  
+  /** Audio Listener Doppler Factor.<br><br>
+   * 
+   * Defines the Web Audio API Listener Doppler Factor.
+   * Default value is <c>1.0</c>.
+   * 
+   * @type float */
+  this.opt_audioDopplerFactor = 1.0;
+  
+  
   /* Variables generales ---------------------------------------------*/
   /** Global WebGL Context handle.
    * @type WebGL Context */
@@ -1168,6 +1179,8 @@ Ovoid.Instance.prototype._setoptions = function(opt) {
   /* Options du solver */
   this.opt_physicsIterativeSolver = opt.opt_physicsIterativeSolver;
   this.opt_physicsContactItFactor = opt.opt_physicsContactItFactor;
+  /* Options audio */
+  this.opt_audioDopplerFactor = opt.opt_audioDopplerFactor;
   
   Ovoid._log(3, this, '._setoptions', ' done');
 };
@@ -1508,16 +1521,8 @@ Ovoid.Instance.prototype._mainloop = function() {
   
   try {
     /* BEGIN FRAME */    
-    
-    /* Reset render queue */
-    this.Queuer._reset();
-    
-    /* QUEUE STACK */
-    this.Queuer._queueScene(this.Scene);
-    
-    /* SOLVE PHYSICS QUEUE */
-    if(this.Solver != undefined)   
-      this.Solver._solveQueue();
+    this.Timer._update();
+    this.Input._update();
     
     /* USER CUSTOM LOOP FUNC */
     try {
@@ -1526,6 +1531,15 @@ Ovoid.Instance.prototype._mainloop = function() {
       Ovoid._log(0, this, '.onloop', ' (Exception)\n' + e.stack);
       Ovoid._err(5, this, '.onloop() Exception thrown');
     }
+    
+    /* Reset render queue */
+    this.Queuer._reset();
+    
+    /* QUEUE STACK */
+    this.Queuer._queueScene(this.Scene);
+    
+    /* SOLVE PHYSICS QUEUE */ 
+    this.Solver._solveQueue();
     
     /* DRAW QUEUE */
     this.ondraw();
@@ -1606,9 +1620,9 @@ Ovoid.Instance.prototype._mainloop = function() {
     }
     
     /* END FRAME */
-    this.Input._update();
     this.Frame._update();
-    this.Timer._update();
+    this.gl.finish();
+    this.gl.flush();
   } 
   catch(e) {
     Ovoid._log(0, this, '._mainloop', ' (Exception)\n' + e.stack);
@@ -2120,7 +2134,7 @@ Ovoid.Instance.prototype._loaddone = function() {
   // On calibre le timer
   this.Timer._reset();
   // Pour updater les viewports et les cameras dès la premiere frame
-  this.Frame._changed = true;
+  this.Frame.changed = true;
   
   Ovoid._log(3, this, '._loaddone', ' instance jump to main loop...now!');
   /* Entre en boucle de rendu */
@@ -2452,8 +2466,8 @@ Ovoid.Instance.prototype.includeAudio = function(name, url, scene) {
   if(!scene) scene = this.Scene;
   
   this._loadstkaud.unshift(new Object);
-  this._loadstktex[0].o = scene.newNode(Ovoid.AUDIO, name);
-  this._loadstktex[0].u = url;
+  this._loadstkaud[0].o = scene.newNode(Ovoid.AUDIO, name);
+  this._loadstkaud[0].u = url;
   
   this._loadtotal++;
   this._loadremains[2]++;
@@ -3164,6 +3178,8 @@ Ovoid.Instance.prototype.toJSON = function() {
   o['o'][40] = this.opt_physicsContactItFactor;
   /* Options de derniere minute */
   o['o'][41] = this.opt_renderCullFace;
+  /* Options audio */
+  o['o'][42] = this.opt_audioDopplerFactor;
   
   return o;
 };

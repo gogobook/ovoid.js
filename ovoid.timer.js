@@ -104,9 +104,12 @@ Ovoid.Timer.prototype._update = function() {
   this._ttime[0] = new Date().getTime();
   this.quantum = (this._ttime[0] - this._ttime[1]) * 0.001;
   this._ttime[1] = this._ttime[0];
+  
+  // Evite les sauts temporels excessifs
+  if(this.quantum > 0.2) this.quantum = 0.001;
   this.clock += this.quantum;
   
-  /* calcul le framerate tous les 0.1 secondes */
+  // calcul le framerate tous les 0.1 secondes 
   this._fclock+=this.quantum;
   if(this._fclock > 0.1) {
     this.framerate = Math.floor(this._fcount / this._fclock);

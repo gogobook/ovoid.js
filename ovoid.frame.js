@@ -109,7 +109,7 @@ Ovoid.Frame = function(i) {
 
 
   /** Frame modification flag. */
-  this._changed = false;
+  this.changed = false;
   
   
   /** Frame canvas style X padding + border + margin */
@@ -180,7 +180,7 @@ Ovoid.Frame.prototype._init = function(canvas) {
  */
 Ovoid.Frame.prototype._update = function() {
 
-  this._changed = false;
+  this.changed = false;
 };
 
 
@@ -205,7 +205,7 @@ Ovoid.Frame.prototype.setMode = function(mode) {
 
   this._updatepos();
   
-  this._changed = true;
+  this.changed = true;
 };
 
 
@@ -246,7 +246,7 @@ Ovoid.Frame.prototype._updatepos = function() {
       
   this.scroll.set(window.pageXOffset, window.pageYOffset, 0.0);
   
-  this._changed = true;
+  this.changed = true;
 };
 
 
@@ -276,6 +276,6 @@ Ovoid.Frame.prototype._updatesize = function() {
   this.matrix.m[0] = 2.0 / this.size.v[0];
   this.matrix.m[5] = 2.0 / -this.size.v[1];
   
-  this._changed = true;
+  this.changed = true;
   
 };

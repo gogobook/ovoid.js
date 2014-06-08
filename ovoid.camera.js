@@ -212,6 +212,8 @@ Ovoid.Camera.prototype.unproject = function(x, y, z, out) {
   p.v[2] = px*ieyeview.m[2]+py*ieyeview.m[6]+pz*ieyeview.m[10]+ieyeview.m[14];
   p.v[3] = px*ieyeview.m[3]+py*ieyeview.m[7]+pz*ieyeview.m[11]+ieyeview.m[15];
   
+  delete ieyeview;
+  
   if(ww != 0.0) {
     // Positions en coordonnees monde
     p.v[0] /= p.v[3];
@@ -234,8 +236,14 @@ Ovoid.Camera.prototype.unproject = function(x, y, z, out) {
     out.m[8] = az.v[0]; out.m[9] = az.v[1]; out.m[10] = az.v[2];
     out.m[12] = p.v[0]; out.m[13] = p.v[1]; out.m[14] = p.v[2];
     out.m[15] = 1.0;
+    delete au;
+    delete az;
+    delete ay;
+    delete ax;
+    delete p;
     return true;
   } else {
+    delete p;
     return false;
   }
 };
@@ -267,9 +275,9 @@ Ovoid.Camera.prototype.cachCamera = function() {
     //  0     0   2*far*near    0
     //            / near-far
 
-    var f = 1.0 / Math.tan(Ovoid.deg2Rad(this.fov) * 0.5);
-    this.perspective.m[0] = f / this.aspect;
-    this.perspective.m[5] = f;
+    var fv = 1.0 / Math.tan(Ovoid.deg2Rad(this.fov) * 0.5);
+    this.perspective.m[0] = fv / this.aspect;
+    this.perspective.m[5] = fv;
     this.perspective.m[15] = 0.0;
     this.perspective.m[11] = -1.0;
     /* si inferieur  ou egal à zero, la projection est calculé différament avec 
@@ -383,13 +391,19 @@ Ovoid.Camera.prototype.cachCamera = function() {
     this.lookat.m[14] = -e.v[0] * f.v[0] +
         -e.v[1] * f.v[1] +
         -e.v[2] * f.v[2];
+        
+    delete s;
+    delete u;
+    delete f;
+    delete e;
 
     this.eyeview.multOf(this.lookat, this.perspective);
 
     /* extraction des plans du frustum */
     if(this._i.opt_viewcull) {
-      var p = 0;
-      for (i = 0; i < 3; i++)
+      var p, m;
+      p = 0;
+      for (var i = 0; i < 3; i++)
       {
         // Pour i=0: Right; i=1: Top; i=2: Far
         this._fstum[p].v[0] = this.eyeview.m[3] - this.eyeview.m[0 + i];
@@ -405,8 +419,7 @@ Ovoid.Camera.prototype.cachCamera = function() {
         p++;
       }
 
-      var m;
-      var p = 6;
+      p = 6;
       while (p--)
       {
         /* normalisation du point-plan, comme pour un point au detail

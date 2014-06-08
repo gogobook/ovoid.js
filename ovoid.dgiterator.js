@@ -55,9 +55,10 @@ Ovoid.DgIterator = function(root) {
   this.current = root;
   this.currentParent = null;
   this.depth = 0;
-  this.queue = new Array(64);
-  this.parent = new Array(64);
-  var i = 64;
+  this.queue = new Array(128);
+  this.parent = new Array(128);
+  var i = 128;
+  while (i--) { this.queue[i] = 0; this.parent[i] = null; }
   this.completed = false;
 };
 
@@ -75,8 +76,8 @@ Ovoid.DgIterator.prototype.init = function(root) {
   this.root = root;
   this.current = root;
   this.currentParent = null;
-  var i = 64;
-  while (i--) { this.queue[i] = 0.0; this.parent[i] = null; }
+  var i = 128;
+  while (i--) { this.queue[i] = 0; this.parent[i] = null; }
   this.depth = 0;
   this.completed = false;
 };

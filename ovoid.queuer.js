@@ -162,6 +162,9 @@ Ovoid.Queuer = function(i) {
 
   /** Current render camera. */
   this._rcamera = null;
+  
+  /** Last audio listener position to comput velocity. */
+  this._lastlwp = [0.0,0.0,0.0];
 
 };
 
@@ -240,7 +243,7 @@ Ovoid.Queuer.prototype._lightcull = function(o, l) {
   /* on verifie le link lumier pour ajouter la 
    * ou les lumieres qu'il faut au render queue */
   if (this._i.opt_sceneLightcull) {
-    i = l.length;
+    var i = l.length;
     while (i--) {
       if (l[i].isLightening(o)) {
         if(!this.qlight.has(l[i])) {
@@ -397,7 +400,7 @@ Ovoid.Queuer.prototype._queueScene = function(sc) {
   this._rcamera = sc.activeCamera;
   
   /* Update/Cach camera si modification de frame */
-  if (this._i.Frame._changed) {
+  if (this._i.Frame.changed) {
     this._rcamera.setView(this._i.Frame.size.v[0],this._i.Frame.size.v[1]);
     this._rcamera.cachCamera();
   }
@@ -405,11 +408,24 @@ Ovoid.Queuer.prototype._queueScene = function(sc) {
   this._cachDependencies(this._rcamera);
   
   /* Update de l'audioListener */
-  if(this._i.al.type == 3) { /* Ovoid.WEB_AUDIO_API */
+  if(this._i.al) { /* Ovoid.WEB_AUDIO_API */
+    
+    this._i.al.listener.dopplerFactor = this._i.opt_audioDopplerFactor;
+            
     var matrix = this._rcamera.worldMatrix;
+    
     this._i.al.listener.setPosition(matrix.m[12], matrix.m[13], matrix.m[14]);
+    
     this._i.al.listener.setOrientation(-matrix.m[8], -matrix.m[9], -matrix.m[10],
         matrix.m[4], matrix.m[5], matrix.m[6]);
+
+    this._i.al.listener.setVelocity(matrix.m[12] - this._lastlwp[0], 
+        matrix.m[13] - this._lastlwp[1],
+        matrix.m[14] - this._lastlwp[2] );
+    
+    this._lastlwp[0] = matrix.m[12];
+    this._lastlwp[1] = matrix.m[13];
+    this._lastlwp[2] = matrix.m[14];
   }
 
   /* Uncach tous les actions */
@@ -540,7 +556,7 @@ Ovoid.Queuer.prototype._queueScene = function(sc) {
   while (i--) sc.track[i].cachTrack();
 
   /* Ordonne les bodys selon la distance à la camera */
-  for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+  for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     this.qalpha[i].sort(this._bodyZSortFunc);
   }
   

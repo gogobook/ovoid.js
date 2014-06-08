@@ -88,7 +88,7 @@ Ovoid.Matrix4.prototype.copy = function(mat) {
  */
 Ovoid.Matrix4.prototype.multBy = function(mat) {
 
-  var result = new Float32Array(16);
+  var result = new Array(16);
   result[0] = this.m[0] * mat.m[0] + this.m[1] * mat.m[4] +
       this.m[2] * mat.m[8] + this.m[3] * mat.m[12];
 
@@ -273,7 +273,7 @@ Ovoid.Matrix4.prototype.toTranspose = function() {
  */
 Ovoid.Matrix4.prototype.toInverse = function() {
 
-  var tempf = new Float32Array(12);
+  var tempf = new Array(12);
   tempf[0] = this.m[0] * this.m[5] - this.m[1] * this.m[4];
   tempf[1] = this.m[0] * this.m[6] - this.m[2] * this.m[4];
   tempf[2] = this.m[0] * this.m[7] - this.m[3] * this.m[4];
@@ -291,7 +291,7 @@ Ovoid.Matrix4.prototype.toInverse = function() {
       tempf[2] * tempf[8] + tempf[3] * tempf[9] -
       tempf[4] * tempf[10] + tempf[5] * tempf[11]);
 
-  var result = new Float32Array(16);
+  var result = new Array(16);
   result[0] = + this.m[5] * tempf[6] -
       this.m[6] * tempf[7] +
       this.m[7] * tempf[8];
