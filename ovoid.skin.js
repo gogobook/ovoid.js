@@ -259,7 +259,7 @@ Ovoid.Skin.prototype.bindSkin = function(mesh, mbindshape, mbindjoint,
 
   /* on crée ou recrée les buffers avec le nouveau format de vertex */
   var vformat = this.mesh._vformat | Ovoid.VERTEX_VEC4_I | Ovoid.VERTEX_VEC4_W;
-  this.mesh.createBuffers(vformat, Ovoid.BUFFER_STATIC);
+  this.mesh._createBuffers(vformat, Ovoid.BUFFER_STATIC);
 
   this.unCach(Ovoid.CACH_SKIN);
 };

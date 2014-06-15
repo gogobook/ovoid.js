@@ -274,7 +274,7 @@ Ovoid.Track.prototype.cachTrack = function() {
       }
     }
     /* Incremente le temps */
-    this._time += (Ovoid.Timer.quantum * this.factor);
+    this._time += (this._i.Timer.quantum * this.factor);
   
     /* Controle d'animation play/end/loop */
     if (!this.playing) {
