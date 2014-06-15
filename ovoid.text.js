@@ -154,6 +154,7 @@ Ovoid.Text.prototype.toJSON = function() {
   /* Ovoid.Node */
   o['n'] = this.name;
   o['v'] = this.visible;
+  o['k'] = this.pickable;
   o['u'] = this.uid;
   o['p'] = this.parent?this.parent.uid:'null';
   o['c'] = new Array();

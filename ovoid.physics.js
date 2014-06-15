@@ -649,6 +649,7 @@ Ovoid.Physics.prototype.toJSON = function() {
   o['dm'] = this.damping;
   o['uf'] = this.useFriction;
   o['re'] = this.restitution;
+  o['sl'] = this.sleeping;
   o['oc'] = Ovoid.compact(this.oncontact);
   
   return o;

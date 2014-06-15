@@ -486,6 +486,7 @@ Ovoid.Ojson.prototype._procNode = function(n, j) {
    * .t
    * .n
    * .v
+   * .k
    * .u
    * .p*
    * .c[*]
@@ -496,6 +497,7 @@ Ovoid.Ojson.prototype._procNode = function(n, j) {
    * .brd
    */
   n.visible = j.v;
+  n.pickable = j.k;
   n.uid = j.u;
   (j.p == 'null')?n.parent=null:n.parent=j.p;
   for (var i = 0; i < j.c.length; i++)
@@ -772,6 +774,7 @@ Ovoid.Ojson.prototype._procPhysic = function(n, j) {
   n.damping = j.dm;
   n.useFriction = j.uf;
   n.restitution = j.re;
+  n.sleeping = j.sl;
   n.oncontact = this._parseFunc(j.oc);
 };
 
