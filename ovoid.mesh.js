@@ -639,6 +639,28 @@ Ovoid.Mesh.prototype._createBuffers = function(format, type) {
 
 
 /**
+ * Checks if mesh has alpha.<br><br>
+ * 
+ * Checks if this mesh has material with opacity value.
+ *
+ * @return {bool} true if mesh has at least one transparent material, 
+ * false otherwise.
+ * 
+ */
+Ovoid.Mesh.prototype.hasAlpha = function() {
+  
+  var a = false;
+  for(var i = 0; i < this.polyset[0].length; i++) {
+    if(this.polyset[0][i].material.opacity < 1.0) {
+      a = true;
+      break;
+    }
+  }
+  return a;
+};
+
+
+/**
  * Generate a debug box.<br><br>
  * 
  * Generates a box mesh structure polyset and put it at the specified LOD

@@ -707,7 +707,7 @@ Ovoid.Collada.prototype._procLig = function(dae) {
       /* devrait être 4 floats */
       d = this._gTxtDataSplit(c[0].childNodes);
 
-      node.setColor(parseFloat(d[0]),
+      node.setColorRgba(parseFloat(d[0]),
           parseFloat(d[1]),
           parseFloat(d[2]),
           1.0);
@@ -877,7 +877,7 @@ Ovoid.Collada.prototype._procEfxComp = function(node, dae, di, mi) {
       /* on récupere les données du <color> (4 floats) */
       var d = this._gTxtDataSplit(ct[0].childNodes);
 
-      node.setColor(mi, parseFloat(d[0]),
+      node.setColorRgba(mi, parseFloat(d[0]),
           parseFloat(d[1]),
           parseFloat(d[2]),
           parseFloat(d[3]));
@@ -922,11 +922,11 @@ Ovoid.Collada.prototype._procEfxComp = function(node, dae, di, mi) {
           /* si on l'a trouvé on applique les parametres */
           if (tn) {
             /* couleur blanche et texture sur ce composant */
-            node.setColor(mi, 1.0, 1.0, 1.0, 1.0);
+            node.setColorRgba(mi, 1.0, 1.0, 1.0, 1.0);
             node.setTexture(mi, tn);
           } else { /* texture non trouvé ? */
             /* couleur noir */
-            node.setColor(mi, 0.0, 0.0, 0.0, 1.0);
+            node.setColorRgba(mi, 0.0, 0.0, 0.0, 1.0);
           }
         } else {
           /* si on a pas trouvé de <image> c'est inquiétant */
@@ -943,7 +943,7 @@ Ovoid.Collada.prototype._procEfxComp = function(node, dae, di, mi) {
   } else {
     /* le composant visé (ex. <diffuse>, <emissive>, etc.. )
      * n'est pas trouvé ? on applique la couleur noir */
-    node.setColor(mi, 0.0, 0.0, 0.0, 1.0);
+    node.setColorRgba(mi, 0.0, 0.0, 0.0, 1.0);
   }
 };
 
@@ -1013,12 +1013,15 @@ Ovoid.Collada.prototype._procMat = function(dae) {
     /* la valeur du <float> */
     d = parseFloat(f[0].childNodes[0].data);
     /* tres amusant, maya exporte en transparency 1.0 et blender en 
-     * transparency 0.0... combien de blague comment ça encore ? */
+     * transparency 0.0... combien de blague comme ça encore ? */
+    /*
     if (d == 0.0) {
       node.opacity = 1.0;
     } else {
       node.opacity = d;
     }
+     Aligne sur le modus Blender, tant pis pour Maya*/
+    node.opacity = d;
   }
 
   /* retourne la node configurée */

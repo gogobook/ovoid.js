@@ -2040,14 +2040,7 @@ Ovoid.RIGID_MASSIVE_SPHERE = 2;
  * @constant
  * @memberOf _global_
  * @see Ovoid.Physics */
-Ovoid.GHOST_MASSIVE_BOX = 3;
-
-
-/** Symbolic constant for physic object kind 
- * @constant
- * @memberOf _global_
- * @see Ovoid.Physics */
-Ovoid.GHOST_MASSIVE_SPHERE = 4;
+Ovoid.GHOST_MASSIVE = 3;
 
 
 /** Symbolic constant for physic object kind 

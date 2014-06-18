@@ -474,17 +474,7 @@ Ovoid.Physics.prototype.cachPhysics = function() {
       /* il s'agit d'un inverse, comme la masse */
       switch(this.model)
       {
-        case 2: /* Ovoid.RIGID_MASSIVE_SPHERE */
-
-          var r2 = (this.target[0].boundingSphere.radius * 2.0);
-          r2 *= r2;
-          
-          Ix = 1.0 / (0.3 * mass * r2 );
-          Iy = 1.0 / (0.3 * mass * r2 );
-          Iz = 1.0 / (0.3 * mass * r2 );
-          
-          break;
-        default: /* Ovoid.RIGID_MASSIVE_BOX */
+        case 1: /* Ovoid.RIGID_MASSIVE_BOX */
 
           var sx = (this.target[0].boundingBox.hsize.v[0] * 2.0);
           var sy = (this.target[0].boundingBox.hsize.v[1] * 2.0);
@@ -496,6 +486,16 @@ Ovoid.Physics.prototype.cachPhysics = function() {
           Iy = 1.0 / (0.333 * mass * (sx + sz) );
           Iz = 1.0 / (0.333 * mass * (sx + sy) );
       
+          break;
+        default: /* Ovoid.RIGID_MASSIVE_SPHERE | Ovoid.GHOST_MASSIVE */
+
+          var r2 = (this.target[0].boundingSphere.radius * 2.0);
+          r2 *= r2;
+          
+          Ix = 1.0 / (0.3 * mass * r2 );
+          Iy = 1.0 / (0.3 * mass * r2 );
+          Iz = 1.0 / (0.3 * mass * r2 );
+          
           break;
       }
 

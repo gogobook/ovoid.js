@@ -245,10 +245,12 @@ Ovoid.Queuer.prototype._lightcull = function(o, l) {
   if (this._i.opt_sceneLightcull) {
     var i = l.length;
     while (i--) {
-      if (l[i].isLightening(o)) {
-        if(!this.qlight.has(l[i])) {
-          l[i].rendered = true;
-          this.qlight.add(l[i]);
+      if (l[i].visible) {
+        if (l[i].isLightening(o)) {
+          if(!this.qlight.has(l[i])) {
+            l[i].rendered = true;
+            this.qlight.add(l[i]);
+          }
         }
       }
     }
@@ -565,9 +567,11 @@ Ovoid.Queuer.prototype._queueScene = function(sc) {
   if (!this._i.opt_sceneLightcull) {
     i = sc.light.length;
     while (i--) {
-      if(!this.qlight.has(sc.light[i])) {
-        sc.light[i].rendered = true;
-        this.qlight.add(sc.light[i]);
+      if(sc.light[i].visible) {
+        if(!this.qlight.has(sc.light[i])) {
+          sc.light[i].rendered = true;
+          this.qlight.add(sc.light[i]);
+        }
       }
     }
   }

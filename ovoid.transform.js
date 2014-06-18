@@ -290,14 +290,14 @@ Ovoid.Transform.prototype.move = function(vect, c, m) {
               vect.v[1] * this.matrix.m[6] +
               vect.v[2] * this.matrix.m[10];
           break;
-        default:
+        default: // Ovoid.WORLD
           this.translation.v[0] = vect.v[0];
           this.translation.v[1] = vect.v[1];
           this.translation.v[2] = vect.v[2];
           break;
       }
       break;
-    default:
+    default: // Ovoid.RELATIVE
       switch (c)
       {
         case 1: // Ovoid.LOCAL
@@ -313,7 +313,7 @@ Ovoid.Transform.prototype.move = function(vect, c, m) {
               vect.v[1] * this.matrix.m[6] +
               vect.v[2] * this.matrix.m[10];
           break;
-        default:
+        default: // Ovoid.WORLD
           this.translation.v[0] += vect.v[0];
           this.translation.v[1] += vect.v[1];
           this.translation.v[2] += vect.v[2];
@@ -357,14 +357,14 @@ Ovoid.Transform.prototype.moveXyz = function(x, y, z, c, m) {
               y * this.matrix.m[6] +
               z * this.matrix.m[10];
           break;
-        default:
+        default: // Ovoid.WORLD
           this.translation.v[0] = x;
           this.translation.v[1] = y;
           this.translation.v[2] = z;
           break;
       }
       break;
-    default:
+    default: // Ovoid.RELATIVE
       switch (c)
       {
         case 1: // Ovoid.LOCAL
@@ -380,7 +380,7 @@ Ovoid.Transform.prototype.moveXyz = function(x, y, z, c, m) {
               y * this.matrix.m[6] +
               z * this.matrix.m[10];
           break;
-        default:
+        default: // Ovoid.WORLD
           this.translation.v[0] += x;
           this.translation.v[1] += y;
           this.translation.v[2] += z;
@@ -411,13 +411,13 @@ Ovoid.Transform.prototype.orient = function(euler, c, m) {
     case 1: // Ovoid.ABSOLUTE
       this.orientation.fromEuler(euler);
       break;
-    default:
+    default: // Ovoid.RELATIVE
       switch (c)
       {
         case 1: // Ovoid.LOCAL
           this.orientation.rotateSwapBy(euler);
           break;
-        default:
+        default: // Ovoid.WORLD
           this.orientation.rotateBy(euler);
           break;
       }
@@ -446,14 +446,14 @@ Ovoid.Transform.prototype.orientXyz = function(x, y, z, c, m) {
   {
     case 1: // Ovoid.ABSOLUTE
       this.orientation.fromEulerXyz(x, y, z);
-      break;
-    default:
+      break; 
+    default: // Ovoid.RELATIVE
       switch (c)
       {
         case 1: // Ovoid.LOCAL
           this.orientation.rotateSwapByXyz(x, y, z);
           break;
-        default:
+        default: // Ovoid.WORLD
           this.orientation.rotateByXyz(x, y, z);
           break;
       }
@@ -483,13 +483,13 @@ Ovoid.Transform.prototype.rotate = function(euler, c, m) {
     case 1: // Ovoid.ABSOLUTE
         this.rotation.fromEuler(euler);
       break;
-    default:
+    default: // Ovoid.RELATIVE
       switch (c)
       {
         case 1: // Ovoid.LOCAL
           this.rotation.rotateSwapBy(euler);
           break;
-        default:
+        default: // Ovoid.WORLD
           this.rotation.rotateBy(euler);
           break;
       }
@@ -518,13 +518,13 @@ Ovoid.Transform.prototype.rotateXyz = function(x, y, z, c, m) {
   {
     case 1: // Ovoid.ABSOLUTE
         this.rotation.fromEulerXyz(x, y, z);
-    default:
+    default: // Ovoid.RELATIVE
       switch (c)
       {
         case 1: // Ovoid.LOCAL
           this.rotation.rotateSwapByXyz(x, y, z);
           break;
-        default:
+        default: // Ovoid.WORLD
           this.rotation.rotateByXyz(x, y, z);
           break;
       }

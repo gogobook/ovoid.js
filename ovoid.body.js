@@ -163,6 +163,11 @@ Ovoid.Body.prototype.setShape = function(shape) {
   }
   this.shape = shape;
   this.makeDepend(shape);
+  if(shape.type & Ovoid.MESH)
+    this.renderAlpha = shape.hasAlpha();
+  if(shape.type & Ovoid.EMITTER) 
+    this.renderAlpha = true;
+  
 };
 
 

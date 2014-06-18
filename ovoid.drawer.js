@@ -1865,25 +1865,21 @@ Ovoid.Drawer.prototype.emitter = function(emitter, layer, color) {
       // Ovoid.VERTEX_PARTICLE, stride, gl.POINTS,
       var n = emitter._alives;
       this.raw(Ovoid.VERTEX_PARTICLE, 44, 0, n, emitter._fbuffer.subarray(0,n*11));
-      this._drawnparticle+=emitter._alives;
+      this._drawnparticle+=n;
     }
   } else {
-    // model de rendu pour les particules 
-    switch(emitter.model) 
-    {
-      case 3: // Ovoid.EMISSIVE
-        this.switchBlend(1); // additive alpha. SRC_ALPHA, ONE
-        break;
-      default: // Ovoid.DIFFUSE
-        this.switchBlend(3); // substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA
-        break;
+    // model de rendu pour les particules
+    if(emitter.model == 3) {
+      this.switchBlend(1); // additive alpha. SRC_ALPHA, ONE
+    } else {
+      this.switchBlend(3); // substractive alpha. SRC_ALPHA, ONE_MINUS_SRC_ALPHA
     }
+    
     if(emitter.billboard) {
       this.switchPipe(7,layer); // PIPE_BILLBOARD
     } else {
       this.switchPipe(2,layer); // PIPE_PARTICLE
     }
-
     
     this.persp(this._i.Queuer._rcamera); // Force la mise à jour de la perspective 
     this.gl.activeTexture(0x84C1); /* TEXTURE1 */
@@ -1913,7 +1909,7 @@ Ovoid.Drawer.prototype.emitter = function(emitter, layer, color) {
       // Ovoid.VERTEX_PARTICLE, stride, gl.POINTS,
       var n = emitter._alives;
       this.raw(Ovoid.VERTEX_PARTICLE, 44, 0, n, emitter._fbuffer.subarray(0,n*11));
-      this._drawnparticle+=emitter._alives;
+      this._drawnparticle+=n;
     }
   }
   // restore depth, blend et pipe

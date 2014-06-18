@@ -122,6 +122,19 @@ Ovoid.Light.prototype.constructor = Ovoid.Light;
 
 
 /**
+ * Set light source color from Color object.<br><br>
+ * 
+ * Sets the light source color according to the specified values.
+ *
+ * @param {Color} c color.
+ */
+Ovoid.Light.prototype.setColor = function(c) {
+
+  this.color.copy(c);
+};
+
+
+/**
  * Set light source color.<br><br>
  * 
  * Sets the light source color according to the specified values.
@@ -131,7 +144,7 @@ Ovoid.Light.prototype.constructor = Ovoid.Light;
  * @param {float} b The Blue component.
  * @param {float} a The Alpha component.
  */
-Ovoid.Light.prototype.setColor = function(r, g, b, a) {
+Ovoid.Light.prototype.setColorRgba = function(r, g, b, a) {
 
   this.color.set(r, g, b, a);
 };

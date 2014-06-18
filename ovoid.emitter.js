@@ -81,7 +81,7 @@ Ovoid.Emitter = function(name, i) {
   this.name = name;
   /** Particle model 
    * @type enum */
-  this.model = Ovoid.EMISSIVE;
+  this.model = 3;
   /** Particles Velocity damping.
    * @type float */
   this.mass = 1.0;
@@ -163,10 +163,27 @@ Ovoid.Emitter.prototype.constructor = Ovoid.Emitter;
  * @param {float} db Particles death color Blue component.
  * @param {float} da Particles death color Alpha component.
  */
-Ovoid.Emitter.prototype.setColours = function(br, bg, bb, ba, dr, dg, db, da) {
+Ovoid.Emitter.prototype.setColoursRgba = function(br, bg, bb, ba, dr, dg, db, da) {
   
   this.color[0].set(br, bg, bb, ba);
   this.color[1].set(dr, dg, db, da);
+};
+
+
+/**
+ * Set particles colours from Color objects.<br><br>
+ * 
+ * Sets the particles birth and death colours with the specified color 
+ * components. The birth and death colours are interpolated during the particle 
+ * lifetime.
+ * 
+ * @param {Color} b Particles birth color.
+ * @param {Color} d Particles death color. 
+ */
+Ovoid.Emitter.prototype.setColours = function(b, d) {
+  
+  this.color[0].copy(b);
+  this.color[1].copy(d);
 };
 
 
@@ -179,7 +196,13 @@ Ovoid.Emitter.prototype.setColours = function(br, bg, bb, ba, dr, dg, db, da) {
  */
 Ovoid.Emitter.prototype.setSprite = function(texture) {
   
+  if (this.texture != null)
+    this.breakDepend(this.texture);
+
   this.texture = texture;
+  if (texture != null)
+    this.makeDepend(texture);
+
 };
 
 
@@ -253,7 +276,7 @@ Ovoid.Emitter.prototype.getAlives = function() {
  * 
  * @private
  */
-Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
+Ovoid.Emitter.prototype.cachEmitter = function() {
   
   if(!this.link[0]) 
     return;
@@ -270,8 +293,8 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
       this._ctdown = 1.0/this.rate;
     }
   }
-
-  if (this._alives != 0 || NB != 0) {
+  
+  if (this._alives > 0 || NB > 0) {
     
     this.unCach(Ovoid.CACH_GEOMETRY);
     
@@ -305,9 +328,7 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
     
     /* facteur de damping */
     var d = Math.pow(this.damping, this._i.Timer.quantum);
-  }
-  
-  if (this._alives != 0 || this.emits) {
+    
     var L, P, V, C, U;
     this._alives = 0;
     var i = this._particles.length;
@@ -323,20 +344,16 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
         U = this._particles[i].u;
         
         /* calcul pour le bounding volum */
-        //FIXME : Cette partie fonctionne, mais est-ce bien utile de faire tous
-        // ces calculs pour une amélioration si minime ?
-        if(i % (this.rate/10) == 0) {
-          WP.copy(P);
-          WP.transform4Inverse(body.worldMatrix);
+        WP.copy(P);
+        WP.transform4Inverse(body.worldMatrix);
 
-          if (WP.v[0] > max.v[0]) max.v[0] = WP.v[0];
-          if (WP.v[1] > max.v[1]) max.v[1] = WP.v[1];
-          if (WP.v[2] > max.v[2]) max.v[2] = WP.v[2];
+        if (WP.v[0] > max.v[0]) max.v[0] = WP.v[0];
+        if (WP.v[1] > max.v[1]) max.v[1] = WP.v[1];
+        if (WP.v[2] > max.v[2]) max.v[2] = WP.v[2];
 
-          if (WP.v[0] < min.v[0]) min.v[0] = WP.v[0];
-          if (WP.v[1] < min.v[1]) min.v[1] = WP.v[1];
-          if (WP.v[2] < min.v[2]) min.v[2] = WP.v[2];
-        }
+        if (WP.v[0] < min.v[0]) min.v[0] = WP.v[0];
+        if (WP.v[1] < min.v[1]) min.v[1] = WP.v[1];
+        if (WP.v[2] < min.v[2]) min.v[2] = WP.v[2];
         
         /* ajustement de la position par la velocité */
         P.v[0] += (V.v[0] * this._i.Timer.quantum);
@@ -363,80 +380,78 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
 
       } else {
         
-        if(this.emits) {
-          if(NB > 0) {
+        if(NB > 0) {
 
-            P = this._particles[i].p;
-            V = this._particles[i].v;
-            C = this._particles[i].c;
-            U = this._particles[i].u;
-        
-            /* Naissance de la particule */
-            this._particles[i].l = this.life;
-            P.copy(body.worldPosition);
-            
-            if(NB == 1) {
-              WP.copy(P);
-              WP.transform4Inverse(body.worldMatrix);
+          P = this._particles[i].p;
+          V = this._particles[i].v;
+          C = this._particles[i].c;
+          U = this._particles[i].u;
+      
+          /* Naissance de la particule */
+          this._particles[i].l = this.life;
+          P.copy(body.worldPosition);
+          
+          if(NB == 1) {
+            WP.copy(P);
+            WP.transform4Inverse(body.worldMatrix);
 
-              if (WP.v[0] > max.v[0]) max.v[0] = WP.v[0];
-              if (WP.v[1] > max.v[1]) max.v[1] = WP.v[1];
-              if (WP.v[2] > max.v[2]) max.v[2] = WP.v[2];
+            if (WP.v[0] > max.v[0]) max.v[0] = WP.v[0];
+            if (WP.v[1] > max.v[1]) max.v[1] = WP.v[1];
+            if (WP.v[2] > max.v[2]) max.v[2] = WP.v[2];
 
-              if (WP.v[0] < min.v[0]) min.v[0] = WP.v[0];
-              if (WP.v[1] < min.v[1]) min.v[1] = WP.v[1];
-              if (WP.v[2] < min.v[2]) min.v[2] = WP.v[2];
-            }
-        
-            // Velocity selon le scattering
-            
-            // Direction de base de la particule
-            V.copy(body.worldDirection);
-            
-            // Angle de rotation aleatoire
-            var rx = (1.0-(Math.random()*2.0))*this.scattering;
-            var ry = (1.0-(Math.random()*2.0))*this.scattering;
-            var rz = (1.0-(Math.random()*2.0))*this.scattering;
-            var ci = Math.cos(rx);
-            var cj = Math.cos(ry);
-            var ch = Math.cos(rz);
-            var si = Math.sin(rx);
-            var sj = Math.sin(ry);
-            var sh = Math.sin(rz);
-            var cc = ci * ch;
-            var cs = ci * sh;
-            var sc = si * ch;
-            var ss = si * sh;
-            this._vmatrix.m[0] = (cj * ch);
-            this._vmatrix.m[1] = (cj * sh);
-            this._vmatrix.m[2] = -sj;
-            this._vmatrix.m[3] = (sj * sc - cs);
-            this._vmatrix.m[4] = (sj * ss + cc);
-            this._vmatrix.m[5] = (cj * si);
-            this._vmatrix.m[6] = (sj * cc + ss);
-            this._vmatrix.m[7] = (sj * cs - sc);
-            this._vmatrix.m[8] = (cj * ci);
-            
-            // Transforme par la matrice du euler
-            V.transform3(this._vmatrix);
-            // Normalize le vecteur
-            V.normalize();
-            // Ajuste la taille du vecteur selon le delta random
-            V.scaleBy(this.velocity + 
-                ((1.0-(Math.random()*2.0))*this.delta));
-            // UV et taille du sprite de la particle
-            U.set(0.0,1.0,this.size[0]);
-            // Couleur de la particle
-            C.copy(this.color[0]);
-            
-            /* Ajout de la particule au buffer */
-            if(!this.billboard)
-              this._particles[i].bufferCopy(this._fbuffer, this._alives * 11);
-            // Alives en plus
-            this._alives++
-            // Nombre de particule a cree --
-            NB--;
+            if (WP.v[0] < min.v[0]) min.v[0] = WP.v[0];
+            if (WP.v[1] < min.v[1]) min.v[1] = WP.v[1];
+            if (WP.v[2] < min.v[2]) min.v[2] = WP.v[2];
           }
+      
+          // Velocity selon le scattering
+          
+          // Direction de base de la particule
+          V.copy(body.worldDirection);
+          
+          // Angle de rotation aleatoire
+          var rx = (1.0-(Math.random()*2.0))*this.scattering;
+          var ry = (1.0-(Math.random()*2.0))*this.scattering;
+          var rz = (1.0-(Math.random()*2.0))*this.scattering;
+          var ci = Math.cos(rx);
+          var cj = Math.cos(ry);
+          var ch = Math.cos(rz);
+          var si = Math.sin(rx);
+          var sj = Math.sin(ry);
+          var sh = Math.sin(rz);
+          var cc = ci * ch;
+          var cs = ci * sh;
+          var sc = si * ch;
+          var ss = si * sh;
+          this._vmatrix.m[0] = (cj * ch);
+          this._vmatrix.m[1] = (cj * sh);
+          this._vmatrix.m[2] = -sj;
+          this._vmatrix.m[3] = (sj * sc - cs);
+          this._vmatrix.m[4] = (sj * ss + cc);
+          this._vmatrix.m[5] = (cj * si);
+          this._vmatrix.m[6] = (sj * cc + ss);
+          this._vmatrix.m[7] = (sj * cs - sc);
+          this._vmatrix.m[8] = (cj * ci);
+          
+          // Transforme par la matrice du euler
+          V.transform3(this._vmatrix);
+          // Normalize le vecteur
+          V.normalize();
+          // Ajuste la taille du vecteur selon le delta random
+          V.scaleBy(this.velocity + 
+              ((1.0-(Math.random()*2.0))*this.delta));
+          // UV et taille du sprite de la particle
+          U.set(0.0,1.0,this.size[0]);
+          // Couleur de la particle
+          C.copy(this.color[0]);
+          
+          /* Ajout de la particule au buffer */
+          if(!this.billboard)
+            this._particles[i].bufferCopy(this._fbuffer, this._alives * 11);
+          // Alives en plus
+          this._alives++;
+          // Nombre de particule a cree --
+          NB--;
         }
       }
     }
@@ -446,10 +461,6 @@ Ovoid.Emitter.prototype.cachEmitter = function(q, g) {
   if (!(this.cach & Ovoid.CACH_GEOMETRY)) {
     this.boundingBox.setBound(min, max);
     this.boundingSphere.setBound(min, max);
-    delete min;
-    delete max;
-    delete g;
-    delete WP;
     /* propage l'uncach du shape */
     for (var i = 0; i < this.link.length; i++) {
         this.link[i].unCach(Ovoid.CACH_BOUNDING_SHAPE);

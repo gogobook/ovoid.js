@@ -78,10 +78,7 @@ Ovoid.Color.prototype.setv = function(a) {
  */
 Ovoid.Color.prototype.copy = function(color) {
 
-  this.v[0] = color.v[0];
-  this.v[1] = color.v[1];
-  this.v[2] = color.v[2];
-  this.v[3] = color.v[3];
+  this.v.set(color.v);
 };
 
 

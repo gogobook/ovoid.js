@@ -78,10 +78,7 @@ Ovoid.Point.prototype.setv = function(a) {
  */
 Ovoid.Point.prototype.copy = function(point) {
 
-  this.v[0] = point.v[0];
-  this.v[1] = point.v[1];
-  this.v[2] = point.v[2];
-  this.v[3] = point.v[3];
+  this.v.set(point.v);
 };
 
 

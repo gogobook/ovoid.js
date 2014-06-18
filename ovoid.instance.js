@@ -1318,44 +1318,44 @@ Ovoid.Instance.prototype._init = function(canvas) {
               }
               
               /* init HUD */
-              this._hudbg.setBgColor(0.6,0.6,0.6,1.0);
+              this._hudbg.setBgColorRgba(0.6,0.6,0.6,1.0);
               this._hudbg.setSize(this.Frame.size.v[0], 17.0, 1.0);
               this._dbg[7].setFormat(16.0, 0.5, 1.0);
               this._dbg[7].moveXyz(4.0, 0.0, 0.0);
-              this._dbg[7].setFgColor(1.0,1.0,1.0,0.6);
+              this._dbg[7].setFgColorRgba(1.0,1.0,1.0,0.6);
               
-              this._dbgbg.setBgColor(0.0,0.0,0.0,0.5);
+              this._dbgbg.setBgColorRgba(0.0,0.0,0.0,0.5);
               this._dbgbg.setSize(this.Frame.size.v[0], 
                                   this.Frame.size.v[1]-17.0, 1.0);
               this._dbgbg.moveXyz(0.0, 16.0, 0.0);
               
               this._dbg[0].setFormat(16.0, 0.5, 1.0);
               this._dbg[0].moveXyz(1.0, 20.0, 0.0);
-              this._dbg[0].setFgColor(1.0,1.0,1.0,1.0);
+              this._dbg[0].setFgColorRgba(1.0,1.0,1.0,1.0);
               
               this._dbg[1].setFormat(16.0, 0.5, 1.0);
               this._dbg[1].moveXyz(250, 20.0, 0.0);
-              this._dbg[1].setFgColor(1.0,1.0,1.0,1.0);
+              this._dbg[1].setFgColorRgba(1.0,1.0,1.0,1.0);
               
               this._dbg[2].setFormat(16.0, 0.5, 1.0);
               this._dbg[2].moveXyz(470.0, 20.0, 0.0);
-              this._dbg[2].setFgColor(1.0,1.0,1.0,1.0);
+              this._dbg[2].setFgColorRgba(1.0,1.0,1.0,1.0);
               
               this._dbg[3].setFormat(16.0, 0.5, 1.0);
               this._dbg[3].moveXyz(720, 20.0, 0.0);
-              this._dbg[3].setFgColor(1.0,1.0,1.0,1.0);
+              this._dbg[3].setFgColorRgba(1.0,1.0,1.0,1.0);
               
               this._dbg[4].setFormat(16.0, 0.5, 1.0);
               this._dbg[4].moveXyz(1.0, 216.0, 0.0);
-              this._dbg[4].setFgColor(1.0,1.0,1.0,1.0);
+              this._dbg[4].setFgColorRgba(1.0,1.0,1.0,1.0);
 
               this._dbg[5].setFormat(16.0, 0.5, 1.0);
               this._dbg[5].moveXyz(300.0, 216.0, 0.0);
-              this._dbg[5].setFgColor(1.0,1.0,1.0,1.0);
+              this._dbg[5].setFgColorRgba(1.0,1.0,1.0,1.0);
               
               this._dbg[6].setFormat(16.0, 0.5, 1.0);
               this._dbg[6].moveXyz(600.0, 216.0, 0.0);
-              this._dbg[6].setFgColor(1.0,1.0,1.0,1.0);
+              this._dbg[6].setFgColorRgba(1.0,1.0,1.0,1.0);
               
               this._dbg[0].cachTransform();
               this._dbg[0].cachLayer();
@@ -1523,7 +1523,7 @@ Ovoid.Instance.prototype._mainloop = function() {
     /* BEGIN FRAME */    
     this.Timer._update();
     this.Input._update();
-    
+
     /* USER CUSTOM LOOP FUNC */
     try {
       this.onloop();
@@ -1661,7 +1661,7 @@ Ovoid.Instance.prototype._loadstart = function() {
     this._loadel[56] = new Ovoid.Text(); // texte de titre
     this._loadel[57] = new Ovoid.Text(); // texte de details
     /* background */
-    this._loadel[0].setBgColor(bg[0],bg[1],bg[2],bg[3]);
+    this._loadel[0].setBgColorRgba(bg[0],bg[1],bg[2],bg[3]);
     this._loadel[0].setSize(this.Frame.size.v[0],this.Frame.size.v[1],1.0);
     this._loadel[0].cachTransform();
     this._loadel[0].cachLayer();
@@ -1679,7 +1679,7 @@ Ovoid.Instance.prototype._loadstart = function() {
         var r = 4;
         for(var i = 2; i < n+2; i+=2) {
           
-          this._loadel[i].setBgColor(ac[0],ac[1],ac[2],ac[3]*0.25);
+          this._loadel[i].setBgColorRgba(ac[0],ac[1],ac[2],ac[3]*0.25);
           this._loadel[i].setSize(1.0,1.0,1.0);
           this._loadel[i].setParent(this._loadel[i+1]);
           this._loadel[i].moveXyz(0.0,r,0.0);
@@ -1707,7 +1707,7 @@ Ovoid.Instance.prototype._loadstart = function() {
         var dx = -(tx*0.5);
         var py = 10.0;
         for(var i = 0; i < n; i++) {
-          this._loadel[i+2].setBgColor(ac[0],ac[1],ac[2],ac[3]*0.25);
+          this._loadel[i+2].setBgColorRgba(ac[0],ac[1],ac[2],ac[3]*0.25);
           this._loadel[i+2].setSize(sx, sy, 1.0);
           this._loadel[i+2].setParent(this._loadel[1]);
           this._loadel[i+2].moveXyz(dx+(i*(sx+px)),py,0.0);
@@ -1715,7 +1715,7 @@ Ovoid.Instance.prototype._loadstart = function() {
           this._loadel[i+2].cachLayer();
         }
         /* cadre de la barre */
-        this._loadel[54].setBgColor(fg[0],fg[1],fg[2],fg[3]);
+        this._loadel[54].setBgColorRgba(fg[0],fg[1],fg[2],fg[3]);
         this._loadel[54].setSize(tx+2, sy+2, 1.0);
         this._loadel[54].setParent(this._loadel[1]);
         this._loadel[54].moveXyz(dx-1,py-1,0.0);
@@ -1723,7 +1723,7 @@ Ovoid.Instance.prototype._loadstart = function() {
         this._loadel[54].cachLayer();
         
         /* fond du cadre */
-        this._loadel[55].setBgColor(bg[0],bg[1],bg[2],bg[3]);
+        this._loadel[55].setBgColorRgba(bg[0],bg[1],bg[2],bg[3]);
         this._loadel[55].setSize(tx, sy, 1.0);
         this._loadel[55].setParent(this._loadel[1]);
         this._loadel[55].moveXyz(dx,py,0.0);
@@ -1743,7 +1743,7 @@ Ovoid.Instance.prototype._loadstart = function() {
         var tsx = this._loadel[56].getWidth();
         this._loadel[56].setParent(this._loadel[1]);
         this._loadel[56].moveXyz(tsx*-0.5,-10.0,0.0);
-        this._loadel[56].setFgColor(fg[0],fg[1],fg[2],fg[3]);
+        this._loadel[56].setFgColorRgba(fg[0],fg[1],fg[2],fg[3]);
         this._loadel[56].cachTransform();
         this._loadel[56].cachLayer();
         
@@ -1754,14 +1754,14 @@ Ovoid.Instance.prototype._loadstart = function() {
         var tsx = this._loadel[57].getWidth();
         this._loadel[57].setParent(this._loadel[1]);
         this._loadel[57].moveXyz(tsx*-0.5,10.0,0.0);
-        this._loadel[57].setFgColor(fg[0],fg[1],fg[2],fg[3]);
+        this._loadel[57].setFgColorRgba(fg[0],fg[1],fg[2],fg[3]);
         this._loadel[57].cachTransform();
         this._loadel[57].cachLayer();
         break;
     } 
     
     /* parent principal, au centre de l'écran */
-    this._loadel[1].setBgColor(1.0,1.0,1.0,0.0);
+    this._loadel[1].setBgColorRgba(1.0,1.0,1.0,0.0);
     this._loadel[1].setSize(1.0,1.0,1.0);
     this._loadel[1].moveXyz(this.Frame.center.v[0],this.Frame.center.v[1],0.0);
     this._loadel[1].cachTransform();
@@ -1872,7 +1872,7 @@ Ovoid.Instance.prototype._loadstep = function() {
         var lphas = (this.preloadTimer*0.01);
         var lfreq = (i*0.12);
         var t = ((1.0+Math.sin(lphas-lfreq))*0.5)*0.5;
-        this._loadel[i].setBgColor(ac[0],ac[1],ac[2],ac[3]*t);
+        this._loadel[i].setBgColorRgba(ac[0],ac[1],ac[2],ac[3]*t);
         this._loadel[i].cachTransform();
         this._loadel[i].cachLayer();
         this.Drawer.model(this._loadel[i].layerMatrix.m);
@@ -1899,7 +1899,7 @@ Ovoid.Instance.prototype._loadstep = function() {
         var lphas = (this.preloadTimer*0.01);
         var lfreq = (i*0.1);
         var t = ((1.0+Math.sin(lphas-lfreq))*0.5)*0.25;
-        this._loadel[i].setBgColor(ac[0],ac[1],ac[2],(ac[3]*c)+t);
+        this._loadel[i].setBgColorRgba(ac[0],ac[1],ac[2],(ac[3]*c)+t);
         this._loadel[i].cachTransform();
         this._loadel[i].cachLayer();
         this.Drawer.model(this._loadel[i].layerMatrix.m);

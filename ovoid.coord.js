@@ -80,9 +80,7 @@ Ovoid.Coord.prototype.setv = function(a) {
  */
 Ovoid.Coord.prototype.copy = function(coord) {
 
-  this.v[0] = coord.v[0];
-  this.v[1] = coord.v[1];
-  this.v[2] = coord.v[2];
+  this.v.set(coord.v.subarray(0,3));
 };
 
 

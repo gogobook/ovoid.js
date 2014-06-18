@@ -165,6 +165,28 @@ Ovoid.Material.prototype.setTexture = function(slot, texture) {
 
 
 /**
+ * Set material component color from Color object.<br><br>
+ *
+ * Sets the specified material component's color according to the specified 
+ * values.
+ * 
+ * @param {enum} slot Component identifier. Can be an integer between 0 and 5 or
+ * one of the following symbolic constants:<br>
+ * Ovoid.AMBIENT<br>
+ * Ovoid.DIFFUSE<br>
+ * Ovoid.SPECULAR<br>
+ * Ovoid.EMISSIVE<br>
+ * Ovoid.REFLECT<br>
+ * Ovoid.NORMAL<br><br>
+ * @param {Color} c Color.
+ */
+Ovoid.Material.prototype.setColor = function(slot, c) {
+
+  this.color[slot].copy(c);
+};
+
+
+/**
  * Set material component color.<br><br>
  *
  * Sets the specified material component's color according to the specified 
@@ -183,7 +205,7 @@ Ovoid.Material.prototype.setTexture = function(slot, texture) {
  * @param {float} b The Blue color component.
  * @param {float} a The Alpha color component.
  */
-Ovoid.Material.prototype.setColor = function(slot, r, g, b, a) {
+Ovoid.Material.prototype.setColorRgba = function(slot, r, g, b, a) {
 
   this.color[slot].v[0] = r;
   this.color[slot].v[1] = g;

@@ -34,7 +34,7 @@
  * 
  * <blockcode>
  * var hello = scene.create(Ovoid.TEXT, "BlueText");<br>
- * hello.setFgColor(0.0, 0.5, 1.0, 1.0);<br>
+ * hello.setFgColorRgba(0.0, 0.5, 1.0, 1.0);<br>
  * hello.moveXyz(320, 240, 0.0);<br>
  * hello.string = "Hello World !";<br>
  * </blockcode><br><br>

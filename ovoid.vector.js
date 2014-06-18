@@ -75,10 +75,8 @@ Ovoid.Vector.prototype.setv = function(a) {
  * @param {Vector} vect The Vector object to copy.
  */
 Ovoid.Vector.prototype.copy = function(vect) {
-
-  this.v[0] = vect.v[0];
-  this.v[1] = vect.v[1];
-  this.v[2] = vect.v[2];
+  
+  this.v.set(vect.v.subarray(0,3));
 };
 
 

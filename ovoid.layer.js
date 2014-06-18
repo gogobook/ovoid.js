@@ -36,7 +36,7 @@
  * 
  * <blockcode>
  * var logo = scene.create(Ovoid.LAYER, "logo");<br>
- * logo.setBgColor(1.0, 0.5, 0.0, 1.0);<br>
+ * logo.setBgColorRgba(1.0, 0.5, 0.0, 1.0);<br>
  * logo.setBgTexture(logoTexture);<br>
  * logo.setSize(320, 240);<br>
  * <br>
@@ -106,9 +106,23 @@ Ovoid.Layer.prototype.setSize = function(x, y) {
  * @param {float} b The Blue component.
  * @param {float} a The Alpha component.
  */
-Ovoid.Layer.prototype.setBgColor = function(r, g, b, a) {
+Ovoid.Layer.prototype.setBgColorRgba = function(r, g, b, a) {
 
   this.bgColor.set(r, g, b, a);
+};
+
+
+
+/**
+ * Set layer background color from Color object.<br><br>
+ * 
+ * Sets the background color of this instance according to the specified values.
+ *
+ * @param {Color} c Color.
+ */
+Ovoid.Layer.prototype.setBgColor = function(c) {
+
+  this.bgColor.copy(c);
 };
 
 
@@ -143,9 +157,22 @@ Ovoid.Layer.prototype.setBgTexture = function(texture) {
  * @param {float} b The Blue component.
  * @param {float} a The Alpha component.
  */
-Ovoid.Layer.prototype.setFgColor = function(r, g, b, a) {
+Ovoid.Layer.prototype.setFgColorRgba = function(r, g, b, a) {
 
   this.fgColor.set(r, g, b, a);
+};
+
+
+/**
+ * Set layer foreground color from Color object.<br><br>
+ * 
+ * Sets the foreground color of this instance according to the specified values.
+ *
+ * @param {Color} c Color.
+ */
+Ovoid.Layer.prototype.setFgColor = function(c) {
+
+  this.fgColor.copy(c);
 };
 
 
