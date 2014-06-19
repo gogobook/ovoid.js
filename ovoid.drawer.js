@@ -129,7 +129,7 @@
  * <li><b>Particles</b><br><br>
  * Symbolic constant:  Ovoid.PIPE_PARTICLE<br>
  * Number Id: 2<br>
- * Pipeline for particles draw. 
+ * Pipeline for point-sprite particles draw. 
  * </li><br><br>
  * 
  * <li><b>Layers</b><br><br>
@@ -154,6 +154,18 @@
  * Symbolic constant:  Ovoid.PIPE_SHADOW_VOLUME<br><br>
  * Number Id: 6<br><br>
  * Pipeline for shadow volumes draw. 
+ * </li>
+ * 
+ * <li><b>Billboard particles</b><br><br>
+ * Symbolic constant:  Ovoid.PIPE_BILLBOARD<br><br>
+ * Number Id: 7<br><br>
+ * Pipeline for billboard/sprite particles draw. 
+ * </li>
+ * 
+ * <li><b>Per-light pass fog</b><br><br>
+ * Symbolic constant:  Ovoid.PIPE_FOG_LP<br><br>
+ * Number Id: 8<br><br>
+ * Pipeline for fog draw in per-light pass mode.
  * </li>
  * </ul><br><br>
  * 
@@ -759,6 +771,7 @@ Ovoid.Drawer.prototype._init = function() {
    * - helpers (pc, vcc);                                // Ovoid.PIPE_HELPER = 5;
    * - shadow volumes (p, black)                         // Ovoid.PIPE_SHADOW_VOLUME = 6;
    * - billboard sprites (pu_billboard,c_tex_billboard)  // Ovoid.PIPE_BILLBOARD = 7;
+   * - light-pass fog (... , ...)                        // Ovoid.PIPE_FOG_LP = 8;
   */
 
   
@@ -847,6 +860,13 @@ Ovoid.Drawer.prototype._init = function() {
   }
   this.plugShader(this.addShader(sp),7,-1);
   
+  sp = new Ovoid.Shader("PIPE_FOG_LP", this._i);
+  if(!sp.setSources(Ovoid.GLSL_PIW_HYBRID_VS, Ovoid.GLSL_FOG_FS, Ovoid.GLSL_WRAPMAP)) {
+    Ovoid._log(1, this._i, '.Drawer._init', " error wrapping default PIPE_FOG_LP pipeline shader program.");
+    return false;
+  }
+  this.plugShader(this.addShader(sp),8,-1);
+  
   sp = new Ovoid.Shader("PIPE_RP_GEOMETRY", this._i);
   if(!sp.setSources(Ovoid.GLSL_PIW_HYBRID_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP)) {
     Ovoid._log(1, this._i, '.Drawer._init', " error wrapping default PIPE_RP_GEOMETRY pipeline shader program.");
@@ -881,6 +901,7 @@ Ovoid.Drawer.prototype._init = function() {
     return false;
   }
   this.plugShader(this.addShader(sp),27,-1);
+  
   
   if (this._i._logGlerror('.Drawer._init:: Shader program creation.'))
     return false;
@@ -2523,6 +2544,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
   // initialize projection pour les shadow volume
   this.switchPipe(6,0); // PIPE_SHADOW_VOLUME
   this.persp(this._i.Queuer._rcamera);
+  // Passe de rendu Ambient
   for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     if(!this._i.Queuer.qsolid[i].count) continue;
     this.switchPipe(pipe,i); // [VL_,LE_]PIPE_L2_GEOMETRY_LP
@@ -2533,6 +2555,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
     this.bodyStack(this._i.Queuer.qsolid[i], i, false);
   }
   this._renderpasses++;
+  // Passes de rendu par lumiere
   this.switchBlend(2); // blend additive color
   this.switchDepth(3); // depth mask off, test lessequal
   var l = this._i.Queuer.qlight.count
@@ -2552,7 +2575,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
       this.restoreDepth(); 
     }
     
-    for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+    for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) { 
       if(!this._i.Queuer.qsolid[i].count) continue;
       this.switchPipe(pipe,i); // [VL_,LE_]PIPE_L2_GEOMETRY_LP
       this.ambient(); // set scene ambiant parameters
@@ -2561,10 +2584,25 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
       this.light(this._i.Queuer.qlight[l]);
       this.bodyStack(this._i.Queuer.qsolid[i], i, false);
     }
-    
     this._renderpasses++;
   }
-  this.gl.disable(0x0B90); // STENCIL_TEST 
+  this.gl.disable(0x0B90); // STENCIL_TEST
+  
+  // Passe de rendu pour le fog
+  this.switchBlend(3); // blend soustractif
+  this.gl.depthMask(1); // depthMask on
+  this.gl.enable(0x0B71);  // DEPTH_TEST
+  this.gl.depthFunc(0x0203); // LEQUAL
+  
+  this.switchPipe(8,0); // PIPE_FOG_LP
+  this.persp(this._i.Queuer._rcamera);
+  this.ambient();  // set scene ambiant parameters
+  
+  for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
+    if(!this._i.Queuer.qsolid[i].count) continue;
+    this.bodyStack(this._i.Queuer.qsolid[i], i, false);
+  }
+  this._renderpasses++;
 }
 
 /**

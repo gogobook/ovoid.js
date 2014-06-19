@@ -306,7 +306,7 @@ Ovoid._run = function() {
         /* on enlève l'instance de la liste */
         Ovoid._inst.splice(i, 1);
         /* on delete l'instance */
-        delete inst;
+        inst = null;
       break;
     }
   }
@@ -357,11 +357,10 @@ Ovoid.newInstance = function(name, canvas, options) {
     if(i._init(c)) {
       Ovoid._inst.push(i);
       Ovoid._log(3,null,""," instance '"+name+"' added in stack.");
-      return i;
     } else {
-      delete(i);
-      return null;
+      i = null;
     }
+    return i;
   } else {
     Ovoid._log(3,null,""," '"+canvas+"' is not a CANVAS.");
     return null;
