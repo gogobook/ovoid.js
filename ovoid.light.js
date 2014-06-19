@@ -32,11 +32,11 @@
  * 
  * <blockcode>
  * var spot = scene.create(Ovoid.LIGHT, "redSpot");<br>
- * spot.setColor(1.0, 0.0, 0.0, 1.0);<br>
+ * spot.setColorRgba(1.0, 0.0, 0.0, 1.0);<br>
  * spot.setSpotAngle(45.0, 0.05);<br>
  * <br>
  * var lamp = scene.create(Ovoid.LIGHT, "pointLight");<br>
- * lamp.setColor(1.0, 1.0, 1.0, 1.0);<br>
+ * lamp.setColorRgba(1.0, 1.0, 1.0, 1.0);<br>
  * </blockcode><br><br>
  * 
  * <b>Lights Model</b><br><br>
