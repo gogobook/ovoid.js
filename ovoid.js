@@ -348,21 +348,26 @@ Ovoid.newConfig = function() {
 Ovoid.newInstance = function(name, canvas, options) {
   
   var c = document.getElementById(canvas);
-  if(c.tagName.toUpperCase() == "CANVAS") {
-    var i = new Ovoid.Instance(name);
-    Ovoid._log(3,null,""," new instance '"+name+"' on canvas '"+canvas+"'");
-    if(options instanceof Ovoid.Config) {
-      i._setoptions(options);
-    }
-    if(i._init(c)) {
-      Ovoid._inst.push(i);
-      Ovoid._log(3,null,""," instance '"+name+"' added in stack.");
+  if(c) {
+    if(c.tagName.toUpperCase() == "CANVAS") {
+      var i = new Ovoid.Instance(name);
+      Ovoid._log(3,null,""," new instance '"+name+"' on canvas '"+canvas+"'");
+      if(options instanceof Ovoid.Config) {
+        i._setoptions(options);
+      }
+      if(i._init(c)) {
+        Ovoid._inst.push(i);
+        Ovoid._log(3,null,""," instance '"+name+"' added in stack.");
+      } else {
+        i = null;
+      }
+      return i;
     } else {
-      i = null;
+      Ovoid._log(3,null,""," '"+canvas+"' is not a CANVAS.");
+      return null;
     }
-    return i;
   } else {
-    Ovoid._log(3,null,""," '"+canvas+"' is not a CANVAS.");
+    Ovoid._log(3,null,""," DOM object '"+canvas+"' not found.");
     return null;
   }
 };
