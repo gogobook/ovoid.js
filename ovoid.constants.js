@@ -2989,4 +2989,4 @@ Ovoid.FIRSTBUILD_DATE = '16-07-2012';
  * @constant
  * @memberOf _global_
  */
-Ovoid.RELEASE_DATE = '16-04-2014';
+Ovoid.RELEASE_DATE = '24-06-2014';
