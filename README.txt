@@ -23,8 +23,7 @@ OvoiD.JS is a WebGL based mixed low-level and middleware library
 including sound, interactive and physics for 3D Web applications and 
 games developpment. 
 
-For more information, documentation and samples see
-the OvoiD.JS project home page at : http://www.ovoid.org/js/
+OvoiD.JS project home page: http://www.ovoid.org/js/
 
 --------------------------------------------------------------------------------
 DOCUMENTATION
@@ -37,5 +36,4 @@ BUG REPPORTS & CONTACT
 --------------------------------------------------------------------------------
 
 E-mail: root (@) ovoid.org
-Blog page: http://www.ovoid.org/?page_id=412
 GitHub: https://github.com/sedenion/ovoid.js/
