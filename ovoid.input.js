@@ -448,4 +448,5 @@ Ovoid.Input.prototype.grabNode = function(node) {
 Ovoid.Input.prototype.grabRelease = function() {
 
   this.grabbedNode = null;
+  document.body.style.cursor = 'default';
 };
