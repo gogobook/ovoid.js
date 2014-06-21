@@ -758,8 +758,10 @@ Ovoid._eventMouseWheel = function(e) {
 Ovoid._eventKeyDn = function(e) {
   var i = Ovoid._inst.length;
   while(i--) {
-    Ovoid._inst[i].Input.intDn[e.keyCode] = true;
-    Ovoid._inst[i].Input.intHl[e.keyCode] = true;
+    if(!Ovoid._inst[i].Input.intHl[e.keyCode]) {
+      Ovoid._inst[i].Input.intDn[e.keyCode] = true;
+      Ovoid._inst[i].Input.intHl[e.keyCode] = true;
+    }
   }
 };
 
@@ -775,8 +777,10 @@ Ovoid._eventKeyUp = function(e) {
 
   var i = Ovoid._inst.length;
   while(i--) {
-    Ovoid._inst[i].Input.intUp[e.keyCode] = true;
-    Ovoid._inst[i].Input.intHl[e.keyCode] = false;
+    if(Ovoid._inst[i].Input.intHl[e.keyCode]) {
+      Ovoid._inst[i].Input.intUp[e.keyCode] = true;
+      Ovoid._inst[i].Input.intHl[e.keyCode] = false;
+    }
   }
 };
 
