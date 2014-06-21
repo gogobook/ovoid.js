@@ -1230,9 +1230,9 @@ Ovoid.Ojson.prototype.save = function(recp) {
   var dl = document.createElement('a');
   if(dl) {
     try {
-      // Ca ne fonctionne pas lorsqu'il y'a trop de data, apparemment.
-      //dl.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this._json));
-      dl.setAttribute('href', 'data:application/octet-stream,' + this._json);
+      // Il faut encoder les espaces pour les préserver (la fonction encodeURIcomponent() crée une string trop lourde qui fait crasher le browser)
+      this._json = this._json.replace(/ /g, "%20"); 
+      dl.setAttribute('href', 'data:text/plain;charset=utf-8,' + this._json);
       dl.setAttribute('download', this.name + ext);
       dl.click();
     } catch (e) {

@@ -3117,13 +3117,14 @@ Ovoid.Instance.prototype.toJSON = function() {
   o['wdw'] = Ovoid.compact(this.waitdraw);
   
   /* Recuperation des shaders */
-  o['sl'] = new Array();
+  
   c = this.Drawer._splib.length;
+  o['sl'] = new Array(c);
   for(i = 0; i < c; i++) {
     o['sl'][i] = this.Drawer._splib[i];
   }
-  o['sp'] = new Array(Ovoid.MAX_RENDER_LAYER);
   c = this.Drawer._sppipe.length;
+  o['sp'] = new Array(c);
   for(i = 0; i < c; i++) {
     o['sp'][i] = this.Drawer._sppipe[i];
   }
