@@ -1522,7 +1522,6 @@ Ovoid.Instance.prototype._mainloop = function() {
   try {
     /* BEGIN FRAME */    
     this.Timer._update();
-    this.Input._update();
 
     /* USER CUSTOM LOOP FUNC */
     try {
@@ -1620,9 +1619,10 @@ Ovoid.Instance.prototype._mainloop = function() {
     }
     
     /* END FRAME */
-    this.Frame._update();
     this.gl.finish();
     this.gl.flush();
+    this.Input._update();
+    this.Frame._update();
   } 
   catch(e) {
     Ovoid._log(0, this, '._mainloop', ' (Exception)\n' + e.stack);

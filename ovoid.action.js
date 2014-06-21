@@ -502,39 +502,39 @@ Ovoid.Action.prototype.setTrigger = function(e, f, item) {
       case 2:
         this.onOver = f;
         break;
-      /* Ovoid.MOUSE_LEFT_DOWN */
+      /* Ovoid.MOUSE_OVER_LEFT_DOWN */
       case 3: 
         this.onLmbDn = f;
         break;
-      /* Ovoid.MOUSE_LEFT_UP */
+      /* Ovoid.MOUSE_OVER_LEFT_UP */
       case 4: 
         this.onLmbUp = f;
         break;
-      /* Ovoid.MOUSE_LEFT_HELD */
+      /* Ovoid.MOUSE_OVER_LEFT_HELD */
       case 5:
         this.onLmbHl = f;
         break;
-      /* Ovoid.MOUSE_MIDDLE_DOWN */
+      /* Ovoid.MOUSE_OVER_MIDDLE_DOWN */
       case 6:
         this.onMmbDn = f;
         break;
-      /* Ovoid.MOUSE_MIDDLE_UP */
+      /* Ovoid.MOUSE_OVER_MIDDLE_UP */
       case 7:
         this.onMmbUp = f;
         break;
-      /* Ovoid.MOUSE_MIDDLE_HELD */
+      /* Ovoid.MOUSE_OVER_MIDDLE_HELD */
       case 8:
         this.onMmbHl = f;
         break;
-      /* Ovoid.MOUSE_RIGHT_DOWN */
+      /* Ovoid.MOUSE_OVER_RIGHT_DOWN */
       case 9:
         this.onRmbDn = f;
         break;
-      /* Ovoid.MOUSE_RIGHT_UP */
+      /* Ovoid.MOUSE_OVER_RIGHT_UP */
       case 10:
         this.onRmbUp = f;
         break;
-      /* Ovoid.MOUSE_RIGHT_HELD */
+      /* Ovoid.MOUSE_OVER_RIGHT_HELD */
       case 11:
         this.onRmbHl = f;
         break;

@@ -651,9 +651,11 @@ Ovoid.Mesh.prototype.hasAlpha = function() {
   
   var a = false;
   for(var i = 0; i < this.polyset[0].length; i++) {
-    if(this.polyset[0][i].material.opacity < 1.0) {
-      a = true;
-      break;
+    if(this.polyset[0][i].material) {
+      if(this.polyset[0][i].material.opacity < 1.0) {
+        a = true;
+        break;
+      }
     }
   }
   return a;
