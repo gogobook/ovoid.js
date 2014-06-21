@@ -115,7 +115,7 @@ Ovoid.Physics = function(name, i) {
   this.name = name;
   /** Inverse mass.
    * @type float */
-  this.imass = 10.0;
+  this.imass = 1.0;
   /** Inverse inertia tensor.
    * @type Matrix3 */
   this.itensor = new Ovoid.Matrix3();
