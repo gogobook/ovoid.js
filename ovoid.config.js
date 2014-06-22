@@ -293,7 +293,7 @@ Ovoid.Config = function() {
    * performance in complex scenes, you should disable it if you dont
    * use it.
    * 
-   * @type bitwize
+   * @type bitmask
    * 
    * */
   this.opt_renderPickingMode = Ovoid.RP_WORLD|Ovoid.RP_OVERLAY;
@@ -481,19 +481,19 @@ Ovoid.Config = function() {
   /** Joint helpers's size.<br><br>
    * 
    * Defines the Joint nodes's helpers drawing size. Default value is
-   * <c>1.0</c>
+   * <c>0.25</c>
    * 
    * @type float*/
-  this.opt_renderJointSize = 1.0;
+  this.opt_renderJointSize = 0.25;
 
 
   /** Normals scale.<br><br>
    * 
    * Defines the meshs's normals drawing size. Default value is
-   * <c>0.7</c>
+   * <c>0.25</c>
    * 
    * @type float */
-  this.opt_renderNormalScale = 0.7;
+  this.opt_renderNormalScale = 0.25;
   
   
   /* Options queuer --------------------------------------------------*/
@@ -574,6 +574,19 @@ Ovoid.Config = function() {
    * 
    * @type float */
   this.opt_audioDopplerFactor = 1.0;
+  
+  
+  /* Options divers --------------------------------------------------*/
+  
+  /** Enable or disable skin local deformed value computation.<br><br>
+   * 
+   * When enabled, weighted vertices's deformations are locally computed 
+   * and stored in real time. This notably allow accurate shadows 
+   * casting for Skin deformed Meshs. This may hit global performances.
+   * Default value is <c>false</c>
+   * 
+   * @type float */
+  this.opt_skinLocalComput = false;
 
 };
 

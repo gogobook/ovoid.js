@@ -1431,6 +1431,8 @@ Ovoid.Ojson.prototype._importEnv = function(inst) {
     this._i.opt_renderCullFace = env.o[41];
     /* Options audio */
     this._i.opt_audioDopplerFactor = env.o[42];
+    /* Options divers */
+    this._i.opt_skinLocalComput = env.o[43];
   
   } catch (e) {
     Ovoid._log(1,this._i,'::Ojson._importEnv', this.name +

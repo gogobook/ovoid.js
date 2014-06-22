@@ -626,7 +626,7 @@ Ovoid.Instance = function(name) {
    * performance in complex scenes, you should disable it if you dont
    * use it.
    * 
-   * @type bitwize
+   * @type bitmask
    * 
    * */
   this.opt_renderPickingMode = Ovoid.RP_WORLD|Ovoid.RP_OVERLAY;
@@ -814,19 +814,19 @@ Ovoid.Instance = function(name) {
   /** Joint helpers's size.<br><br>
    * 
    * Defines the Joint nodes's helpers drawing size. Default value is
-   * <c>1.0</c>
+   * <c>0.25</c>
    * 
    * @type float*/
-  this.opt_renderJointSize = 1.0;
+  this.opt_renderJointSize = 0.25;
 
 
   /** Normals scale.<br><br>
    * 
    * Defines the meshs's normals drawing size. Default value is
-   * <c>0.7</c>
+   * <c>0.25</c>
    * 
    * @type float */
-  this.opt_renderNormalScale = 0.7;
+  this.opt_renderNormalScale = 0.25;
   
   
   /* Options queuer --------------------------------------------------*/
@@ -908,6 +908,19 @@ Ovoid.Instance = function(name) {
    * 
    * @type float */
   this.opt_audioDopplerFactor = 1.0;
+  
+  
+  /* Options divers --------------------------------------------------*/
+  
+  /** Enable or disable skin local deformed value computation.<br><br>
+   * 
+   * When enabled, weighted vertices's deformations are locally computed 
+   * and stored in real time. This notably allow accurate shadows 
+   * casting for Skin deformed Meshs. This may hit global performances.
+   * Default value is <c>false</c>
+   * 
+   * @type float */
+  this.opt_skinLocalComput = false;
   
   
   /* Variables generales ---------------------------------------------*/
@@ -1181,6 +1194,8 @@ Ovoid.Instance.prototype._setoptions = function(opt) {
   this.opt_physicsContactItFactor = opt.opt_physicsContactItFactor;
   /* Options audio */
   this.opt_audioDopplerFactor = opt.opt_audioDopplerFactor;
+  /* Options divers */
+  this.opt_skinLocalComput = opt.opt_skinLocalComput;
   
   Ovoid._log(3, this, '._setoptions', ' done');
 };
@@ -3129,7 +3144,7 @@ Ovoid.Instance.prototype.toJSON = function() {
     o['sp'][i] = this.Drawer._sppipe[i];
   }
   
-  o['o'] = new Array();
+  o['o'] = new Array(44);
   /* Options generales */
   o['o'][0] = this.opt_debugMode;
   o['o'][1] = this.opt_enableAlerts;
@@ -3181,6 +3196,8 @@ Ovoid.Instance.prototype.toJSON = function() {
   o['o'][41] = this.opt_renderCullFace;
   /* Options audio */
   o['o'][42] = this.opt_audioDopplerFactor;
+  /* Options diverses */
+  o['o'][43] = this.opt_skinLocalComput;
   
   return o;
 };

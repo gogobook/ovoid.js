@@ -104,6 +104,9 @@ Ovoid.Skin = function(name, i) {
    * @type Triangle[][] */
   this.triangles = new Array(Ovoid.MAX_MESH_LOD);
   
+  /** Current used LOD. */
+  this._lod = 0;
+  
   /** Ovoid.JS parent instance
    * @type Object */
   this._i = i;
@@ -205,7 +208,7 @@ Ovoid.Skin.prototype.bindSkin = function(mesh, mbindshape, mbindjoint,
   this.makeDepend(mesh);
   
   /* mirroir des vertices et polygones du mesh */
-  if (Ovoid.opt_localSkinData) {
+  if (this._i.opt_skinLocalComput) {
     this._localMirror();
   }
   
@@ -293,7 +296,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
     }
     
     // Mirroring des weighted vertices
-    if (this._i.opt_localSkinData && this.mesh) {
+    if (this._i.opt_skinLocalComput && this.mesh) {
         
       // Pour le calcul du bounding volum
       var min = new Ovoid.Point(Ovoid.FLOAT_MAX,
@@ -312,7 +315,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
       
       var S;
       
-      var l = mesh._lod;
+      var l = this._lod;
       var c = this.mesh.vertices[l].length;
       for (var i = 0; i < c; i++) {
         sv = this.vertices[l][i];
@@ -348,7 +351,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
         
       }
       // On met a jour les infos triangles si le shadow-volum est enabled
-      if (this._i.opt_shadowCasting) {
+      if (this._i.opt_renderShadowCasting) {
         // pour la maj des triangles
         var v0 = new Ovoid.Vector();
         var v1 = new Ovoid.Vector();

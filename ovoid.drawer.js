@@ -401,8 +401,7 @@ Ovoid.Drawer = function(i) {
   /* indigo */
   this._tcolor[10].set(0.5,0.0,1.0,1.0);
   /* magenta */
-  this._tcolor[11].set(0.1,0.0,1.0,1.0);
-
+  this._tcolor[11].set(1.0,0.0,1.0,1.0);
 
   /** Default blank material **/
   this._mblank = null;
@@ -2502,6 +2501,7 @@ Ovoid.Drawer.prototype.drawQueueHL = function() {
     if (this._i.opt_renderDrawNormals) {
       for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
         this.normalsStack(this._i.Queuer.qsolid[i]);
+        this.normalsStack(this._i.Queuer.qalpha[i]);
       }
     }
     this.helpersStack(this._i.Queuer.qtform);

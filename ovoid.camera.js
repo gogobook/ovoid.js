@@ -283,7 +283,7 @@ Ovoid.Camera.prototype.cachCamera = function() {
     /* si inferieur  ou egal à zero, la projection est calculé différament avec 
      * un far_clip infini. c'est utile pour le rendu stencil des ombres 
      * volumétriques */
-    if(this._i.opt_shadowCasting) {
+    if(this._i.opt_renderShadowCasting) {
       var zfact = 1.0 / (this.clipNear - -1.0);
       this.perspective.m[10] = 0.0;
       this.perspective.m[14] = (2.0 * -1.0 * this.clipNear) * zfact;

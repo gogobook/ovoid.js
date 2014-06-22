@@ -148,7 +148,7 @@ Ovoid.Physics = function(name, i) {
   
   /** Sleeping motion threshold.
    * @type float */
-  this.sleeping = 0.5;
+  this.sleeping = 0.4;
   
   /** Overridable triggered function.<br><br>
    * 
@@ -240,12 +240,13 @@ Ovoid.Physics.prototype.setDamping = function(ldamp, adamp) {
 Ovoid.Physics.prototype.newton = function(g) {
   
   if(!(this.cach & Ovoid.CACH_PHYSICS)) {
-    var mass;
-    (this.imass>0.0)?mass = 1.0/this.imass:mass = 0.0;
-    this.linearInfluence.v[0] += mass * g.v[0];
-    this.linearInfluence.v[1] += mass * g.v[1];
-    this.linearInfluence.v[2] += mass * g.v[2];
-    this.unCach(Ovoid.CACH_INFLUENCES);
+    if(this.imass > 0.0) {
+      var mass = 1.0/this.imass;
+      this.linearInfluence.v[0] += mass * g.v[0];
+      this.linearInfluence.v[1] += mass * g.v[1];
+      this.linearInfluence.v[2] += mass * g.v[2];
+      this.unCach(Ovoid.CACH_INFLUENCES);
+    }
   }
 };
 
@@ -263,12 +264,13 @@ Ovoid.Physics.prototype.newton = function(g) {
 Ovoid.Physics.prototype.newtonXyz = function(x, y, z) {
   
   if(!(this.cach & Ovoid.CACH_PHYSICS)) {
-    var mass;
-    (this.imass>0.0)?mass = 1.0/this.imass:mass = 0.0;
-    this.linearInfluence.v[0] += mass * x;
-    this.linearInfluence.v[1] += mass * y;
-    this.linearInfluence.v[2] += mass * z;
-    this.unCach(Ovoid.CACH_INFLUENCES);
+    if(this.imass > 0.0) {
+      var mass = 1.0/this.imass;
+      this.linearInfluence.v[0] += mass * x;
+      this.linearInfluence.v[1] += mass * y;
+      this.linearInfluence.v[2] += mass * z;
+      this.unCach(Ovoid.CACH_INFLUENCES);
+    }
   }
 };
 
@@ -465,10 +467,9 @@ Ovoid.Physics.prototype.cachPhysics = function() {
     /* Update l'inertia tensor */
     if( ( this.target[0].boundingBox.hsize.v[0] + 
           this.target[0].boundingBox.hsize.v[1] +
-          this.target[0].boundingBox.hsize.v[2]) > 0.0) {
+          this.target[0].boundingBox.hsize.v[2]) > 0.0 && this.imass > 0.0) {
 
-      var mass;
-      (this.imass>0.0)?mass = 1.0/this.imass:mass = 0.0;
+      var mass = 1.0/this.imass;
       var Ix, Iy, Iz;
       
       /* il s'agit d'un inverse, comme la masse */
@@ -482,9 +483,9 @@ Ovoid.Physics.prototype.cachPhysics = function() {
           sx *= sx;
           sy *= sy;
           sz *= sz;
-          Ix = 1.0 / (0.333 * mass * (sy + sz) );
-          Iy = 1.0 / (0.333 * mass * (sx + sz) );
-          Iz = 1.0 / (0.333 * mass * (sx + sy) );
+          Ix = 1.0 / (0.333 * mass * (sy + sz));
+          Iy = 1.0 / (0.333 * mass * (sx + sz));
+          Iz = 1.0 / (0.333 * mass * (sx + sy));
       
           break;
         default: /* Ovoid.RIGID_MASSIVE_SPHERE | Ovoid.GHOST_MASSIVE */
@@ -492,9 +493,9 @@ Ovoid.Physics.prototype.cachPhysics = function() {
           var r2 = this.target[0].boundingSphere.radius;
           r2 *= r2;
           
-          Ix = 1.0 / (0.666 * mass * r2 );
-          Iy = 1.0 / (0.666 * mass * r2 );
-          Iz = 1.0 / (0.666 * mass * r2 );
+          Ix = 1.0 / (0.333 * mass * r2);
+          Iy = 1.0 / (0.333 * mass * r2);
+          Iz = 1.0 / (0.333 * mass * r2);
           
           break;
       }
