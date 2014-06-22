@@ -330,11 +330,10 @@ Ovoid.Solver.prototype._getContactB2L = function (a, b) {
           */
           nC++;
           if(nC == 4) 
-            break;
+            break; // On se limite à 4 contacts par landscape
         }
       }
     }
-        
     if(nC) { 
       if(nC > 1) {
         N.normalize();
@@ -397,6 +396,9 @@ Ovoid.Solver.prototype._getContactS2L = function (a, b) {
   var f, u, v;
   /* distance */
   var d;
+  
+  /* Nombre de contact */
+  var nC = 0;
 
   /* parcourre la liste des triangles */
   var i = mesh.triangles[0].length;
@@ -439,13 +441,18 @@ Ovoid.Solver.prototype._getContactS2L = function (a, b) {
         N.transform4Of(n, Tb);
         var Np = this._tmpVect[0];
         Np.copy(N);
-        Np.scaleBy(-d);
-        C.addOf(Lc, Np);
+        /* Ho... mais qu'est-ce que j'ai fais là ?!! j'étais saoul ?
+         * Je garde cette hérésie en souvenir... */
+        //Np.scaleBy(-d);
+        //C.addOf(Lc, Np);
+        //C.v[3] = 1.0;
+        //C.transform4(Tb);
+        Np.scaleBy(Sa.radius);
+        C.addOf(Sa.worldCenter, Np);
         C.v[3] = 1.0;
-        C.transform4(Tb);
         /* Ajoute un contact */
         this._addContact(a, null, C, N, P);
-        return;
+        return; // On se limite à un contact par landscape
       }
     }
   }

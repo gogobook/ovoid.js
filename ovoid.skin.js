@@ -306,7 +306,11 @@ Ovoid.Skin.prototype.cachSkin = function() {
           Ovoid.FLOAT_MIN,
           1.0);
           
+      var rad = 0.0;
+          
       var mv, sv, p0, p1, p2;
+      
+      var S;
       
       var l = mesh._lod;
       var c = this.mesh.vertices[l].length;
@@ -329,6 +333,9 @@ Ovoid.Skin.prototype.cachSkin = function() {
         /* normalise le poids */
         sv.p.normalizeWeight();
         // calcul min et max pour le bounding volum
+        
+        S = sv.p.size();
+        
         if (sv.p.v[0] > max.v[0]) max.v[0] = sv.p.v[0];
         if (sv.p.v[1] > max.v[1]) max.v[1] = sv.p.v[1];
         if (sv.p.v[2] > max.v[2]) max.v[2] = sv.p.v[2];
@@ -336,6 +343,9 @@ Ovoid.Skin.prototype.cachSkin = function() {
         if (sv.p.v[0] < min.v[0]) min.v[0] = sv.p.v[0];
         if (sv.p.v[1] < min.v[1]) min.v[1] = sv.p.v[1];
         if (sv.p.v[2] < min.v[2]) min.v[2] = sv.p.v[2];
+        
+        if (rad < S) rad = S;
+        
       }
       // On met a jour les infos triangles si le shadow-volum est enabled
       if (this._i.opt_shadowCasting) {
@@ -364,7 +374,7 @@ Ovoid.Skin.prototype.cachSkin = function() {
       }
 
       this.boundingBox.setBound(min, max);
-      this.boundingSphere.setBound(min, max);
+      this.boundingSphere.setBound(min, max, rad);
 
       // propage l'uncach du shape
       for (var i = 0; i < this.link.length; i++)

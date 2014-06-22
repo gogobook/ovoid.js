@@ -1422,13 +1422,16 @@ Ovoid.Mesh.prototype.cachMesh = function() {
         Ovoid.FLOAT_MIN,
         Ovoid.FLOAT_MIN,
         1.0);
+        
+    var rad = 0.0;
 
-    var P;
+    var P, S;
     var c = this.vertices[0].length;
     for (var i = 0; i < c; i++) {
       
       P = this.vertices[0][i].p;
-
+      S = P.size();
+      
       if (P.v[0] > max.v[0]) max.v[0] = P.v[0];
       if (P.v[1] > max.v[1]) max.v[1] = P.v[1];
       if (P.v[2] > max.v[2]) max.v[2] = P.v[2];
@@ -1436,10 +1439,12 @@ Ovoid.Mesh.prototype.cachMesh = function() {
       if (P.v[0] < min.v[0]) min.v[0] = P.v[0];
       if (P.v[1] < min.v[1]) min.v[1] = P.v[1];
       if (P.v[2] < min.v[2]) min.v[2] = P.v[2];
+      
+      if(rad < S) rad = S;
     }
 
     this.boundingBox.setBound(min, max);
-    this.boundingSphere.setBound(min, max);
+    this.boundingSphere.setBound(min, max, rad);
 
     delete min;
     delete max;

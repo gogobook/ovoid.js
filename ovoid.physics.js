@@ -115,7 +115,7 @@ Ovoid.Physics = function(name, i) {
   this.name = name;
   /** Inverse mass.
    * @type float */
-  this.imass = 1.0;
+  this.imass = 10.0;
   /** Inverse inertia tensor.
    * @type Matrix3 */
   this.itensor = new Ovoid.Matrix3();
@@ -148,7 +148,7 @@ Ovoid.Physics = function(name, i) {
   
   /** Sleeping motion threshold.
    * @type float */
-  this.sleeping = 1.0;
+  this.sleeping = 0.5;
   
   /** Overridable triggered function.<br><br>
    * 
@@ -489,12 +489,12 @@ Ovoid.Physics.prototype.cachPhysics = function() {
           break;
         default: /* Ovoid.RIGID_MASSIVE_SPHERE | Ovoid.GHOST_MASSIVE */
 
-          var r2 = (this.target[0].boundingSphere.radius * 2.0);
+          var r2 = this.target[0].boundingSphere.radius;
           r2 *= r2;
           
-          Ix = 1.0 / (0.3 * mass * r2 );
-          Iy = 1.0 / (0.3 * mass * r2 );
-          Iz = 1.0 / (0.3 * mass * r2 );
+          Ix = 1.0 / (0.666 * mass * r2 );
+          Iy = 1.0 / (0.666 * mass * r2 );
+          Iz = 1.0 / (0.666 * mass * r2 );
           
           break;
       }

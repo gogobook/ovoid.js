@@ -258,9 +258,7 @@ Ovoid.Point.prototype.size = function() {
  */
 Ovoid.Point.prototype.size2 = function() {
 
-  return this.v[0] * this.v[0] +
-      this.v[1] * this.v[1] +
-          this.v[2] * this.v[2];
+  return this.v[0] * this.v[0] + this.v[1] * this.v[1] + this.v[2] * this.v[2];
 };
 
 

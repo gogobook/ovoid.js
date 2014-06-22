@@ -68,25 +68,19 @@ Ovoid.Boundingsphere.prototype.copy = function(bsphere) {
  * 
  * @see Ovoid.Point
  */
-Ovoid.Boundingsphere.prototype.setBound = function(min, max) {
+Ovoid.Boundingsphere.prototype.setBound = function(min, max, rad) {
 
   /* half size */
   var hsx = (max.v[0] - min.v[0]) * 0.5;
   var hsy = (max.v[1] - min.v[1]) * 0.5;
   var hsz = (max.v[2] - min.v[2]) * 0.5;
-                
+
   this.center.set(hsx + min.v[0],
       hsy + min.v[1],
       hsz + min.v[2], 
       1.0);
 
-  this.radius = 0.0;
-
-  var S;
-  S = max.dist(this.center);
-  if (S > this.radius) this.radius = S;
-  S = min.dist(this.center);
-  if (S > this.radius) this.radius = S;
+  this.radius = rad;
 };
 
 

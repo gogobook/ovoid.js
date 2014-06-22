@@ -137,7 +137,7 @@ Ovoid.Camera.prototype.setFov = function(f) {
  * @param {float} n Near clipping plane distance.
  * @param {float} f Far clipping plane distance.
  */
-Ovoid.Camera.prototype.setCliping = function(n, f) {
+Ovoid.Camera.prototype.setClipping = function(n, f) {
 
   this.clipNear = n;
   this.clipFar = f;

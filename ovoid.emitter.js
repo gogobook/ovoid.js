@@ -315,10 +315,16 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         Ovoid.FLOAT_MIN,
         Ovoid.FLOAT_MIN,
         1.0);
+        
+    var rad = 0.0;
     
     /* Point pour les coordonnées du particule relatif au body 
      * pour construire le bounding volum */
     var WP = new Ovoid.Point();
+    
+    /* Variable pour la taille du vecteur radius pour
+     * pour construire le bounding volum */
+    var WS;
     
     /* Influence gravite */
     var g = new Ovoid.Vector(this.mass * this._i.opt_gravity[0], 
@@ -346,6 +352,8 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         /* calcul pour le bounding volum */
         WP.copy(P);
         WP.transform4Inverse(body.worldMatrix);
+        
+        WS = WP.size();
 
         if (WP.v[0] > max.v[0]) max.v[0] = WP.v[0];
         if (WP.v[1] > max.v[1]) max.v[1] = WP.v[1];
@@ -354,6 +362,8 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
         if (WP.v[0] < min.v[0]) min.v[0] = WP.v[0];
         if (WP.v[1] < min.v[1]) min.v[1] = WP.v[1];
         if (WP.v[2] < min.v[2]) min.v[2] = WP.v[2];
+        
+        if (rad < WS) rad = WS;
         
         /* ajustement de la position par la velocité */
         P.v[0] += (V.v[0] * this._i.Timer.quantum);
@@ -395,6 +405,8 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
             WP.copy(P);
             WP.transform4Inverse(body.worldMatrix);
 
+            WS = WP.size();
+
             if (WP.v[0] > max.v[0]) max.v[0] = WP.v[0];
             if (WP.v[1] > max.v[1]) max.v[1] = WP.v[1];
             if (WP.v[2] > max.v[2]) max.v[2] = WP.v[2];
@@ -402,6 +414,8 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
             if (WP.v[0] < min.v[0]) min.v[0] = WP.v[0];
             if (WP.v[1] < min.v[1]) min.v[1] = WP.v[1];
             if (WP.v[2] < min.v[2]) min.v[2] = WP.v[2];
+            
+            if (rad < WS) rad = WS;
           }
       
           // Velocity selon le scattering
@@ -460,7 +474,7 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
   /* update bounding box et bounding sphere */
   if (!(this.cach & Ovoid.CACH_GEOMETRY)) {
     this.boundingBox.setBound(min, max);
-    this.boundingSphere.setBound(min, max);
+    this.boundingSphere.setBound(min, max, rad);
     /* propage l'uncach du shape */
     for (var i = 0; i < this.link.length; i++) {
         this.link[i].unCach(Ovoid.CACH_BOUNDING_SHAPE);
