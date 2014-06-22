@@ -406,7 +406,7 @@ Ovoid.Contact.prototype._applyImpulses = function() {
     U[6] = (T[7] * this._rc[0].v[2] + T[8] * -this._rc[0].v[1]) * -1.0;
     U[7] = (T[6] * -this._rc[0].v[2] + T[8] * this._rc[0].v[0]) * -1.0;
     U[8] = (T[6] * this._rc[0].v[1] + T[7] * -this._rc[0].v[0]) * -1.0;
-    
+  
     var imass = this._b[0].imass;
 
     /* Même principe pour le second body */

@@ -447,6 +447,7 @@ Ovoid.Solver.prototype._getContactS2L = function (a, b) {
         //C.addOf(Lc, Np);
         //C.v[3] = 1.0;
         //C.transform4(Tb);
+        Np.scaleBy(-1.0);
         Np.scaleBy(Sa.radius);
         C.addOf(Sa.worldCenter, Np);
         C.v[3] = 1.0;
