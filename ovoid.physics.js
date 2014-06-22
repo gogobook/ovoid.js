@@ -492,9 +492,9 @@ Ovoid.Physics.prototype.cachPhysics = function() {
           var r2 = this.target[0].boundingSphere.radius;
           r2 *= r2;
           
-          Ix = 1.0 / (0.666 * mass * r2 );
-          Iy = 1.0 / (0.666 * mass * r2 );
-          Iz = 1.0 / (0.666 * mass * r2 );
+          Ix = 1.0 / (-0.666 * mass * r2 );
+          Iy = 1.0 / (-0.666 * mass * r2 );
+          Iz = 1.0 / (-0.666 * mass * r2 );
           
           break;
       }
