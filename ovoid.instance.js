@@ -2832,8 +2832,11 @@ Ovoid.Instance.prototype.setAction = function(e, target, f, item) {
  * @see Ovoid.Animation
  * @see Ovoid.Physics
  * 
- * @param {int} type Constraint node type. Can be Ovoid.PHYSICS, 
- * Ovoid.ANIMATION or Ovoid.EXPRESSION.
+ * @param {int} type Constraint node type. Can be one of the following:<br>
+ * Ovoid.PHYSICS,<br>
+ * Ovoid.ANIMATION,<br>
+ * Ovoid.EXPRESSION,<br>
+ * Ovoid.AIM<br>
  * 
  * @param {string|Node} target Node object, or a string to retrieve one or 
  * several nodes whose name matches with.
@@ -2853,12 +2856,11 @@ Ovoid.Instance.prototype.setConstraint = function(type, target) {
       return;
     }
   } else {
-    if(target.type & Ovoid.TRANSFORM) {
+    if(target.type & Ovoid.TRANSFORM || type == Ovoid.EXPRESSION) {
       nodes = new Array();
       nodes.push(target);
     } else {
-      Ovoid._log(2, this, '.setConstraint', ' node ' 
-          + target.name + ' is not a Transform instance.');
+      Ovoid._log(2, this, '.setConstraint', ' node '+target.name+' has wrong type for the chosen Constraint, aborted.');
       return;
     }
   }
@@ -2869,9 +2871,8 @@ Ovoid.Instance.prototype.setConstraint = function(type, target) {
   var i = nodes.length;
   while(i--) {
     /* Si ce n'est pas un body, cancel */
-    if (!(nodes[i].type & Ovoid.TRANSFORM)) {
-      Ovoid._log(2, this, '.setConstraint', ' node ' 
-          + nodes[i].name + ' is not a Transform instance.');
+    if (!(nodes[i].type & Ovoid.TRANSFORM) && type != Ovoid.EXPRESSION) {
+      Ovoid._log(2, this, '.setConstraint', ' node '+nodes[i].name+' has wrong type for the chosen Constraint, aborted.');
       continue;
     }
 
@@ -2879,184 +2880,32 @@ Ovoid.Instance.prototype.setConstraint = function(type, target) {
     switch (type)
     {
       case Ovoid.PHYSICS:
-        constraint = this.Scene.newNode(type, nodes[i].name + "Physics", null);
-        Ovoid._log(3, this, '.setConstraint', ' creating Physics node ' 
-          + constraint.name + ' in active scene');
+        constraint = this.Scene.newNode(type, nodes[i].name + "Phys", null);
+        Ovoid._log(3, this, '.setConstraint', ' creating Physics node '+constraint.name+' in active scene');
         break;
       case Ovoid.ANIMATION:
-        constraint = this.Scene.newNode(type, nodes[i].name + "Animation", null);
-        Ovoid._log(3, this, '.setConstraint', ' creating Animation node ' 
-          + constraint.name + ' in active scene');
+        constraint = this.Scene.newNode(type, nodes[i].name + "Anim", null);
+        Ovoid._log(3, this, '.setConstraint', ' creating Animation node '+constraint.name+' in active scene');
         break;
       case Ovoid.EXPRESSION:
-        constraint = this.Scene.newNode(type, nodes[i].name + "Animation", null);
-        Ovoid._log(3, this, '.setConstraint', ' creating Animation node ' 
-          + constraint.name + ' in active scene');
+        constraint = this.Scene.newNode(type, nodes[i].name + "Expr", null);
+        Ovoid._log(3, this, '.setConstraint', ' creating Expression node '+constraint.name+' in active scene');
+        break;
+      case Ovoid.AIM:
+        constraint = this.Scene.newNode(type, nodes[i].name + "Aim", null);
+        Ovoid._log(3, this, '.setConstraint', ' creating Aim node '+constraint.name+' in active scene');
         break;
       default:
         Ovoid._log(2, this, '.setConstraint', ' invalid Constraint type.');
         return;
     }
-    Ovoid._log(3, this, '.setConstraint', ' adding constraint ' 
-          + constraint.name + ' to ' + nodes[i].name);
+    Ovoid._log(3, this, '.setConstraint', ' adding '+nodes[i].name+' as Targer of '+constraint.name);
     constraint.setTarget(nodes[i]);
     constraints.push(constraint);
   }
   return constraints;
 };
 
-
-/**
- * Assign Physics nodes to one or several Transform nodes.<br><br>
- * 
- * Assigns Physics nodes of the specified type to one or several Transform 
- * nodes. Target can be a Transform node instance or a string to retrieve one or 
- * several nodes whose name matches with. This method creates one new Physics
- * node per target nodes.<br><br>
- * 
- * <blockcode>
- * var physics = Instance.setPhysics("box")<br>
- * for (var i = 0; i < physics.length; i++) {<br>
- * &nbsp;&nbsp;physics[i].model = Ovoid.RIGID_MASSIVE_BOX;<br>
- * &nbsp;&nbsp;physics[i].setMass(2.0);<br>
- * }<br>
- * </blockcode>
- * 
- * @see Ovoid.Physics
- * 
- * @param {string|Node} target Node object, or a string to retrieve one or 
- * several nodes whose name matches with.
- * 
- * @return {Array} Array containing references of the created Physics nodes.
- */
-Ovoid.Instance.prototype.setPhysics = function(target) {
-  
-  /* retrouve la node si c'est un string */
-  var nodes;
-  if ( typeof(target) == "string" ) {
-    nodes = this.Scene.findMatches(target);
-    
-    if (nodes.length == 0) {
-      Ovoid._log(2, this, '.setPhysics', " no node found with matching name '"
-        +target+"' in the current active scene '" + this.Scene.name + "'.");
-      return;
-    }
-  } else {
-    if(target.type & Ovoid.TRANSFORM) {
-      nodes = new Array();
-      nodes.push(target);
-    } else {
-      Ovoid._log(2, this, '.setPhysics', ' node ' 
-          + target.name + ' is not a Transform instance.');
-      return;
-    }
-  }
-  
-  var constraints = new Array();
-  
-  var constraint;
-  var i = nodes.length;
-  while(i--) {
-    /* Si ce n'est pas un body, cancel */
-    if (!(nodes[i].type & Ovoid.TRANSFORM)) {
-      Ovoid._log(2, this, '.setPhysics', ' node ' 
-          + nodes[i].name + ' is not a Transform instance.');
-      continue;
-    }
-    constraint = this.Scene.newNode(Ovoid.PHYSICS, nodes[i].name + "Physics", null);
-    Ovoid._log(3, this, '.setPhysics', ' creating Physics node ' 
-      + constraint.name + ' in active scene');
-    Ovoid._log(3, this, '.setPhysics', ' adding constraint ' 
-          + constraint.name + ' to ' + nodes[i].name);
-    constraint.setTarget(nodes[i]);
-    constraints.push(constraint);
-  }
-  return constraints;
-};
-
-
-/**
- * Assign Expression nodesto one or several nodes.<br><br>
- * 
- * Assigns Expression node with the specified expression function to one or 
- * several nodes. Target can be a Transform node instance or a string to 
- * retrieve one or several nodes whose name matches with. This method creates 
- * one Expression node for all target nodes.<br><br>
- * 
- * <blockcode>
- * var exprfunc = function(node, t, l) {<br>
- * &nbsp;&nbsp;node.rotateXyz(0.0, t*0.1, 0.0);<br>
- * &nbsp;&nbsp;node.moveXyz(0.0, Math.cos(l)*0.02, 0.0);<br>
- * }<br>
- * <br>
- * var expression = Instance.setExpression("box", exprfunc)<br>
- * expression.play(0.8);<br>
- * </blockcode>
- * 
- * @see Ovoid.Expression
- * 
- * @param {string|Node} target Node object, or a string to retrieve one or 
- * several nodes whose name matches with.
- * 
- * @param {Function} f Expression function. The expression function should 
- * takes three arguments where first is the target node and second the time 
- * quantum value and third the time line value:<br>
- * <c>var expr = function(node, timeq, timel) {};</c>
- * 
- * @return {Expression} Created Expression node.
- */
-Ovoid.Instance.prototype.setExpression = function(target, f) {
-  
-  if (!(f instanceof Function)) {
-    Ovoid._log(2, this, '.setExpression', " not valid Function ("+ f +").");
-    return;
-  }
-  
-  /* retrouve la node si c'est un string */
-  var exprname;
-  var nodes;
-  if ( typeof(target) == "string" ) {
-    exprname = target;
-    nodes = this.Scene.findMatches(target);
-    if (nodes.length == 0) {
-      Ovoid._log(2, this, '.setExpression', " no node found with matching name '"
-        +target+"' in the current active scene '" + this.Scene.name + "'.");
-      return;
-    }
-  } else {
-    if(target.type & Ovoid.TRANSFORM || target.type & Ovoid.MATERIAL) {
-      exprname = target.name;
-      nodes = new Array();
-      nodes.push(target);
-    } else {
-      Ovoid._log(2, this, '.setExpression', ' node ' 
-          + target.name + ' is not a valide node type instance.');
-      return;
-    }
-  }
-
-  /* Cree la nouvelle expression */
-  var expr = this.Scene.newNode(Ovoid.EXPRESSION, exprname + "Expression");
-  Ovoid._log(3, this, '.setExpression', ' creating Expression node ' 
-          + expr.name + ' in active scene');
-  expr.addExpression(f);
-  
-  var i = nodes.length;
-  while(i--) {
-    /* Si ce n'est pas un body, cancel */
-    if (!(nodes[i].type & Ovoid.TRANSFORM || nodes[i].type & Ovoid.MATERIAL)) {
-      Ovoid._log(2, this, '.setExpression', ' node ' 
-          + nodes[i].name + ' is not a valide node type instance.');
-      continue;
-    }
-
-    Ovoid._log(3, this, '.setExpression', ' adding expression ' 
-          + expr.name + ' to ' + nodes[i].name);
-    expr.setTarget(nodes[i]);
-  }
-  return expr;
-  
-};
 
 /**
  * JavaScript Object Notation (JSON) serialization method.<br><br>

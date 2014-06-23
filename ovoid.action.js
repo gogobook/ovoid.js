@@ -437,14 +437,13 @@ Ovoid.Action.prototype.linkNode = function(node) {
       if(this.link[i] === node)
         return;
     }
+    
     node.pickable = true;
     if(!this._i.opt_renderPickingMode) {
       Ovoid._log(2,this._i,'::Action.linkNode', this.name +
           ":: linked node '"+node.name+"' set as pickable but render picking mode is disabled, that will not work.");
     }
-    if(this.onIntersect.length || 
-        this.onIntersectEnter.length || 
-        this.onIntersectLeave.length) {
+    if(this.onIntersect.length || this.onIntersectEnter.length || this.onIntersectLeave.length) {
       node.intersectable = true;
       if(!this._i.opt_sceneIntersectDetect) {
         Ovoid._log(2,this._i,'::Action.linkNode', this.name +
@@ -586,7 +585,7 @@ Ovoid.Action.prototype.cachAction = function() {
 
   if (!(this.cach & Ovoid.CACH_ACTION))
   {
-    var i;
+    var i, j, k, l;
     var c = this._i.Input;
     try { /* handle exceptions car des fonctions sont custom */
       
@@ -594,15 +593,16 @@ Ovoid.Action.prototype.cachAction = function() {
       i = this.link.length;
       while (i--)
       {
+        l = this.link[i];
         
-        if (this.link[i].uid == c.mouseLeaveUid) {
-          this.onLeave(this.link[i]);
+        if (l.uid == c.mouseLeaveUid) {
+          this.onLeave(l);
           document.body.style.cursor = 'default';
         }
         
-        if (this.link[i].uid == c.mouseEnterUid) {
-          this.onEnter(this.link[i]);
-          c.mouseOverNode = this.link[i];
+        if (l.uid == c.mouseEnterUid) {
+          this.onEnter(l);
+          c.mouseOverNode = l;
         }
           
         /* le pickId est-il dans le background ? */
@@ -610,100 +610,100 @@ Ovoid.Action.prototype.cachAction = function() {
             c.mouseOverNode = null;
         } else {
           /* La node est-elle sous la souris ? */
-          if (this.link[i].uid == c.mouseOverUid) {
+          if (l.uid == c.mouseOverUid) {
             document.body.style.cursor = 'pointer';
-            this.onOver(this.link[i]);
+            this.onOver(l);
             /* y'a-t-il une node grabbed ? */
             if (!c.grabbedNode) {
               /* si non on test tous les evenements */
-              if (c.intDn[0]) this.onLmbDn(this.link[i]);
-              if (c.intUp[0]) this.onLmbUp(this.link[i]);
-              if (c.intHl[0]) this.onLmbHl(this.link[i]);
-              if (c.intDn[1]) this.onMmbDn(this.link[i]);
-              if (c.intUp[1]) this.onMmbUp(this.link[i]);
-              if (c.intHl[1]) this.onMmbHl(this.link[i]);
-              if (c.intDn[2]) this.onRmbDn(this.link[i]);
-              if (c.intUp[2]) this.onRmbUp(this.link[i]);
-              if (c.intHl[2]) this.onRmbHl(this.link[i]);
+              if (c.intDn[0]) this.onLmbDn(l);
+              if (c.intUp[0]) this.onLmbUp(l);
+              if (c.intHl[0]) this.onLmbHl(l);
+              if (c.intDn[1]) this.onMmbDn(l);
+              if (c.intUp[1]) this.onMmbUp(l);
+              if (c.intHl[1]) this.onMmbHl(l);
+              if (c.intDn[2]) this.onRmbDn(l);
+              if (c.intUp[2]) this.onRmbUp(l);
+              if (c.intHl[2]) this.onRmbHl(l);
             }
           }
         }
 
         /* cette node est-elle la grabbed one ? */
-        if (this.link[i] == c.grabbedNode) {
+        if (l == c.grabbedNode) {
           /* modifie le curseur */
           document.body.style.cursor = 'crosshair';
-          this.onGrabd(this.link[i]);
+          this.onGrabd(l);
           /* on test tous les évements */
-          if (c.intDn[0]) this.onLmbDn(this.link[i]);
-          if (c.intUp[0]) this.onLmbUp(this.link[i]);
-          if (c.intHl[0]) this.onLmbHl(this.link[i]);
-          if (c.intDn[1]) this.onMmbDn(this.link[i]);
-          if (c.intUp[1]) this.onMmbUp(this.link[i]);
-          if (c.intHl[1]) this.onMmbHl(this.link[i]);
-          if (c.intDn[2]) this.onRmbDn(this.link[i]);
-          if (c.intUp[2]) this.onRmbUp(this.link[i]);
-          if (c.intHl[2]) this.onRmbHl(this.link[i]);
+          if (c.intDn[0]) this.onLmbDn(l);
+          if (c.intUp[0]) this.onLmbUp(l);
+          if (c.intHl[0]) this.onLmbHl(l);
+          if (c.intDn[1]) this.onMmbDn(l);
+          if (c.intUp[1]) this.onMmbUp(l);
+          if (c.intHl[1]) this.onMmbHl(l);
+          if (c.intDn[2]) this.onRmbDn(l);
+          if (c.intUp[2]) this.onRmbUp(l);
+          if (c.intHl[2]) this.onRmbHl(l);
         } else {
-          this.onUgrabd(this.link[i]);
+          this.onUgrabd(l);
         }
         
-        /* intersections ? */
-        if(this.onIntersect[0].length) {
-          var j = this.link[i].intersect.count;
-          var k = this.onIntersect[0].length;
-          while (k --) {
-            // Si l'argument est null, on applique à toutes les nodes
-            if(this.onIntersect[0][k] == null) {
-              while (j--) {
-                this.onIntersect[1][k](this.link[i], this.link[i].intersect[j]);
-              }
-            } else {
-              while (j--) {
-                if(this.link[i].intersect[j] === this.onIntersect[0][k])
-                  this.onIntersect[1][k](this.link[i], this.link[i].intersect[j]);
+        if(this._i.opt_sceneIntersectDetect) {
+          /* intersections ? */
+          k = this.onIntersect[0].length;
+          if(l.intersect.count && k) {
+            while (k --) {
+              // Si l'argument est null, on applique à toutes les nodes
+              j = l.intersect.count;
+              if(this.onIntersect[0][k] == null) {
+                while (j--) {
+                  this.onIntersect[1][k](l, l.intersect[j]);
+                }
+              } else {
+                while (j--) {
+                  if(l.intersect[j] === this.onIntersect[0][k])
+                    this.onIntersect[1][k](l, l.intersect[j]);
+                }
               }
             }
           }
-        }
-        
-        /* intersections enter ? */
-        if(this.onIntersectEnter[0].length) {
-          var j = this.link[i].enter.count;
-          var k = this.onIntersectEnter[0].length;
-          while (k --) {
-            // Si l'argument est null, on applique à toutes les nodes
-            if(this.onIntersectEnter[0][k] == null) {
-              while (j--) {
-                this.onIntersectEnter[1][k](this.link[i], this.link[i].enter[j]);
-              }
-            } else {
-              while (j--) {
-                if(this.link[i].enter[j] === this.onIntersectEnter[0][k])
-                  this.onIntersectEnter[1][k](this.link[i], this.link[i].enter[j]);
-              }
-            }
-          }
-        }
-        
-        /* intersections Leave ? */
-        if(this.onIntersectLeave[0].length) {
-          var j = this.link[i].leave.count;
-          var k = this.onIntersectLeave[0].length;
-          while (k --) {
-            // Si l'argument est null, on applique à toutes les nodes
-            if(this.onIntersectLeave[0][k] == null) {
-              while (j--) {
-                this.onIntersectLeave[1][k](this.link[i], this.link[i].leave[j]);
-              }
-            } else {
-              while (j--) {
-                if(this.link[i].leave[j] === this.onIntersectLeave[0][k])
-                  this.onIntersectLeave[1][k](this.link[i], this.link[i].leave[j]);
+          /* intersections enter ? */
+          k = this.onIntersectEnter[0].length;
+          if(l.enter.count && k) {
+            while (k --) {
+              // Si l'argument est null, on applique à toutes les nodes
+              j = l.enter.count;
+              if(this.onIntersectEnter[0][k] == null) {
+                while (j--) {
+                  this.onIntersectEnter[1][k](l, l.enter[j]);
+                }
+              } else {
+                while (j--) {
+                  if(l.enter[j] === this.onIntersectEnter[0][k])
+                    this.onIntersectEnter[1][k](l, l.enter[j]);
+                }
               }
             }
           }
-        }
+          /* intersections Leave ? */
+          k = this.onIntersectLeave[0].length;
+          if(l.leave.count && k) {
+            while (k --) {
+              j = l.leave.count;
+              // Si l'argument est null, on applique à toutes les nodes
+              if(this.onIntersectLeave[0][k] == null) {
+                while (j--) {
+                  this.onIntersectLeave[1][k](l, l.leave[j]);
+                }
+              } else {
+                while (j--) {
+                  if(l.leave[j] === this.onIntersectLeave[0][k])
+                    this.onIntersectLeave[1][k](l, l.leave[j]);
+                }
+              }
+            }
+          }
+        } // if(this._i.opt_sceneIntersectDetect)
       }
     } catch(e) {
       Ovoid._log(0, this._i, '::Action.cachAction', this.name + 

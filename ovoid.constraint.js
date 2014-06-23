@@ -50,7 +50,7 @@ Ovoid.Constraint = function(name, i) {
   /** Node name 
    * @type string */
   this.name = name;
-  /** Constraint's target node 
+  /** Constraint's target nodes 
    * @type Node */
   this.target = new Array();
   
