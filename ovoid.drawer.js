@@ -2623,8 +2623,6 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
   for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     if(this._i.Queuer.qsolid[i].count)
       this.bodyStack(this._i.Queuer.qsolid[i], i, false, false);
-    if(this._i.Queuer.qalpha[i].count)
-      this.bodyStack(this._i.Queuer.qalpha[i], i, false, false);
   }
   this._renderpasses++;
 }
