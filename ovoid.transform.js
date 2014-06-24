@@ -30,7 +30,7 @@
  * rotation, scale...<br><br>
  * 
  * <blockcode>
- * var locator = scene.create(Ovoid.TRANSFORM, "nullobject");<br>
+ * var locator = Instance.Scene.newNode(Ovoid.TRANSFORM, "nullobject");<br>
  * locator.moveXyz(5.0, -2.0, 0.0, Ovoid.WORLD, Ovoid.ABSOLUT);<br>
  * locator.rotateXyz(0.0, 1.57, 0.0, Ovoid.LOCAL, Ovoid.RELATIVE);<br>
  * </blockcode><br><br>

@@ -31,11 +31,11 @@
  * rotated, scaled...<br><br>
  * 
  * <blockcode>
- * var spot = scene.create(Ovoid.LIGHT, "redSpot");<br>
+ * var spot = Instance.Scene.newNode(Ovoid.LIGHT, "redSpot");<br>
  * spot.setColorRgba(1.0, 0.0, 0.0, 1.0);<br>
  * spot.setSpotAngle(45.0, 0.05);<br>
  * <br>
- * var lamp = scene.create(Ovoid.LIGHT, "pointLight");<br>
+ * var lamp = Instance.Scene.newNode(Ovoid.LIGHT, "pointLight");<br>
  * lamp.setColorRgba(1.0, 1.0, 1.0, 1.0);<br>
  * </blockcode><br><br>
  * 

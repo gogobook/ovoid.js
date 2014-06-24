@@ -34,7 +34,7 @@
  * dependency node and does not takes place directly in the 3D world.<br><br>
  * 
  * <blockcode>
- * var material = scene.create(Ovoid.MATERIAL, "green");<br>
+ * var material = Instance.Scene.newNode(Ovoid.MATERIAL, "green");<br>
  * material.setColorRgba(Ovoid.DIFFUSE, 0.0, 1.0, 0.0, 1.0);<br>
  * material.setTexture(Ovoid.DIFFUSE, anyTexture);<br>
  * </blockcode><br><br>

@@ -33,7 +33,7 @@
  * corresponds to the canvas/client area.<br><br>
  * 
  * <blockcode>
- * var hello = scene.create(Ovoid.TEXT, "BlueText");<br>
+ * var hello = Instance.Scene.newNode(Ovoid.TEXT, "BlueText");<br>
  * hello.setFgColorRgba(0.0, 0.5, 1.0, 1.0);<br>
  * hello.moveXyz(320, 240, 0.0);<br>
  * hello.string = "Hello World !";<br>

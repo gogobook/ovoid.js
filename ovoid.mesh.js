@@ -45,7 +45,7 @@
  * shapes with different transformations (rotation, position, etc...).<br><br>
  * 
  * <blockcode>
- * &nbsp;&nbsp;var mesh = scene.create(Ovoid.MESH, "box1");<br>
+ * &nbsp;&nbsp;var mesh = Instance.Scene.newNode(Ovoid.MESH, "box1");<br>
  * &nbsp;&nbsp;body1.setShape(mesh);<br>
  * &nbsp;&nbsp;body2.setShape(mesh);<br>
  * </blockcode><br><br>

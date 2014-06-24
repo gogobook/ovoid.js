@@ -34,7 +34,7 @@
  * its target node's transformations.<br><br>
  * 
  * <blockcode>
- * var phyics = scene.create(Ovoid.PHYSICS, "bodyPhysics");<br>
+ * var phyics = Instance.Scene.newNode(Ovoid.PHYSICS, "bodyPhysics");<br>
  * physics.model = Ovoid.RIGID_MASSIVE_SPHERE;<br>
  * physics.setTarget(body);<br>
  * </blockcode><br><br>

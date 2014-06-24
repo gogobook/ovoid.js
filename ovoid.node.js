@@ -42,8 +42,8 @@
  * transformation (in parent space coordinate) applied to its parents.<br><br>
  * 
  * <blockcode>
- * var node0 = scene.create(Ovoid.NODE, "node0");<br>
- * var node1 = scene.create(Ovoid.NODE, "node1");<br>
+ * var node0 = Instance.Scene.newNode(Ovoid.NODE, "node0");<br>
+ * var node1 = Instance.Scene.newNode(Ovoid.NODE, "node1");<br>
  * node0.setParent(node1);<br>
  * </blockcode><br><br>
  * 
@@ -60,8 +60,8 @@
  * order to fulfill updates of an other one.<br><br>
  * 
  * <blockcode>
- * var node0 = scene.create(Ovoid.NODE, "node0");<br>
- * var node1 = scene.create(Ovoid.NODE, "node1");<br>
+ * var node0 = Instance.Scene.newNode(Ovoid.NODE, "node0");<br>
+ * var node1 = Instance.Scene.newNode(Ovoid.NODE, "node1");<br>
  * node0.makeDepend(node1);<br>
  * </blockcode><br><br>
  * 

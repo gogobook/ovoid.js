@@ -32,10 +32,10 @@
  * an Audio node assigned.<br><br>
  * 
  * <blockcode>
- * var vroum = scene.create(Ovoid.AUDIO, "vroum");<br>
+ * var vroum = Instance.Scene.newNode(Ovoid.AUDIO, "vroum");<br>
  * vroum.loadSource("vroum.ogg");<br>
  * <br>
- * var sound = scene.create(Ovoid.SOUND, "engineSound");<br>
+ * var sound = Instance.Scene.newNode(Ovoid.SOUND, "engineSound");<br>
  * sound.setAudio(vroum);<br>
  * sound.spatialize(true);<br>
  * </blockcode><br><br>

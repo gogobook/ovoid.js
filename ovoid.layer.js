@@ -35,7 +35,7 @@
  * context through 3D environment.<br><br>
  * 
  * <blockcode>
- * var logo = scene.create(Ovoid.LAYER, "logo");<br>
+ * var logo = Instance.Scene.newNode(Ovoid.LAYER, "logo");<br>
  * logo.setBgColorRgba(1.0, 0.5, 0.0, 1.0);<br>
  * logo.setBgTexture(logoTexture);<br>
  * logo.setSize(320, 240);<br>

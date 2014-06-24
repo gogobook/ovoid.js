@@ -33,7 +33,7 @@
  * sequence, which should all be started and ended at the same time.<br><br>
  * 
  * <blockcode>
- * var characterSet1 = scene.create(Ovoid.TRACK, "CharacterSet1");<br>
+ * var characterSet1 = Instance.Scene.newNode(Ovoid.TRACK, "CharacterSet1");<br>
  * characterSet1.addAnimation(leftArmAnimation);<br>
  * characterSet1.addAnimation(rightArmAnimation);<br>
  * characterSet1.addAnimation(LeftLegAnimation);<br>

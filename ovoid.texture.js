@@ -30,7 +30,7 @@
  * dependency node and does not takes place directly in the 3D world.<br><br>
  * 
  * <blockcode>
- * var brick = scene.create(Ovoid.TEXTURE, "BrickTexture");<br>
+ * var brick = Instance.Scene.newNode(Ovoid.TEXTURE, "BrickTexture");<br>
  * brick.loadSource("brickwall.png", true);<br>
  * </blockcode><br><br>
  * 
