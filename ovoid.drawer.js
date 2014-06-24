@@ -2581,8 +2581,10 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
       this.gl.stencilFunc(0x0207,0,0); // ALWAYS,0,0
   
       for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-        if(!this._i.Queuer.qsolid[i].count) continue;
-        this.zfailStack(this._i.Queuer.qlight[l], this._i.Queuer.qsolid[i]);
+        if(this._i.Queuer.qsolid[i].count)
+          this.zfailStack(this._i.Queuer.qlight[l], this._i.Queuer.qsolid[i]);
+        if(this._i.Queuer.qalpha[i].count)
+          this.zfailStack(this._i.Queuer.qlight[l], this._i.Queuer.qalpha[i]);
       }
       
       this.gl.stencilFunc(0x0202,0,-1); // EQUAL

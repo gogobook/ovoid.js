@@ -452,8 +452,7 @@ Ovoid.Emitter.prototype.cachEmitter = function() {
           // Normalize le vecteur
           V.normalize();
           // Ajuste la taille du vecteur selon le delta random
-          V.scaleBy(this.velocity + 
-              ((1.0-(Math.random()*2.0))*this.delta));
+          V.scaleBy(this.velocity + ((1.0-(Math.random()*2.0))*this.delta));
           // UV et taille du sprite de la particle
           U.set(0.0,1.0,this.size[0]);
           // Couleur de la particle
