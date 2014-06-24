@@ -53,15 +53,31 @@ Ovoid.Aim = function(name, i) {
   /** Aim up vector.
    * @type Vector */
   this.upvector = new Ovoid.Vector(0.0,1.0,0.0);
-  /** Aim vector.
-   * @type Vector */
-  this.aimvector = new Ovoid.Vector(0.0,0.0,1.0);
   /** Aim at node
    * @type Transform */
   this.aimat = null;
+
+  /** Invert aiming flag
+   * @type bool */
+  this.invert = true;
+  
+  /** X vector for internal usage
+   * @type Vector */
   this._x = new Ovoid.Vector();
+  /** Y vector for internal usage
+   * @type Vector */
   this._y = new Ovoid.Vector();
+  /** Z vector for internal usage
+   * @type Vector */
   this._z = new Ovoid.Vector();
+  
+  /** Aim point for internal usage
+   * @type Vector */
+  this._a = new Ovoid.Point();
+  
+  /** Aim moved flag for internal usage
+   * @type Bool */
+  this._amoved = true;
   
   /** Ovoid.JS parent instance
    * @type Object */
@@ -70,6 +86,74 @@ Ovoid.Aim = function(name, i) {
 };
 Ovoid.Aim.prototype = new Ovoid.Constraint;
 Ovoid.Aim.prototype.constructor = Ovoid.Aim;
+
+
+
+/**
+ * Set the node to be aimed.<br><br>
+ *
+ * Assign the specified node as aimed node of this instance. 
+ * The node must be of type or inherited of Ovoid.TRANSFORM.
+ * 
+ * @param {Node} node Node object to set as the aimed one.
+ * 
+ * @see Ovoid.Node
+ */
+Ovoid.Aim.prototype.setAimedNode = function(node) {
+  
+  if(node) {
+    if(node.type) {
+      if(node.type & Ovoid.TRANSFORM) {
+        this.aimat = node;
+        return;
+      }
+    }
+  }
+  this.aimat = null;
+  
+};
+
+
+/**
+ * Set the Up vector from Vector object.<br><br>
+ *
+ * Defines the Up vector for aiming computation.
+ * 
+ * @param {Vector} vect Vector to copy as up Vector.
+ */
+Ovoid.Aim.prototype.setUpVector = function(vect) {
+  
+  this.upvector.copy(vect);
+};
+
+
+/**
+ * Set the Up vector.<br><br>
+ *
+ * Defines the Up vector for aiming computation.
+ * 
+ * @param {Float} x X component for Up vector.
+ * @param {Float} y Y component for Up vector.
+ * @param {Float} z Z component for Up vector.
+ */
+Ovoid.Aim.prototype.setUpVectorXyz = function(x, y, z) {
+  
+  this.upvector.set(x, y, z);
+};
+
+
+/**
+ * Set invert aiming.<br><br>
+ *
+ * Defines aiming inversion. If <c>true</c> aiming is oriented to -Z, 
+ * otherwise it is oriented to +Z.
+ * 
+ * @param {Bool} inv Inversion flag value.
+ */
+Ovoid.Aim.prototype.setInvert = function(inv) {
+  
+  this.invert = inv;
+};
 
 
 /**
@@ -83,41 +167,61 @@ Ovoid.Aim.prototype.constructor = Ovoid.Aim;
  */
 Ovoid.Aim.prototype.cachAim = function() {
 
-  if(this.aimat) {
-    // Pour chaque target
-    var i = this.target.length;
-    while(i--) {
-      if(!(this.aimat.cach & Ovoid.CACH_WORLD) || 
-          !(this.target[i].cach & Ovoid.CACH_WORLD)) {
-        
-        // Construits les axes 
-        this._z.subOf(this.target[i].worldPosition, this.aimat.worldPosition);
-        this._z.normalize();
-        this._x.crossOf(this.upvector, this._z);
-        this._y.crossOf(this._z, this._x);
-        
-        /* Convertis les axes en angles d'euler selon le schema d'une matrice 
-         * de transformation:
-         * 
-         * | m0=x0  m1=x1  m2=x2  |
-         * | m4=y0  m5=y1  m6=y2  |
-         * | m8=z0  m9=z1  m10=z2 |
-         */
-        var rx, ry, rz;
-        var cy = Math.sqrt(this._x.v[0] * this._x.v[0] + this._x.v[1] * this._x.v[1]);
-        if (cy > 0.001) {
-          rx = Math.atan2(this._y.v[2], this._z.v[2]);
-          ry = Math.atan2(-this._x.v[2], cy);
-          rz = Math.atan2(this._x.v[1], this._x.v[0]);
-        } else {
-          rx = Math.atan2(-this._z.v[1], this._y.v[1]);
-          ry = Math.atan2(-this._x.v[2], cy);
-          rz = 0.0;
-        }
-        // On applique la rotation au target
-        this.target[i].rotateXyz(0.0,0.0,0.0,0,1);
-        this.target[i].rotateXyz(rx,ry,rz);
+  if(!this.aimat)
+    return;
+  
+  // Ca evite de tout recalculer si rien n'a bougé du aimat et du constraint'target
+  if(this._a.equal(this.aimat.worldPosition)) {
+    this._amoved=false
+  } else {
+    this._amoved=true;
+    this._a.copy(this.aimat.worldPosition);
+  }
+  
+  var i = this.target.length;
+  while(i--) {
+    if(!(this.target[i].cach & Ovoid.CACH_WORLD) || this._amoved) {
+      
+      // Construits les axes 
+      if(this.invert) {
+        this._z.subOf(this.target[i].worldPosition, this._a);
+      } else {
+        this._z.subOf(this._a, this.target[i].worldPosition);
       }
+      
+      // Evite la division par zero si aimat et target sont confondus ou si les vecteurs s'annullent completement
+      if(this._z.v[0] == 0.0 && this._z.v[1] == 0.0 && this._z.v[2] == 0.0)
+        return;
+
+      this._z.normalize();
+      this._x.crossOf(this.upvector, this._z);
+      this._y.crossOf(this._z, this._x);
+      
+      /* Convertis les axes en angles d'euler selon le schema d'une matrice 
+       * de transformation:
+       * 
+       * | m0=x0  m1=x1  m2=x2  |
+       * | m4=y0  m5=y1  m6=y2  |
+       * | m8=z0  m9=z1  m10=z2 |
+       */
+      var rx, ry, rz;
+      var cy = Math.sqrt(this._x.v[0] * this._x.v[0] + this._x.v[1] * this._x.v[1]);
+      if (cy > 0.001) {
+        rx = Math.atan2(this._y.v[2], this._z.v[2]);
+        ry = Math.atan2(-this._x.v[2], cy);
+        rz = Math.atan2(this._x.v[1], this._x.v[0]);
+      } else {
+        rx = Math.atan2(-this._z.v[1], this._y.v[1]);
+        ry = Math.atan2(-this._x.v[2], cy);
+        rz = 0.0;
+      }
+
+      // Evite les accidents en cas d'exception arythmétique
+      if( rx == NaN || ry == NaN || rz == NaN)
+        return;
+      // On applique la rotation au target
+      this.target[i].rotateXyz(0.0,0.0,0.0,0,1);
+      this.target[i].rotateXyz(rx,ry,rz);
     }
   }
   

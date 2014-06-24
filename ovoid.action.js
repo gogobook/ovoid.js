@@ -443,7 +443,7 @@ Ovoid.Action.prototype.linkNode = function(node) {
       Ovoid._log(2,this._i,'::Action.linkNode', this.name +
           ":: linked node '"+node.name+"' set as pickable but render picking mode is disabled, that will not work.");
     }
-    if(this.onIntersect.length || this.onIntersectEnter.length || this.onIntersectLeave.length) {
+    if((this.onIntersect.length || this.onIntersectEnter.length || this.onIntersectLeave.length) && (node.type & Ovoid.BODY)) {
       node.intersectable = true;
       if(!this._i.opt_sceneIntersectDetect) {
         Ovoid._log(2,this._i,'::Action.linkNode', this.name +
@@ -648,7 +648,7 @@ Ovoid.Action.prototype.cachAction = function() {
           this.onUgrabd(l);
         }
         
-        if(this._i.opt_sceneIntersectDetect) {
+        if(this._i.opt_sceneIntersectDetect && (l.type & Ovoid.BODY)) {
           /* intersections ? */
           k = this.onIntersect[0].length;
           if(l.intersect.count && k) {

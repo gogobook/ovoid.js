@@ -1792,8 +1792,9 @@ Ovoid.Drawer.prototype.text = function(text, color) {
  * 
  * @param {Mesh} mesh Mesh node to be drawn.
  * @param {Color} [color] Optionnal flat color.
+ * @param {Bool} [alpha] Optionnal draw as alpha.
  */
-Ovoid.Drawer.prototype.mesh = function(mesh, color) {
+Ovoid.Drawer.prototype.mesh = function(mesh, color, alpha) {
 
   var l, j, k, s, m;
   l = mesh._lod;
@@ -1823,6 +1824,7 @@ Ovoid.Drawer.prototype.mesh = function(mesh, color) {
       this.sp.setUniform1f(15,m.shininess);
       this.sp.setUniform1f(16,m.opacity);
       this.sp.setUniform1f(17,m.reflectivity);
+      this.sp.setUniform1f(18,m.bumpiness);
       /* bind texture */
       for (k = 0; k < 6; k++) {
         if(this.sp.uniformSampler[k] != -1) {
@@ -1831,8 +1833,19 @@ Ovoid.Drawer.prototype.mesh = function(mesh, color) {
           this.gl.uniform1i(this.sp.uniformSampler[k], k);
         }
       }
-      /* TRIANGLES, count, UNSIGNED_SHORT, offset */
-      this.gl.drawElements(s.mode,s.icount,0x1403,s.ioffset);
+      /* dessin special si c'est un alpha*/
+      if(!alpha) {
+        /* TRIANGLES, count, UNSIGNED_SHORT, offset */
+        this.gl.drawElements(s.mode,s.icount,0x1403,s.ioffset);
+      } else {
+        this.setCull(2); // CULL FRONT
+        /* TRIANGLES, count, UNSIGNED_SHORT, offset */
+        this.gl.drawElements(s.mode,s.icount,0x1403,s.ioffset);
+        this.setCull(3); // CULL BACK
+        /* TRIANGLES, count, UNSIGNED_SHORT, offset */
+        this.gl.drawElements(s.mode,s.icount,0x1403,s.ioffset);
+        this.setCull(this._i.opt_renderCullFace);
+      }
       this._drawnpolyset++;
     }
   }
@@ -1850,6 +1863,7 @@ Ovoid.Drawer.prototype.mesh = function(mesh, color) {
  */
 Ovoid.Drawer.prototype.emitter = function(emitter, layer, color) {
   
+  this.setCull(0); // disable face culling
   if (color) {
     if(emitter.billboard) {
       this.switchPipe(27,layer); // PIPE_RP_BILLBOARD
@@ -1932,10 +1946,11 @@ Ovoid.Drawer.prototype.emitter = function(emitter, layer, color) {
       this._drawnparticle+=n;
     }
   }
-  // restore depth, blend et pipe
+  // restore depth, blend, pipe et culling
   this.restoreBlend();
   this.restoreDepth();
   this.restorePipe();
+  this.setCull(this._i.opt_renderCullFace);
 };
 
 
@@ -2263,12 +2278,13 @@ Ovoid.Drawer.prototype.helpers = function(tform) {
  * @param {Body} body Body node.
  * @param {int} layer Render layer to use.
  * @param {Color} [color] Optionnal flat color.
+ * @param {Bool} [alpha] Draw as alpha.
  */
-Ovoid.Drawer.prototype.body = function(body, layer, color) {
+Ovoid.Drawer.prototype.body = function(body, layer, color, alpha) {
   
   if (body.shape.type & Ovoid.MESH) {
     this.model(body.worldMatrix.m, body.normalMatrix.m);
-    this.mesh(body.shape, color);
+    this.mesh(body.shape, color, alpha);
     body.addCach(Ovoid.CACH_WORLD);
     return;
   }
@@ -2276,7 +2292,7 @@ Ovoid.Drawer.prototype.body = function(body, layer, color) {
     if (body.shape.mesh) {
       this.model(body.shape.infMxfArray, body.shape.infMnrArray);
       this.enable(6);
-      this.mesh(body.shape.mesh, color);
+      this.mesh(body.shape.mesh, color, alpha);
       this.disable(6);
     }
     body.addCach(Ovoid.CACH_WORLD);
@@ -2299,8 +2315,9 @@ Ovoid.Drawer.prototype.body = function(body, layer, color) {
  * @param {int} layer Render layer to use.
  * @param {bool} [rp] Optionnal draw for readPixel picking frame (per-id flat
  * color).
+ * @param {bool} [alpha] Draw as alpha
  */
-Ovoid.Drawer.prototype.bodyStack = function(stack, layer, rp) {
+Ovoid.Drawer.prototype.bodyStack = function(stack, layer, rp, alpha) {
   
   var i = stack.count;
   if (rp) {
@@ -2308,12 +2325,12 @@ Ovoid.Drawer.prototype.bodyStack = function(stack, layer, rp) {
     while(i--) {
       if(stack[i].pickable) {
         color.fromInt(stack[i].uid);
-        this.body(stack[i], layer, color);
+        this.body(stack[i], layer, color, alpha);
       }
     }
   } else {
     while(i--) {
-      this.body(stack[i], layer);
+      this.body(stack[i], layer, null, alpha);
     }
   }
 };
@@ -2429,18 +2446,11 @@ Ovoid.Drawer.prototype.normalsStack = function(stack) {
  */
 Ovoid.Drawer.prototype.zfailStack = function(light, stack) {
 
-  this.gl.enable(0x0B90); // STENCIL_TEST
-  this.gl.clear(0x00000400); // STENCIL_BUFFER_BIT
-  this.gl.colorMask(0,0,0,0); 
-  this.gl.stencilFunc(0x0207,0,0); // ALWAYS,0,0
   var i = stack.count;
   while(i--) {
     if(stack[i].shadowCasting)
       this.shadow(light, stack[i]);
   }
-  this.gl.stencilFunc(0x0202,0,-1); // EQUAL
-  this.gl.stencilOp(0x1E00,0x1E00,0x1E00); // KEEP,KEEP,KEEP
-  this.gl.colorMask(1,1,1,1);
 };
 
 
@@ -2459,14 +2469,13 @@ Ovoid.Drawer.prototype.drawQueueRP = function() {
     this.beginRpDraw();
     this.switchBlend(0); // blend off
     this.switchDepth(1); // depth mask on, test less
+    this.setCull(this._i.opt_renderCullFace);
     if(this._i.opt_renderPickingMode & 2) { /* Ovoid.RP_WORLD */
       for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
         this.switchPipe(20,0); //PIPE_RP_GEOMETRY
         this.persp(this._i.Queuer._rcamera);
-        this.setCull(this.opt_renderCullFace);
-        this.bodyStack(this._i.Queuer.qsolid[i], 0, true);
-        this.setCull(0); // no cull
-        this.bodyStack(this._i.Queuer.qalpha[i], 0, true);
+        this.bodyStack(this._i.Queuer.qsolid[i], 0, true, false);
+        this.bodyStack(this._i.Queuer.qalpha[i], 0, true, true);
       }
     }
     if (this._i.opt_renderDrawLayers && (this._i.opt_renderPickingMode & 1)) { /* Ovoid.RP_OVERLAY */
@@ -2537,7 +2546,7 @@ Ovoid.Drawer.prototype.drawQueueHL = function() {
 Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
   
   var i;
-  this.setCull(this.opt_renderCullFace);
+  this.setCull(this._i.opt_renderCullFace);
   this.switchBlend(3); // blending substracting alpha
   this.switchDepth(1); // depth mask on, test less
   
@@ -2552,7 +2561,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
     this.ambient();  // set scene ambiant parameters
     this.disable(0); // disable diffuse; ENd 
     this.enable(1);  // enable ambient; ENa 
-    this.bodyStack(this._i.Queuer.qsolid[i], i, false);
+    this.bodyStack(this._i.Queuer.qsolid[i], i, false, false);
   }
   this._renderpasses++;
   // Passes de rendu par lumiere
@@ -2565,12 +2574,23 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
       this.switchPipe(6,0); // PIPE_SHADOW_VOLUME
       this.switchBlend(0); // blend off
       this.switchDepth(2); // mask off, test less
+      
+      this.gl.enable(0x0B90); // STENCIL_TEST
+      this.gl.clear(0x00000400); // STENCIL_BUFFER_BIT
+      this.gl.colorMask(0,0,0,0); 
+      this.gl.stencilFunc(0x0207,0,0); // ALWAYS,0,0
+  
       for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
         if(!this._i.Queuer.qsolid[i].count) continue;
         this.zfailStack(this._i.Queuer.qlight[l], this._i.Queuer.qsolid[i]);
       }
+      
+      this.gl.stencilFunc(0x0202,0,-1); // EQUAL
+      this.gl.stencilOp(0x1E00,0x1E00,0x1E00); // KEEP,KEEP,KEEP
+      this.gl.colorMask(1,1,1,1);
+
       // retour au culling par default
-      this.setCull(this.opt_renderCullFace);
+      this.setCull(this._i.opt_renderCullFace);
       this.restoreBlend(); // one, one
       this.restoreDepth(); 
     }
@@ -2582,7 +2602,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
       this.enable(0); // enable diffuse
       this.disable(1); // disable ambient
       this.light(this._i.Queuer.qlight[l]);
-      this.bodyStack(this._i.Queuer.qsolid[i], i, false);
+      this.bodyStack(this._i.Queuer.qsolid[i], i, false, false);
     }
     this._renderpasses++;
   }
@@ -2600,7 +2620,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
   
   for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
     if(!this._i.Queuer.qsolid[i].count) continue;
-    this.bodyStack(this._i.Queuer.qsolid[i], i, false);
+    this.bodyStack(this._i.Queuer.qsolid[i], i, false, false);
   }
   this._renderpasses++;
 }
@@ -2614,7 +2634,7 @@ Ovoid.Drawer.prototype.drawQueueLP = function(pipe) {
  */
 Ovoid.Drawer.prototype.drawQueue1P = function(pipe) {
 
-  this.setCull(this.opt_renderCullFace);
+  this.setCull(this._i.opt_renderCullFace);
   this.switchBlend(3); // blending disabled
   this.switchDepth(1); // depth mask on, test less
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
@@ -2625,7 +2645,7 @@ Ovoid.Drawer.prototype.drawQueue1P = function(pipe) {
     this.enable(0); // enable diffuse; ENd 
     this.enable(1); // enable ambient; ENa 
     this.light(this._i.Queuer.qlight);
-    this.bodyStack(this._i.Queuer.qsolid[i], i, false);
+    this.bodyStack(this._i.Queuer.qsolid[i], i, false, false);
   }
   this._renderpasses++;
 }
@@ -2639,7 +2659,6 @@ Ovoid.Drawer.prototype.drawQueue1P = function(pipe) {
  */
 Ovoid.Drawer.prototype.drawQueueFX = function(pipe) {
 
-  this.setCull(0); // disable face culling
   this.switchBlend(3); // blend substractive alpha
   this.switchDepth(2); // depthMask off, depth test less
   for(var i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
@@ -2648,7 +2667,7 @@ Ovoid.Drawer.prototype.drawQueueFX = function(pipe) {
     this.persp(this._i.Queuer._rcamera);
     this.ambient();   // set scene ambiant parameters
     this.light(this._i.Queuer.qlight);
-    this.bodyStack(this._i.Queuer.qalpha[i], i, false);
+    this.bodyStack(this._i.Queuer.qalpha[i], i, false, true);
   }
   this._renderpasses++;
 }

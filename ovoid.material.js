@@ -101,7 +101,7 @@ Ovoid.Material = function(name, i) {
   /** node name.
    * @type string */
   this.name = name;
-  /** Materia components color array.
+  /** Material components color array.
    * @type Color[] */
   this.color = Ovoid.Color.newArray(5);
 
@@ -111,22 +111,25 @@ Ovoid.Material = function(name, i) {
   this.color[3].set(0.0, 0.0, 0.0, 1.0);
   this.color[4].set(1.0, 1.0, 1.0, 1.0);
 
-  /** Materia components texture array.
+  /** Material components texture array.
    * @type Texture[] */
   this.texture = new Array(6);
   var j = 6;
   while (j--) { this.texture[j] = null; }
 
-  /** Materia shininess.
+  /** Material shininess.
    * @type float */
   this.shininess = 100.0;
   /** Materia reflectivity factor.
    * @type float */
   this.reflectivity = 0.0;
-  /** Materia opacity factor.
+  /** Material opacity factor.
    * @type float */
   this.opacity = 1.0;
-  
+  /** Material bumpiness factor.
+   * @type float */
+  this.bumpiness = 0.0;
+
   /** Ovoid.JS parent instance
    * @type Object */
   this._i = i;
