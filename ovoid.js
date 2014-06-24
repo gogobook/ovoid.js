@@ -190,6 +190,8 @@ Ovoid._err = function(code, instance, message) {
       } else {
         DOMnode.innerHTML = stderr;
       }
+    } else {
+      DOMnode.innerHTML = csterr;
     }
   } else {
     console.log(stderr);
