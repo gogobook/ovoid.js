@@ -374,8 +374,8 @@ Ovoid.Queuer.prototype._QSzSort = function(a, p, r) {
   var q;
   if( p < r ) {
     q = this._QSzParter(a, p, r);
-    this._QSzSorter(a, p, q);
-    this._QSzSorter(a, q+1, r);
+    this._QSzSort(a, p, q);
+    this._QSzSort(a, q+1, r);
   }
 };
 
