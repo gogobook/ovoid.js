@@ -338,22 +338,45 @@ Ovoid.Queuer.prototype._physicscull = function(o) {
 };
 
 
-/** 
- * Sort function for rendering order.
- * This function is typically used as class's private member and should not be 
- * called independently.
- * 
- * @param {Body} a Body object to compare distance from camera.
- * @param {Body} b Body object to compare distance from camera.
- * 
- * @return {bool} True if a is the farest from eye, false otherwise.
- * 
- * @see Ovoid.Body
+/**
+ * Sort function for rendering order (QuickSort Partitionner).<br><br>
  */
-Ovoid.Queuer.prototype._bodyZSortFunc = function(a, b) {
+Ovoid.Queuer.prototype._QSzParter = function(a, p, r) {
   
-  return a.distFromEye - b.distFromEye;
-  
+  var x = a[p].distFromEye;
+  var i = p-1;
+  var j = r+1;
+  var t;
+
+  while(1) {
+    do {
+      j--;
+    } while(a[j].distFromEye < x);
+    do {
+      i++;
+    } while(a[i].distFromEye > x);
+    if(i < j) {
+      t = array[i];
+      a[i] = a[j];
+      a[j] = t;
+    } else {
+      return j;
+    }
+  }
+  return j;
+};
+
+
+/**
+ * Sort function for rendering order (QuickSort sort).<br><br>
+ */
+Ovoid.Queuer.prototype._QSzSort = function(a, p, r) {
+  var q;
+  if( p < r ) {
+    q = this._QSzParter(a, p, r);
+    this._QSzSorter(a, p, q);
+    this._QSzSorter(a, q+1, r);
+  }
 };
 
 
@@ -559,7 +582,7 @@ Ovoid.Queuer.prototype._queueScene = function(sc) {
 
   /* Ordonne les bodys selon la distance à la camera */
   for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-    this.qalpha[i].sort(this._bodyZSortFunc);
+    this._QSzSort(this.qalpha[i], 0, this.qalpha[i].length - 1);
   }
   
 
