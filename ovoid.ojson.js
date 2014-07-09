@@ -1234,14 +1234,15 @@ Ovoid.Ojson.prototype.save = function(recp) {
       this._json = this._json.replace(/ /g, "%20"); 
       dl.setAttribute('href', 'data:text/plain;charset=utf-8,' + this._json);
       dl.setAttribute('download', this.name + ext);
+      document.body.appendChild(dl); // Pour Firefox
       dl.click();
     } catch (e) {
       Ovoid._log(1,this._i,'::Ojson.save', this.name + ":: download exception thrown: " + e);
     }
   } else {
-    Ovoid._log(1,this._i,'::Ojson.export', this.name + 
+    Ovoid._log(1,this._i,'::Ojson.save', this.name + 
       ":: unable to create download link");
-    alert("Ovoid :: Ojson.exportScene :: unable to create download link.");
+    alert("Ovoid :: Ojson.save :: unable to create download link.");
   }
   
   return this._json;
