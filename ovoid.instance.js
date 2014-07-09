@@ -1387,6 +1387,13 @@ Ovoid.Instance.prototype._init = function(canvas) {
               this._dbg[6].cachTransform();
               this._dbg[6].cachLayer();
               
+               /* test hack firefox */
+			  this.Frame.canvas.width = 1;
+			  this.Frame.canvas.height = 1;
+			  this.Frame.canvas.width = this.Frame.canvas.clientWidth;
+			  this.Frame.canvas.height = this.Frame.canvas.clientHeight;
+			  this.Frame._changed = true;
+              
             } else {
               Ovoid._log(0, this, '._init',
                   ' queuer class initialization error');
@@ -1664,6 +1671,12 @@ Ovoid.Instance.prototype._loadstart = function() {
   /* Passe en runstat 1 pour la boucle de chargement */
   this._runstat = 1;
 
+   /* Contourne le bug de firefox qui rame lorsque le canvas n'est pas redimenssionné */
+  this.Frame.canvas.width = 1;
+  this.Frame.canvas.height = 1;
+  this.Frame.canvas.width = this.Frame.canvas.clientWidth;
+  this.Frame.canvas.height = this.Frame.canvas.clientHeight;
+  
   if (this.opt_preloadStyle) {
 
     var bg = this.opt_preloadBgColor;

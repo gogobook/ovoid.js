@@ -140,7 +140,7 @@ Ovoid.Frame.prototype._init = function(canvas) {
   
   /* on garde la taille d'origine */
   this.fixed.set(this.canvas.clientWidth,this.canvas.clientHeight,0.0);
-  
+    
   /* definit la partie fixe de la matrice */
   this.matrix.m[10] = 1.0;
   this.matrix.m[3] = 0.0;
@@ -204,6 +204,7 @@ Ovoid.Frame.prototype.setMode = function(mode) {
   }
 
   this._updatepos();
+  this._updatesize();
   
   this.changed = true;
 };
