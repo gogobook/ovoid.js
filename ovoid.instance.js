@@ -1672,8 +1672,8 @@ Ovoid.Instance.prototype._loadstart = function() {
   this._runstat = 1;
 
    /* Contourne le bug de firefox qui rame lorsque le canvas n'est pas redimenssionné */
-  this.Frame.canvas.width = 1;
-  this.Frame.canvas.height = 1;
+  this.Frame.canvas.width = 2;
+  this.Frame.canvas.height = 2;
   this.Frame.canvas.width = this.Frame.canvas.clientWidth;
   this.Frame.canvas.height = this.Frame.canvas.clientHeight;
   
@@ -2180,6 +2180,11 @@ Ovoid.Instance.prototype._loaddone = function() {
   
   // On calibre le timer
   this.Timer._reset();
+   /* Contourne le bug de firefox qui rame lorsque le canvas n'est pas redimenssionné */
+  this.Frame.canvas.width = 2;
+  this.Frame.canvas.height = 2;
+  this.Frame.canvas.width = this.Frame.canvas.clientWidth;
+  this.Frame.canvas.height = this.Frame.canvas.clientHeight;
   // Pour updater les viewports et les cameras dès la premiere frame
   this.Frame.changed = true;
   
