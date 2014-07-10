@@ -58,6 +58,11 @@
  * Client size canvas. This frame mode allow HTML style and integration 
  * defining the canvas size.</li>
  * 
+ * <li><b>FRAME_STRETCHED</b><br>
+ * Stretched render buffer. This frame mode allow HTML style and integration 
+ * defining the canvas size but the render buffer size is override and
+ * stretched to fit the canvas size.</li>
+ * 
  * <li><b>FRAME_FULL_SCREEN</b> (Not yet implemented)<br>
  * Full screen size. This frame mode defines a fixed canvas size according to
  * the full screen size. NOTE: This frame mode is not yet implemented.</li>
@@ -138,9 +143,22 @@ Ovoid.Frame.prototype._init = function(canvas) {
 
   this.mode = this._i.opt_frameMode;
   
-  /* on garde la taille d'origine */
-  this.fixed.set(this.canvas.clientWidth,this.canvas.clientHeight,0.0);
-    
+  switch(this.mode)
+  {
+    case 0: // FRAME_MANUAL_SIZE
+      this.fixed.set(this._i.opt_frameWidth,this._i.opt_frameHeight,0.0);
+    break;
+    case 1: // FRAME_CLIENT_SIZE
+      /* on garde la taille d'origine */
+      this.fixed.set(this.canvas.clientWidth,this.canvas.clientHeight,0.0);
+    break;
+    case 2: // FRAME_FULL_SCREEN
+    break;
+    case 3: // FRAME_STRETCHED
+      this.fixed.set(this._i.opt_frameWidth,this._i.opt_frameHeight,0.0);
+    break;
+  }
+  
   /* definit la partie fixe de la matrice */
   this.matrix.m[10] = 1.0;
   this.matrix.m[3] = 0.0;
@@ -199,7 +217,7 @@ Ovoid.Frame.prototype._update = function() {
 Ovoid.Frame.prototype.setMode = function(mode) {
 
   this.mode = mode;
-  if (this.mode == 0) {
+  if (this.mode == 0 || this.mode == 0) {
     this.resize(this.fixed.v[0], this.fixed.v[1]);
   }
 
@@ -220,12 +238,22 @@ Ovoid.Frame.prototype.setMode = function(mode) {
  * @param {int} height Frame height.
  */
 Ovoid.Frame.prototype.resize = function(width, height) {
-    
-    if(this.mode > 0) {
+
+  switch(this.mode)
+  {
+    case 0: // FRAME_MANUAL_SIZE
+      this.fixed.set(width, height, 0.0);
+    break;
+    case 1: // FRAME_CLIENT_SIZE
       Ovoid._log(3, this._i, '.Frame.resize', ' resizing frame in FRAME_CLIENT_SIZE has no effect');
-    }
-    this.fixed.set(width, height, 0.0);
-    this._updatesize();
+    break;
+    case 2: // FRAME_FULL_SCREEN
+    break;
+    case 3: // FRAME_STRETCHED
+      this.fixed.set(width, height, 0.0);
+    break;
+  }
+  this._updatesize();
 };
 
 
@@ -267,7 +295,14 @@ Ovoid.Frame.prototype._updatesize = function() {
       this.canvas.height = this.canvas.clientHeight;
     break;
     case 2: // FRAME_FULL_SCREEN
-
+    break;
+    case 3: // FRAME_STRETCHED
+      var ox = this.canvas.width;
+      var oy = this.canvas.height;
+      this.canvas.width = this.fixed.v[0];
+      this.canvas.height = this.fixed.v[1];
+      this.canvas.clientWidth = ox;
+      this.canvas.clientHeight = oy;
     break;
   }
 
@@ -280,3 +315,20 @@ Ovoid.Frame.prototype._updatesize = function() {
   this.changed = true;
   
 };
+
+
+/**
+ * Resizing hack for firefox.<br><br>
+ */
+Ovoid.Frame.prototype._ffhack = function() {
+  
+  this.canvas.width = 2;
+  this.canvas.height = 2;
+  if(this.mode == 3) {
+    this.canvas.width = this.fixed.v[0];
+    this.canvas.height = this.fixed.v[1];
+  } else {
+    this.canvas.width = this.canvas.clientWidth;
+    this.canvas.height = this.canvas.clientHeight;
+  }
+}

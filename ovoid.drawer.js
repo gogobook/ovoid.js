@@ -906,7 +906,7 @@ Ovoid.Drawer.prototype._init = function() {
     return false;
     
   /* Initialization des parameteres WebGL par defaut */
-  this.gl.viewport(0, 0, this._i.Frame.size.v[0], this._i.Frame.size.v[1]);
+  this.gl.viewport(0, 0, this._i.Frame.canvas.width, this._i.Frame.canvas.height);
   this.gl.clear(0x4000|0x100); /* COLOR_BUFFER_BIT, DEPTH_BUFFER_BIT*/
   
   // Blend soustractif 
@@ -1241,7 +1241,7 @@ Ovoid.Drawer.prototype.beginDraw = function() {
   this._pc = (new Date().getTime());
   
   if (this._i.Frame.changed) {
-    this.gl.viewport(0,0,this._i.Frame.size.v[0],this._i.Frame.size.v[1]);
+    this.gl.viewport(0, 0, this._i.Frame.canvas.width, this._i.Frame.canvas.height);
   }
   
   /* ambient color par defaut */

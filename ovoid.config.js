@@ -224,6 +224,7 @@ Ovoid.Config = function() {
    * 
    * <c>Ovoid.FRAME_MANUAL_SIZE</c> : Manual sizing.<br>
    * <c>Ovoid.FRAME_CLIENT_SIZE</c> : Canvas style sizing.<br>
+   * <c>Ovoid.FRAME_STRETCHED</c> : Stretched render buffer.<br>
    * <c>Ovoid.FRAME_FULL_SCREEN</c> : Full screen size. (Not yet implemented)<br>
    * 
    * Default value is <c>Ovoid.FRAME_CLIENT_SIZE</c>
@@ -232,6 +233,29 @@ Ovoid.Config = function() {
    *  */
   this.opt_frameMode = Ovoid.FRAME_CLIENT_SIZE;
   
+
+  /** Default starting frame fixed width.<br><br>
+   * 
+   * Defines the default frame width for this instance. Value affects the 
+   * frame behaviour depending of the selected frame mode.<br><br>
+   * 
+   * Default value is <c>960</c>
+   * 
+   * @type int
+   *  */
+  this.opt_frameWidth = 960;
+  
+  
+  /** Default starting frame fixed height.<br><br>
+   * 
+   * Defines the default frame height for this instance. Value affects the 
+   * frame behaviour depending of the selected frame mode.<br><br>
+   * 
+   * Default value is <c>540</c>
+   * 
+   * @type int
+   *  */
+  this.opt_frameHeight = 540;
   
   /* Options timer ---------------------------------------------------*/
   

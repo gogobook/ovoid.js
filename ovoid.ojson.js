@@ -1434,6 +1434,9 @@ Ovoid.Ojson.prototype._importEnv = function(inst) {
     this._i.opt_audioDopplerFactor = env.o[42];
     /* Options divers */
     this._i.opt_skinLocalComput = env.o[43];
+    /* rajout frame */
+    this._i.opt_frameWidth = env.o[44];
+    this._i.opt_frameHeight = env.o[45];
   
   } catch (e) {
     Ovoid._log(1,this._i,'::Ojson._importEnv', this.name +

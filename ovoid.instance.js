@@ -557,6 +557,7 @@ Ovoid.Instance = function(name) {
    * 
    * <c>Ovoid.FRAME_MANUAL_SIZE</c> : Manual sizing.<br>
    * <c>Ovoid.FRAME_CLIENT_SIZE</c> : Canvas style sizing.<br>
+   * <c>Ovoid.FRAME_STRETCHED</c> : Stretched render buffer.<br>
    * <c>Ovoid.FRAME_FULL_SCREEN</c> : Full screen size. (Not yet implemented)<br>
    * 
    * Default value is <c>Ovoid.FRAME_CLIENT_SIZE</c>
@@ -565,6 +566,29 @@ Ovoid.Instance = function(name) {
    *  */
   this.opt_frameMode = Ovoid.FRAME_CLIENT_SIZE;
   
+  
+  /** Default starting frame fixed width.<br><br>
+   * 
+   * Defines the default frame width for this instance. Value affects the 
+   * frame behaviour depending of the selected frame mode.<br><br>
+   * 
+   * Default value is <c>960</c>
+   * 
+   * @type int
+   *  */
+  this.opt_frameWidth = 960;
+  
+  
+  /** Default starting frame fixed height.<br><br>
+   * 
+   * Defines the default frame height for this instance. Value affects the 
+   * frame behaviour depending of the selected frame mode.<br><br>
+   * 
+   * Default value is <c>540</c>
+   * 
+   * @type int
+   *  */
+  this.opt_frameHeight = 540;
   
   /* Options timer ---------------------------------------------------*/
   
@@ -1159,6 +1183,8 @@ Ovoid.Instance.prototype._setoptions = function(opt) {
   this.opt_preloadAcColor = opt.opt_preloadAcColor;
   /* Options de frame */
   this.opt_frameMode = opt.opt_frameMode;
+  this.opt_frameWidth = opt.opt_frameWidth;
+  this.opt_frameHeight = opt.opt_frameHeight;
   /* Options du drawer */
   this.opt_renderClearColor = opt.opt_renderClearColor;
   this.opt_renderAmbientColor = opt.opt_renderAmbientColor;
@@ -1386,13 +1412,6 @@ Ovoid.Instance.prototype._init = function(canvas) {
               this._dbg[5].cachLayer();
               this._dbg[6].cachTransform();
               this._dbg[6].cachLayer();
-              
-               /* test hack firefox */
-			  this.Frame.canvas.width = 1;
-			  this.Frame.canvas.height = 1;
-			  this.Frame.canvas.width = this.Frame.canvas.clientWidth;
-			  this.Frame.canvas.height = this.Frame.canvas.clientHeight;
-			  this.Frame._changed = true;
               
             } else {
               Ovoid._log(0, this, '._init',
@@ -1672,10 +1691,7 @@ Ovoid.Instance.prototype._loadstart = function() {
   this._runstat = 1;
 
    /* Contourne le bug de firefox qui rame lorsque le canvas n'est pas redimenssionné */
-  this.Frame.canvas.width = 2;
-  this.Frame.canvas.height = 2;
-  this.Frame.canvas.width = this.Frame.canvas.clientWidth;
-  this.Frame.canvas.height = this.Frame.canvas.clientHeight;
+  this.Frame._ffhack();
   
   if (this.opt_preloadStyle) {
 
@@ -1868,7 +1884,7 @@ Ovoid.Instance.prototype._loadstep = function() {
   this.gl.clear(this.gl.COLOR_BUFFER_BIT|this.gl.DEPTH_BUFFER_BIT);
   
   /* Initialize pour dessiner l'ecran de chargement */
-  this.gl.viewport(0,0,this.Frame.size.v[0],this.Frame.size.v[1]);
+  this.gl.viewport(0, 0, this.Frame.canvas.width, this.Frame.canvas.height);
   this.Drawer.switchPipe(4,0); /* SP_TEXT */
   this.Drawer.screen(this.Frame.matrix);
   this.Drawer.switchPipe(3,0); /* SP_LAYER */
@@ -2181,10 +2197,7 @@ Ovoid.Instance.prototype._loaddone = function() {
   // On calibre le timer
   this.Timer._reset();
    /* Contourne le bug de firefox qui rame lorsque le canvas n'est pas redimenssionné */
-  this.Frame.canvas.width = 2;
-  this.Frame.canvas.height = 2;
-  this.Frame.canvas.width = this.Frame.canvas.clientWidth;
-  this.Frame.canvas.height = this.Frame.canvas.clientHeight;
+  this.Frame._ffhack();
   // Pour updater les viewports et les cameras dès la premiere frame
   this.Frame.changed = true;
   
@@ -3030,7 +3043,7 @@ Ovoid.Instance.prototype.toJSON = function() {
     o['sp'][i] = this.Drawer._sppipe[i];
   }
   
-  o['o'] = new Array(44);
+  o['o'] = new Array(46);
   /* Options generales */
   o['o'][0] = this.opt_debugMode;
   o['o'][1] = this.opt_enableAlerts;
@@ -3084,6 +3097,9 @@ Ovoid.Instance.prototype.toJSON = function() {
   o['o'][42] = this.opt_audioDopplerFactor;
   /* Options diverses */
   o['o'][43] = this.opt_skinLocalComput;
+  /* Rajout frame */
+  o['o'][44] = this.opt_frameWidth;
+  o['o'][45] = this.opt_frameHeight;
   
   return o;
 };

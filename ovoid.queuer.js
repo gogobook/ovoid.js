@@ -424,7 +424,11 @@ Ovoid.Queuer.prototype._queueScene = function(sc) {
   
   /* Update/Cach camera si modification de frame */
   if (this._i.Frame.changed) {
-    this._rcamera.setView(this._i.Frame.size.v[0],this._i.Frame.size.v[1]);
+    if(this._i.Frame.mode == 3) { /* FRAME_STRETCHED */
+      this._rcamera.setView(this._i.Frame.fixed.v[0],this._i.Frame.fixed.v[1]);
+    } else {
+      this._rcamera.setView(this._i.Frame.size.v[0],this._i.Frame.size.v[1]);
+    }
     this._rcamera.cachCamera();
   }
 

@@ -1234,6 +1234,13 @@ Ovoid.FRAME_CLIENT_SIZE = 1;
 Ovoid.FRAME_FULL_SCREEN = 2;
 
 
+/** Symbolic constant for frame mode.
+ * @constant
+ * @memberOf _global_
+ * @see Ovoid.Frame */
+Ovoid.FRAME_STRETCHED = 3;
+
+
 /** Symbolic constant for Audio API mode.
  * @constant
  * @memberOf _global_
