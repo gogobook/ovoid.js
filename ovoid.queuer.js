@@ -356,14 +356,13 @@ Ovoid.Queuer.prototype._QSzParter = function(a, p, r) {
       i++;
     } while(a[i].distFromEye > x);
     if(i < j) {
-      t = array[i];
+      t = a[i];
       a[i] = a[j];
       a[j] = t;
     } else {
       return j;
     }
   }
-  return j;
 };
 
 
@@ -582,7 +581,7 @@ Ovoid.Queuer.prototype._queueScene = function(sc) {
 
   /* Ordonne les bodys selon la distance à la camera */
   for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-    this._QSzSort(this.qalpha[i], 0, this.qalpha[i].length - 1);
+    this._QSzSort(this.qalpha[i], 0, this.qalpha[i].length-1);
   }
   
 
