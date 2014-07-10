@@ -834,8 +834,6 @@ Ovoid._handleResize = function() {
       case 2: // FRAME_FULL_SCREEN
       break;
       case 3: // FRAME_STRETCHED
-        console.log("cwh:"+Ovoid._inst[i].Frame.canvas.clientWidth+","+Ovoid._inst[i].Frame.canvas.clientHeight);
-        console.log("wh:"+Ovoid._inst[i].Frame.canvas.width+","+Ovoid._inst[i].Frame.canvas.height);
       break;
     }
   }
