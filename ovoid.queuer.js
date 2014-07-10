@@ -348,7 +348,7 @@ Ovoid.Queuer.prototype._QSzParter = function(a, p, r) {
   var j = r+1;
   var t;
 
-  while(1) {
+  while(true) {
     do {
       j--;
     } while(a[j].distFromEye < x);
@@ -370,9 +370,8 @@ Ovoid.Queuer.prototype._QSzParter = function(a, p, r) {
  * Sort function for rendering order (QuickSort sort).<br><br>
  */
 Ovoid.Queuer.prototype._QSzSort = function(a, p, r) {
-  var q;
   if( p < r ) {
-    q = this._QSzParter(a, p, r);
+    var q = this._QSzParter(a, p, r);
     this._QSzSort(a, p, q);
     this._QSzSort(a, q+1, r);
   }
@@ -581,9 +580,9 @@ Ovoid.Queuer.prototype._queueScene = function(sc) {
 
   /* Ordonne les bodys selon la distance à la camera */
   for(i = 0; i < Ovoid.MAX_RENDER_LAYER; i++) {
-    this._QSzSort(this.qalpha[i], 0, this.qalpha[i].length-1);
+   if(this.qalpha[i].count > 1) 
+      this._QSzSort(this.qalpha[i], 0, this.qalpha[i].count-1);
   }
-  
 
   /* Si le light-linking est desactivé on ajoute toutes les lumieres */
   if (!this._i.opt_sceneLightcull) {
