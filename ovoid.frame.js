@@ -324,11 +324,22 @@ Ovoid.Frame.prototype._ffhack = function() {
   
   this.canvas.width = 2;
   this.canvas.height = 2;
-  if(this.mode == 3) {
-    this.canvas.width = this.fixed.v[0];
-    this.canvas.height = this.fixed.v[1];
-  } else {
-    this.canvas.width = this.canvas.clientWidth;
-    this.canvas.height = this.canvas.clientHeight;
+
+  switch(this.mode)
+  {
+    case 0: // FRAME_MANUAL_SIZE
+      this.canvas.width = this.fixed.v[0];
+      this.canvas.height = this.fixed.v[1];
+    break;
+    case 1: // FRAME_CLIENT_SIZE
+      this.canvas.width = this.canvas.clientWidth;
+      this.canvas.height = this.canvas.clientHeight;
+    break;
+    case 2: // FRAME_FULL_SCREEN
+    break;
+    case 3: // FRAME_STRETCHED
+      this.canvas.width = this.fixed.v[0];
+      this.canvas.height = this.fixed.v[1];
+    break;
   }
 }
