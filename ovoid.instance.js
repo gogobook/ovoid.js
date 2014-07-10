@@ -1860,6 +1860,7 @@ Ovoid.Instance.prototype._loadstart = function() {
  */
 Ovoid.Instance.prototype._loadstep = function() {
 
+  var i, j, d;
   // Avance l'horloge pour un increment temporel
   this.preloadTimer = new Date().getTime() - this._loadtcnt;
   
@@ -1893,7 +1894,7 @@ Ovoid.Instance.prototype._loadstep = function() {
   {
     case 1:
       /* Rosasse de chargement */
-      for(var i = 2; i < 52; i+=2) {
+      for(i = 2; i < 52; i+=2) {
         
         this._loadel[i+1].cachTransform();
 
@@ -2046,26 +2047,44 @@ Ovoid.Instance.prototype._loadstep = function() {
       if (this._loadobj.loadStatus != 0) {
         if (this._loadobj.loadStatus == 1) {
           /* on insert les textures pour leur chargement ulterieur */
-          var i = this._loaditem.d.texture.length;
+          i = this._loaditem.d.texture.length;
           while (i--) {
             if(this._loaditem.d.texture[i].loadStatus == 0) {
-              this._loadstktex.unshift(new Object);
-              this._loadstktex[0].o = this._loaditem.d.texture[i];
-              this._loadstktex[0].u = this._loaditem.d.texture[i].url;
-              this._loadstktex[0].f = true;
-              this._loadtotal++;
-              this._loadremains[1]++;
+              d = false;
+              for(j = 0; j < this._loadstktex.length; j++) {
+                if(this._loaditem.d.texture[i] === this._loadstktex[j].o) {
+                  d = true;
+                  break;
+                }
+              }
+              if(!d) {
+                this._loadstktex.unshift(new Object);
+                this._loadstktex[0].o = this._loaditem.d.texture[i];
+                this._loadstktex[0].u = this._loaditem.d.texture[i].url;
+                this._loadstktex[0].f = true;
+                this._loadtotal++;
+                this._loadremains[1]++;
+              }
             }
           }
           /* on insert les audios pour leur chargement ulterieur */
-          var i = this._loaditem.d.audio.length;
+          i = this._loaditem.d.audio.length;
           while (i--) {
             if(this._loaditem.d.audio[i].loadStatus == 0) {
-              this._loadstkaud.unshift(new Object);
-              this._loadstkaud[0].o = this._loaditem.d.audio[i];
-              this._loadstkaud[0].u = this._loaditem.d.audio[i].url;
-              this._loadtotal++;
-              this._loadremains[2]++;
+              d = false;
+              for(j = 0; j < this._loadstkaud.length; j++) {
+                if(this._loaditem.d.audio[i] === this._loadstkaud[j].o) {
+                  d = true;
+                  break;
+                }
+              }
+              if(!d) {
+                this._loadstkaud.unshift(new Object);
+                this._loadstkaud[0].o = this._loaditem.d.audio[i];
+                this._loadstkaud[0].u = this._loaditem.d.audio[i].url;
+                this._loadtotal++;
+                this._loadremains[2]++;
+              }
             }
           }
         }
