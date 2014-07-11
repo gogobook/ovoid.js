@@ -832,7 +832,7 @@ Ovoid.Drawer.prototype._init = function() {
   this.plugShader(this.addShader(sp),3,-1);
   
   sp = new Ovoid.Shader("PIPE_STRING", this._i);
-  if(!sp.setSources(Ovoid.GLSL_P_ZWSRING_VS, Ovoid.GLSL_C_TEX_STRING_FS, Ovoid.GLSL_WRAPMAP)) {
+  if(!sp.setSources(Ovoid.GLSL_P_ZWSTRING_VS, Ovoid.GLSL_C_TEX_STRING_FS, Ovoid.GLSL_WRAPMAP)) {
     Ovoid._log(1, this._i, '.Drawer._init', " error wrapping default PIPE_STRING pipeline shader program.");
     return false;
   }
@@ -888,7 +888,7 @@ Ovoid.Drawer.prototype._init = function() {
   this.plugShader(this.addShader(sp),23,-1);
   
   sp = new Ovoid.Shader("PIPE_RP_STRING", this._i);
-  if(!sp.setSources(Ovoid.GLSL_P_ZSRING_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP)) {
+  if(!sp.setSources(Ovoid.GLSL_P_ZSTRING_VS, Ovoid.GLSL_C_ADEPTH_FS, Ovoid.GLSL_WRAPMAP)) {
     Ovoid._log(1, this._i, '.Drawer._init', " error wrapping default PIPE_RP_STRING pipeline shader program.");
     return false;
   }

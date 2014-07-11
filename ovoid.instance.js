@@ -996,7 +996,7 @@ Ovoid.Instance = function(name) {
   /** Current active scene reference.
    * @type Ovoid.Scene */
   this.Scene = this._dScene;
-  
+
   
   /** User definable wait screen draw function.<br><br>
    *
@@ -1548,7 +1548,7 @@ Ovoid.Instance.prototype._getGlerror = function() {
 Ovoid.Instance.prototype._logGlerror = function(scope) {
 
   if (this._hasGlerror()) {
-    Ovoid._log(1, this, scope, ' WebGL error: ' + this._getGlerror());
+    Ovoid._log(2, this, scope, ' WebGL error: ' + this._getGlerror());
     return true;
   }
   return false;
@@ -1666,7 +1666,7 @@ Ovoid.Instance.prototype._mainloop = function() {
     this.Frame._update();
   } 
   catch(e) {
-    Ovoid._log(0, this, '._mainloop', ' (Exception)\n' + e.stack);
+	Ovoid._log(0, this, '._mainloop', ' (Exception)\n' + e.stack);
     Ovoid._err(5, this, '._mainloop() Exception thrown');
   }
 };
@@ -1880,9 +1880,10 @@ Ovoid.Instance.prototype._loadstep = function() {
   // Avance l'horloge pour un increment temporel
   this.preloadTimer = new Date().getTime() - this._loadtcnt;
   
+  this._clearGlerror();
   /* ------ LOADING PASSAGE POUR LE DESSIN DE LA FRAME ------- */
   this.gl.clear(this.gl.COLOR_BUFFER_BIT|this.gl.DEPTH_BUFFER_BIT);
-  
+
   /* Initialize pour dessiner l'ecran de chargement */
   this.gl.viewport(0, 0, this.Frame.canvas.width, this.Frame.canvas.height);
   this.Drawer.switchPipe(4,0); /* SP_TEXT */
@@ -1891,8 +1892,8 @@ Ovoid.Instance.prototype._loadstep = function() {
   this.Drawer.screen(this.Frame.matrix);
   this.Drawer.switchDepth(0);
   this.Drawer.switchBlend(3);
-    
   this.Drawer.switchPipe(3,0); /* SP_LAYER */
+  
   /* background */
   this.Drawer.model(this._loadel[0].layerMatrix.m);
   this.Drawer.layer(this._loadel[0]);
@@ -1966,9 +1967,12 @@ Ovoid.Instance.prototype._loadstep = function() {
       this.Drawer.text(this._loadel[57]);
       break;
   }
-  
+    
   this.waitdraw();
   
+  this.gl.finish();
+  this.gl.flush();
+    
   this.Frame._update();
   
   /* ------ LOADING PASSAGE POUR LE CHARMENT DES ELEMENTS ------- */
@@ -2146,7 +2150,7 @@ Ovoid.Instance.prototype._loadstep = function() {
   this.preloadRatio = ((this._loadloaded) / this._loadtotal) * 100;
 
   if (this._logGlerror('._loadstep')) {
-    Ovoid._err(3, this, '._loadstep() WebGL error');
+    //Ovoid._err(3, this, '._loadstep() WebGL error');
   }
 
   if (!(this._loadloaded < this._loadtotal)) {
@@ -3100,7 +3104,7 @@ Ovoid.Instance.prototype.toJSON = function() {
   /* Rajout frame */
   o['o'][44] = this.opt_frameWidth;
   o['o'][45] = this.opt_frameHeight;
-  
+
   return o;
 };
 

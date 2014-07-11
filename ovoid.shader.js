@@ -904,6 +904,9 @@ Ovoid.Shader.prototype._linkWrap = function() {
     return false;
   }
   
+  Ovoid._log(3,this._i, ' Shader.linkWrap', this.name + 
+        ":: link log: " + this.progstat);
+  
   this._i._logGlerror(' Shader.linkWrap::' + this.name);
 
   /* retrouve le type de fichier */

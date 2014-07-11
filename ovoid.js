@@ -266,7 +266,7 @@ Ovoid._log = function(level, instance, scope, message) {
     console.log(log);
     /* ajoute aux logs instance */
     if(instance) {
-      instance._log = log + instance._log;
+      instance._log = log + "\n" + instance._log;
       /* control de flux d'erreur */
       if (instance._nerror > 10) {
         Ovoid._err(6, instance, "Too many errors");
@@ -275,6 +275,32 @@ Ovoid._log = function(level, instance, scope, message) {
   }
 };
 
+// Detection du navigateur
+if(/opera/.test(Ovoid._ua))Ovoid._curBrower="opera";
+if(/safari/.test(Ovoid._ua))Ovoid._curBrower="safari";
+if(/chrome/.test(Ovoid._ua))Ovoid._curBrower="chrome";
+if(/msie/.test(Ovoid._ua))Ovoid._curBrower="msie";
+if(/firefox/.test(Ovoid._ua))Ovoid._curBrower="firefox";
+Ovoid._log(3,null,""," user agent: "+Ovoid._ua+"");
+Ovoid._log(3,null,""," browser '"+Ovoid._curBrower+"' detected");
+
+/**
+ * Hidden vsync flag for "out of law" performances.<br><br>
+ */
+Ovoid.opt_vsync = false;
+
+// Force le vsync pour firefox si non c'est instable.
+if(Ovoid._curBrower == "firefox") {
+  Ovoid.opt_vsync = true;
+}
+
+/**
+ * Request animation frame cross-browser.<br><br>
+ */
+window.requestAnimationFrame = window.requestAnimationFrame || 
+        window.mozRequestAnimationFrame ||
+        window.webkitRequestAnimationFrame || 
+        window.msRequestAnimationFrame;
 
 /**
  * Main library start and loop function.<br><br>
@@ -312,12 +338,16 @@ Ovoid._run = function() {
       break;
     }
   }
-  // Le plus rapide, mais moins stable..
-  //window.setTimeout(Ovoid._run,0);
-  // Moins rapide mais plus stable...
-  window.requestAnimationFrame(Ovoid._run);
+  Ovoid._anim(Ovoid.opt_vsync);
 };
 
+
+/**
+ * Anim function, needed for safari working.<br><br>
+ */
+Ovoid._anim = function(s) {
+  s?window.requestAnimationFrame(Ovoid._run):window.setTimeout(Ovoid._run,0);
+}
 
 /**
  * Create Ovoid.JS Config.<br><br>
@@ -856,15 +886,6 @@ Ovoid._handleScroll = function() {
 
 
 /* ----------------- Opération globales préliminaire ---------------- */
-
-// Detection du navigateur
-if(/opera/.test(Ovoid._ua))Ovoid._curBrower="opera";
-if(/safari/.test(Ovoid._ua))Ovoid._curBrower="safari";
-if(/chrome/.test(Ovoid._ua))Ovoid._curBrower="chrome";
-if(/msie/.test(Ovoid._ua))Ovoid._curBrower="msie";
-if(/firefox/.test(Ovoid._ua))Ovoid._curBrower="firefox";
-Ovoid._log(3,null,""," user agent: "+Ovoid._ua+"");
-Ovoid._log(3,null,""," browser '"+Ovoid._curBrower+"' detected");
 
 // Attribution des fonctions d'evenements clavier/souris.
 window.onmousedown = Ovoid._eventMouseDn;

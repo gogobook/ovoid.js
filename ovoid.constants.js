@@ -2849,13 +2849,13 @@ Ovoid.GLSL_PC_VS="attribute vec4 p;attribute vec4 c;uniform mat4 MEV;uniform mat
 /** Default built-in Glsl vertex shader string.
  * @constant
  * @memberOf _global_ */
-Ovoid.GLSL_P_ZSRING_VS="attribute vec4 p;uniform mat4 MXF;uniform mat4 MEV;uniform vec4 Ep;void main(void){gl_PointSize=p.z;gl_Position=MEV*MXF*vec4(p.xy,0.0,1.0);}";
+Ovoid.GLSL_P_ZSTRING_VS="attribute vec4 p;uniform mat4 MXF;uniform mat4 MEV;uniform vec4 Ep;void main(void){gl_PointSize=p.z;gl_Position=MEV*MXF*vec4(p.xy,0.0,1.0);}";
 
 
 /** Default built-in Glsl vertex shader string.
  * @constant
  * @memberOf _global_ */
-Ovoid.GLSL_P_ZWSRING_VS="attribute vec4 p;uniform mat4 MXF;uniform mat4 MEV;varying float a;void main(void){a=p.w;gl_PointSize=p.z;gl_Position=MEV*MXF*vec4(p.xy,0.0,1.0);}";
+Ovoid.GLSL_P_ZWSTRING_VS="attribute vec4 p;uniform mat4 MXF;uniform mat4 MEV;varying float a;void main(void){a=p.w;gl_PointSize=p.z;gl_Position=MEV*MXF*vec4(p.xy,0.0,1.0);}";
 
 
 /** Default built-in Glsl vertex shader string.
